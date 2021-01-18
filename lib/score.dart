@@ -1,9 +1,13 @@
+import 'package:uuid/uuid.dart';
+
 class Score {
   TeleScore teleScore;
   AutoScore autoScore;
   EndgameScore endgameScore;
-  final id = 0;
-  Score() {}
+  Uuid id;
+  Score(Uuid id) {
+    this.id = id;
+  }
   int total() {
     return teleScore.total() + autoScore.total() + endgameScore.total();
   }

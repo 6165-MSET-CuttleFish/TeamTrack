@@ -1,7 +1,8 @@
-import 'dart:ffi';
 import 'dart:html';
 import 'dart:math';
 import 'score.dart';
+import 'package:uuid/uuid.dart';
+import 'package:tuple/tuple.dart';
 
 class DataModel {}
 
@@ -21,11 +22,26 @@ class Team {
   String name;
   String number;
   List<Score> scores;
+  Team(String number, String name) {
+    this.name = name;
+    this.number = number;
+    scores = List();
+  }
+  static Team nullTeam() {
+    return Team("?", "?");
+  }
+
+  bool equals(Team other) {
+    return this.number == other.number;
+  }
 }
 
 class Match {
   EventType type = EventType.live;
   Dice dice = Dice.one;
+  Tuple2<Team, Team> red;
+  Tuple2<Team, Team> blue;
+  Match() {}
 }
 
 enum EventType { live, local, remote }
