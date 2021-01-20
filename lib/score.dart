@@ -3,7 +3,7 @@ import 'package:uuid/uuid.dart';
 
 class Score {
   TeleScore teleScore;
-  AutoScore autoScore;
+  AutoScore autoScore = AutoScore();
   EndgameScore endgameScore;
   Uuid id;
   Dice dice;
