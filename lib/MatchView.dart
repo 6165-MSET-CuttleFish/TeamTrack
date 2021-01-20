@@ -11,20 +11,24 @@ class MatchView extends StatefulWidget {
   final String title;
 
   @override
-  _MatchView createState() => _MatchView(Match(
-      Tuple2(Team('1', 'Alpha'), Team('2', 'Beta')),
-      Tuple2(Team('3', 'Charlie'), Team('4', 'Delta')),
-      EventType.local));
+  _MatchView createState() => _MatchView(
+      Match(
+        Tuple2(Team('1', 'Alpha'), Team('2', 'Beta')),
+        Tuple2(Team('3', 'Charlie'), Team('4', 'Delta')),
+        EventType.local
+      )
+  );
 }
 
 class _MatchView extends State<MatchView> {
   Match _match;
   Team _selectedTeam;
   Color _color = Colors.red;
-  Score _score = Score(Uuid(), Dice.one);
+  Score _score;
   _MatchView(Match match) {
     this._match = match;
     _selectedTeam = match.red.item1;
+    _score = _selectedTeam.scores.firstWhere((element) => element.id == _match.id);
   }
 
   @override
@@ -58,7 +62,6 @@ class _MatchView extends State<MatchView> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Text('Stack Height '),
                   DropdownButton<Dice>(
                     value: _match.dice,
                     icon: Icon(Icons.height_rounded),
@@ -66,7 +69,7 @@ class _MatchView extends State<MatchView> {
                     elevation: 16,
                     style: TextStyle(color: Colors.deepPurple),
                     underline: Container(
-                      height: 2,
+                      height: 0.5,
                       color: Colors.deepPurpleAccent,
                     ),
                     onChanged: (Dice newValue) {
@@ -85,20 +88,22 @@ class _MatchView extends State<MatchView> {
                   ),
                 ],
               ),
+
               SizedBox(
                 child: TabBar(
-                  labelColor: Colors.deepPurple,
+                  labelColor: Theme.of(context).accentColor,
                   unselectedLabelColor: Colors.grey,
+                  labelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, fontFamily: '.SF UI Display'),
                   tabs: [
                     Tab(
-                      text: 'Autonomous',
+                      text: 'Autonomous : ' + _score.autoScore.total().toString(),
                       //icon: Icon(Icons.ac_unit_outlined),
                     ),
                     Tab(
-                      text: 'Tele-Op',
+                      text: 'Tele-Op : ' + _score.teleScore.total().toString(),
                     ),
                     Tab(
-                      text: 'Endgame',
+                      text: 'Endgame : ' + _score.endgameScore.total().toString(),
                     )
                   ],
                 ),
@@ -107,23 +112,8 @@ class _MatchView extends State<MatchView> {
                 child: TabBarView(
                   children: [
                     autoView(),
-
-                    // second tab bar view widget
-                    Container(
-                        color: Colors.pink,
-                        child: Center(
-                          child: Text(
-                            'Car',
-                          ),
-                        )),
-                    Container(
-                      color: Colors.red,
-                      child: Center(
-                        child: Text(
-                          'Bike',
-                        ),
-                      ),
-                    ),
+                    teleView(),
+                    endView(),
                   ],
                 ),
               ),
@@ -131,6 +121,236 @@ class _MatchView extends State<MatchView> {
           ),
         ),
       ),
+    );
+  }
+  ListView endView(){
+    return ListView(
+      children: [
+        Row(children: [
+          Padding(
+            padding: EdgeInsets.all(5),
+          ),
+          Text('Power Shots'),
+          Spacer(),
+          RawMaterialButton(
+            onPressed: _score.endgameScore.pwrShots > 0 ? () { setState(() {_score.endgameScore.pwrShots--; });} : null,
+            elevation: 2.0,
+            fillColor: Colors.white,
+            splashColor: Colors.red,
+            child: Icon(Icons.remove_circle_outline_rounded),
+            shape: CircleBorder(),
+          ),
+          SizedBox(
+            width: 20,
+            child: Text(_score.endgameScore.pwrShots.toString(), textAlign: TextAlign.center,),
+          ),
+          RawMaterialButton(
+            onPressed: _score.endgameScore.pwrShots < 3 ? () { setState(() {_score.endgameScore.pwrShots++; });} : null,
+            elevation: 2.0,
+            fillColor: Colors.white,
+            splashColor: Colors.green,
+            child: Icon(Icons.add_circle_outline_rounded),
+            shape: CircleBorder(),
+          )
+        ]),
+        Divider(
+          height: 3,
+          color: Colors.black,
+        ),
+        Row(children: [
+          Padding(
+            padding: EdgeInsets.all(5),
+          ),
+          Text('Wobbles in Drop'),
+          Spacer(),
+          RawMaterialButton(
+            onPressed: _score.endgameScore.wobbleGoalsInDrop > 0 ? () { setState(() {_score.endgameScore.wobbleGoalsInDrop--; });} : null,
+            elevation: 2.0,
+            fillColor: Colors.white,
+            splashColor: Colors.red,
+            child: Icon(Icons.remove_circle_outline_rounded),
+            shape: CircleBorder(),
+          ),
+          SizedBox(
+            width: 20,
+            child: Text(_score.endgameScore.wobbleGoalsInDrop.toString(), textAlign: TextAlign.center,),
+          ),
+          RawMaterialButton(
+            onPressed: _score.endgameScore.wobbleGoalsInDrop +_score.endgameScore.wobbleGoalsInStart < 2 ? () { setState(() {_score.endgameScore.wobbleGoalsInDrop++; });} : null,
+            elevation: 2.0,
+            fillColor: Colors.white,
+            splashColor: Colors.green,
+            child: Icon(Icons.add_circle_outline_rounded),
+            shape: CircleBorder(),
+          )
+        ]),
+        Divider(
+          height: 3,
+          color: Colors.black,
+        ),
+        Row(children: [
+          Padding(
+            padding: EdgeInsets.all(5),
+          ),
+          Text('Wobbles in Start'),
+          Spacer(),
+          RawMaterialButton(
+            onPressed: _score.endgameScore.wobbleGoalsInStart > 0 ? () { setState(() {_score.endgameScore.wobbleGoalsInStart--; });} : null,
+            elevation: 2.0,
+            fillColor: Colors.white,
+            splashColor: Colors.red,
+            child: Icon(Icons.remove_circle_outline_rounded),
+            shape: CircleBorder(),
+          ),
+          SizedBox(
+            width: 20,
+            child: Text(_score.endgameScore.wobbleGoalsInStart.toString(), textAlign: TextAlign.center,),
+          ),
+          RawMaterialButton(
+            onPressed: _score.endgameScore.wobbleGoalsInDrop +_score.endgameScore.wobbleGoalsInStart < 2 ? () { setState(() {_score.endgameScore.wobbleGoalsInStart++; });} : null,
+            elevation: 2.0,
+            fillColor: Colors.white,
+            splashColor: Colors.green,
+            child: Icon(Icons.add_circle_outline_rounded),
+            shape: CircleBorder(),
+          )
+        ]),
+        Divider(
+          height: 3,
+          color: Colors.black,
+        ),
+
+        Row(children: [
+          Padding(
+            padding: EdgeInsets.all(5),
+          ),
+          Text('Rings on Wobble'),
+          Spacer(),
+          RawMaterialButton(
+            onPressed: _score.endgameScore.ringsOnWobble > 0 ? () { setState(() {_score.endgameScore.ringsOnWobble--; });} : null,
+            elevation: 2.0,
+            fillColor: Colors.white,
+            splashColor: Colors.red,
+            child: Icon(Icons.remove_circle_outline_rounded),
+            shape: CircleBorder(),
+          ),
+          SizedBox(
+            width: 20,
+            child: Text(_score.endgameScore.ringsOnWobble.toString(), textAlign: TextAlign.center,),
+          ),
+          RawMaterialButton(
+            onPressed: () { setState(() {
+              _score.endgameScore.ringsOnWobble++;
+            }); },
+            elevation: 2.0,
+            fillColor: Colors.white,
+            splashColor: Colors.green,
+            child: Icon(Icons.add_circle_outline_rounded),
+            shape: CircleBorder(),
+          )
+        ])
+      ],
+    );
+  }
+  ListView teleView() {
+    return ListView(
+      children: [
+        Row(children: [
+          Padding(
+            padding: EdgeInsets.all(5),
+          ),
+          Text('High Goals'),
+          Spacer(),
+          RawMaterialButton(
+            onPressed: _score.teleScore.hiGoals > 0 ? () { setState(() {_score.teleScore.hiGoals--; });} : null,
+            elevation: 2.0,
+            fillColor: Colors.white,
+            splashColor: Colors.red,
+            child: Icon(Icons.remove_circle_outline_rounded),
+            shape: CircleBorder(),
+          ),
+          SizedBox(
+            width: 20,
+            child: Text(_score.teleScore.hiGoals.toString(), textAlign: TextAlign.center,),
+          ),
+          RawMaterialButton(
+            onPressed: () { setState(() {
+              _score.teleScore.hiGoals++;
+            }); },
+            elevation: 2.0,
+            fillColor: Colors.white,
+            splashColor: Colors.green,
+            child: Icon(Icons.add_circle_outline_rounded),
+            shape: CircleBorder(),
+          )
+        ]),
+        Divider(
+          height: 3,
+          color: Colors.black,
+        ),
+        Row(children: [
+          Padding(
+            padding: EdgeInsets.all(5),
+          ),
+          Text('Middle Goals'),
+          Spacer(),
+          RawMaterialButton(
+            onPressed: _score.teleScore.midGoals > 0 ? () { setState(() {_score.teleScore.midGoals--; });} : null,
+            elevation: 2.0,
+            fillColor: Colors.white,
+            splashColor: Colors.red,
+            child: Icon(Icons.remove_circle_outline_rounded),
+            shape: CircleBorder(),
+          ),
+          SizedBox(
+            width: 20,
+            child: Text(_score.teleScore.midGoals.toString(), textAlign: TextAlign.center,),
+          ),
+          RawMaterialButton(
+            onPressed: () { setState(() {
+              _score.teleScore.midGoals++;
+            }); },
+            elevation: 2.0,
+            fillColor: Colors.white,
+            splashColor: Colors.green,
+            child: Icon(Icons.add_circle_outline_rounded),
+            shape: CircleBorder(),
+          )
+        ]),
+        Divider(
+          height: 3,
+          color: Colors.black,
+        ),
+        Row(children: [
+          Padding(
+            padding: EdgeInsets.all(5),
+          ),
+          Text('Low Goals'),
+          Spacer(),
+          RawMaterialButton(
+            onPressed: _score.teleScore.lowGoals > 0 ? () { setState(() {_score.teleScore.lowGoals--; });} : null,
+            elevation: 2.0,
+            fillColor: Colors.white,
+            splashColor: Colors.red,
+            child: Icon(Icons.remove_circle_outline_rounded),
+            shape: CircleBorder(),
+          ),
+          SizedBox(
+            width: 20,
+            child: Text(_score.teleScore.lowGoals.toString(), textAlign: TextAlign.center,),
+          ),
+          RawMaterialButton(
+            onPressed: () { setState(() {
+              _score.teleScore.lowGoals++;
+            }); },
+            elevation: 2.0,
+            fillColor: Colors.white,
+            splashColor: Colors.green,
+            child: Icon(Icons.add_circle_outline_rounded),
+            shape: CircleBorder(),
+          )
+        ]),
+      ],
     );
   }
   ListView autoView() {
