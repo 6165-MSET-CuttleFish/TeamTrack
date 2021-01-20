@@ -1,4 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:teamtrack/backend.dart';
+import 'package:tuple/tuple.dart';
 
 void main() {
   runApp(MyApp());
@@ -9,7 +13,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'TeamTrack',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -20,13 +24,13 @@ class MyApp extends StatelessWidget {
         // or simply save your changes to "hot reload" in a Flutter IDE).
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.deepPurple,
         // This makes the visual density adapt to the platform that you run
         // the app on. For desktop platforms, the controls will be smaller and
         // closer together (more dense) than on mobile platforms.
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MatchView(title: 'TeamTrack'),
     );
   }
 }
@@ -47,6 +51,132 @@ class MyHomePage extends StatefulWidget {
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
+}
+
+class MatchView extends StatefulWidget {
+  MatchView({Key key, this.title}) : super(key: key);
+  final String title;
+
+  @override
+  _MatchView createState() => _MatchView(Match(
+      Tuple2(Team('1', 'Alpha'), Team('2', 'Beta')),
+      Tuple2(Team('3', 'Charlie'), Team('4', 'Delta')),
+      EventType.local));
+}
+
+class _MatchView extends State<MatchView> {
+  Match _match;
+  void name() {}
+  void changeTeam() {
+    setState(() {
+      _pressed = true;
+    });
+  }
+
+  _MatchView(Match match) {
+    this._match = match;
+    _selectedTeam = match.red.item1;
+  }
+  bool _pressed = false;
+  Team _selectedTeam;
+  double textSize = 13;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Match Stats'),
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.red,
+                Theme.of(context).canvasColor,
+                Theme.of(context).canvasColor,
+                Theme.of(context).canvasColor,
+                Theme.of(context).canvasColor
+              ]),
+        ),
+        child: Center(
+          child: Column(children: [
+            Text('270 - 590', style: Theme.of(context).textTheme.headline3),
+            FlatButton(
+              textColor: Colors.white,
+              color: Colors.purple,
+              splashColor: Colors.black,
+              child: Text('Wow'),
+              onPressed: () {
+                setState(() {
+                  _pressed = false;
+                });
+              },
+            ),
+            Row(
+              children: [
+                Flexible(
+                  flex: 1,
+                  child: CupertinoButton(
+                    child: Text(
+                      _match.red.item1.name,
+                      style:
+                          TextStyle(color: _pressed ? Colors.grey : Colors.red),
+                    ),
+                    onPressed: _pressed ? null : changeTeam,
+                    disabledColor: Colors.grey,
+                  ),
+                ),
+                Flexible(
+                  flex: 1,
+                  child: CupertinoButton(
+                    child: Text(
+                      _match.red.item2.name,
+                      style:
+                          TextStyle(color: _pressed ? Colors.grey : Colors.red),
+                    ),
+                    onPressed: _pressed ? null : changeTeam,
+                    disabledColor: Colors.grey,
+                  ),
+                ),
+                Flexible(
+                  child: Spacer(),
+                  flex: 2,
+                ),
+                Flexible(
+                  flex: 1,
+                  child: CupertinoButton(
+                    child: Text(
+                      _match.blue.item1.name,
+                      style: TextStyle(
+                          color: _pressed ? Colors.grey : Colors.blue),
+                    ),
+                    onPressed: _pressed ? null : changeTeam,
+                    disabledColor: Colors.grey,
+                  ),
+                ),
+                Flexible(
+                  flex: 1,
+                  child: CupertinoButton(
+                    child: Text(
+                      _match.blue.item2.name,
+                      style: TextStyle(
+                          color: _pressed ? Colors.grey : Colors.blue),
+                    ),
+                    onPressed: _pressed ? null : changeTeam,
+                    disabledColor: Colors.grey,
+                  ),
+                )
+              ],
+            ),
+            Text(_selectedTeam.name + ' : 30',
+                style: Theme.of(context).textTheme.headline6),
+            Spacer()
+          ]),
+        ),
+      ),
+    );
+  }
 }
 
 class _MyHomePageState extends State<MyHomePage> {

@@ -1,3 +1,4 @@
+import 'package:teamtrack/backend.dart';
 import 'package:uuid/uuid.dart';
 
 class Score {
@@ -5,11 +6,27 @@ class Score {
   AutoScore autoScore;
   EndgameScore endgameScore;
   Uuid id;
-  Score(Uuid id) {
+  Dice dice;
+  Score(Uuid id, Dice dice) {
     this.id = id;
+    this.dice = dice;
   }
   int total() {
     return teleScore.total() + autoScore.total() + endgameScore.total();
+  }
+}
+
+extension scoreList on List<Score> {
+  void addScore(Score value) {
+    var cop = false;
+    for (int i = 0; i < this.length; i++) {
+      if (this[i].id == value.id) {
+        cop = true;
+      }
+    }
+    if (!cop) {
+      this.add(value);
+    }
   }
 }
 

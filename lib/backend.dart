@@ -1,10 +1,13 @@
-import 'dart:html';
 import 'dart:math';
 import 'score.dart';
 import 'package:uuid/uuid.dart';
 import 'package:tuple/tuple.dart';
 
-class DataModel {}
+class DataModel {
+  List<Event> localEvents;
+  List<Event> remoteEvents;
+  List<Event> liveEvents;
+}
 
 class Event {
   List<Team> teams;
@@ -15,6 +18,30 @@ class Event {
 
   double lowestMadScore() {
     return teams.map((e) => e.scores.madScore()).reduce(min);
+  }
+
+  double maxAutoScore() {
+    return teams.map((e) => e.scores.autoMaxScore()).reduce(max);
+  }
+
+  double lowestAutoMadScore() {
+    return teams.map((e) => e.scores.autoMADScore()).reduce(min);
+  }
+
+  double maxTeleScore() {
+    return teams.map((e) => e.scores.teleMaxScore()).reduce(max);
+  }
+
+  double lowestTeleMadScore() {
+    return teams.map((e) => e.scores.teleMADScore()).reduce(min);
+  }
+
+  double maxEndScore() {
+    return teams.map((e) => e.scores.endMaxScore()).reduce(max);
+  }
+
+  double lowestEndMadScore() {
+    return teams.map((e) => e.scores.endMADScore()).reduce(min);
   }
 }
 
@@ -41,7 +68,17 @@ class Match {
   Dice dice = Dice.one;
   Tuple2<Team, Team> red;
   Tuple2<Team, Team> blue;
-  Match() {}
+  Uuid id;
+  Match(Tuple2<Team, Team> red, Tuple2<Team, Team> blue, EventType type) {
+    this.type = type;
+    this.red = red;
+    this.blue = blue;
+    id = Uuid();
+    red.item1.scores.addScore(Score(id, dice));
+    red.item2.scores.addScore(Score(id, dice));
+    blue.item1.scores.addScore(Score(id, dice));
+    blue.item2.scores.addScore(Score(id, dice));
+  }
 }
 
 enum EventType { live, local, remote }
