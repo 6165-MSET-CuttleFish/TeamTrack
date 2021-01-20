@@ -2,9 +2,9 @@ import 'package:teamtrack/backend.dart';
 import 'package:uuid/uuid.dart';
 
 class Score {
-  TeleScore teleScore;
+  TeleScore teleScore = TeleScore();
   AutoScore autoScore = AutoScore();
-  EndgameScore endgameScore;
+  EndgameScore endgameScore = EndgameScore();
   Uuid id;
   Dice dice;
   Score(Uuid id, Dice dice) {
@@ -40,12 +40,12 @@ class TeleScore {
 }
 
 class AutoScore {
-  int wobbleGoals;
-  int lowGoals;
-  int midGoals;
-  int hiGoals;
-  int pwrShots;
-  bool navigated;
+  int wobbleGoals = 0;
+  int lowGoals = 0;
+  int midGoals = 0;
+  int hiGoals = 0;
+  int pwrShots = 0;
+  bool navigated = false;
   int total() {
     return wobbleGoals * 15 +
         lowGoals * 3 +

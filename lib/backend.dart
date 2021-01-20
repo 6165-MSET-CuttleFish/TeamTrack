@@ -79,6 +79,17 @@ class Match {
     blue.item1.scores.addScore(Score(id, dice));
     blue.item2.scores.addScore(Score(id, dice));
   }
+  String score() {
+    final r0 =
+        red.item1.scores.firstWhere((e) => e.id == id).total();
+    final r1 =
+        red.item2.scores.firstWhere((e) => e.id == id).total();
+    final b0 =
+        blue.item1.scores.firstWhere((e) => e.id == id).total();
+    final b1 =
+        blue.item2.scores.firstWhere((e) => e.id == id).total();
+    return (r0 + r1).toString() + " - " + (b0 + b1).toString();
+  }
 }
 
 enum EventType { live, local, remote }

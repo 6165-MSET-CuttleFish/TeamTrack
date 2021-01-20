@@ -21,7 +21,7 @@ class _MatchView extends State<MatchView> {
   Match _match;
   Team _selectedTeam;
   Color _color = Colors.red;
-  Score score = Score(Uuid(), Dice.one);
+  Score _score = Score(Uuid(), Dice.one);
   _MatchView(Match match) {
     this._match = match;
     _selectedTeam = match.red.item1;
@@ -45,14 +45,15 @@ class _MatchView extends State<MatchView> {
                   Theme.of(context).canvasColor,
                   Theme.of(context).canvasColor,
                   Theme.of(context).canvasColor,
+                  Theme.of(context).canvasColor,
                   Theme.of(context).canvasColor
                 ]),
           ),
           child: Center(
             child: Column(children: [
-              Text('270 - 590', style: Theme.of(context).textTheme.headline3),
+              Text(_match.score(), style: Theme.of(context).textTheme.headline3),
               buttonRow(),
-              Text(_selectedTeam.name + ' : 30',
+              Text(_selectedTeam.name + ' : ' + _score.total().toString(),
                   style: Theme.of(context).textTheme.headline6),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -85,17 +86,19 @@ class _MatchView extends State<MatchView> {
                 ],
               ),
               SizedBox(
-                height: 50,
                 child: TabBar(
+                  labelColor: Colors.deepPurple,
+                  unselectedLabelColor: Colors.grey,
                   tabs: [
                     Tab(
-                      icon: Icon(Icons.ac_unit_outlined),
+                      text: 'Autonomous',
+                      //icon: Icon(Icons.ac_unit_outlined),
                     ),
                     Tab(
-                      text: 'Wow',
+                      text: 'Tele-Op',
                     ),
                     Tab(
-                      text: 'Wow',
+                      text: 'Endgame',
                     )
                   ],
                 ),
@@ -130,8 +133,6 @@ class _MatchView extends State<MatchView> {
       ),
     );
   }
-
-  bool _val = false;
   ListView autoView() {
     return ListView(
       children: [
@@ -141,17 +142,27 @@ class _MatchView extends State<MatchView> {
           ),
           Text('High Goals'),
           Spacer(),
-          IconButton(
-            icon: Icon(Icons.remove_circle_outline_rounded),
-            splashColor: Colors.blue,
-            onPressed: () {},
+          RawMaterialButton(
+            onPressed: _score.autoScore.hiGoals > 0 ? () { setState(() {_score.autoScore.hiGoals--; });} : null,
+            elevation: 2.0,
+            fillColor: Colors.white,
+            splashColor: Colors.red,
+            child: Icon(Icons.remove_circle_outline_rounded),
+            shape: CircleBorder(),
           ),
-          Text('1'),
-          IconButton(
-            icon: Icon(Icons.add_circle_outline_rounded),
-            color: Colors.deepPurple,
-            splashColor: Colors.blue,
-            onPressed: () {},
+          SizedBox(
+            width: 20,
+            child: Text(_score.autoScore.hiGoals.toString(), textAlign: TextAlign.center,),
+          ),
+          RawMaterialButton(
+            onPressed: () { setState(() {
+              _score.autoScore.hiGoals++;
+            }); },
+            elevation: 2.0,
+            fillColor: Colors.white,
+            splashColor: Colors.green,
+            child: Icon(Icons.add_circle_outline_rounded),
+            shape: CircleBorder(),
           )
         ]),
         Divider(
@@ -165,20 +176,116 @@ class _MatchView extends State<MatchView> {
           Text('Middle Goals'),
           Spacer(),
           RawMaterialButton(
-            onPressed: () {
-              setState(() {
-                score.autoScore.midGoals++;
-              });
-            },
+            onPressed: _score.autoScore.midGoals > 0 ? () { setState(() {_score.autoScore.midGoals--; });} : null,
             elevation: 2.0,
             fillColor: Colors.white,
             splashColor: Colors.red,
             child: Icon(Icons.remove_circle_outline_rounded),
             shape: CircleBorder(),
           ),
-          Text(score.autoScore.midGoals.toString()),
+          SizedBox(
+            width: 20,
+            child: Text(_score.autoScore.midGoals.toString(), textAlign: TextAlign.center,),
+          ),
           RawMaterialButton(
-            onPressed: () {},
+            onPressed: () { setState(() {
+              _score.autoScore.midGoals++;
+            }); },
+            elevation: 2.0,
+            fillColor: Colors.white,
+            splashColor: Colors.green,
+            child: Icon(Icons.add_circle_outline_rounded),
+            shape: CircleBorder(),
+          )
+        ]),
+        Divider(
+          height: 3,
+          color: Colors.black,
+        ),
+        Row(children: [
+          Padding(
+            padding: EdgeInsets.all(5),
+          ),
+          Text('Low Goals'),
+          Spacer(),
+          RawMaterialButton(
+            onPressed: _score.autoScore.lowGoals > 0 ? () { setState(() {_score.autoScore.lowGoals--; });} : null,
+            elevation: 2.0,
+            fillColor: Colors.white,
+            splashColor: Colors.red,
+            child: Icon(Icons.remove_circle_outline_rounded),
+            shape: CircleBorder(),
+          ),
+          SizedBox(
+            width: 20,
+            child: Text(_score.autoScore.lowGoals.toString(), textAlign: TextAlign.center,),
+          ),
+          RawMaterialButton(
+            onPressed: () { setState(() {
+              _score.autoScore.lowGoals++;
+            }); },
+            elevation: 2.0,
+            fillColor: Colors.white,
+            splashColor: Colors.green,
+            child: Icon(Icons.add_circle_outline_rounded),
+            shape: CircleBorder(),
+          )
+        ]),
+        Divider(
+          height: 3,
+          color: Colors.black,
+        ),
+        Row(children: [
+          Padding(
+            padding: EdgeInsets.all(5),
+          ),
+          Text('Wobble Goals'),
+          Spacer(),
+          RawMaterialButton(
+            onPressed: _score.autoScore.wobbleGoals > 0 ? () { setState(() {_score.autoScore.wobbleGoals--; });} : null,
+            elevation: 2.0,
+            fillColor: Colors.white,
+            splashColor: Colors.red,
+            child: Icon(Icons.remove_circle_outline_rounded),
+            shape: CircleBorder(),
+          ),
+          SizedBox(
+            width: 20,
+            child: Text(_score.autoScore.wobbleGoals.toString(), textAlign: TextAlign.center,),
+          ),
+          RawMaterialButton(
+            onPressed: _score.autoScore.wobbleGoals < 2 ? () { setState(() {_score.autoScore.wobbleGoals++; });} : null,
+            elevation: 2.0,
+            fillColor: Colors.white,
+            splashColor: Colors.green,
+            child: Icon(Icons.add_circle_outline_rounded),
+            shape: CircleBorder(),
+          )
+        ]),
+        Divider(
+          height: 3,
+          color: Colors.black,
+        ),
+        Row(children: [
+          Padding(
+            padding: EdgeInsets.all(5),
+          ),
+          Text('Power Shots'),
+          Spacer(),
+          RawMaterialButton(
+            onPressed: _score.autoScore.pwrShots > 0 ? () { setState(() {_score.autoScore.pwrShots--; });} : null,
+            elevation: 2.0,
+            fillColor: Colors.white,
+            splashColor: Colors.red,
+            child: Icon(Icons.remove_circle_outline_rounded),
+            shape: CircleBorder(),
+          ),
+          SizedBox(
+            width: 20,
+            child: Text(_score.autoScore.pwrShots.toString(), textAlign: TextAlign.center,),
+          ),
+          RawMaterialButton(
+            onPressed: _score.autoScore.pwrShots < 3 ? () { setState(() {_score.autoScore.pwrShots++; });} : null,
             elevation: 2.0,
             fillColor: Colors.white,
             splashColor: Colors.green,
@@ -197,10 +304,10 @@ class _MatchView extends State<MatchView> {
           Text('Navigated'),
           Spacer(),
           CupertinoSwitch(
-            value: _val,
+            value: _score.autoScore.navigated,
             onChanged: (bool newVal) {
               setState(() {
-                _val = newVal;
+                _score.autoScore.navigated = newVal;
               });
             },
           )
@@ -229,6 +336,7 @@ class _MatchView extends State<MatchView> {
                     setState(() {
                       _selectedTeam = _match.red.item1;
                       _color = Colors.red;
+                      _score = _selectedTeam.scores.firstWhere((element) => element.id == _match.id);
                     });
                   },
             disabledColor: Colors.grey,
@@ -242,7 +350,7 @@ class _MatchView extends State<MatchView> {
               style: TextStyle(
                   color: _selectedTeam == _match.red.item2
                       ? Colors.grey
-                      : Colors.red),
+                      : Colors.red,),
             ),
             onPressed: _selectedTeam == _match.red.item2
                 ? null
@@ -250,6 +358,7 @@ class _MatchView extends State<MatchView> {
                     setState(() {
                       _selectedTeam = _match.red.item2;
                       _color = Colors.red;
+                      _score = _selectedTeam.scores.firstWhere((element) => element.id == _match.id);
                     });
                   },
             disabledColor: Colors.grey,
@@ -272,6 +381,7 @@ class _MatchView extends State<MatchView> {
                     setState(() {
                       _selectedTeam = _match.blue.item1;
                       _color = Colors.blue;
+                      _score = _selectedTeam.scores.firstWhere((element) => element.id == _match.id);
                     });
                   },
             disabledColor: Colors.grey,
@@ -293,6 +403,7 @@ class _MatchView extends State<MatchView> {
                     setState(() {
                       _selectedTeam = _match.blue.item2;
                       _color = Colors.blue;
+                      _score = _selectedTeam.scores.firstWhere((element) => element.id == _match.id);
                     });
                   },
             disabledColor: Colors.grey,
