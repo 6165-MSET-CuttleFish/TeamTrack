@@ -1,3 +1,4 @@
+import 'package:TeamTrack/PlatformGraphics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -550,8 +551,7 @@ class _MatchView extends State<MatchView> {
           ),
           Text('Navigated'),
           Spacer(),
-          if(Platform.isIOS)
-          CupertinoSwitch(
+          PlatformSwitch(
             value: _score.autoScore.navigated,
             onChanged: (bool newVal) {
               setState(() {
@@ -559,15 +559,6 @@ class _MatchView extends State<MatchView> {
               });
             },
           ),
-          if(Platform.isAndroid)
-          Switch(
-            value: _score.autoScore.navigated,
-            onChanged: (bool newVal) {
-              setState(() {
-                _score.autoScore.navigated = newVal;
-              });
-            },
-          )
         ])
       ],
     );
@@ -579,25 +570,7 @@ class _MatchView extends State<MatchView> {
       children: [
         Flexible(
           flex: 1,
-          child: Platform.isIOS ? CupertinoButton(
-            child: Text(
-              _match.red.item1.name,
-              style: TextStyle(
-                  color: _selectedTeam == _match.red.item1
-                      ? Colors.grey
-                      : Colors.red),
-            ),
-            onPressed: _selectedTeam == _match.red.item1
-                ? null
-                : () {
-                    setState(() {
-                      _selectedTeam = _match.red.item1;
-                      _color = Colors.red;
-                      _score = _selectedTeam.scores.firstWhere((element) => element.id == _match.id);
-                    });
-                  },
-            disabledColor: Colors.grey,
-          ) : MaterialButton(
+          child: PlatformButton(
             child: Text(
               _match.red.item1.name,
               style: TextStyle(
@@ -614,29 +587,11 @@ class _MatchView extends State<MatchView> {
                 _score = _selectedTeam.scores.firstWhere((element) => element.id == _match.id);
               });
             },
-          ),
+          )
         ),
         Flexible(
           flex: 1,
-          child: Platform.isIOS ? CupertinoButton(
-            child: Text(
-              _match.red.item2.name,
-              style: TextStyle(
-                  color: _selectedTeam == _match.red.item2
-                      ? Colors.grey
-                      : Colors.red,),
-            ),
-            onPressed: _selectedTeam == _match.red.item2
-                ? null
-                : () {
-                    setState(() {
-                      _selectedTeam = _match.red.item2;
-                      _color = Colors.red;
-                      _score = _selectedTeam.scores.firstWhere((element) => element.id == _match.id);
-                    });
-                  },
-            disabledColor: Colors.grey,
-          ) : MaterialButton(
+          child: PlatformButton(
             child: Text(
               _match.red.item2.name,
               style: TextStyle(
@@ -653,31 +608,12 @@ class _MatchView extends State<MatchView> {
                 _score = _selectedTeam.scores.firstWhere((element) => element.id == _match.id);
               });
             },
-
-          ),
+          )
         ),
         Spacer(),
         Flexible(
           flex: 1,
-          child: Platform.isIOS ? CupertinoButton(
-            child: Text(
-              _match.blue.item1.name,
-              style: TextStyle(
-                  color: _selectedTeam == _match.blue.item1
-                      ? Colors.grey
-                      : Colors.blue),
-            ),
-            onPressed: _selectedTeam == _match.blue.item1
-                ? null
-                : () {
-                    setState(() {
-                      _selectedTeam = _match.blue.item1;
-                      _color = Colors.blue;
-                      _score = _selectedTeam.scores.firstWhere((element) => element.id == _match.id);
-                    });
-                  },
-            disabledColor: Colors.grey,
-          ) : MaterialButton(
+          child: PlatformButton(
             child: Text(
               _match.blue.item1.name,
               style: TextStyle(
@@ -694,31 +630,11 @@ class _MatchView extends State<MatchView> {
                 _score = _selectedTeam.scores.firstWhere((element) => element.id == _match.id);
               });
             },
-
-          ),
+          )
         ),
         Flexible(
           flex: 1,
-          child: Platform.isIOS ? CupertinoButton(
-            child: Text(
-              _match.blue.item2.name,
-              style: TextStyle(
-                  color: _selectedTeam == _match.blue.item2
-                      ? Colors.grey
-                      : Colors.blue),
-            ),
-            onPressed: _selectedTeam == _match.blue.item2
-                ? null
-                : () {
-                    setState(() {
-                      _selectedTeam = _match.blue.item2;
-                      _color = Colors.blue;
-                      _score = _selectedTeam.scores.firstWhere((element) => element.id == _match.id);
-                    });
-                  },
-            disabledColor: Colors.grey,
-          ) : MaterialButton(
-
+          child: PlatformButton(
             child: Text(
               _match.blue.item2.name,
               style: TextStyle(
@@ -735,7 +651,7 @@ class _MatchView extends State<MatchView> {
                 _score = _selectedTeam.scores.firstWhere((element) => element.id == _match.id);
               });
             },
-          ),
+          )
         )
       ],
     );

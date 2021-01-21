@@ -33,15 +33,15 @@ class MyApp extends StatelessWidget {
         // closer together (more dense) than on mobile platforms.
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      //home: MatchView(title: 'TeamTrack'),
-      home: MatchList(matches:
-      [
-        Match(
-            Tuple2(Team('1', 'Alpha'), Team('2', 'Beta')),
-            Tuple2(Team('3', 'Charlie'), Team('4', 'Delta')),
-            EventType.local
-        )
-      ])
+      home: MatchView(title: 'TeamTrack'),
+      // home: MatchList(matches:
+      // [
+      //   Match(
+      //       Tuple2(Team('1', 'Alpha'), Team('2', 'Beta')),
+      //       Tuple2(Team('3', 'Charlie'), Team('4', 'Delta')),
+      //       EventType.local
+      //   )
+      // ])
       //home: TeamView(team: Team('6165', 'Cuttlefish'),)
     );
   }

@@ -54,4 +54,36 @@ class PlatformAlert extends PlatformWidget<CupertinoAlertDialog, AlertDialog> {
       content: content,
       actions: actions,
     );
-  }}
+  }
+}
+class PlatformButton extends PlatformWidget<CupertinoButton, MaterialButton> {
+  PlatformButton({Key key, this.child, this.onPressed, this.disabledColor = Colors.transparent, this.color = null}) : super(key: key);
+  final Widget child;
+  final Function onPressed;
+  final Color color;
+  final Color disabledColor;
+  @override
+  CupertinoButton buildCupertinoWidget(BuildContext context) {
+    return CupertinoButton(child: child, onPressed : onPressed, color: color, disabledColor: disabledColor,);
+  }
+
+  @override
+  MaterialButton buildMaterialWidget(BuildContext context) {
+    return MaterialButton(child: child, onPressed : onPressed, color: color, disabledColor: disabledColor,);
+  }
+}
+class PlatformScaffold extends PlatformWidget<CupertinoPageScaffold, Scaffold>{
+  PlatformScaffold({Key key, this.child, this.backgroundColor = null, this.resizeToAvoidBottomInset = true}) : super(key: key);
+  final Widget child;
+  final Color backgroundColor;
+  final bool resizeToAvoidBottomInset;
+  @override
+  CupertinoPageScaffold buildCupertinoWidget(BuildContext context) {
+    return CupertinoPageScaffold(child: null, backgroundColor: backgroundColor, resizeToAvoidBottomInset: resizeToAvoidBottomInset);
+  }
+
+  @override
+  Scaffold buildMaterialWidget(BuildContext context) {
+    return Scaffold(body: null, backgroundColor: backgroundColor, resizeToAvoidBottomInset: resizeToAvoidBottomInset);
+  }
+}
