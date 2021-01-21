@@ -2,6 +2,7 @@ import 'dart:math';
 import 'score.dart';
 import 'package:uuid/uuid.dart';
 import 'package:tuple/tuple.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 class DataModel {
   List<Event> localEvents;
@@ -122,10 +123,20 @@ extension IterableExtensions on Iterable {
 extension TeamsExtension on List<Team> {}
 
 extension ScoresExtension on List<Score> {
+  List<FlSpot> spots(){
+    final list =  this.map((e) => e.total()).toList();
+    List<FlSpot> val;
+    for(int i = 0; i < list.length; i++){
+      val.add(FlSpot(i.toDouble(), list[i].toDouble()));
+    }
+    return val;
+  }
   double maxScore() {
     return this.map((e) => e.total()).reduce(max).toDouble();
   }
-
+  double minScore(){
+    return this.map((e) => e.total()).reduce(min).toDouble();
+  }
   double avgScore() {
     return this.map((e) => e.total()).mean();
   }

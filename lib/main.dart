@@ -1,3 +1,5 @@
+import 'package:TeamTrack/TeamView.dart';
+import 'package:TeamTrack/backend.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -29,7 +31,8 @@ class MyApp extends StatelessWidget {
         // closer together (more dense) than on mobile platforms.
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MatchView(title: 'TeamTrack'),
+      //home: MatchView(title: 'TeamTrack'),
+      home: TeamView(team: Team('6165', 'Cuttlefish'),)
     );
   }
 }
