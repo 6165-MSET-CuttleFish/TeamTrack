@@ -31,8 +31,8 @@ class MyApp extends StatelessWidget {
         // closer together (more dense) than on mobile platforms.
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      //home: MatchView(title: 'TeamTrack'),
-      home: TeamView(team: Team('6165', 'Cuttlefish'),)
+      home: MatchView(title: 'TeamTrack'),
+      //home: TeamView(team: Team('6165', 'Cuttlefish'),)
     );
   }
 }
