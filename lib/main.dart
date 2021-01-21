@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:teamtrack/MatchView.dart';
+import 'package:TeamTrack/MatchView.dart';
 
 void main() {
   runApp(MyApp());

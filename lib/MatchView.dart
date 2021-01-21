@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:teamtrack/backend.dart';
-import 'package:teamtrack/score.dart';
+import 'package:TeamTrack/backend.dart';
+import 'package:TeamTrack/score.dart';
 import 'package:tuple/tuple.dart';
-import 'package:uuid/uuid.dart';
+import 'dart:io' show Platform;
 
 class MatchView extends StatefulWidget {
   MatchView({Key key, this.title}) : super(key: key);
@@ -25,6 +25,7 @@ class _MatchView extends State<MatchView> {
   Team _selectedTeam;
   Color _color = Colors.red;
   Score _score;
+  int _view = 0;
   _MatchView(Match match) {
     this._match = match;
     _selectedTeam = match.red.item1;
@@ -81,47 +82,73 @@ class _MatchView extends State<MatchView> {
                         .map<DropdownMenuItem<Dice>>((Dice value) {
                       return DropdownMenuItem<Dice>(
                         value: value,
-                        child: Text(
-                            'Stack Height : ' + value.stackHeight().toString()),
+                        child: Text('Stack Height : ' + value.stackHeight().toString()),
                       );
                     }).toList(),
                   ),
                 ],
               ),
-
-              SizedBox(
-                child: TabBar(
-                  labelColor: Theme.of(context).accentColor,
-                  unselectedLabelColor: Colors.grey,
-                  labelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, fontFamily: '.SF UI Display'),
-                  tabs: [
-                    Tab(
-                      text: 'Autonomous : ' + _score.autoScore.total().toString(),
-                      //icon: Icon(Icons.ac_unit_outlined),
-                    ),
-                    Tab(
-                      text: 'Tele-Op : ' + _score.teleScore.total().toString(),
-                    ),
-                    Tab(
-                      text: 'Endgame : ' + _score.endgameScore.total().toString(),
-                    )
-                  ],
+              if(Platform.isIOS)
+                CupertinoSlidingSegmentedControl(
+                  groupValue: _view,
+                  children: <int, Widget>{
+                    0: Text('Autonomous : ' + _score.autoScore.total().toString()),
+                    1: Text('Tele-Op : ' + _score.teleScore.total().toString()),
+                    2: Text('Endgame : ' + _score.endgameScore.total().toString())
+                  },
+                  onValueChanged: (int x) {
+                    setState(() {
+                      _view = x;
+                    });
+                  },
                 ),
-              ),
-              Expanded(
-                child: TabBarView(
-                  children: [
-                    autoView(),
-                    teleView(),
-                    endView(),
-                  ],
+              if(Platform.isAndroid)
+                SizedBox(
+                  height: 50,
+                  child: TabBar(
+                    labelColor: Theme.of(context).accentColor,
+                    unselectedLabelColor: Colors.grey,
+                    labelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, fontFamily: '.SF UI Display'),
+                    tabs: [
+                      Tab(
+                        text: 'Autonomous : ' + _score.autoScore.total().toString(),
+                        //icon: Icon(Icons.ac_unit_outlined),
+                      ),
+                      Tab(
+                        text: 'Tele-Op : ' + _score.teleScore.total().toString(),
+                      ),
+                      Tab(
+                        text: 'Endgame : ' + _score.endgameScore.total().toString(),
+                      )
+                    ],
+                  ),
                 ),
-              ),
+              if(Platform.isAndroid)
+                Expanded(
+                  child: TabBarView(
+                    children: [
+                      autoView(),
+                      teleView(),
+                      endView(),
+                    ],
+                  ),
+                ),
+              if(Platform.isIOS)
+                Expanded(
+                    child: viewSelect()
+                )
             ]),
           ),
         ),
       ),
     );
+  }
+  ListView viewSelect() {
+    switch(_view){
+      case 0: return autoView();
+      case 1: return teleView();
+      default: return endView();
+    }
   }
   ListView endView(){
     return ListView(
@@ -542,7 +569,7 @@ class _MatchView extends State<MatchView> {
       children: [
         Flexible(
           flex: 1,
-          child: CupertinoButton(
+          child: Platform.isIOS ? CupertinoButton(
             child: Text(
               _match.red.item1.name,
               style: TextStyle(
@@ -560,11 +587,28 @@ class _MatchView extends State<MatchView> {
                     });
                   },
             disabledColor: Colors.grey,
+          ) : MaterialButton(
+            child: Text(
+              _match.red.item1.name,
+              style: TextStyle(
+                  color: _selectedTeam == _match.red.item1
+                      ? Colors.grey
+                      : Colors.red),
+            ),
+            onPressed: _selectedTeam == _match.red.item1
+                ? null
+                : () {
+              setState(() {
+                _selectedTeam = _match.red.item1;
+                _color = Colors.red;
+                _score = _selectedTeam.scores.firstWhere((element) => element.id == _match.id);
+              });
+            },
           ),
         ),
         Flexible(
           flex: 1,
-          child: CupertinoButton(
+          child: Platform.isIOS ? CupertinoButton(
             child: Text(
               _match.red.item2.name,
               style: TextStyle(
@@ -582,12 +626,30 @@ class _MatchView extends State<MatchView> {
                     });
                   },
             disabledColor: Colors.grey,
+          ) : MaterialButton(
+            child: Text(
+              _match.red.item2.name,
+              style: TextStyle(
+                color: _selectedTeam == _match.red.item2
+                    ? Colors.grey
+                    : Colors.red,),
+            ),
+            onPressed: _selectedTeam == _match.red.item2
+                ? null
+                : () {
+              setState(() {
+                _selectedTeam = _match.red.item2;
+                _color = Colors.red;
+                _score = _selectedTeam.scores.firstWhere((element) => element.id == _match.id);
+              });
+            },
+
           ),
         ),
         Spacer(),
         Flexible(
           flex: 1,
-          child: CupertinoButton(
+          child: Platform.isIOS ? CupertinoButton(
             child: Text(
               _match.blue.item1.name,
               style: TextStyle(
@@ -605,11 +667,29 @@ class _MatchView extends State<MatchView> {
                     });
                   },
             disabledColor: Colors.grey,
+          ) : MaterialButton(
+            child: Text(
+              _match.blue.item1.name,
+              style: TextStyle(
+                  color: _selectedTeam == _match.blue.item1
+                      ? Colors.grey
+                      : Colors.blue),
+            ),
+            onPressed: _selectedTeam == _match.blue.item1
+                ? null
+                : () {
+              setState(() {
+                _selectedTeam = _match.blue.item1;
+                _color = Colors.blue;
+                _score = _selectedTeam.scores.firstWhere((element) => element.id == _match.id);
+              });
+            },
+
           ),
         ),
         Flexible(
           flex: 1,
-          child: CupertinoButton(
+          child: Platform.isIOS ? CupertinoButton(
             child: Text(
               _match.blue.item2.name,
               style: TextStyle(
@@ -627,6 +707,24 @@ class _MatchView extends State<MatchView> {
                     });
                   },
             disabledColor: Colors.grey,
+          ) : MaterialButton(
+
+            child: Text(
+              _match.blue.item2.name,
+              style: TextStyle(
+                  color: _selectedTeam == _match.blue.item2
+                      ? Colors.grey
+                      : Colors.blue),
+            ),
+            onPressed: _selectedTeam == _match.blue.item2
+                ? null
+                : () {
+              setState(() {
+                _selectedTeam = _match.blue.item2;
+                _color = Colors.blue;
+                _score = _selectedTeam.scores.firstWhere((element) => element.id == _match.id);
+              });
+            },
           ),
         )
       ],

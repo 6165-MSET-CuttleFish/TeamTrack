@@ -1,4 +1,4 @@
-import 'package:teamtrack/backend.dart';
+import 'package:TeamTrack/backend.dart';
 import 'package:uuid/uuid.dart';
 
 class Score {
