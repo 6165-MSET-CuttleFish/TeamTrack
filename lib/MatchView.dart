@@ -51,7 +51,7 @@ class _MatchView extends State<MatchView> {
                   Theme.of(context).canvasColor,
                   Theme.of(context).canvasColor,
                   Theme.of(context).canvasColor,
-                  Theme.of(context).canvasColor
+                  Theme.of(context).canvasColor,
                 ]),
           ),
           child: Center(
@@ -550,7 +550,17 @@ class _MatchView extends State<MatchView> {
           ),
           Text('Navigated'),
           Spacer(),
+          if(Platform.isIOS)
           CupertinoSwitch(
+            value: _score.autoScore.navigated,
+            onChanged: (bool newVal) {
+              setState(() {
+                _score.autoScore.navigated = newVal;
+              });
+            },
+          ),
+          if(Platform.isAndroid)
+          Switch(
             value: _score.autoScore.navigated,
             onChanged: (bool newVal) {
               setState(() {

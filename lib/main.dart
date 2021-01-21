@@ -1,8 +1,10 @@
+import 'package:TeamTrack/MatchList.dart';
 import 'package:TeamTrack/TeamView.dart';
 import 'package:TeamTrack/backend.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:tuple/tuple.dart';
 import 'package:TeamTrack/MatchView.dart';
 
 void main() {
@@ -31,7 +33,15 @@ class MyApp extends StatelessWidget {
         // closer together (more dense) than on mobile platforms.
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MatchView(title: 'TeamTrack'),
+      //home: MatchView(title: 'TeamTrack'),
+      home: MatchList(matches:
+      [
+        Match(
+            Tuple2(Team('1', 'Alpha'), Team('2', 'Beta')),
+            Tuple2(Team('3', 'Charlie'), Team('4', 'Delta')),
+            EventType.local
+        )
+      ])
       //home: TeamView(team: Team('6165', 'Cuttlefish'),)
     );
   }
