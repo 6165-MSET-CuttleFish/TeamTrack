@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
         // closer together (more dense) than on mobile platforms.
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MatchView(title: 'TeamTrack'),
+      //home: MatchView(title: 'TeamTrack'),
       // home: MatchList(matches:
       // [
       //   Match(
@@ -42,7 +42,7 @@ class MyApp extends StatelessWidget {
       //       EventType.local
       //   )
       // ])
-      //home: TeamView(team: Team('6165', 'Cuttlefish'),)
+      home: TeamView(team: Team('6165', 'Cuttlefish'),)
     );
   }
 }
