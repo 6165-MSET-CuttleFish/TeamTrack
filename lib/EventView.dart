@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:TeamTrack/TeamView.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -18,82 +19,31 @@ class EventView extends StatefulWidget {
 class _EventView extends State<EventView> {
   List<Widget> materialTabs(){
     return <Widget>[
-      CupertinoPageScaffold(
-          child: SafeArea(
-              child: Scaffold(
-                  body: CustomScrollView(
-                    slivers: [
-                      CupertinoSliverNavigationBar(
-                        largeTitle: Text('Teams'),
-                        previousPageTitle: 'Events',
-                        trailing: CupertinoButton(
-                          child: Text('Add'),
-                          onPressed: () {
-                            setState(() {
-                              event.teams.add(Team('7390', 'Jellyfish'));
-                            });
-                          },
-                        ),
-                      ),
-                      SliverList(
-                        delegate: SliverChildListDelegate(
-                            event.teams.map((e) => ListTile(
-                              title: Text(e.name),
-                              leading: Text(e.number, style: Theme.of(context).textTheme.caption),
-                            )).toList()
-                        ),
-                      ),
-                    ],
-                  )
-              )
-          )
+      ListView(
+        children: event.teams.map((e) => ListTile(
+          title: Text(e.name),
+          leading: Text(e.number, style: Theme.of(context).textTheme.caption),
+          onTap: (){
+            Navigator.push(context, MaterialPageRoute(builder: (context) => TeamView(team: e)));
+          },
+        )).toList(),
       ),
-      CupertinoPageScaffold(
-          child: SafeArea(
-              child: Scaffold(
-                  body: CustomScrollView(
-                    slivers: [
-                      CupertinoSliverNavigationBar(
-                        largeTitle: Text('Matches'),
-                        previousPageTitle: 'Events',
-                        trailing: CupertinoButton(
-                          child: Text('Add'),
-                          onPressed: () {
-                            setState(() {
-                              event.matches.add(Match.defaultMatch(EventType.local));
-                            });
-                          },
-                        ),
-                        leading: CupertinoButton(
-                          child: Text('Events'),
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                        ),
-                      ),
-                      SliverList(
-                        delegate: SliverChildListDelegate(
-                            event.matches.map((e) => ListTile(
-                              leading: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(e.red.item1.name + ' & ' + e.red.item2.name),
-                                    Text('VS', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),),
-                                    Text(e.blue.item1.name + ' & ' + e.blue.item2.name)
-                                  ]
-                              ),
-                              trailing: Text(e.score()),
-                              onTap: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => MatchView(match: e)));
-                              },
-                            )).toList()
-                        ),
-                      ),
-                    ],
-                  )
-              )
-          )
-      ),
+      ListView(
+        children: event.matches.map((e) => ListTile(
+          leading: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(e.red.item1.name + ' & ' + e.red.item2.name),
+                Text('VS', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),),
+                Text(e.blue.item1.name + ' & ' + e.blue.item2.name)
+              ]
+          ),
+          trailing: Text(e.score()),
+          onTap: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => MatchView(match: e)));
+          },
+        )).toList(),
+      )
     ];
   }
   List<Widget> cupertinoTabs() {
@@ -120,6 +70,9 @@ class _EventView extends State<EventView> {
                 event.teams.map((e) => ListTile(
                   title: Text(e.name),
                   leading: Text(e.number, style: Theme.of(context).textTheme.caption),
+                  onTap: () {
+                    Navigator.push(context, CupertinoPageRoute(builder: (context) => TeamView(team: e)));
+                  },
                 )).toList()
               ),
               ),
@@ -164,7 +117,7 @@ class _EventView extends State<EventView> {
                              ),
                              trailing: Text(e.score()),
                              onTap: () {
-                               Navigator.push(context, MaterialPageRoute(builder: (context) => MatchView(match: e)));
+                               Navigator.push(context, CupertinoPageRoute(builder: (context) => MatchView(match: e)));
                              },
                            )).toList()
                        ),
@@ -187,7 +140,7 @@ class _EventView extends State<EventView> {
     if(Platform.isAndroid) {
       return Scaffold(
           appBar: AppBar(
-            title: Text('Event'),
+            title: _x == 0 ? Text('Teams') : Text('Matches'),
           ),
           bottomNavigationBar: BottomNavigationBar(
             currentIndex: _x,
@@ -201,12 +154,23 @@ class _EventView extends State<EventView> {
               label: 'Teams',
             ), BottomNavigationBarItem(
               icon: Icon(Icons.sports_esports_rounded),
-              label: 'Teams',
+              label: 'Matches',
             )
             ],
           ),
           body: materialTabs()[_x],
-
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.add),
+          onPressed: (){
+            setState(() {
+              if(_x == 0){
+                event.teams.add(Team('7390', 'Jellyfish'));
+              } else {
+                event.matches.add(Match.defaultMatch(EventType.local));
+              }
+            });
+          },
+        ),
         );
     }
     else{

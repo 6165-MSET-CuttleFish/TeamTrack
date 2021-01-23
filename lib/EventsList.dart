@@ -29,7 +29,11 @@ class _EventsList extends State<EventsList>{
           subtitle: Text('Some time in the future'),
           title: Text(e.name),
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => EventView(event: e,)));
+              if(Platform.isIOS) {
+                Navigator.push(context, CupertinoPageRoute(builder: (context) => EventView(event: e,)));
+              } else {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => EventView(event: e,)));
+              }
             },
     ))).toList();
   }
@@ -37,7 +41,7 @@ class _EventsList extends State<EventsList>{
 
   @override
   Widget build(BuildContext context) {
-    if (true) {
+    if (Platform.isIOS) {
       return CupertinoPageScaffold(
           child: SafeArea(
               child: Scaffold(

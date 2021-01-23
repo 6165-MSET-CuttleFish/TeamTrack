@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:TeamTrack/backend.dart';
 import 'package:TeamTrack/score.dart';
-import 'package:tuple/tuple.dart';
 import 'dart:io' show Platform;
 
 class MatchView extends StatefulWidget {
