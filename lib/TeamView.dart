@@ -66,18 +66,14 @@ class _TeamView extends State<TeamView>{
               )
           ),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
+            padding: EdgeInsets.symmetric(horizontal: 0),
           )
         ],
        ),
-       
             MaterialButton(
             child: Text('Okay'),
             onPressed: (){
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => MatchView(title: 'Hello',)),
-              );
+              Navigator.push(context, MaterialPageRoute(builder: (context) => MatchView(match: Match.defaultMatch(EventType.local))));
             }),
        ListTile(
            title: Text('Amazing'),

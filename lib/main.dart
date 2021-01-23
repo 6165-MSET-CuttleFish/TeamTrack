@@ -1,3 +1,4 @@
+import 'package:TeamTrack/EventsList.dart';
 import 'package:TeamTrack/MatchList.dart';
 import 'package:TeamTrack/TeamView.dart';
 import 'package:TeamTrack/backend.dart';
@@ -42,7 +43,8 @@ class MyApp extends StatelessWidget {
       //       EventType.local
       //   )
       // ])
-      home: TeamView(team: Team('6165', 'Cuttlefish'),)
+      //home: TeamView(team: Team('6165', 'Cuttlefish'),),
+      home: EventsList(dataModel: DataModel(),)
     );
   }
 }

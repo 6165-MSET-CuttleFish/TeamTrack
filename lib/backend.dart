@@ -5,14 +5,16 @@ import 'package:tuple/tuple.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class DataModel {
-  List<Event> localEvents;
-  List<Event> remoteEvents;
-  List<Event> liveEvents;
+  List<Event> localEvents = [];
+  List<Event> remoteEvents = [];
+  List<Event> liveEvents = [];
 }
 
 class Event {
+  Event({this.name});
   List<Team> teams;
   List<Match> matches;
+  String name;
   double maxScore() {
     return teams.map((e) => e.scores.maxScore()).reduce(max);
   }
@@ -79,6 +81,9 @@ class Match {
     red.item2.scores.addScore(Score(id, dice));
     blue.item1.scores.addScore(Score(id, dice));
     blue.item2.scores.addScore(Score(id, dice));
+  }
+  static Match defaultMatch(EventType type){
+    return Match(Tuple2(Team('1', 'Alpha'), Team('2', 'Beta')), Tuple2(Team('3', 'Charlie'), Team('4', 'Delta')), type);
   }
   String score() {
     final r0 =

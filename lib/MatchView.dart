@@ -8,17 +8,11 @@ import 'package:tuple/tuple.dart';
 import 'dart:io' show Platform;
 
 class MatchView extends StatefulWidget {
-  MatchView({Key key, this.title}) : super(key: key);
-  final String title;
+  MatchView({Key key, this.match}) : super(key: key);
+  final Match match;
 
   @override
-  _MatchView createState() => _MatchView(
-      Match(
-        Tuple2(Team('1', 'Alpha'), Team('2', 'Beta')),
-        Tuple2(Team('3', 'Charlie'), Team('4', 'Delta')),
-        EventType.local
-      )
-  );
+  _MatchView createState() => _MatchView(match);
 }
 
 class _MatchView extends State<MatchView> {
