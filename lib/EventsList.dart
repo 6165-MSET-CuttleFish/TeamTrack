@@ -8,6 +8,7 @@ import 'package:tuple/tuple.dart';
 import 'backend.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:TeamTrack/PlatformGraphics.dart';
+import 'package:TeamTrack/EventView.dart';
 
 class EventsList extends StatefulWidget {
   EventsList({Key key, this.dataModel}) : super(key: key);
@@ -19,16 +20,18 @@ class EventsList extends StatefulWidget {
 class _EventsList extends State<EventsList>{
   _EventsList({this.dataModel});
   DataModel dataModel;
-  List<ListTile> localEvents () {
-    return dataModel.localEvents.map((e) => ListTile(
-      leading: Icon(Icons.computer_rounded),
-      trailing: Icon(Icons.account_box_sharp),
-      subtitle: Text('Some time in the future'),
-      title: Text(e.name),
-        onTap: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => MatchView(match: Match.defaultMatch(EventType.local),)));
-        },
-    )).toList();
+  List<Widget> localEvents () {
+    return dataModel.localEvents.map((e) => ListTileTheme(
+      iconColor: Theme.of(context).primaryColor,
+        child: ListTile(
+          leading: Icon(Icons.all_inbox_rounded),
+          trailing: Icon(Icons.account_box_sharp),
+          subtitle: Text('Some time in the future'),
+          title: Text(e.name),
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => EventView(event: e,)));
+            },
+    ))).toList();
   }
 
 

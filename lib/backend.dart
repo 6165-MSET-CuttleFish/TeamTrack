@@ -12,8 +12,8 @@ class DataModel {
 
 class Event {
   Event({this.name});
-  List<Team> teams;
-  List<Match> matches;
+  List<Team> teams = [];
+  List<Match> matches = [];
   String name;
   double maxScore() {
     return teams.map((e) => e.scores.maxScore()).reduce(max);
