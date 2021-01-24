@@ -24,8 +24,8 @@ class _EventsList extends State<EventsList>{
     return dataModel.localEvents.map((e) => ListTileTheme(
       iconColor: Theme.of(context).primaryColor,
         child: ListTile(
-          leading: Icon(Icons.all_inbox_rounded),
-          trailing: Icon(Icons.account_box_sharp),
+          leading: Icon(Icons.all_inbox_rounded, color: Theme.of(context).accentColor,),
+          trailing: Icon(Icons.account_box_sharp, color: Theme.of(context).accentColor,),
           title: Text(e.name),
             onTap: () {
               if(Platform.isIOS) {
@@ -41,7 +41,7 @@ class _EventsList extends State<EventsList>{
   String _newName;
   @override
   Widget build(BuildContext context) {
-    if (true) {
+    if (Platform.isIOS) {
       return CupertinoPageScaffold(
           child: SafeArea(
               child: Scaffold(
@@ -59,6 +59,7 @@ class _EventsList extends State<EventsList>{
                              title: Text('New Event'),
                              content: CupertinoTextField(
                                keyboardType: TextInputType.name,
+                               textCapitalization: TextCapitalization.words,
                                onChanged: (String input){
                                  _newName = input;
                                },
@@ -82,7 +83,6 @@ class _EventsList extends State<EventsList>{
                                     Navigator.of(context).pop();
                                   },
                                 ),
-
                               ],
                             )
                         );
@@ -112,9 +112,37 @@ class _EventsList extends State<EventsList>{
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.add),
           onPressed: () {
-            setState(() {
-              dataModel.localEvents.add(Event(name: 'ok'));
-            });
+            showDialog(
+                context: context,
+                builder: (BuildContext context) => AlertDialog(
+                  title: Text('New Event'),
+                  content: TextField(
+                    keyboardType: TextInputType.name,
+                    textCapitalization: TextCapitalization.words,
+                    onChanged: (String input){
+                      _newName = input;
+                    },
+                  ),
+                  actions: [
+                    FlatButton(
+                      child: Text('Cancel'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                    FlatButton(
+                      child: Text('Save'),
+                      onPressed: () {
+                        setState(() {
+                          if(_newName.isNotEmpty)
+                            dataModel.localEvents.add(Event(name: _newName));
+                        });
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                )
+            );
           },
         ),
       );
