@@ -75,22 +75,7 @@ class _TeamView extends State<TeamView>{
             onPressed: (){
               Navigator.push(context, MaterialPageRoute(builder: (context) => MatchView(match: Match.defaultMatch(EventType.local))));
             }),
-       ListTile(
-           title: Text('Amazing'),
-       ),ListTile(
-         title: Text('Amazing'),
-       ),ListTile(
-         title: Text('Amazing'),
-       ),ListTile(
-         title: Text('Amazing'),
-       ),ListTile(
-         title: Text('Amazing'),
-       ),ListTile(
-         title: Text('Amazing'),
-       ),ListTile(
-         title: Text('Amazing'),
-       ),
-          ],
+     ],
     );
   }
   Widget build(BuildContext context) {
@@ -153,6 +138,11 @@ class _TeamView extends State<TeamView>{
                       barWidth: 5,
                       shadow: Shadow(color: Colors.green,
                           blurRadius: 5)
+                  ),
+                  LineChartBarData(
+                    colors: [
+                      Colors.red
+                    ]
                   )]
               )
           ),
