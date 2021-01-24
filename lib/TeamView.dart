@@ -18,12 +18,9 @@ class TeamView extends StatefulWidget {
     _TeamView createState() => _TeamView();
 }
 class _TeamView extends State<TeamView>{
-  int _x = 0;
-  @override
-  Widget body(){
-   return
-     ListView(
-     children: [
+
+  List<Widget> body(){
+   return <Widget>[
        Text('Timeline', style: Theme.of(context).textTheme.headline4,),
        Padding(
          padding: EdgeInsets.all(10),
@@ -75,107 +72,39 @@ class _TeamView extends State<TeamView>{
             onPressed: (){
               Navigator.push(context, MaterialPageRoute(builder: (context) => MatchView(match: Match.defaultMatch(EventType.local))));
             }),
-     ],
-    );
+     ];
   }
+  @override
   Widget build(BuildContext context) {
     if(Platform.isAndroid) {
       return
       Scaffold(
         appBar: AppBar(
-          // Here we take the value from the MyHomePage object that was created by
-          // the App.build method, and use it to set our appbar title.
           title: Text(widget.team.name),
         ),
-        bottomNavigationBar: BottomNavigationBar(
-          backgroundColor: Colors.green,
-          currentIndex: _x,
-          onTap: (int index) {
-            setState(() {
-              _x = index;
-            });
-          },
-          items: [BottomNavigationBarItem(
-            backgroundColor: Colors.green,
-            icon: Icon(Icons.ac_unit),
-            label: 'Teams',
-          ), BottomNavigationBarItem(
-            backgroundColor: Colors.deepPurple,
-            icon: Icon(Icons.ac_unit),
-            label: 'Teams',
-          )
-          ],
+        body: ListView(
+          children: body(),
         ),
-        body: _x == 0 ? Center(
-          child: LineChart(
-              LineChartData(
-                  minX: 0,
-                  maxX: 100,
-                  minY: 0,
-                  maxY: 7,
-                  backgroundColor: Theme.of(context).canvasColor,
-                  lineBarsData: [LineChartBarData(
-                      spots: [
-                        FlSpot(0, 3),
-                        FlSpot(50, 2),
-                      ],
-                      colors: [Colors.green, Colors.blue],
-                      isCurved: true,
-                      preventCurveOverShooting: true,
-                      barWidth: 5,
-                      shadow: Shadow(color: Colors.green,
-                          blurRadius: 5)
-                  ), LineChartBarData(
-                      spots: [
-                        FlSpot(0, 5),
-                        FlSpot(20, 5),
-                        FlSpot(30, 7),
-                        FlSpot(80, 2),
-                      ],
-                      colors: [Colors.deepPurple, Colors.blue],
-                      isCurved: true,
-                      preventCurveOverShooting: true,
-                      barWidth: 5,
-                      shadow: Shadow(color: Colors.green,
-                          blurRadius: 5)
-                  ),
-                  LineChartBarData(
-                    colors: [
-                      Colors.red
-                    ]
-                  )]
-              )
-          ),
-        ) : body(),
-
       );
     }
     else{
-      return CupertinoTabScaffold(
-        backgroundColor: Colors.blue,
-        tabBuilder: (BuildContext context, int index){
-          return CupertinoTabView(
-            builder: (BuildContext context) {
-              return CupertinoPageScaffold(child: body());
-            },
-          );
-        },
-        tabBar: CupertinoTabBar(
-          backgroundColor: Colors.green,
-          activeColor: Colors.red,
-          currentIndex: _x,
-          items: [BottomNavigationBarItem(
-            backgroundColor: Colors.deepPurple,
-            icon: Icon(Icons.ac_unit),
-            label: 'Teams',
-          ), BottomNavigationBarItem(
-            backgroundColor: Colors.deepPurple,
-            icon: Icon(Icons.ac_unit),
-            label: 'Teams',
-          )
-          ],
-          onTap: (int x){ _x = x; },
+      return CupertinoPageScaffold(
+        child: SafeArea(
+          child: Scaffold(
+          body: CustomScrollView(
+            slivers: [
+              CupertinoSliverNavigationBar(
+                largeTitle: Text(widget.team.name),
+              ),
+              SliverList(
+                delegate: SliverChildListDelegate(
+                  body()
+                )
+              )
+            ],
+          ),
         ),
+      )
       );
     }
 

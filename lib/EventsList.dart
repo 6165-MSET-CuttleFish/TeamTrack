@@ -26,7 +26,6 @@ class _EventsList extends State<EventsList>{
         child: ListTile(
           leading: Icon(Icons.all_inbox_rounded),
           trailing: Icon(Icons.account_box_sharp),
-          subtitle: Text('Some time in the future'),
           title: Text(e.name),
             onTap: () {
               if(Platform.isIOS) {
@@ -35,13 +34,14 @@ class _EventsList extends State<EventsList>{
                 Navigator.push(context, MaterialPageRoute(builder: (context) => EventView(event: e,)));
               }
             },
-    ))).toList();
+    )
+    )).toList();
   }
 
-
+  String _newName;
   @override
   Widget build(BuildContext context) {
-    if (Platform.isIOS) {
+    if (true) {
       return CupertinoPageScaffold(
           child: SafeArea(
               child: Scaffold(
@@ -53,9 +53,39 @@ class _EventsList extends State<EventsList>{
                     trailing: CupertinoButton(
                       child: Text('Add'),
                       onPressed: () {
-                        setState(() {
-                          dataModel.localEvents.add(Event(name: 'ok'));
-                        });
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) => CupertinoAlertDialog(
+                             title: Text('New Event'),
+                             content: CupertinoTextField(
+                               keyboardType: TextInputType.name,
+                               onChanged: (String input){
+                                 _newName = input;
+                               },
+                             ),
+                              actions: [
+                                CupertinoDialogAction(
+                                  isDefaultAction: true,
+                                  child: Text('Cancel'),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                                CupertinoDialogAction(
+                                  isDefaultAction: false,
+                                  child: Text('Save'),
+                                  onPressed: () {
+                                    setState(() {
+                                      if(_newName.isNotEmpty)
+                                      dataModel.localEvents.add(Event(name: _newName));
+                                    });
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+
+                              ],
+                            )
+                        );
                       },
                     ),
                   ),

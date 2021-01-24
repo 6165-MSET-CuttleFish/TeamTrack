@@ -34,6 +34,16 @@ class MyApp extends StatelessWidget {
         // closer together (more dense) than on mobile platforms.
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        canvasColor: Colors.black,
+        buttonColor: Colors.grey,
+        shadowColor: Colors.white,
+        accentColor: Colors.cyan,
+        primarySwatch: Colors.cyan,
+      ),
+     // theme: CupertinoThemeData(brightness: Brightness.dark),
+
       //home: MatchView(title: 'TeamTrack'),
       // home: MatchList(matches:
       // [

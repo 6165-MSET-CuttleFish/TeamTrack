@@ -150,10 +150,10 @@ class _EventView extends State<EventView> {
               });
             },
             items: [BottomNavigationBarItem(
-              icon: Icon(Icons.people),
+              icon: Icon(CupertinoIcons.person_3_fill),
               label: 'Teams',
             ), BottomNavigationBarItem(
-              icon: Icon(Icons.sports_esports_rounded),
+              icon: Icon(CupertinoIcons.sportscourt_fill),
               label: 'Matches',
             )
             ],
@@ -185,10 +185,10 @@ class _EventView extends State<EventView> {
         tabBar: CupertinoTabBar(
           currentIndex: _x,
           items: [BottomNavigationBarItem(
-            icon: Icon(Icons.people),
+            icon: Icon(CupertinoIcons.person_3_fill),
             label: 'Teams',
           ), BottomNavigationBarItem(
-            icon: Icon(Icons.sports_esports_rounded),
+            icon: Icon(CupertinoIcons.sportscourt_fill),
             label: 'Matches',
           )
           ],
