@@ -45,7 +45,9 @@ class MyApp extends StatelessWidget {
       //   visualDensity: VisualDensity.adaptivePlatformDensity
       // ),
         theme: ThemeData.dark(),
-     // theme: CupertinoThemeData(brightness: Brightness.dark),
+      // theme: CupertinoThemeData(brightness: Brightness.dark,
+      // scaffoldBackgroundColor: Colors.black,
+      // primaryColor: Colors.purple),
 
       //home: MatchView(title: 'TeamTrack'),
       // home: MatchList(matches:

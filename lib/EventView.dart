@@ -29,9 +29,9 @@ class _EventView extends State<EventView> {
         )).toList(),
       ),
       ListView(
+        semanticChildCount: event.matches.length,
         children: event.matches.map((e) => ListTile(
           leading: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(e.red.item1.name + ' & ' + e.red.item2.name),
                 Text('VS', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),),
@@ -43,7 +43,7 @@ class _EventView extends State<EventView> {
             Navigator.push(context, MaterialPageRoute(builder: (context) => MatchView(match: e)));
           },
         )).toList(),
-      )
+      ),
     ];
   }
   List<Widget> cupertinoTabs() {
