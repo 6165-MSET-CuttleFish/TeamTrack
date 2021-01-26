@@ -36,7 +36,6 @@ class _TeamView extends State<TeamView> {
               maxX: 8,
               minY: 0,
               maxY: 7,
-              backgroundColor: Theme.of(context).canvasColor,
               lineBarsData: [
                 LineChartBarData(
                     spots: [
@@ -84,43 +83,46 @@ class _TeamView extends State<TeamView> {
       Padding(
         padding: EdgeInsets.symmetric(horizontal: 0),
       ),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          BarChart(BarChartData(
-            minY: 0,
-            maxY: 7,
-            barGroups: [
-              BarChartGroupData(x: 2, barRods: [
-                BarChartRodData(y: 6,
-                width: 36),
-              ]),
-              BarChartGroupData(x: 6, barRods: [
-                BarChartRodData(y: 2,
-                width: 36),
-              ]),
-              BarChartGroupData(x: 7, barRods: [
-                BarChartRodData(y: 4,
-                width: 36,
-                colors: [Colors.red, Colors.blue]),
-              ]),
-            ],
-            //groupsSpace,
-            alignment: BarChartAlignment.spaceEvenly,
-            //titlesData: FlTitlesData(show: true),
-            //barTouchData: ,
-            //axisTitleData,
+      MaterialButton(
+        onPressed: () {},
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            BarChart(BarChartData(
+              minY: 0,
+              maxY: 7,
+              barGroups: [
+                BarChartGroupData(x: 2, barRods: [
+                  BarChartRodData(y: 6,
+                      width: 36),
+                ]),
+                BarChartGroupData(x: 6, barRods: [
+                  BarChartRodData(y: 2,
+                      width: 36),
+                ]),
+                BarChartGroupData(x: 7, barRods: [
+                  BarChartRodData(y: 4,
+                      width: 36,
+                      colors: [Colors.red, Colors.blue]),
+                ]),
+              ],
+              //groupsSpace,
+              alignment: BarChartAlignment.spaceEvenly,
+              //titlesData: FlTitlesData(show: true),
+              //barTouchData: ,
+              //axisTitleData,
 
-            //gridData,
-            //borderData,
-            //rangeAnnotations,
-            backgroundColor: Colors.white,
-          )),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 0),
-          )
-        ],
+              //gridData,
+              //borderData,
+              //rangeAnnotations,
+            )),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 0),
+            )
+          ],
+        ),
       ),
+
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
@@ -151,7 +153,6 @@ class _TeamView extends State<TeamView> {
             //gridData,
             //borderData,
             //rangeAnnotations,
-            backgroundColor: Colors.white,
           )),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 0),
