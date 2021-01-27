@@ -46,6 +46,22 @@ class Event {
   double lowestEndMadScore() {
     return teams.map((e) => e.scores.endMADScore()).reduce(min);
   }
+  void addTeam(Team newTeam){
+    bool isIn = false;
+    teams.forEach((element) {
+      if(element.equals(newTeam))
+        isIn = true;
+    });
+    if(!isIn)
+      teams.add(newTeam);
+  }
+  void addMatch(Match newMatch){
+    teams.firstWhere((element) => newMatch.red.item1.equals(element)).name = newMatch.red.item1.name;
+    teams.firstWhere((element) => newMatch.red.item2.equals(element)).name = newMatch.red.item2.name;
+    teams.firstWhere((element) => newMatch.blue.item1.equals(element)).name = newMatch.blue.item1.name;
+    teams.firstWhere((element) => newMatch.blue.item2.equals(element)).name = newMatch.blue.item2.name;
+    matches.add(newMatch);
+  }
 }
 
 class Team {

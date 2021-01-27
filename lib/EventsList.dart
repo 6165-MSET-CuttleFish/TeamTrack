@@ -52,41 +52,7 @@ class _EventsList extends State<EventsList>{
                     previousPageTitle: 'Events',
                     trailing: CupertinoButton(
                       child: Text('Add'),
-                      onPressed: () {
-                        showDialog(
-                            context: context,
-                            builder: (BuildContext context) => CupertinoAlertDialog(
-                             title: Text('New Event'),
-                             content: CupertinoTextField(
-                               keyboardType: TextInputType.name,
-                               textCapitalization: TextCapitalization.words,
-                               onChanged: (String input){
-                                 _newName = input;
-                               },
-                             ),
-                              actions: [
-                                CupertinoDialogAction(
-                                  isDefaultAction: true,
-                                  child: Text('Cancel'),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                                CupertinoDialogAction(
-                                  isDefaultAction: false,
-                                  child: Text('Save'),
-                                  onPressed: () {
-                                    setState(() {
-                                      if(_newName.isNotEmpty)
-                                      dataModel.localEvents.add(Event(name: _newName));
-                                    });
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                              ],
-                            )
-                        );
-                      },
+                      onPressed: _onPressed,
                     ),
                   ),
                   SliverList(
@@ -111,41 +77,46 @@ class _EventsList extends State<EventsList>{
         ),
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.add),
-          onPressed: () {
-            showDialog(
-                context: context,
-                builder: (BuildContext context) => AlertDialog(
-                  title: Text('New Event'),
-                  content: TextField(
-                    keyboardType: TextInputType.name,
-                    textCapitalization: TextCapitalization.words,
-                    onChanged: (String input){
-                      _newName = input;
-                    },
-                  ),
-                  actions: [
-                    FlatButton(
-                      child: Text('Cancel'),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                    FlatButton(
-                      child: Text('Save'),
-                      onPressed: () {
-                        setState(() {
-                          if(_newName.isNotEmpty)
-                            dataModel.localEvents.add(Event(name: _newName));
-                        });
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
-                )
-            );
-          },
+          onPressed: _onPressed,
         ),
       );
     }
+  }
+  void _onPressed(){
+    showDialog(
+        context: context,
+        builder: (BuildContext context) => PlatformAlert(
+          title: Text('New Event'),
+          content: PlatformTextField(
+            keyboardType: TextInputType.name,
+            textCapitalization: TextCapitalization.words,
+            onChanged: (String input){
+              _newName = input;
+            },
+          ),
+          actions: [
+            PlatformDialogAction(
+              isDefaultAction: true,
+              child: Text('Cancel'),
+              onPressed: () {
+                _newName = '';
+                Navigator.of(context).pop();
+              },
+            ),
+            PlatformDialogAction(
+              isDefaultAction: false,
+              child: Text('Save'),
+              onPressed: () {
+                setState(() {
+                  if(_newName.isNotEmpty)
+                    dataModel.localEvents.add(Event(name: _newName));
+                  _newName = '';
+                });
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        )
+    );
   }
 }

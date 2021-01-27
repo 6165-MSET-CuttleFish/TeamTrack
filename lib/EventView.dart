@@ -14,13 +14,13 @@ class EventView extends StatefulWidget {
   EventView({Key key, this.event}) : super(key: key);
   Event event;
   @override
-  _EventView createState() => _EventView(event: event);
+  _EventView createState() => _EventView();
 }
 class _EventView extends State<EventView> {
   List<Widget> materialTabs(){
     return <Widget>[
       ListView(
-        children: event.teams.map((e) => ListTile(
+        children: widget.event.teams.map((e) => ListTile(
           title: Text(e.name),
           leading: Text(e.number, style: Theme.of(context).textTheme.caption),
           onTap: (){
@@ -29,8 +29,8 @@ class _EventView extends State<EventView> {
         )).toList(),
       ),
       ListView(
-        semanticChildCount: event.matches.length,
-        children: event.matches.map((e) => ListTile(
+        semanticChildCount: widget.event.matches.length,
+        children: widget.event.matches.map((e) => ListTile(
           leading: Column(
               children: [
                 Text(e.red.item1.name + ' & ' + e.red.item2.name),
@@ -60,14 +60,14 @@ class _EventView extends State<EventView> {
                 child: Text('Add'),
                 onPressed: () {
                   setState(() {
-                    event.teams.add(Team('7390', 'Jellyfish'));
+                    widget.event.teams.add(Team('7390', 'JCjos'));
                   });
                 },
                 ),
               ),
               SliverList(
               delegate: SliverChildListDelegate(
-                event.teams.map((e) => ListTile(
+                  widget.event.teams.map((e) => ListTile(
                   title: Text(e.name),
                   leading: Text(e.number, style: Theme.of(context).textTheme.caption),
                   onTap: () {
@@ -93,7 +93,7 @@ class _EventView extends State<EventView> {
                          child: Text('Add'),
                          onPressed: () {
                            setState(() {
-                             event.matches.add(Match.defaultMatch(EventType.local));
+                             widget.event.matches.add(Match.defaultMatch(EventType.local));
                            });
                          },
                        ),
@@ -106,7 +106,7 @@ class _EventView extends State<EventView> {
                      ),
                      SliverList(
                        delegate: SliverChildListDelegate(
-                           event.matches.map((e) => ListTile(
+                           widget.event.matches.map((e) => ListTile(
                              leading: Column(
                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -130,23 +130,20 @@ class _EventView extends State<EventView> {
     ];
   }
 
-  int _x = 0;
-  Event event;
-
-  _EventView({this.event});
+  int _tab = 0;
 
   @override
   Widget build(BuildContext context) {
     if(Platform.isAndroid) {
       return Scaffold(
           appBar: AppBar(
-            title: _x == 0 ? Text('Teams') : Text('Matches'),
+            title: _tab == 0 ? Text('Teams') : Text('Matches'),
           ),
           bottomNavigationBar: BottomNavigationBar(
-            currentIndex: _x,
+            currentIndex: _tab,
             onTap: (int index) {
               setState(() {
-                _x = index;
+                _tab = index;
               });
             },
             items: [BottomNavigationBarItem(
@@ -158,17 +155,15 @@ class _EventView extends State<EventView> {
             )
             ],
           ),
-          body: materialTabs()[_x],
+          body: materialTabs()[_tab],
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.add),
           onPressed: (){
-            setState(() {
-              if(_x == 0){
-                event.teams.add(Team('7390', 'Jellyfish'));
-              } else {
-                event.matches.add(Match.defaultMatch(EventType.local));
-              }
-            });
+            if(_tab == 0){
+              _teamConfig();
+            } else {
+              _matchConfig();
+            }
           },
         ),
         );
@@ -178,12 +173,12 @@ class _EventView extends State<EventView> {
         tabBuilder: (BuildContext context, int index){
           return CupertinoTabView(
             builder: (BuildContext context) {
-              return CupertinoPageScaffold(child: cupertinoTabs()[_x]);
+              return CupertinoPageScaffold(child: cupertinoTabs()[_tab]);
             },
           );
         },
         tabBar: CupertinoTabBar(
-          currentIndex: _x,
+          currentIndex: _tab,
           items: [BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.person_3_fill),
             label: 'Teams',
@@ -192,10 +187,307 @@ class _EventView extends State<EventView> {
             label: 'Matches',
           )
           ],
-          onTap: (int x){ _x = x; },
+          onTap: (int x){ _tab = x; },
         ),
       );
     }
   }
+  void _matchConfig(){
+    if(Platform.isAndroid) {
+      showModalBottomSheet(context: context, isScrollControlled: true, builder: (context) {
+        return _addMatch();
+      });
+    } else {
+      showCupertinoModalPopup(context: null, builder: (context) {
+        return CupertinoPageScaffold(child: Text('Hello'));
+      });
+    }
+  }
+  String _newName;
+  String _newNumber;
+  void _teamConfig(){
+    showDialog(
+        context: context,
+        builder: (BuildContext context) => PlatformAlert(
+          title: Text('New Team'),
+          content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                PlatformTextField(
+                  placeholder: 'Team name',
+                  keyboardType: TextInputType.name,
+                  textCapitalization: TextCapitalization.words,
+                  onChanged: (String input){
+                    _newName = input;
+                  },
+                ),
+                PlatformTextField(
+                  placeholder: 'Team number',
+                  keyboardType: TextInputType.number,
+                  textCapitalization: TextCapitalization.words,
+                  onChanged: (String input){
+                    _newNumber = input;
+                  },
+                ),
+              ],
+            ),
+          actions: [
+            PlatformDialogAction(
+              isDefaultAction: true,
+              child: Text('Cancel'),
+              onPressed: () {
+                _newName = '';
+                _newNumber = '';
+                Navigator.of(context).pop();
+              },
+            ),
+            PlatformDialogAction(
+              isDefaultAction: false,
+              child: Text('Save'),
+              onPressed: () {
+                setState(() {
+                  if(_newNumber.isNotEmpty && _newName.isNotEmpty)
+                    widget.event.addTeam(Team(_newNumber, _newName));
+                  _newName = '';
+                  _newNumber = '';
+                });
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+      )
+    );
+  }
+  Tuple2<String, TextEditingController> _r0 = Tuple2('', TextEditingController());
+  Tuple2<String, TextEditingController> _r1 = Tuple2('', TextEditingController());
+  Tuple2<String, TextEditingController> _b0 = Tuple2('', TextEditingController());
+  Tuple2<String, TextEditingController> _b1 = Tuple2('', TextEditingController());
+  Widget _addMatch() {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Add Match'),
+        backgroundColor: Colors.green,
+      ),
+      body: SafeArea(
+        child: Center(
+          child: Form(
+            child: ListView(
+              children: [
+                Container(alignment: Alignment.center,color: Colors.red,child: Text('Red Alliance', style: Theme.of(context).textTheme.headline6,)),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(labelText: 'Team number'),
+                        validator: (String value) {
+                          if(value.isEmpty) {
+                            return 'Number is required';
+                          } else {
+                            return null;
+                          }
+                        },
+                        onChanged: (String val){
+                          setState(() {
+                            _r0.item2.value = TextEditingValue(
+                              text: widget.event.teams.firstWhere((element) => element.number == val.replaceAll(new RegExp(r' [^\w\s]+'),'').replaceAll(' ', '')).name,
+                              selection: TextSelection.fromPosition(
+                                TextPosition(offset: val.length),
+                              ),
+                            );
+                            //_r0 = Tuple2(val, TextEditingController().text = widget.event.teams.firstWhere((element) => element.number == val.trim())?.name ?? _r0.item2);
+                          });
+                        },
+                      ),
+                    ),
+                    Expanded(
+                        child: TextFormField(
+                          controller: _r0.item2,
+                          keyboardType: TextInputType.name,
+                          textCapitalization: TextCapitalization.words,
+                          decoration: InputDecoration(labelText: 'Name'),
+                          validator: (String value) {
+                            if(value.isEmpty) {
+                              return 'Name is required';
+                            } else {
+                              return null;
+                            }
+                          },
+                          onChanged: (String val){
+                            setState(() {
+                              _r0.item2.value = TextEditingValue(
+                                text: val,
+                                selection: TextSelection.fromPosition(
+                                  TextPosition(offset: val.length),
+                                ),
+                              );
+                            });
+                          },
+                        )
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Expanded(child: TextFormField(
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(labelText: 'Team number'),
+                      validator: (String value) {
+                        if(value.isEmpty) {
+                          return 'Number is required';
+                        } else {
+                          return null;
+                        }
+                      },
+                      onChanged: (String val){
+                        print(widget.event.teams.firstWhere((element) => element.number == val.replaceAll(new RegExp(r' [^\w\s]+'),'').replaceAll(' ', '')).name);
+                        setState(() {
+                          _r1.item2.value = TextEditingValue(
+                            text: widget.event.teams.firstWhere((element) => element.number == val.replaceAll(new RegExp(r' [^\w\s]+'),'').replaceAll(' ', '')).name,
+                            selection: TextSelection.fromPosition(
+                              TextPosition(offset: val.length),
+                            ),
+                          );
+                        });
+                      },
+                    ),),
+                    Expanded(
+                      child: TextFormField(
+                        controller: _r1.item2,
+                        keyboardType: TextInputType.name,
+                        textCapitalization: TextCapitalization.words,
+                        decoration: InputDecoration(labelText: 'Name'),
+                        validator: (String value) {
+                          if(value.isEmpty) {
+                            return 'Name is required';
+                          } else {
+                            return null;
+                          }
+                        },
+                        onChanged: (String val){
+                          setState(() {
+                            _r1.item2.value = TextEditingValue(
+                              text: val,
+                              selection: TextSelection.fromPosition(
+                                TextPosition(offset: val.length),
+                              ),
+                            );
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                Container(alignment: Alignment.center,color: Colors.blue,child: Text('Blue Alliance', style: Theme.of(context).textTheme.headline6,)),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(labelText: 'Team number'),
+                        validator: (String value) {
+                          if(value.isEmpty) {
+                            return 'Number is required';
+                          } else {
+                            return null;
+                          }
+                        },
+                        onChanged: (String val){
+                          setState(() {
+                            _b0.item2.value = TextEditingValue(
+                              text: widget.event.teams.firstWhere((element) => element.number == val.replaceAll(new RegExp(r' [^\w\s]+'),'').replaceAll(' ', '')).name,
+                              selection: TextSelection.fromPosition(
+                                TextPosition(offset: val.length),
+                              ),
+                            );
+                          });
+                        },
+                      ),
+                    ),
+                    Expanded(
+                        child: TextFormField(
+                          controller: _b0.item2,
+                          keyboardType: TextInputType.name,
+                          textCapitalization: TextCapitalization.words,
+                          decoration: InputDecoration(labelText: 'Name'),
+                          validator: (String value) {
+                            if(value.isEmpty) {
+                              return 'Name is required';
+                            } else {
+                              return null;
+                            }
+                          },
+                          onChanged: (String val){
+                            setState(() {
+                              _b0.item2.value = TextEditingValue(
+                                text: val,
+                                selection: TextSelection.fromPosition(
+                                  TextPosition(offset: val.length),
+                                ),
+                              );
+                            });
+                          },
+                        )
+                    ),
 
+                  ],
+                ),
+                Row(
+                  children: [
+                    Expanded(child: TextFormField(
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(labelText: 'Team number'),
+                      validator: (String value) {
+                        if(value.isEmpty) {
+                          return 'Number is required';
+                        } else {
+                          return null;
+                        }
+                      },
+                      onChanged: (String val){
+                        setState(() {
+                          _b1.item2.value = TextEditingValue(
+                            text: widget.event.teams.firstWhere((element) => element.number == val.replaceAll(new RegExp(r' [^\w\s]+'),'').replaceAll(' ', '')).name,
+                            selection: TextSelection.fromPosition(
+                              TextPosition(offset: val.length),
+                            ),
+                          );
+                        });
+                      },
+                    ),),
+                    Expanded(
+                      child: TextFormField(
+                        controller: _b1.item2,
+                        keyboardType: TextInputType.name,
+                        textCapitalization: TextCapitalization.words,
+                        decoration: InputDecoration(labelText: 'Name'),
+                        validator: (String value) {
+                          if(value.isEmpty) {
+                            return 'Name is required';
+                          } else {
+                            return null;
+                          }
+                        },
+                        onChanged: (String val){
+                          setState(() {
+                            _b1.item2.value = TextEditingValue(
+                              text: val,
+                              selection: TextSelection.fromPosition(
+                                TextPosition(offset: val.length),
+                              ),
+                            );
+                          });
+                        },
+                      ),
+                    ),
+
+                  ],
+                ),
+              ]
+            )
+          )
+        ),
+      )
+    );
+  }
 }

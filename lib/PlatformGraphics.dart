@@ -56,6 +56,52 @@ class PlatformAlert extends PlatformWidget<CupertinoAlertDialog, AlertDialog> {
     );
   }
 }
+class PlatformTextField extends PlatformWidget<CupertinoTextField, TextFormField>{
+  PlatformTextField({Key key, this.onChanged, this.keyboardType, this.textCapitalization, this.placeholder}) : super(key: key);
+  final ValueChanged<String> onChanged;
+  final TextInputType keyboardType;
+  final TextCapitalization textCapitalization;
+  final String placeholder;
+  @override
+  CupertinoTextField buildCupertinoWidget(BuildContext context) {
+    return CupertinoTextField(
+      onChanged: onChanged,
+      keyboardType: keyboardType,
+      textCapitalization: textCapitalization,
+      placeholder: placeholder,
+    );
+  }
+
+  @override
+  TextFormField buildMaterialWidget(BuildContext context) {
+    return TextFormField(
+      onChanged: onChanged,
+      keyboardType: keyboardType,
+      textCapitalization: textCapitalization,
+      decoration: InputDecoration(labelText: placeholder),
+    );
+  }
+}
+class PlatformDialogAction extends PlatformWidget<CupertinoDialogAction, FlatButton>{
+  PlatformDialogAction({Key key, this.child, this.isDefaultAction = false, this.onPressed}) : super(key: key);
+  final Widget child;
+  final bool isDefaultAction;
+  final Function onPressed;
+  @override
+  CupertinoDialogAction buildCupertinoWidget(BuildContext context) {
+    return CupertinoDialogAction(
+      isDefaultAction: isDefaultAction,
+      child: child,
+      onPressed: onPressed
+    );
+  }
+
+  @override
+  FlatButton buildMaterialWidget(BuildContext context) {
+    return FlatButton(onPressed: onPressed, child: child);
+  }
+
+}
 class PlatformButton extends PlatformWidget<CupertinoButton, MaterialButton> {
   PlatformButton({Key key, this.child, this.onPressed, this.disabledColor = Colors.transparent, this.color = null}) : super(key: key);
   final Widget child;

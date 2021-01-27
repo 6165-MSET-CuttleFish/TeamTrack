@@ -36,6 +36,7 @@ class MyApp extends StatelessWidget {
       // ),
 
       // theme: ThemeData(
+      //   splashColor: Colors.deepPurple,
       //   brightness: Brightness.dark,
       //   canvasColor: Colors.black,
       //   buttonColor: Colors.grey,
