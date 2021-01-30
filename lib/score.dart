@@ -14,6 +14,12 @@ class Score {
   int total() {
     return teleScore.total() + autoScore.total() + endgameScore.total();
   }
+
+  Map<String, dynamic> toJson() => {
+        'AutoScore': autoScore,
+        'TeleScore': teleScore,
+        'EndgameScore': endgameScore,
+      };
 }
 
 extension scoreList on List<Score> {
@@ -37,6 +43,12 @@ class TeleScore {
   int total() {
     return lowGoals * 2 + midGoals * 4 + hiGoals * 6;
   }
+
+  Map<String, dynamic> toJson() => {
+        'HighGoals': hiGoals,
+        'MiddleGoals': midGoals,
+        'LowGoals': lowGoals,
+      };
 }
 
 class AutoScore {
@@ -54,6 +66,15 @@ class AutoScore {
         pwrShots * 15 +
         (navigated ? 5 : 0);
   }
+
+  Map<String, dynamic> toJson() => {
+        'HighGoals': hiGoals,
+        'MiddleGoals': midGoals,
+        'LowGoals': lowGoals,
+        'WobbleGoals': wobbleGoals,
+        'PowerShots': pwrShots,
+        'Navigated': navigated,
+      };
 }
 
 class EndgameScore {
@@ -67,4 +88,11 @@ class EndgameScore {
         ringsOnWobble * 5 +
         pwrShots * 15;
   }
+
+  Map<String, dynamic> toJson() => {
+        'WobblesInDrop': wobbleGoalsInDrop,
+        'MiddleGoals': wobbleGoalsInStart,
+        'PowerShots': pwrShots,
+        'RingsOnWobble': ringsOnWobble
+      };
 }

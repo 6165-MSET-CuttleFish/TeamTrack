@@ -3,6 +3,7 @@ import 'score.dart';
 import 'package:uuid/uuid.dart';
 import 'package:tuple/tuple.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DataModel {
   List<Event> localEvents = [];
@@ -22,19 +23,15 @@ class Event {
       if (element.equals(newTeam)) isIn = true;
     });
     if (!isIn) teams.add(newTeam);
+    teams.sortTeams();
   }
 
-  void addMatch(Match newMatch) {
-    teams.firstWhere((element) => newMatch.red.item1.equals(element)).name =
-        newMatch.red.item1.name;
-    teams.firstWhere((element) => newMatch.red.item2.equals(element)).name =
-        newMatch.red.item2.name;
-    teams.firstWhere((element) => newMatch.blue.item1.equals(element)).name =
-        newMatch.blue.item1.name;
-    teams.firstWhere((element) => newMatch.blue.item2.equals(element)).name =
-        newMatch.blue.item2.name;
-    matches.add(newMatch);
-  }
+  Map<String, dynamic> toJson() => {
+        'name': name,
+        'teams': teams,
+        'matches': matches,
+        'type': type,
+      };
 }
 
 class Team {
@@ -53,6 +50,12 @@ class Team {
   bool equals(Team other) {
     return this.number == other.number;
   }
+
+  Map<String, dynamic> toJson() => {
+        'name': name,
+        'number': number,
+        'scores': scores,
+      };
 }
 
 class Match {
@@ -93,6 +96,13 @@ class Match {
     final b1 = blue.item2.scores.firstWhere((e) => e.id == id).total();
     return (r0 + r1).toString() + " - " + (b0 + b1).toString();
   }
+
+  Map<String, dynamic> toJson() => {
+        'red1': red.item1,
+        'red2': red.item2,
+        'blue1': blue.item1,
+        'blue2': blue.item2,
+      };
 }
 
 enum EventType { live, local, remote }
@@ -126,19 +136,29 @@ extension TeamsExtension on List<Team> {
   Team findAdd(String number, String name) {
     bool found = false;
     for (Team team in this) {
-      if (team.number == number) {
+      if (team.number ==
+          number.replaceAll(new RegExp(r' [^\w\s]+'), '').replaceAll(' ', '')) {
         found = true;
       }
     }
     if (found) {
-      var team = this.firstWhere((e) => e.number == number);
+      var team = this.firstWhere((e) =>
+          e.number ==
+          number.replaceAll(new RegExp(r' [^\w\s]+'), '').replaceAll(' ', ''));
       team.name = name;
       return team;
     } else {
-      var newTeam = Team(number, name);
+      var newTeam = Team(
+          number.replaceAll(new RegExp(r' [^\w\s]+'), '').replaceAll(' ', ''),
+          name);
       this.add(newTeam);
+      this.sortTeams();
       return newTeam;
     }
+  }
+
+  void sortTeams() {
+    this.sort((a, b) => int.parse(a.number).compareTo(int.parse(b.number)));
   }
 
   double maxScore() {
