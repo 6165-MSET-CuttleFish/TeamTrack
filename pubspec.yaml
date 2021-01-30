@@ -24,6 +24,7 @@ dependencies:
   uuid: ^2.2.2
   tuple: ^1.0.3
   fl_chart: ^0.12.2
+  flutter_slidable: ^0.5.7
   flutter:
     sdk: flutter
 

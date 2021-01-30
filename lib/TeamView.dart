@@ -4,10 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:TeamTrack/MatchView.dart';
-import 'package:tuple/tuple.dart';
 import 'backend.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:TeamTrack/PlatformGraphics.dart';
 
 class TeamView extends StatefulWidget {
   TeamView({Key key, this.team}) : super(key: key);
@@ -31,41 +29,37 @@ class _TeamView extends State<TeamView> {
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          LineChart(LineChartData(
-              minX: 0,
-              maxX: 8,
-              minY: 0,
-              maxY: 7,
-              lineBarsData: [
-                LineChartBarData(
-                    spots: [
-                      FlSpot(0, 3),
-                      FlSpot(2, 2),
-                    ],
-                    colors: [
-                      Colors.green,
-                      Colors.blue
-                    ],
-                    isCurved: true,
-                    preventCurveOverShooting: true,
-                    barWidth: 5,
-                    shadow: Shadow(color: Colors.green, blurRadius: 5)),
-                LineChartBarData(
-                    spots: [
-                      FlSpot(0, 5),
-                      FlSpot(2, 3),
-                      FlSpot(3, 7),
-                      FlSpot(4, 1),
-                    ],
-                    colors: [
-                      Colors.deepPurple,
-                      Colors.blue
-                    ],
-                    isCurved: true,
-                    preventCurveOverShooting: true,
-                    barWidth: 5,
-                    shadow: Shadow(color: Colors.green, blurRadius: 5))
-              ])),
+          LineChart(
+              LineChartData(minX: 0, maxX: 8, minY: 0, maxY: 7, lineBarsData: [
+            LineChartBarData(
+                spots: [
+                  FlSpot(0, 3),
+                  FlSpot(2, 2),
+                ],
+                colors: [
+                  Colors.green,
+                  Colors.blue
+                ],
+                isCurved: true,
+                preventCurveOverShooting: true,
+                barWidth: 5,
+                shadow: Shadow(color: Colors.green, blurRadius: 5)),
+            LineChartBarData(
+                spots: [
+                  FlSpot(0, 5),
+                  FlSpot(2, 3),
+                  FlSpot(3, 7),
+                  FlSpot(4, 1),
+                ],
+                colors: [
+                  Colors.deepPurple,
+                  Colors.blue
+                ],
+                isCurved: true,
+                preventCurveOverShooting: true,
+                barWidth: 5,
+                shadow: Shadow(color: Colors.green, blurRadius: 5))
+          ])),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 0),
           )
@@ -93,17 +87,14 @@ class _TeamView extends State<TeamView> {
               maxY: 7,
               barGroups: [
                 BarChartGroupData(x: 2, barRods: [
-                  BarChartRodData(y: 6,
-                      width: 36),
+                  BarChartRodData(y: 6, width: 36),
                 ]),
                 BarChartGroupData(x: 6, barRods: [
-                  BarChartRodData(y: 2,
-                      width: 36),
+                  BarChartRodData(y: 2, width: 36),
                 ]),
                 BarChartGroupData(x: 7, barRods: [
-                  BarChartRodData(y: 4,
-                      width: 36,
-                      colors: [Colors.red, Colors.blue]),
+                  BarChartRodData(
+                      y: 4, width: 36, colors: [Colors.red, Colors.blue]),
                 ]),
               ],
               //groupsSpace,
@@ -122,7 +113,6 @@ class _TeamView extends State<TeamView> {
           ],
         ),
       ),
-
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
@@ -131,17 +121,14 @@ class _TeamView extends State<TeamView> {
             maxY: 7,
             barGroups: [
               BarChartGroupData(x: 2, barRods: [
-                BarChartRodData(y: 6,
-                    width: 36),
+                BarChartRodData(y: 6, width: 36),
               ]),
               BarChartGroupData(x: 6, barRods: [
-                BarChartRodData(y: 2,
-                    width: 36),
+                BarChartRodData(y: 2, width: 36),
               ]),
               BarChartGroupData(x: 7, barRods: [
-                BarChartRodData(y: 4,
-                    width: 36,
-                    colors: [Colors.red, Colors.blue]),
+                BarChartRodData(
+                    y: 4, width: 36, colors: [Colors.red, Colors.blue]),
               ]),
             ],
             //groupsSpace,

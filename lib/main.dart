@@ -1,12 +1,8 @@
 import 'package:TeamTrack/EventsList.dart';
-import 'package:TeamTrack/MatchList.dart';
-import 'package:TeamTrack/TeamView.dart';
 import 'package:TeamTrack/backend.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:tuple/tuple.dart';
-import 'package:TeamTrack/MatchView.dart';
 
 void main() {
   runApp(MyApp());
@@ -14,54 +10,60 @@ void main() {
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
+  final lightTheme = ThemeData(
+    primarySwatch: Colors.deepPurple,
+    splashColor: Colors.cyan,
+    visualDensity: VisualDensity.adaptivePlatformDensity,
+  );
+  final darkTheme = ThemeData(
+    splashColor: Colors.deepPurple,
+    brightness: Brightness.dark,
+    canvasColor: Colors.black,
+    buttonColor: Colors.grey,
+    accentColor: Colors.cyan,
+    primarySwatch: Colors.cyan,
+    visualDensity: VisualDensity.adaptivePlatformDensity,
+  );
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'TeamTrack',
-      // theme: ThemeData(
-      //   // This is the theme of your application.
-      //   //
-      //   // Try running your application with "flutter run". You'll see the
-      //   // application has a blue toolbar. Then, without quitting the app, try
-      //   // changing the primarySwatch below to Colors.green and then invoke
-      //   // "hot reload" (press "r" in the console where you ran "flutter run",
-      //   // or simply save your changes to "hot reload" in a Flutter IDE).
-      //   // Notice that the counter didn't reset back to zero; the application
-      //   // is not restarted.
-      //   primarySwatch: Colors.deepPurple,
-      //   // This makes the visual density adapt to the platform that you run
-      //   // the app on. For desktop platforms, the controls will be smaller and
-      //   // closer together (more dense) than on mobile platforms.
-      //   visualDensity: VisualDensity.adaptivePlatformDensity,
-      // ),
+        title: 'TeamTrack',
+        // theme: ThemeData(
+        //   // This is the theme of your application.
+        //   //
+        //   // Try running your application with "flutter run". You'll see the
+        //   // application has a blue toolbar. Then, without quitting the app, try
+        //   // changing the primarySwatch below to Colors.green and then invoke
+        //   // "hot reload" (press "r" in the console where you ran "flutter run",
+        //   // or simply save your changes to "hot reload" in a Flutter IDE).
+        //   // Notice that the counter didn't reset back to zero; the application
+        //   // is not restarted.
+        //   primarySwatch: Colors.deepPurple,
+        //   // This makes the visual density adapt to the platform that you run
+        //   // the app on. For desktop platforms, the controls will be smaller and
+        //   // closer together (more dense) than on mobile platforms.
+        //   visualDensity: VisualDensity.adaptivePlatformDensity,
+        // ),
 
-      // theme: ThemeData(
-      //   splashColor: Colors.deepPurple,
-      //   brightness: Brightness.dark,
-      //   canvasColor: Colors.black,
-      //   buttonColor: Colors.grey,
-      //   shadowColor: Colors.grey,
-      //   accentColor: Colors.cyan,
-      //   primarySwatch: Colors.cyan,
-      //   visualDensity: VisualDensity.adaptivePlatformDensity
-      // ),
-        theme: ThemeData.dark(),
-      // theme: CupertinoThemeData(brightness: Brightness.dark,
-      // scaffoldBackgroundColor: Colors.black,
-      // primaryColor: Colors.purple),
+        theme: darkTheme,
+        // theme: ThemeData.dark(),
+        // theme: CupertinoThemeData(brightness: Brightness.dark,
+        // scaffoldBackgroundColor: Colors.black,
+        // primaryColor: Colors.purple),
 
-      //home: MatchView(title: 'TeamTrack'),
-      // home: MatchList(matches:
-      // [
-      //   Match(
-      //       Tuple2(Team('1', 'Alpha'), Team('2', 'Beta')),
-      //       Tuple2(Team('3', 'Charlie'), Team('4', 'Delta')),
-      //       EventType.local
-      //   )
-      // ])
-      //home: TeamView(team: Team('6165', 'Cuttlefish'),),
-      home: EventsList(dataModel: DataModel(),)
-    );
+        //home: MatchView(title: 'TeamTrack'),
+        // home: MatchList(matches:
+        // [
+        //   Match(
+        //       Tuple2(Team('1', 'Alpha'), Team('2', 'Beta')),
+        //       Tuple2(Team('3', 'Charlie'), Team('4', 'Delta')),
+        //       EventType.local
+        //   )
+        // ])
+        //home: TeamView(team: Team('6165', 'Cuttlefish'),),
+        home: EventsList(
+          dataModel: DataModel(),
+        ));
   }
 }
 

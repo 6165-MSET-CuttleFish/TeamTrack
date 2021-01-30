@@ -17,7 +17,7 @@ class MatchView extends StatefulWidget {
 class _MatchView extends State<MatchView> {
   Match _match;
   Team _selectedTeam;
-  Color _color = Colors.red;
+  Color _color = CupertinoColors.systemRed;
   Score _score;
   int _view = 0;
 
@@ -68,7 +68,7 @@ class _MatchView extends State<MatchView> {
                       icon: Icon(Icons.height_rounded),
                       iconSize: 24,
                       elevation: 16,
-                      style: TextStyle(color: Colors.deepPurple),
+                      style: TextStyle(color: Theme.of(context).accentColor),
                       underline: Container(
                         height: 0.5,
                         color: Colors.deepPurpleAccent,
@@ -149,7 +149,6 @@ class _MatchView extends State<MatchView> {
                       ],
                     ),
                   ),
-                if (Platform.isIOS) Expanded(child: viewSelect())
               ]),
             ),
           ),
@@ -827,14 +826,14 @@ class _MatchView extends State<MatchView> {
                 style: TextStyle(
                     color: _selectedTeam == _match.red.item1
                         ? Colors.grey
-                        : Colors.red),
+                        : CupertinoColors.systemRed),
               ),
               onPressed: _selectedTeam == _match.red.item1
                   ? null
                   : () {
                       setState(() {
                         _selectedTeam = _match.red.item1;
-                        _color = Colors.red;
+                        _color = CupertinoColors.systemRed;
                         _score = _selectedTeam.scores
                             .firstWhere((element) => element.id == _match.id);
                       });
@@ -848,7 +847,7 @@ class _MatchView extends State<MatchView> {
                 style: TextStyle(
                   color: _selectedTeam == _match.red.item2
                       ? Colors.grey
-                      : Colors.red,
+                      : CupertinoColors.systemRed,
                 ),
               ),
               onPressed: _selectedTeam == _match.red.item2
@@ -856,7 +855,7 @@ class _MatchView extends State<MatchView> {
                   : () {
                       setState(() {
                         _selectedTeam = _match.red.item2;
-                        _color = Colors.red;
+                        _color = CupertinoColors.systemRed;
                         _score = _selectedTeam.scores
                             .firstWhere((element) => element.id == _match.id);
                       });

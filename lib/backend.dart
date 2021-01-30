@@ -11,55 +11,28 @@ class DataModel {
 }
 
 class Event {
-  Event({this.name});
+  Event({this.name, this.type});
+  EventType type;
   List<Team> teams = [];
   List<Match> matches = [];
   String name;
-  double maxScore() {
-    return teams.map((e) => e.scores.maxScore()).reduce(max);
-  }
-
-  double lowestMadScore() {
-    return teams.map((e) => e.scores.madScore()).reduce(min);
-  }
-
-  double maxAutoScore() {
-    return teams.map((e) => e.scores.autoMaxScore()).reduce(max);
-  }
-
-  double lowestAutoMadScore() {
-    return teams.map((e) => e.scores.autoMADScore()).reduce(min);
-  }
-
-  double maxTeleScore() {
-    return teams.map((e) => e.scores.teleMaxScore()).reduce(max);
-  }
-
-  double lowestTeleMadScore() {
-    return teams.map((e) => e.scores.teleMADScore()).reduce(min);
-  }
-
-  double maxEndScore() {
-    return teams.map((e) => e.scores.endMaxScore()).reduce(max);
-  }
-
-  double lowestEndMadScore() {
-    return teams.map((e) => e.scores.endMADScore()).reduce(min);
-  }
-  void addTeam(Team newTeam){
+  void addTeam(Team newTeam) {
     bool isIn = false;
     teams.forEach((element) {
-      if(element.equals(newTeam))
-        isIn = true;
+      if (element.equals(newTeam)) isIn = true;
     });
-    if(!isIn)
-      teams.add(newTeam);
+    if (!isIn) teams.add(newTeam);
   }
-  void addMatch(Match newMatch){
-    teams.firstWhere((element) => newMatch.red.item1.equals(element)).name = newMatch.red.item1.name;
-    teams.firstWhere((element) => newMatch.red.item2.equals(element)).name = newMatch.red.item2.name;
-    teams.firstWhere((element) => newMatch.blue.item1.equals(element)).name = newMatch.blue.item1.name;
-    teams.firstWhere((element) => newMatch.blue.item2.equals(element)).name = newMatch.blue.item2.name;
+
+  void addMatch(Match newMatch) {
+    teams.firstWhere((element) => newMatch.red.item1.equals(element)).name =
+        newMatch.red.item1.name;
+    teams.firstWhere((element) => newMatch.red.item2.equals(element)).name =
+        newMatch.red.item2.name;
+    teams.firstWhere((element) => newMatch.blue.item1.equals(element)).name =
+        newMatch.blue.item1.name;
+    teams.firstWhere((element) => newMatch.blue.item2.equals(element)).name =
+        newMatch.blue.item2.name;
     matches.add(newMatch);
   }
 }
@@ -98,18 +71,26 @@ class Match {
     blue.item1.scores.addScore(Score(id, dice));
     blue.item2.scores.addScore(Score(id, dice));
   }
-  static Match defaultMatch(EventType type){
-    return Match(Tuple2(Team('1', 'Alpha'), Team('2', 'Beta')), Tuple2(Team('3', 'Charlie'), Team('4', 'Delta')), type);
+  static Match defaultMatch(EventType type) {
+    return Match(Tuple2(Team('1', 'Alpha'), Team('2', 'Beta')),
+        Tuple2(Team('3', 'Charlie'), Team('4', 'Delta')), type);
   }
+
+  Tuple2<Team, Team> alliance(Team team) {
+    if (red.item1.equals(team) || red.item2.equals(team)) {
+      return red;
+    } else if (blue.item1.equals(team) || blue.item2.equals(team)) {
+      return blue;
+    } else {
+      return null;
+    }
+  }
+
   String score() {
-    final r0 =
-        red.item1.scores.firstWhere((e) => e.id == id).total();
-    final r1 =
-        red.item2.scores.firstWhere((e) => e.id == id).total();
-    final b0 =
-        blue.item1.scores.firstWhere((e) => e.id == id).total();
-    final b1 =
-        blue.item2.scores.firstWhere((e) => e.id == id).total();
+    final r0 = red.item1.scores.firstWhere((e) => e.id == id).total();
+    final r1 = red.item2.scores.firstWhere((e) => e.id == id).total();
+    final b0 = blue.item1.scores.firstWhere((e) => e.id == id).total();
+    final b1 = blue.item2.scores.firstWhere((e) => e.id == id).total();
     return (r0 + r1).toString() + " - " + (b0 + b1).toString();
   }
 }
@@ -141,23 +122,76 @@ extension IterableExtensions on Iterable {
   }
 }
 
-extension TeamsExtension on List<Team> {}
+extension TeamsExtension on List<Team> {
+  Team findAdd(String number, String name) {
+    bool found = false;
+    for (Team team in this) {
+      if (team.number == number) {
+        found = true;
+      }
+    }
+    if (found) {
+      var team = this.firstWhere((e) => e.number == number);
+      team.name = name;
+      return team;
+    } else {
+      var newTeam = Team(number, name);
+      this.add(newTeam);
+      return newTeam;
+    }
+  }
+
+  double maxScore() {
+    return this.map((e) => e.scores.maxScore()).reduce(max);
+  }
+
+  double lowestMadScore() {
+    return this.map((e) => e.scores.madScore()).reduce(min);
+  }
+
+  double maxAutoScore() {
+    return this.map((e) => e.scores.autoMaxScore()).reduce(max);
+  }
+
+  double lowestAutoMadScore() {
+    return this.map((e) => e.scores.autoMADScore()).reduce(min);
+  }
+
+  double maxTeleScore() {
+    return this.map((e) => e.scores.teleMaxScore()).reduce(max);
+  }
+
+  double lowestTeleMadScore() {
+    return this.map((e) => e.scores.teleMADScore()).reduce(min);
+  }
+
+  double maxEndScore() {
+    return this.map((e) => e.scores.endMaxScore()).reduce(max);
+  }
+
+  double lowestEndMadScore() {
+    return this.map((e) => e.scores.endMADScore()).reduce(min);
+  }
+}
 
 extension ScoresExtension on List<Score> {
-  List<FlSpot> spots(){
-    final list =  this.map((e) => e.total()).toList();
+  List<FlSpot> spots() {
+    final list = this.map((e) => e.total()).toList();
     List<FlSpot> val;
-    for(int i = 0; i < list.length; i++){
+    for (int i = 0; i < list.length; i++) {
       val.add(FlSpot(i.toDouble(), list[i].toDouble()));
     }
     return val;
   }
+
   double maxScore() {
     return this.map((e) => e.total()).reduce(max).toDouble();
   }
-  double minScore(){
+
+  double minScore() {
     return this.map((e) => e.total()).reduce(min).toDouble();
   }
+
   double avgScore() {
     return this.map((e) => e.total()).mean();
   }
