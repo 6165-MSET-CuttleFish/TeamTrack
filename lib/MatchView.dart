@@ -1,4 +1,4 @@
-import 'package:TeamTrack/PlatformGraphics.dart';
+import 'package:TeamTrack/Graphic Assets/PlatformGraphics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -55,8 +55,28 @@ class _MatchView extends State<MatchView> {
             ),
             child: Center(
               child: Column(children: [
-                Text(_match.score(),
-                    style: Theme.of(context).textTheme.headline3),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Container(
+                      width: 100,
+                      child: Text(_match.redScore(),
+                          style: Theme.of(context).textTheme.headline4),
+                    ),
+                    Container(
+                      child: Text('-',
+                          style: Theme.of(context).textTheme.headline4),
+                    ),
+                    Container(
+                      width: 100,
+                      child: Text(_match.blueScore(),
+                          style: Theme.of(context).textTheme.headline4),
+                    )
+                  ],
+                ),
+                Padding(
+                  padding: EdgeInsets.all(10),
+                ),
                 buttonRow(),
                 Text(_selectedTeam.name + ' : ' + _score.total().toString(),
                     style: Theme.of(context).textTheme.headline6),
@@ -822,7 +842,7 @@ class _MatchView extends State<MatchView> {
             flex: 1,
             child: PlatformButton(
               child: Text(
-                _match.red.item1.name,
+                _match.red.item1.number,
                 style: TextStyle(
                     color: _selectedTeam == _match.red.item1
                         ? Colors.grey
@@ -843,7 +863,7 @@ class _MatchView extends State<MatchView> {
             flex: 1,
             child: PlatformButton(
               child: Text(
-                _match.red.item2.name,
+                _match.red.item2.number,
                 style: TextStyle(
                   color: _selectedTeam == _match.red.item2
                       ? Colors.grey
@@ -866,7 +886,7 @@ class _MatchView extends State<MatchView> {
             flex: 1,
             child: PlatformButton(
               child: Text(
-                _match.blue.item1.name,
+                _match.blue.item1.number,
                 style: TextStyle(
                     color: _selectedTeam == _match.blue.item1
                         ? Colors.grey
@@ -887,7 +907,7 @@ class _MatchView extends State<MatchView> {
             flex: 1,
             child: PlatformButton(
               child: Text(
-                _match.blue.item2.name,
+                _match.blue.item2.number,
                 style: TextStyle(
                     color: _selectedTeam == _match.blue.item2
                         ? Colors.grey

@@ -90,11 +90,19 @@ class Match {
   }
 
   String score() {
+    return redScore() + " - " + blueScore();
+  }
+
+  String redScore() {
     final r0 = red.item1.scores.firstWhere((e) => e.id == id).total();
     final r1 = red.item2.scores.firstWhere((e) => e.id == id).total();
+    return (r0 + r1).toString();
+  }
+
+  String blueScore() {
     final b0 = blue.item1.scores.firstWhere((e) => e.id == id).total();
     final b1 = blue.item2.scores.firstWhere((e) => e.id == id).total();
-    return (r0 + r1).toString() + " - " + (b0 + b1).toString();
+    return (b0 + b1).toString();
   }
 
   Map<String, dynamic> toJson() => {

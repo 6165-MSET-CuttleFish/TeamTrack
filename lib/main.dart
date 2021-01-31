@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:TeamTrack/EventsList.dart';
 import 'package:TeamTrack/backend.dart';
 import 'package:flutter/cupertino.dart';

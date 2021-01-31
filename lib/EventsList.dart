@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'backend.dart';
-import 'package:TeamTrack/PlatformGraphics.dart';
+import 'package:TeamTrack/Graphic Assets/PlatformGraphics.dart';
 import 'package:TeamTrack/EventView.dart';
 
 class EventsList extends StatefulWidget {

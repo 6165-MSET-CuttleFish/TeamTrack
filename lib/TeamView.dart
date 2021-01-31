@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:TeamTrack/Graphic%20Assets/BarGraph.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -8,9 +9,10 @@ import 'backend.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class TeamView extends StatefulWidget {
-  TeamView({Key key, this.team}) : super(key: key);
+  TeamView({Key key, this.team, this.event}) : super(key: key);
 
   final Team team;
+  final Event event;
 
   @override
   _TeamView createState() => _TeamView();
@@ -146,6 +148,14 @@ class _TeamView extends State<TeamView> {
           )
         ],
       ),
+      Container(
+          color: Colors.grey,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              BarGraph(val: 2, max: 9),
+            ],
+          ))
     ];
   }
 

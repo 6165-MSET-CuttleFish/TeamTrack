@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:tuple/tuple.dart';
 import 'dart:io' show Platform;
 
 abstract class PlatformWidget<C extends Widget, M extends Widget>
@@ -29,12 +28,18 @@ class PlatformSwitch extends PlatformWidget<CupertinoSwitch, Switch> {
     return CupertinoSwitch(
       value: value,
       onChanged: onChanged,
+      activeColor: Theme.of(context).accentColor,
     );
   }
 
   @override
   Switch buildMaterialWidget(BuildContext context) {
-    return Switch(value: value, onChanged: onChanged);
+    return Switch(
+      value: value,
+      onChanged: onChanged,
+      activeColor: Colors.green,
+      activeTrackColor: Theme.of(context).accentColor,
+    );
   }
 }
 

@@ -8,7 +8,8 @@ import 'package:TeamTrack/MatchView.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:tuple/tuple.dart';
 import 'backend.dart';
-import 'package:TeamTrack/PlatformGraphics.dart';
+import 'package:TeamTrack/Graphic Assets/PlatformGraphics.dart';
+import 'package:TeamTrack/Graphic Assets/BarGraph.dart';
 
 class EventView extends StatefulWidget {
   EventView({Key key, this.event}) : super(key: key);
@@ -18,7 +19,7 @@ class EventView extends StatefulWidget {
 }
 
 class _EventView extends State<EventView> {
-  final slider = SlidableDrawerActionPane();
+  final slider = SlidableStrechActionPane();
   final secondaryActions = <Widget>[
     IconSlideAction(
       caption: 'Delete',
@@ -42,7 +43,10 @@ class _EventView extends State<EventView> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => TeamView(team: e)));
+                            builder: (context) => TeamView(
+                                  team: e,
+                                  event: widget.event,
+                                )));
                   },
                 )))
             .toList(),
@@ -194,6 +198,7 @@ class _EventView extends State<EventView> {
             : null,
         body: materialTabs()[_tab],
         floatingActionButton: FloatingActionButton(
+          tooltip: _tab == 0 ? 'Add Team' : 'Add Match',
           child: Icon(Icons.add),
           onPressed: () {
             if (_tab == 0) {
@@ -322,16 +327,30 @@ class _EventView extends State<EventView> {
     for (int i = 0; i < 4; i++) {
       if (i == 0) {
         list.add(Container(
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Colors.transparent,
+                width: 6,
+              ),
+              borderRadius: BorderRadius.circular(60),
+              color: Colors.red,
+            ),
             alignment: Alignment.center,
-            color: Colors.red,
             child: Text(
               'Red Alliance',
               style: Theme.of(context).textTheme.headline6,
             )));
       } else if (i == 2) {
         list.add(Container(
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Colors.transparent,
+                width: 6,
+              ),
+              borderRadius: BorderRadius.circular(60),
+              color: Colors.blue,
+            ),
             alignment: Alignment.center,
-            color: Colors.blue,
             child: Text(
               'Blue Alliance',
               style: Theme.of(context).textTheme.headline6,
@@ -413,6 +432,9 @@ class _EventView extends State<EventView> {
                     widget.event.teams.findAdd(names[3], controllers[3].text)),
                 widget.event.type));
           });
+          for (TextEditingController controller in controllers) {
+            controller.text = '';
+          }
           Navigator.pop(context);
         }
       },
