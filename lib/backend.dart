@@ -131,10 +131,17 @@ extension DiceExtension on Dice {
 
 extension IterableExtensions on Iterable {
   double mean() {
-    return this.reduce((value, element) => value += element) / this.length;
+    if (this.length == 0) {
+      return 0;
+    } else {
+      return this.reduce((value, element) => value += element) / this.length;
+    }
   }
 
   double mad() {
+    if (this.length == 0) {
+      return 0;
+    }
     final mean = this.mean();
     return this.map((e) => (e - mean).abs()).mean();
   }
@@ -177,8 +184,8 @@ extension TeamsExtension on List<Team> {
     return this.map((e) => e.scores.madScore()).reduce(min);
   }
 
-  double maxAutoScore() {
-    return this.map((e) => e.scores.autoMaxScore()).reduce(max);
+  double maxAutoScore(Dice dice) {
+    return this.map((e) => e.scores.autoMaxScore(dice)).reduce(max);
   }
 
   double lowestAutoMadScore() {
@@ -220,8 +227,12 @@ extension ScoresExtension on List<Score> {
     return this.map((e) => e.total()).reduce(min).toDouble();
   }
 
-  double avgScore() {
-    return this.map((e) => e.total()).mean();
+  double meanScore(Dice dice) {
+    if (dice == null) {
+      return this.map((e) => e.total()).mean();
+    } else {
+      return this.where((e) => e.dice == dice).map((e) => e.total()).mean();
+    }
   }
 
   double madScore() {
@@ -240,7 +251,7 @@ extension ScoresExtension on List<Score> {
     return this.map((e) => e.teleScore.total()).mad();
   }
 
-  double autoMaxScore() {
+  double autoMaxScore(Dice dice) {
     return this.map((e) => e.autoScore.total()).reduce(max).toDouble();
   }
 
@@ -263,4 +274,11 @@ extension ScoresExtension on List<Score> {
   double endMADScore() {
     return this.map((e) => e.endgameScore.total()).mad();
   }
+}
+
+bool toggle(bool init) {
+  if (init)
+    return false;
+  else
+    return true;
 }

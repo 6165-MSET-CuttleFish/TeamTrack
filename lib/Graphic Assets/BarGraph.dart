@@ -8,12 +8,12 @@ class BarGraph extends StatelessWidget {
       this.max,
       this.val,
       this.inverted = false,
-      this.height = 200,
+      this.height = 150,
       this.title = 'Default'})
       : super(key: key);
   final String title;
-  final double max;
-  final double val;
+  double max;
+  double val;
   final bool inverted;
   final double height;
   @override
@@ -22,26 +22,34 @@ class BarGraph extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(title, style: Theme.of(context).textTheme.caption),
+        Padding(
+          padding: EdgeInsets.all(2),
+        ),
         Stack(
           alignment: AlignmentDirectional.bottomStart,
           children: [
             Container(
-              width: 50,
+              width: 40,
               height: height,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(60),
                 color: Theme.of(context).canvasColor.inverseColor(1),
               ),
             ),
-            Container(
-              width: 50,
-              height: (val / max) * height,
+            AnimatedContainer(
+              curve: Curves.fastLinearToSlowEaseIn,
+              duration: Duration(milliseconds: 600),
+              width: 40,
+              height: inverted ? (max / val) * height : (val / max) * height,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(60),
                 color: _colorSelect(val, max),
               ),
             ),
           ],
+        ),
+        Padding(
+          padding: EdgeInsets.all(2),
         ),
         Text(val.toInt().toString(),
             style: Theme.of(context).textTheme.caption),
