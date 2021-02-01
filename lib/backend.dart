@@ -177,34 +177,42 @@ extension TeamsExtension on List<Team> {
   }
 
   double maxScore() {
+    if (this.length == 0) return 1;
     return this.map((e) => e.scores.maxScore()).reduce(max);
   }
 
   double lowestMadScore() {
+    if (this.length == 0) return 1;
     return this.map((e) => e.scores.madScore()).reduce(min);
   }
 
   double maxAutoScore(Dice dice) {
+    if (this.length == 0) return 1;
     return this.map((e) => e.scores.autoMaxScore(dice)).reduce(max);
   }
 
-  double lowestAutoMadScore() {
-    return this.map((e) => e.scores.autoMADScore()).reduce(min);
+  double lowestAutoMadScore(Dice dice) {
+    if (this.length == 0) return 1;
+    return this.map((e) => e.scores.autoMADScore(dice)).reduce(min);
   }
 
   double maxTeleScore() {
+    if (this.length == 0) return 1;
     return this.map((e) => e.scores.teleMaxScore()).reduce(max);
   }
 
   double lowestTeleMadScore() {
+    if (this.length == 0) return 1;
     return this.map((e) => e.scores.teleMADScore()).reduce(min);
   }
 
   double maxEndScore() {
+    if (this.length == 0) return 1;
     return this.map((e) => e.scores.endMaxScore()).reduce(max);
   }
 
   double lowestEndMadScore() {
+    if (this.length == 0) return 1;
     return this.map((e) => e.scores.endMADScore()).reduce(min);
   }
 }
@@ -220,6 +228,7 @@ extension ScoresExtension on List<Score> {
   }
 
   double maxScore() {
+    if (this.length == 0) return 0;
     return this.map((e) => e.total()).reduce(max).toDouble();
   }
 
@@ -227,51 +236,77 @@ extension ScoresExtension on List<Score> {
     return this.map((e) => e.total()).reduce(min).toDouble();
   }
 
-  double meanScore(Dice dice) {
-    if (dice == null) {
-      return this.map((e) => e.total()).mean();
-    } else {
-      return this.where((e) => e.dice == dice).map((e) => e.total()).mean();
-    }
+  double meanScore() {
+    if (this.length == 0) return 0;
+    return this.map((e) => e.total()).mean();
   }
 
   double madScore() {
+    if (this.length == 0) return 0;
     return this.map((e) => e.total()).mad();
   }
 
   double teleMaxScore() {
+    if (this.length == 0) return 0;
     return this.map((e) => e.teleScore.total()).reduce(max).toDouble();
   }
 
   double teleMeanScore() {
+    if (this.length == 0) return 0;
     return this.map((e) => e.teleScore.total()).mean();
   }
 
   double teleMADScore() {
+    if (this.length == 0) return 0;
     return this.map((e) => e.teleScore.total()).mad();
   }
 
   double autoMaxScore(Dice dice) {
-    return this.map((e) => e.autoScore.total()).reduce(max).toDouble();
+    if (this.length == 0) return 0;
+    if (dice == null)
+      return this.map((e) => e.autoScore.total()).reduce(max).toDouble();
+    else
+      return this
+          .where((e) => e.dice == dice)
+          .map((e) => e.autoScore.total())
+          .reduce(max)
+          .toDouble();
   }
 
-  double autoMeanScore() {
-    return this.map((e) => e.autoScore.total()).mean();
+  double autoMeanScore(Dice dice) {
+    if (this.length == 0) return 0;
+    if (dice == null)
+      return this.map((e) => e.autoScore.total()).mean();
+    else
+      return this
+          .where((e) => e.dice == dice)
+          .map((e) => e.autoScore.total())
+          .mean();
   }
 
-  double autoMADScore() {
-    return this.map((e) => e.autoScore.total()).mad();
+  double autoMADScore(Dice dice) {
+    if (this.length == 0) return 0;
+    if (dice == null)
+      return this.map((e) => e.autoScore.total()).mad();
+    else
+      return this
+          .where((e) => e.dice == dice)
+          .map((e) => e.autoScore.total())
+          .mad();
   }
 
   double endMaxScore() {
+    if (this.length == 0) return 0;
     return this.map((e) => e.endgameScore.total()).reduce(max).toDouble();
   }
 
   double endMeanScore() {
+    if (this.length == 0) return 0;
     return this.map((e) => e.endgameScore.total()).mean();
   }
 
   double endMADScore() {
+    if (this.length == 0) return 0;
     return this.map((e) => e.endgameScore.total()).mad();
   }
 }

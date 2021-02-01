@@ -12,8 +12,8 @@ class BarGraph extends StatelessWidget {
       this.title = 'Default'})
       : super(key: key);
   final String title;
-  double max;
-  double val;
+  final double max;
+  final double val;
   final bool inverted;
   final double height;
   @override
@@ -40,7 +40,9 @@ class BarGraph extends StatelessWidget {
               curve: Curves.fastLinearToSlowEaseIn,
               duration: Duration(milliseconds: 600),
               width: 40,
-              height: inverted ? (max / val) * height : (val / max) * height,
+              height: inverted
+                  ? (val != 0 ? max / val : 0) * height
+                  : (max != 0 ? val / max : 0) * height,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(60),
                 color: _colorSelect(val, max),
