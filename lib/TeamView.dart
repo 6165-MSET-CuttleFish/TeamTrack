@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:TeamTrack/Graphic%20Assets/BarGraph.dart';
 import 'package:TeamTrack/Graphic%20Assets/CardView.dart';
 import 'package:flutter/cupertino.dart';
@@ -20,34 +21,140 @@ class _TeamView extends State<TeamView> {
   final Curve finalCurve = Curves.fastLinearToSlowEaseIn;
   final Duration finalDuration = Duration(milliseconds: 800);
   Widget _lineChart() {
-    return widget.team.scores.length > 2
-        ? LineChart(LineChartData(
-            minX: 0,
-            maxX: widget.team.scores.length.toDouble(),
-            minY: widget.team.scores.minScore(),
-            maxY: widget.team.scores.maxScore(),
-            lineBarsData: [
-              LineChartBarData(
-                  spots: widget.team.scores.spots(),
-                  colors: [Colors.deepPurple, Colors.blue],
-                  isCurved: true,
-                  preventCurveOverShooting: true,
-                  barWidth: 5,
-                  shadow: Shadow(color: Colors.green, blurRadius: 5)),
-            ],
-          ))
+    return widget.team.scores.length >= 2
+        ? AspectRatio(
+            aspectRatio: 1.70,
+            child: Container(
+              decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(18),
+                  ),
+                  color: Color(0xff232d37)),
+              child: Padding(
+                  padding: const EdgeInsets.only(
+                      right: 50.0, left: 12.0, top: 24, bottom: 12),
+                  child: LineChart(LineChartData(
+                    minX: 0,
+                    maxX: widget.team.scores.length.toDouble(),
+                    minY: 0,
+                    maxY: widget.event.matches
+                        .maxAllianceScore(widget.team)
+                        .toDouble(),
+                    //widget.team.scores.maxScore(),
+                    lineBarsData: [
+                      LineChartBarData(
+                          spots: widget.event.matches.spots(widget.team),
+                          colors: [
+                            Colors.orange,
+                          ],
+                          isCurved: true,
+                          preventCurveOverShooting: true,
+                          barWidth: 5,
+                          shadow: Shadow(color: Colors.green, blurRadius: 5)),
+                      LineChartBarData(
+                          spots: widget.team.scores.spots(),
+                          colors: [
+                            Colors.deepPurple,
+                          ],
+                          isCurved: true,
+                          preventCurveOverShooting: true,
+                          barWidth: 5,
+                          shadow: Shadow(color: Colors.green, blurRadius: 5)),
+                      LineChartBarData(
+                          spots: widget.team.scores.autoSpots(),
+                          colors: [
+                            Colors.green,
+                          ],
+                          isCurved: true,
+                          preventCurveOverShooting: true,
+                          barWidth: 5,
+                          shadow: Shadow(color: Colors.green, blurRadius: 5)),
+                      LineChartBarData(
+                          spots: widget.team.scores.endSpots(),
+                          colors: [
+                            Colors.red,
+                          ],
+                          isCurved: true,
+                          preventCurveOverShooting: true,
+                          barWidth: 5,
+                          shadow: Shadow(color: Colors.green, blurRadius: 5)),
+                      LineChartBarData(
+                          spots: widget.team.scores.teleSpots(),
+                          colors: [
+                            Colors.blue,
+                          ],
+                          isCurved: true,
+                          preventCurveOverShooting: true,
+                          barWidth: 5,
+                          shadow: Shadow(color: Colors.green, blurRadius: 5)),
+                    ],
+                  ))),
+            ),
+          )
         : Text('');
   }
 
   List<Widget> body() {
     return <Widget>[
       Padding(
-        padding: EdgeInsets.all(30),
+        padding: EdgeInsets.all(40),
+      ),
+      Wrap(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(18),
+                ),
+                color: Colors.orange),
+            child: Padding(
+                padding: EdgeInsets.all(8), child: Text('Alliance Total')),
+          ),
+          Container(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(18),
+                ),
+                color: Colors.deepPurple),
+            child: Padding(padding: EdgeInsets.all(8), child: Text('Timeline')),
+          ),
+          Container(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(18),
+                ),
+                color: Colors.green),
+            child:
+                Padding(padding: EdgeInsets.all(8), child: Text('Autonomous')),
+          ),
+          Container(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(18),
+                ),
+                color: Colors.blue),
+            child: Padding(padding: EdgeInsets.all(8), child: Text('Tele-Op')),
+          ),
+          Container(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(18),
+                ),
+                color: Colors.red),
+            child: Padding(padding: EdgeInsets.all(8), child: Text('Endgame')),
+          ),
+        ],
       ),
       _lineChart(),
+      Padding(
+        padding: EdgeInsets.all(10),
+      ),
       Text(
         'General',
         style: Theme.of(context).textTheme.bodyText1,
+      ),
+      Padding(
+        padding: EdgeInsets.all(5),
       ),
       CardView(
           isActive: widget.team.scores.length >= 2,
@@ -71,7 +178,7 @@ class _TeamView extends State<TeamView> {
               ),
             ],
           ),
-          collapsed: widget.team.scores.length >= 2
+          collapsed: widget.team.scores.length >= 1
               ? LineChart(LineChartData(
                   minX: 0,
                   maxX: widget.team.scores.length.toDouble(),
@@ -87,13 +194,22 @@ class _TeamView extends State<TeamView> {
                           shadow: Shadow(color: Colors.green, blurRadius: 5)),
                     ]))
               : Text('')),
+      Padding(
+        padding: EdgeInsets.all(10),
+      ),
       Text(
         'Autonomous',
         style: Theme.of(context).textTheme.bodyText1,
       ),
+      Padding(
+        padding: EdgeInsets.all(5),
+      ),
       Text(
         'Stack Height',
         style: Theme.of(context).textTheme.caption,
+      ),
+      Padding(
+        padding: EdgeInsets.all(5),
       ),
       CupertinoSlidingSegmentedControl(
         groupValue: _dice,
@@ -108,6 +224,9 @@ class _TeamView extends State<TeamView> {
             _dice = newDice;
           });
         },
+      ),
+      Padding(
+        padding: EdgeInsets.all(5),
       ),
       CardView(
         isActive: _dice == Dice.none
@@ -136,7 +255,7 @@ class _TeamView extends State<TeamView> {
         collapsed: widget.team.scores
                     .where((e) => _dice != Dice.none ? e.dice == _dice : true)
                     .length >=
-                2
+                1
             ? LineChart(LineChartData(
                 minX: 0,
                 maxX: widget.team.scores
@@ -160,9 +279,15 @@ class _TeamView extends State<TeamView> {
                   ]))
             : Text(''),
       ),
+      Padding(
+        padding: EdgeInsets.all(10),
+      ),
       Text(
         'Tele-Op',
         style: Theme.of(context).textTheme.bodyText1,
+      ),
+      Padding(
+        padding: EdgeInsets.all(5),
       ),
       CardView(
           isActive: widget.team.scores.length >= 2,
@@ -186,7 +311,7 @@ class _TeamView extends State<TeamView> {
               ),
             ],
           ),
-          collapsed: widget.team.scores.length >= 2
+          collapsed: widget.team.scores.length >= 1
               ? LineChart(LineChartData(
                   minX: 0,
                   maxX: widget.team.scores.length.toDouble(),
@@ -202,9 +327,15 @@ class _TeamView extends State<TeamView> {
                           shadow: Shadow(color: Colors.green, blurRadius: 5)),
                     ]))
               : Text('')),
+      Padding(
+        padding: EdgeInsets.all(10),
+      ),
       Text(
         'Endgame',
         style: Theme.of(context).textTheme.bodyText1,
+      ),
+      Padding(
+        padding: EdgeInsets.all(5),
       ),
       CardView(
           isActive: widget.team.scores.length >= 2,
@@ -228,7 +359,7 @@ class _TeamView extends State<TeamView> {
               ),
             ],
           ),
-          collapsed: widget.team.scores.length >= 2
+          collapsed: widget.team.scores.length >= 1
               ? LineChart(LineChartData(
                   minX: 0,
                   maxX: widget.team.scores.length.toDouble(),
@@ -244,7 +375,9 @@ class _TeamView extends State<TeamView> {
                           shadow: Shadow(color: Colors.green, blurRadius: 5)),
                     ]))
               : Text('')),
-      //SizeTransition()
+      Padding(
+        padding: EdgeInsets.all(150),
+      ),
     ];
   }
 

@@ -26,25 +26,6 @@ class Event {
     teams.sortTeams();
   }
 
-  void safeDelete(Team team) {
-    for (Match match in matches) {
-      if (match.red.item1.equals(team)) {
-        match = Match.defaultMatch(EventType.live);
-        // match.red.item1 = Team.nullTeam();
-      } else if (match.red.item2.equals(team)) {
-        match = Match.defaultMatch(EventType.live);
-        // match.red.item2 = Team.nullTeam();
-      } else if (match.blue.item1.equals(team)) {
-        match = Match.defaultMatch(EventType.live);
-        //match.blue.item1 = Team.nullTeam();
-      } else if (match.blue.item2.equals(team)) {
-        match = Match.defaultMatch(EventType.live);
-        //match.blue.item2 = Team.nullTeam();
-      }
-    }
-    teams.remove(team);
-  }
-
   Map<String, dynamic> toJson() => {
         'name': name,
         'teams': teams,
@@ -60,6 +41,15 @@ class Alliance {
     this.item1 = item1;
     this.item2 = item2;
   }
+  int allianceTotal(Uuid id) {
+    return item1.scores.firstWhere((e) => e.id == id).total() +
+        item2.scores.firstWhere((e) => e.id == id).total();
+  }
+
+  Map<String, dynamic> toJson() => {
+        'item1': item1,
+        'item2': item2,
+      };
 }
 
 class Team {
@@ -166,6 +156,14 @@ extension DiceExtension on Dice {
 }
 
 extension IterableExtensions on Iterable<int> {
+  List<FlSpot> spots() {
+    List<FlSpot> val = [];
+    for (int i = 0; i < this.length; i++) {
+      val.add(FlSpot(i.toDouble(), this.toList()[i].toDouble()));
+    }
+    return val;
+  }
+
   double mean() {
     if (this.length == 0) {
       return 0;
@@ -180,6 +178,32 @@ extension IterableExtensions on Iterable<int> {
     }
     final mean = this.mean();
     return this.map((e) => (e - mean).abs().toInt()).mean();
+  }
+}
+
+extension MatchExtensions on List<Match> {
+  List<FlSpot> spots(Team team) {
+    List<FlSpot> val = [];
+    for (int i = 0; i < this.length; i++) {
+      final alliance = this[i].alliance(team);
+      if (alliance != null) {
+        final allianceTotal = alliance.allianceTotal(this[i].id);
+        val.add(FlSpot(i.toDouble(), allianceTotal.toDouble()));
+      }
+    }
+    return val;
+  }
+
+  int maxAllianceScore(Team team) {
+    List<int> val = [];
+    for (int i = 0; i < this.length; i++) {
+      final alliance = this[i].alliance(team);
+      if (alliance != null) {
+        final allianceTotal = alliance.allianceTotal(this[i].id);
+        val.add(allianceTotal);
+      }
+    }
+    return val.reduce(max);
   }
 }
 

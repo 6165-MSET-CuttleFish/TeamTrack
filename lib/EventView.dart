@@ -6,10 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:TeamTrack/MatchView.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:tuple/tuple.dart';
 import 'backend.dart';
 import 'package:TeamTrack/Graphic Assets/PlatformGraphics.dart';
-import 'package:TeamTrack/Graphic Assets/BarGraph.dart';
 
 class EventView extends StatefulWidget {
   EventView({Key key, this.event}) : super(key: key);
@@ -36,7 +34,6 @@ class _EventView extends State<EventView> {
                   actionPane: slider,
                   secondaryActions: [
                     IconSlideAction(
-                      caption: 'Delete',
                       icon: Icons.delete,
                       color: Colors.red,
                       onTap: () {
@@ -100,7 +97,6 @@ class _EventView extends State<EventView> {
                 actionPane: slider,
                 secondaryActions: [
                   IconSlideAction(
-                    caption: 'Delete',
                     icon: Icons.delete,
                     color: Colors.red,
                     onTap: () {
@@ -141,24 +137,31 @@ class _EventView extends State<EventView> {
                     },
                   )
                 ],
-                child: ListTile(
-                  leading: Column(children: [
-                    Text(e.red.item1.name + ' & ' + e.red.item2.name),
-                    Text(
-                      'VS',
-                      style: TextStyle(
-                          color: Colors.red, fontWeight: FontWeight.bold),
+                child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.grey,
+                        width: 1,
+                      ),
                     ),
-                    Text(e.blue.item1.name + ' & ' + e.blue.item2.name)
-                  ]),
-                  trailing: Text(e.score()),
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => MatchView(match: e)));
-                  },
-                )))
+                    child: ListTile(
+                      leading: Column(children: [
+                        Text(e.red.item1.name + ' & ' + e.red.item2.name),
+                        Text(
+                          'VS',
+                          style: TextStyle(
+                              color: Colors.red, fontWeight: FontWeight.bold),
+                        ),
+                        Text(e.blue.item1.name + ' & ' + e.blue.item2.name)
+                      ]),
+                      trailing: Text(e.score()),
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => MatchView(match: e)));
+                      },
+                    ))))
             .toList(),
       ),
     ];
