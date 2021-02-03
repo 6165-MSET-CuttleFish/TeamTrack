@@ -33,28 +33,115 @@ class _EventView extends State<EventView> {
       ListView(
         children: widget.event.teams
             .map((e) => Slidable(
-                actionPane: slider,
-                secondaryActions: secondaryActions,
-                child: ListTile(
-                  title: Text(e.name),
-                  leading: Text(e.number,
-                      style: Theme.of(context).textTheme.caption),
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => TeamView(
-                                  team: e,
-                                  event: widget.event,
-                                )));
-                  },
-                )))
+                  actionPane: slider,
+                  secondaryActions: [
+                    IconSlideAction(
+                      caption: 'Delete',
+                      icon: Icons.delete,
+                      color: Colors.red,
+                      onTap: () {
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) => PlatformAlert(
+                                  title: Text('Delete Team'),
+                                  content: Text('Are you sure?'),
+                                  actions: [
+                                    PlatformDialogAction(
+                                      isDefaultAction: true,
+                                      child: Text('Cancel'),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                    PlatformDialogAction(
+                                      isDefaultAction: false,
+                                      isDestructive: true,
+                                      child: Text('Confirm'),
+                                      onPressed: () {
+                                        setState(() {
+                                          widget.event.teams.remove(e);
+                                        });
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ],
+                                ));
+                      },
+                    )
+                  ],
+                  child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.grey,
+                          width: 1,
+                        ),
+                      ),
+                      child: ListTile(
+                        title: Text(e.name),
+                        leading: Text(e.number,
+                            style: Theme.of(context).textTheme.caption),
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => TeamView(
+                                        team: e,
+                                        event: widget.event,
+                                      )));
+                        },
+                      )),
+                ))
             .toList(),
       ),
       ListView(
         semanticChildCount: widget.event.matches.length,
         children: widget.event.matches
-            .map((e) => ListTile(
+            .map((e) => Slidable(
+                actionPane: slider,
+                secondaryActions: [
+                  IconSlideAction(
+                    caption: 'Delete',
+                    icon: Icons.delete,
+                    color: Colors.red,
+                    onTap: () {
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) => PlatformAlert(
+                                title: Text('Delete Match'),
+                                content: Text('Are you sure?'),
+                                actions: [
+                                  PlatformDialogAction(
+                                    isDefaultAction: true,
+                                    child: Text('Cancel'),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                  PlatformDialogAction(
+                                    isDefaultAction: false,
+                                    isDestructive: true,
+                                    child: Text('Confirm'),
+                                    onPressed: () {
+                                      setState(() {
+                                        e.red.item1.scores
+                                            .removeWhere((f) => f.id == e.id);
+                                        e.red.item2.scores
+                                            .removeWhere((f) => f.id == e.id);
+                                        e.blue.item1.scores
+                                            .removeWhere((f) => f.id == e.id);
+                                        e.blue.item2.scores
+                                            .removeWhere((f) => f.id == e.id);
+                                        widget.event.matches.remove(e);
+                                      });
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                ],
+                              ));
+                    },
+                  )
+                ],
+                child: ListTile(
                   leading: Column(children: [
                     Text(e.red.item1.name + ' & ' + e.red.item2.name),
                     Text(
@@ -71,7 +158,7 @@ class _EventView extends State<EventView> {
                         MaterialPageRoute(
                             builder: (context) => MatchView(match: e)));
                   },
-                ))
+                )))
             .toList(),
       ),
     ];
@@ -424,10 +511,10 @@ class _EventView extends State<EventView> {
         if (_formKey.currentState.validate()) {
           setState(() {
             widget.event.matches.add(Match(
-                Tuple2<Team, Team>(
+                Alliance(
                     widget.event.teams.findAdd(names[0], controllers[0].text),
                     widget.event.teams.findAdd(names[1], controllers[1].text)),
-                Tuple2<Team, Team>(
+                Alliance(
                     widget.event.teams.findAdd(names[2], controllers[2].text),
                     widget.event.teams.findAdd(names[3], controllers[3].text)),
                 widget.event.type));

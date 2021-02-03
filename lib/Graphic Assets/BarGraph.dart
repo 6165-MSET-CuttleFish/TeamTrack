@@ -5,8 +5,8 @@ import 'package:flutter/rendering.dart';
 class BarGraph extends StatelessWidget {
   BarGraph(
       {Key key,
-      this.max,
-      this.val,
+      this.max = 2,
+      this.val = 9,
       this.inverted = false,
       this.height = 150,
       this.title = 'Default'})
@@ -60,12 +60,22 @@ class BarGraph extends StatelessWidget {
   }
 
   Color _colorSelect(double val, double max) {
-    if (val / max < 0.5) {
-      return CupertinoColors.systemRed;
-    } else if (val / max < 0.7) {
-      return CupertinoColors.systemYellow;
+    if (!inverted) {
+      if (val / max < 0.5) {
+        return CupertinoColors.systemRed;
+      } else if (val / max < 0.7) {
+        return CupertinoColors.systemYellow;
+      } else {
+        return CupertinoColors.systemGreen;
+      }
     } else {
-      return CupertinoColors.systemGreen;
+      if (max / val < 0.5) {
+        return CupertinoColors.systemRed;
+      } else if (max / val < 0.7) {
+        return CupertinoColors.systemYellow;
+      } else {
+        return CupertinoColors.systemGreen;
+      }
     }
   }
 }

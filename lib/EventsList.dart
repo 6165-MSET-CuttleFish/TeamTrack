@@ -33,7 +33,7 @@ class _EventsList extends State<EventsList> {
                   iconColor: Theme.of(context).primaryColor,
                   child: ListTile(
                     leading: Icon(
-                      CupertinoIcons.floppy_disk,
+                      CupertinoIcons.lock_shield_fill,
                       color: Theme.of(context).accentColor,
                     ),
                     trailing: Icon(
@@ -88,7 +88,7 @@ class _EventsList extends State<EventsList> {
             iconColor: Theme.of(context).primaryColor,
             child: ListTile(
               leading: Icon(
-                CupertinoIcons.floppy_disk,
+                CupertinoIcons.lock_shield_fill,
                 color: Theme.of(context).accentColor,
               ),
               trailing: Icon(
@@ -177,6 +177,7 @@ class _EventsList extends State<EventsList> {
     } else {
       return Scaffold(
         appBar: AppBar(
+          backgroundColor: Theme.of(context).accentColor,
           title: Text('Events'),
         ),
         body: SafeArea(

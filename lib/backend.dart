@@ -26,12 +26,40 @@ class Event {
     teams.sortTeams();
   }
 
+  void safeDelete(Team team) {
+    for (Match match in matches) {
+      if (match.red.item1.equals(team)) {
+        match = Match.defaultMatch(EventType.live);
+        // match.red.item1 = Team.nullTeam();
+      } else if (match.red.item2.equals(team)) {
+        match = Match.defaultMatch(EventType.live);
+        // match.red.item2 = Team.nullTeam();
+      } else if (match.blue.item1.equals(team)) {
+        match = Match.defaultMatch(EventType.live);
+        //match.blue.item1 = Team.nullTeam();
+      } else if (match.blue.item2.equals(team)) {
+        match = Match.defaultMatch(EventType.live);
+        //match.blue.item2 = Team.nullTeam();
+      }
+    }
+    teams.remove(team);
+  }
+
   Map<String, dynamic> toJson() => {
         'name': name,
         'teams': teams,
         'matches': matches,
         'type': type,
       };
+}
+
+class Alliance {
+  Team item1;
+  Team item2;
+  Alliance(Team item1, Team item2) {
+    this.item1 = item1;
+    this.item2 = item2;
+  }
 }
 
 class Team {
@@ -44,7 +72,7 @@ class Team {
     scores = List();
   }
   static Team nullTeam() {
-    return Team("?", "?");
+    return Team("1", "1");
   }
 
   bool equals(Team other) {
@@ -61,10 +89,10 @@ class Team {
 class Match {
   EventType type = EventType.live;
   Dice dice = Dice.one;
-  Tuple2<Team, Team> red;
-  Tuple2<Team, Team> blue;
+  Alliance red;
+  Alliance blue;
   Uuid id;
-  Match(Tuple2<Team, Team> red, Tuple2<Team, Team> blue, EventType type) {
+  Match(Alliance red, Alliance blue, EventType type) {
     this.type = type;
     this.red = red;
     this.blue = blue;
@@ -75,11 +103,11 @@ class Match {
     blue.item2.scores.addScore(Score(id, dice));
   }
   static Match defaultMatch(EventType type) {
-    return Match(Tuple2(Team('1', 'Alpha'), Team('2', 'Beta')),
-        Tuple2(Team('3', 'Charlie'), Team('4', 'Delta')), type);
+    return Match(Alliance(Team('1', 'Alpha'), Team('2', 'Beta')),
+        Alliance(Team('3', 'Charlie'), Team('4', 'Delta')), type);
   }
 
-  Tuple2<Team, Team> alliance(Team team) {
+  Alliance alliance(Team team) {
     if (red.item1.equals(team) || red.item2.equals(team)) {
       return red;
     } else if (blue.item1.equals(team) || blue.item2.equals(team)) {
@@ -87,6 +115,14 @@ class Match {
     } else {
       return null;
     }
+  }
+
+  void setDice(Dice dice) {
+    this.dice = dice;
+    red.item1.scores.firstWhere((e) => e.id == id).dice = dice;
+    red.item2.scores.firstWhere((e) => e.id == id).dice = dice;
+    blue.item1.scores.firstWhere((e) => e.id == id).dice = dice;
+    blue.item2.scores.firstWhere((e) => e.id == id).dice = dice;
   }
 
   String score() {
@@ -114,7 +150,7 @@ class Match {
 }
 
 enum EventType { live, local, remote }
-enum Dice { one, two, three }
+enum Dice { one, two, three, none }
 
 extension DiceExtension on Dice {
   int stackHeight() {
@@ -129,7 +165,7 @@ extension DiceExtension on Dice {
   }
 }
 
-extension IterableExtensions on Iterable {
+extension IterableExtensions on Iterable<int> {
   double mean() {
     if (this.length == 0) {
       return 0;
@@ -143,7 +179,7 @@ extension IterableExtensions on Iterable {
       return 0;
     }
     final mean = this.mean();
-    return this.map((e) => (e - mean).abs()).mean();
+    return this.map((e) => (e - mean).abs().toInt()).mean();
   }
 }
 
@@ -220,7 +256,34 @@ extension TeamsExtension on List<Team> {
 extension ScoresExtension on List<Score> {
   List<FlSpot> spots() {
     final list = this.map((e) => e.total()).toList();
-    List<FlSpot> val;
+    List<FlSpot> val = [];
+    for (int i = 0; i < list.length; i++) {
+      val.add(FlSpot(i.toDouble(), list[i].toDouble()));
+    }
+    return val;
+  }
+
+  List<FlSpot> teleSpots() {
+    final list = this.map((e) => e.teleScore.total()).toList();
+    List<FlSpot> val = [];
+    for (int i = 0; i < list.length; i++) {
+      val.add(FlSpot(i.toDouble(), list[i].toDouble()));
+    }
+    return val;
+  }
+
+  List<FlSpot> autoSpots() {
+    final list = this.map((e) => e.autoScore.total()).toList();
+    List<FlSpot> val = [];
+    for (int i = 0; i < list.length; i++) {
+      val.add(FlSpot(i.toDouble(), list[i].toDouble()));
+    }
+    return val;
+  }
+
+  List<FlSpot> endSpots() {
+    final list = this.map((e) => e.endgameScore.total()).toList();
+    List<FlSpot> val = [];
     for (int i = 0; i < list.length; i++) {
       val.add(FlSpot(i.toDouble(), list[i].toDouble()));
     }
@@ -251,6 +314,11 @@ extension ScoresExtension on List<Score> {
     return this.map((e) => e.teleScore.total()).reduce(max).toDouble();
   }
 
+  double teleMinScore() {
+    if (this.length == 0) return 0;
+    return this.map((e) => e.teleScore.total()).reduce(min).toDouble();
+  }
+
   double teleMeanScore() {
     if (this.length == 0) return 0;
     return this.map((e) => e.teleScore.total()).mean();
@@ -262,42 +330,45 @@ extension ScoresExtension on List<Score> {
   }
 
   double autoMaxScore(Dice dice) {
-    if (this.length == 0) return 0;
-    if (dice == null)
-      return this.map((e) => e.autoScore.total()).reduce(max).toDouble();
+    final arr = dice != Dice.none ? this.where((e) => e.dice == dice) : this;
+    if (arr.length == 0)
+      return 0;
     else
-      return this
-          .where((e) => e.dice == dice)
-          .map((e) => e.autoScore.total())
-          .reduce(max)
-          .toDouble();
+      return arr.map((e) => e.autoScore.total()).reduce(max).toDouble();
+  }
+
+  double autoMinScore(Dice dice) {
+    final arr = dice != Dice.none ? this.where((e) => e.dice == dice) : this;
+    if (arr.length == 0)
+      return 0;
+    else
+      return arr.map((e) => e.autoScore.total()).reduce(min).toDouble();
   }
 
   double autoMeanScore(Dice dice) {
-    if (this.length == 0) return 0;
-    if (dice == null)
-      return this.map((e) => e.autoScore.total()).mean();
+    final arr = dice != Dice.none ? this.where((e) => e.dice == dice) : this;
+    if (arr.length == 0)
+      return 0;
     else
-      return this
-          .where((e) => e.dice == dice)
-          .map((e) => e.autoScore.total())
-          .mean();
+      return arr.map((e) => e.autoScore.total()).mean();
   }
 
   double autoMADScore(Dice dice) {
-    if (this.length == 0) return 0;
-    if (dice == null)
-      return this.map((e) => e.autoScore.total()).mad();
+    final arr = dice != Dice.none ? this.where((e) => e.dice == dice) : this;
+    if (arr.length == 0)
+      return 0;
     else
-      return this
-          .where((e) => e.dice == dice)
-          .map((e) => e.autoScore.total())
-          .mad();
+      return arr.map((e) => e.autoScore.total()).mad();
   }
 
   double endMaxScore() {
     if (this.length == 0) return 0;
     return this.map((e) => e.endgameScore.total()).reduce(max).toDouble();
+  }
+
+  double endMinScore() {
+    if (this.length == 0) return 0;
+    return this.map((e) => e.endgameScore.total()).reduce(min).toDouble();
   }
 
   double endMeanScore() {

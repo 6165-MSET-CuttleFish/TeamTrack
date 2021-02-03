@@ -1,392 +1,249 @@
 import 'dart:io';
-
 import 'package:TeamTrack/Graphic%20Assets/BarGraph.dart';
 import 'package:TeamTrack/Graphic%20Assets/CardView.dart';
-import 'package:TeamTrack/Graphic%20Assets/Collapsible.dart';
-import 'package:TeamTrack/Graphic%20Assets/PlatformGraphics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:TeamTrack/MatchView.dart';
 import 'backend.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'dart:async';
 
 class TeamView extends StatefulWidget {
   TeamView({Key key, this.team, this.event}) : super(key: key);
-
   final Team team;
   final Event event;
-
   @override
   _TeamView createState() => _TeamView();
 }
 
 class _TeamView extends State<TeamView> {
-  bool _genBool = false;
-  bool _autoBool = false;
-  bool _teleBool = false;
-  bool _endBool = false;
+  Dice _dice = Dice.none;
   final Curve finalCurve = Curves.fastLinearToSlowEaseIn;
   final Duration finalDuration = Duration(milliseconds: 800);
-  List<Widget> genCard() {
-    var list = <Widget>[
-      AnimatedContainer(
-        curve: finalCurve,
-        duration: finalDuration,
-        width: _genBool
-            ? MediaQuery.of(context).size.width
-            : MediaQuery.of(context).size.width - 50,
-        height: _genBool ? 300 : 200,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            BarGraph(
-              val: 2,
-              max: 9,
-              title: 'Average',
-            ),
-            BarGraph(val: 2, max: 9, title: 'Best Score'),
-            BarGraph(
-              val: 6,
-              max: 7,
-              inverted: false,
-              title: 'Consistency',
-            ),
-          ],
-        ),
-      ),
-      Collapsible(
-          isCollapsed: !_genBool,
-          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Padding(
-              padding: EdgeInsets.all(2.5),
-            ),
-            LineChart(LineChartData(
-                minX: 0,
-                maxX: 8,
-                minY: 0,
-                maxY: 7,
-                lineBarsData: [
-                  LineChartBarData(
-                      spots: [
-                        FlSpot(0, 3),
-                        FlSpot(2, 2),
-                      ],
-                      colors: [
-                        Colors.green,
-                        Colors.blue
-                      ],
-                      isCurved: true,
-                      preventCurveOverShooting: true,
-                      barWidth: 5,
-                      shadow: Shadow(color: Colors.green, blurRadius: 5)),
-                  LineChartBarData(
-                      spots: [
-                        FlSpot(0, 5),
-                        FlSpot(2, 3),
-                        FlSpot(3, 7),
-                        FlSpot(4, 1),
-                      ],
-                      colors: [
-                        Colors.deepPurple,
-                        Colors.blue
-                      ],
-                      isCurved: true,
-                      preventCurveOverShooting: true,
-                      barWidth: 5,
-                      shadow: Shadow(color: Colors.green, blurRadius: 5))
-                ]))
-          ]))
-    ];
-    return list;
+  Widget _lineChart() {
+    return widget.team.scores.length > 2
+        ? LineChart(LineChartData(
+            minX: 0,
+            maxX: widget.team.scores.length.toDouble(),
+            minY: widget.team.scores.minScore(),
+            maxY: widget.team.scores.maxScore(),
+            lineBarsData: [
+              LineChartBarData(
+                  spots: widget.team.scores.spots(),
+                  colors: [Colors.deepPurple, Colors.blue],
+                  isCurved: true,
+                  preventCurveOverShooting: true,
+                  barWidth: 5,
+                  shadow: Shadow(color: Colors.green, blurRadius: 5)),
+            ],
+          ))
+        : Text('');
   }
 
   List<Widget> body() {
     return <Widget>[
       Padding(
-        padding: EdgeInsets.all(10),
+        padding: EdgeInsets.all(30),
       ),
-
-      LineChart(LineChartData(
-        minX: 0,
-        maxX: 8,
-        minY: 0,
-        maxY: 7,
-        lineBarsData: [
-          LineChartBarData(
-              spots: [
-                FlSpot(0, 3),
-                FlSpot(2, 2),
-              ],
-              colors: [
-                Colors.green,
-                Colors.blue
-              ],
-              isCurved: true,
-              preventCurveOverShooting: true,
-              barWidth: 5,
-              shadow: Shadow(color: Colors.green, blurRadius: 5)),
-          LineChartBarData(
-              spots: [
-                FlSpot(0, 5),
-                FlSpot(2, 3),
-                FlSpot(3, 7),
-                FlSpot(4, 1),
-              ],
-              colors: [
-                Colors.deepPurple,
-                Colors.blue
-              ],
-              isCurved: true,
-              preventCurveOverShooting: true,
-              barWidth: 5,
-              shadow: Shadow(color: Colors.green, blurRadius: 5))
-        ],
-      )),
+      _lineChart(),
       Text(
         'General',
         style: Theme.of(context).textTheme.bodyText1,
       ),
       CardView(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            BarGraph(
-              val: widget.team.scores.meanScore(),
-              max: widget.event.teams.maxScore(),
-              title: 'Average',
-            ),
-            BarGraph(
-                val: widget.team.scores.maxScore(),
+          isActive: widget.team.scores.length >= 2,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              BarGraph(
+                val: widget.team.scores.meanScore(),
                 max: widget.event.teams.maxScore(),
-                title: 'Best Score'),
-            BarGraph(
-              val: widget.team.scores.madScore(),
-              max: widget.event.teams.lowestMadScore(),
-              inverted: false,
-              title: 'Consistency',
-            ),
-          ],
-        ),
-        collapsed:
-            Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Padding(
-            padding: EdgeInsets.all(2.5),
+                title: 'Average',
+              ),
+              BarGraph(
+                  val: widget.team.scores.maxScore(),
+                  max: widget.event.teams.maxScore(),
+                  title: 'Best Score'),
+              BarGraph(
+                val: widget.team.scores.madScore(),
+                max: widget.event.teams.lowestMadScore(),
+                inverted: true,
+                title: 'Consistency',
+              ),
+            ],
           ),
-          LineChart(
-              LineChartData(minX: 0, maxX: 8, minY: 0, maxY: 7, lineBarsData: [
-            LineChartBarData(
-                spots: [
-                  FlSpot(0, 3),
-                  FlSpot(2, 2),
-                ],
-                colors: [
-                  Colors.green,
-                  Colors.blue
-                ],
-                isCurved: true,
-                preventCurveOverShooting: true,
-                barWidth: 5,
-                shadow: Shadow(color: Colors.green, blurRadius: 5)),
-            LineChartBarData(
-                spots: [
-                  FlSpot(0, 5),
-                  FlSpot(2, 3),
-                  FlSpot(3, 7),
-                  FlSpot(4, 1),
-                ],
-                colors: [
-                  Colors.deepPurple,
-                  Colors.blue
-                ],
-                isCurved: true,
-                preventCurveOverShooting: true,
-                barWidth: 5,
-                shadow: Shadow(color: Colors.green, blurRadius: 5))
-          ]))
-        ]),
-      ),
+          collapsed: widget.team.scores.length >= 2
+              ? LineChart(LineChartData(
+                  minX: 0,
+                  maxX: widget.team.scores.length.toDouble(),
+                  minY: widget.team.scores.minScore(),
+                  maxY: widget.team.scores.maxScore(),
+                  lineBarsData: [
+                      LineChartBarData(
+                          spots: widget.team.scores.spots(),
+                          colors: [Colors.green, Colors.blue],
+                          isCurved: true,
+                          preventCurveOverShooting: true,
+                          barWidth: 5,
+                          shadow: Shadow(color: Colors.green, blurRadius: 5)),
+                    ]))
+              : Text('')),
       Text(
         'Autonomous',
         style: Theme.of(context).textTheme.bodyText1,
       ),
+      Text(
+        'Stack Height',
+        style: Theme.of(context).textTheme.caption,
+      ),
+      CupertinoSlidingSegmentedControl(
+        groupValue: _dice,
+        children: <Dice, Widget>{
+          Dice.one: Text('0'),
+          Dice.two: Text('1'),
+          Dice.three: Text('4'),
+          Dice.none: Text('All Cases')
+        },
+        onValueChanged: (Dice newDice) {
+          setState(() {
+            _dice = newDice;
+          });
+        },
+      ),
       CardView(
+        isActive: _dice == Dice.none
+            ? widget.team.scores.length >= 2
+            : widget.team.scores.where((e) => e.dice == _dice).length >= 2,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             BarGraph(
-              val: 2,
-              max: 9,
+              val: widget.team.scores.autoMeanScore(_dice),
+              max: widget.event.teams.maxAutoScore(_dice),
               title: 'Average',
             ),
-            BarGraph(val: 2, max: 9, title: 'Best Score'),
             BarGraph(
-              val: 6,
-              max: 7,
-              inverted: false,
+                val: widget.team.scores.autoMaxScore(_dice),
+                max: widget.event.teams.maxAutoScore(_dice),
+                title: 'Best Score'),
+            BarGraph(
+              val: widget.team.scores.autoMADScore(_dice),
+              max: widget.event.teams.lowestAutoMadScore(_dice),
+              inverted: true,
               title: 'Consistency',
             ),
           ],
         ),
-        collapsed:
-            Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Padding(
-            padding: EdgeInsets.all(2.5),
-          ),
-          LineChart(
-              LineChartData(minX: 0, maxX: 8, minY: 0, maxY: 7, lineBarsData: [
-            LineChartBarData(
-                spots: [
-                  FlSpot(0, 3),
-                  FlSpot(2, 2),
-                ],
-                colors: [
-                  Colors.green,
-                  Colors.blue
-                ],
-                isCurved: true,
-                preventCurveOverShooting: true,
-                barWidth: 5,
-                shadow: Shadow(color: Colors.green, blurRadius: 5)),
-            LineChartBarData(
-                spots: [
-                  FlSpot(0, 5),
-                  FlSpot(2, 3),
-                  FlSpot(3, 7),
-                  FlSpot(4, 1),
-                ],
-                colors: [
-                  Colors.deepPurple,
-                  Colors.blue
-                ],
-                isCurved: true,
-                preventCurveOverShooting: true,
-                barWidth: 5,
-                shadow: Shadow(color: Colors.green, blurRadius: 5))
-          ]))
-        ]),
+        collapsed: widget.team.scores
+                    .where((e) => _dice != Dice.none ? e.dice == _dice : true)
+                    .length >=
+                2
+            ? LineChart(LineChartData(
+                minX: 0,
+                maxX: widget.team.scores
+                    .where((e) => _dice != Dice.none ? e.dice == _dice : true)
+                    .length
+                    .toDouble(),
+                minY: widget.team.scores.autoMinScore(_dice),
+                maxY: widget.team.scores.autoMaxScore(_dice),
+                lineBarsData: [
+                    LineChartBarData(
+                        spots: widget.team.scores
+                            .where((e) =>
+                                _dice != Dice.none ? e.dice == _dice : true)
+                            .toList()
+                            .autoSpots(),
+                        colors: [Colors.green, Colors.blue],
+                        isCurved: true,
+                        preventCurveOverShooting: true,
+                        barWidth: 5,
+                        shadow: Shadow(color: Colors.green, blurRadius: 5)),
+                  ]))
+            : Text(''),
       ),
       Text(
         'Tele-Op',
         style: Theme.of(context).textTheme.bodyText1,
       ),
       CardView(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            BarGraph(
-              val: 2,
-              max: 9,
-              title: 'Average',
-            ),
-            BarGraph(val: 2, max: 9, title: 'Best Score'),
-            BarGraph(
-              val: 6,
-              max: 7,
-              inverted: false,
-              title: 'Consistency',
-            ),
-          ],
-        ),
-        collapsed:
-            Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Padding(
-            padding: EdgeInsets.all(2.5),
+          isActive: widget.team.scores.length >= 2,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              BarGraph(
+                val: widget.team.scores.teleMeanScore(),
+                max: widget.event.teams.maxTeleScore(),
+                title: 'Average',
+              ),
+              BarGraph(
+                  val: widget.team.scores.teleMaxScore(),
+                  max: widget.event.teams.maxTeleScore(),
+                  title: 'Best Score'),
+              BarGraph(
+                val: widget.team.scores.teleMADScore(),
+                max: widget.event.teams.lowestTeleMadScore(),
+                inverted: true,
+                title: 'Consistency',
+              ),
+            ],
           ),
-          LineChart(
-              LineChartData(minX: 0, maxX: 8, minY: 0, maxY: 7, lineBarsData: [
-            LineChartBarData(
-                spots: [
-                  FlSpot(0, 3),
-                  FlSpot(2, 2),
-                ],
-                colors: [
-                  Colors.green,
-                  Colors.blue
-                ],
-                isCurved: true,
-                preventCurveOverShooting: true,
-                barWidth: 5,
-                shadow: Shadow(color: Colors.green, blurRadius: 5)),
-            LineChartBarData(
-                spots: [
-                  FlSpot(0, 5),
-                  FlSpot(2, 3),
-                  FlSpot(3, 7),
-                  FlSpot(4, 1),
-                ],
-                colors: [
-                  Colors.deepPurple,
-                  Colors.blue
-                ],
-                isCurved: true,
-                preventCurveOverShooting: true,
-                barWidth: 5,
-                shadow: Shadow(color: Colors.green, blurRadius: 5))
-          ]))
-        ]),
-      ),
+          collapsed: widget.team.scores.length >= 2
+              ? LineChart(LineChartData(
+                  minX: 0,
+                  maxX: widget.team.scores.length.toDouble(),
+                  minY: widget.team.scores.teleMinScore(),
+                  maxY: widget.team.scores.teleMaxScore().toDouble(),
+                  lineBarsData: [
+                      LineChartBarData(
+                          spots: widget.team.scores.teleSpots(),
+                          colors: [Colors.green, Colors.blue],
+                          isCurved: true,
+                          preventCurveOverShooting: true,
+                          barWidth: 5,
+                          shadow: Shadow(color: Colors.green, blurRadius: 5)),
+                    ]))
+              : Text('')),
       Text(
         'Endgame',
         style: Theme.of(context).textTheme.bodyText1,
       ),
       CardView(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            BarGraph(
-              val: 2,
-              max: 9,
-              title: 'Average',
-            ),
-            BarGraph(val: 2, max: 9, title: 'Best Score'),
-            BarGraph(
-              val: 6,
-              max: 7,
-              inverted: false,
-              title: 'Consistency',
-            ),
-          ],
-        ),
-        collapsed:
-            Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Padding(
-            padding: EdgeInsets.all(2.5),
+          isActive: widget.team.scores.length >= 2,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              BarGraph(
+                val: widget.team.scores.endMeanScore(),
+                max: widget.event.teams.maxEndScore(),
+                title: 'Average',
+              ),
+              BarGraph(
+                  val: widget.team.scores.endMaxScore(),
+                  max: widget.event.teams.maxEndScore(),
+                  title: 'Best Score'),
+              BarGraph(
+                val: widget.team.scores.endMADScore(),
+                max: widget.event.teams.lowestEndMadScore(),
+                inverted: true,
+                title: 'Consistency',
+              ),
+            ],
           ),
-          LineChart(
-              LineChartData(minX: 0, maxX: 8, minY: 0, maxY: 7, lineBarsData: [
-            LineChartBarData(
-                spots: [
-                  FlSpot(0, 3),
-                  FlSpot(2, 2),
-                ],
-                colors: [
-                  Colors.green,
-                  Colors.blue
-                ],
-                isCurved: true,
-                preventCurveOverShooting: true,
-                barWidth: 5,
-                shadow: Shadow(color: Colors.green, blurRadius: 5)),
-            LineChartBarData(
-                spots: [
-                  FlSpot(0, 5),
-                  FlSpot(2, 3),
-                  FlSpot(3, 7),
-                  FlSpot(4, 1),
-                ],
-                colors: [
-                  Colors.deepPurple,
-                  Colors.blue
-                ],
-                isCurved: true,
-                preventCurveOverShooting: true,
-                barWidth: 5,
-                shadow: Shadow(color: Colors.green, blurRadius: 5))
-          ]))
-        ]),
-      ),
+          collapsed: widget.team.scores.length >= 2
+              ? LineChart(LineChartData(
+                  minX: 0,
+                  maxX: widget.team.scores.length.toDouble(),
+                  minY: widget.team.scores.endMinScore(),
+                  maxY: widget.team.scores.endMaxScore(),
+                  lineBarsData: [
+                      LineChartBarData(
+                          spots: widget.team.scores.endSpots(),
+                          colors: [Colors.green, Colors.blue],
+                          isCurved: true,
+                          preventCurveOverShooting: true,
+                          barWidth: 5,
+                          shadow: Shadow(color: Colors.green, blurRadius: 5)),
+                    ]))
+              : Text('')),
       //SizeTransition()
     ];
   }

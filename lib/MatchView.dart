@@ -95,7 +95,7 @@ class _MatchView extends State<MatchView> {
                       ),
                       onChanged: (Dice newValue) {
                         setState(() {
-                          _match.dice = newValue;
+                          _match.setDice(newValue);
                         });
                       },
                       items: <Dice>[Dice.one, Dice.two, Dice.three]

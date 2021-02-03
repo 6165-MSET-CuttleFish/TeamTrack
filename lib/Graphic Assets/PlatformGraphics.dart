@@ -61,6 +61,7 @@ class PlatformAlert extends PlatformWidget<CupertinoAlertDialog, AlertDialog> {
   @override
   AlertDialog buildMaterialWidget(BuildContext context) {
     return AlertDialog(
+      elevation: 0,
       title: title,
       content: content,
       actions: actions,
@@ -105,15 +106,24 @@ class PlatformTextField
 class PlatformDialogAction
     extends PlatformWidget<CupertinoDialogAction, FlatButton> {
   PlatformDialogAction(
-      {Key key, this.child, this.isDefaultAction = false, this.onPressed})
+      {Key key,
+      this.child,
+      this.isDefaultAction = false,
+      this.onPressed,
+      this.isDestructive = false})
       : super(key: key);
   final Widget child;
   final bool isDefaultAction;
   final Function onPressed;
+  final bool isDestructive;
   @override
   CupertinoDialogAction buildCupertinoWidget(BuildContext context) {
     return CupertinoDialogAction(
-        isDefaultAction: isDefaultAction, child: child, onPressed: onPressed);
+      isDefaultAction: isDefaultAction,
+      child: child,
+      onPressed: onPressed,
+      isDestructiveAction: isDestructive,
+    );
   }
 
   @override
