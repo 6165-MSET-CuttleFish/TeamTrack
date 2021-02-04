@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:TeamTrack/MatchList.dart';
+import 'package:TeamTrack/TeamList.dart';
 import 'package:TeamTrack/TeamView.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +9,7 @@ import 'package:flutter/rendering.dart';
 import 'package:TeamTrack/MatchView.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'backend.dart';
-import 'package:TeamTrack/Graphic Assets/PlatformGraphics.dart';
+import 'package:TeamTrack/Assets/PlatformGraphics.dart';
 
 class EventView extends StatefulWidget {
   EventView({Key key, this.event}) : super(key: key);
@@ -28,142 +30,12 @@ class _EventView extends State<EventView> {
   ];
   List<Widget> materialTabs() {
     return <Widget>[
-      ListView(
-        children: widget.event.teams
-            .map((e) => Slidable(
-                  actionPane: slider,
-                  secondaryActions: [
-                    IconSlideAction(
-                      icon: Icons.delete,
-                      color: Colors.red,
-                      onTap: () {
-                        showDialog(
-                            context: context,
-                            builder: (BuildContext context) => PlatformAlert(
-                                  title: Text('Delete Team'),
-                                  content: Text('Are you sure?'),
-                                  actions: [
-                                    PlatformDialogAction(
-                                      isDefaultAction: true,
-                                      child: Text('Cancel'),
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                    ),
-                                    PlatformDialogAction(
-                                      isDefaultAction: false,
-                                      isDestructive: true,
-                                      child: Text('Confirm'),
-                                      onPressed: () {
-                                        setState(() {
-                                          widget.event.teams.remove(e);
-                                        });
-                                        Navigator.of(context).pop();
-                                      },
-                                    ),
-                                  ],
-                                ));
-                      },
-                    )
-                  ],
-                  child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Colors.grey,
-                          width: 1,
-                        ),
-                      ),
-                      child: ListTile(
-                        title: Text(e.name),
-                        leading: Text(e.number,
-                            style: Theme.of(context).textTheme.caption),
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => TeamView(
-                                        team: e,
-                                        event: widget.event,
-                                      )));
-                        },
-                      )),
-                ))
-            .toList(),
+      TeamList(
+        event: widget.event,
       ),
-      ListView(
-        semanticChildCount: widget.event.matches.length,
-        children: widget.event.matches
-            .map((e) => Slidable(
-                actionPane: slider,
-                secondaryActions: [
-                  IconSlideAction(
-                    icon: Icons.delete,
-                    color: Colors.red,
-                    onTap: () {
-                      showDialog(
-                          context: context,
-                          builder: (BuildContext context) => PlatformAlert(
-                                title: Text('Delete Match'),
-                                content: Text('Are you sure?'),
-                                actions: [
-                                  PlatformDialogAction(
-                                    isDefaultAction: true,
-                                    child: Text('Cancel'),
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                  ),
-                                  PlatformDialogAction(
-                                    isDefaultAction: false,
-                                    isDestructive: true,
-                                    child: Text('Confirm'),
-                                    onPressed: () {
-                                      setState(() {
-                                        e.red.item1.scores
-                                            .removeWhere((f) => f.id == e.id);
-                                        e.red.item2.scores
-                                            .removeWhere((f) => f.id == e.id);
-                                        e.blue.item1.scores
-                                            .removeWhere((f) => f.id == e.id);
-                                        e.blue.item2.scores
-                                            .removeWhere((f) => f.id == e.id);
-                                        widget.event.matches.remove(e);
-                                      });
-                                      Navigator.of(context).pop();
-                                    },
-                                  ),
-                                ],
-                              ));
-                    },
-                  )
-                ],
-                child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Colors.grey,
-                        width: 1,
-                      ),
-                    ),
-                    child: ListTile(
-                      leading: Column(children: [
-                        Text(e.red.item1.name + ' & ' + e.red.item2.name),
-                        Text(
-                          'VS',
-                          style: TextStyle(
-                              color: Colors.red, fontWeight: FontWeight.bold),
-                        ),
-                        Text(e.blue.item1.name + ' & ' + e.blue.item2.name)
-                      ]),
-                      trailing: Text(e.score()),
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => MatchView(match: e)));
-                      },
-                    ))))
-            .toList(),
-      ),
+      MatchList(
+        event: widget.event,
+      )
     ];
   }
 

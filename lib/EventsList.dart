@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'backend.dart';
-import 'package:TeamTrack/Graphic Assets/PlatformGraphics.dart';
+import 'package:TeamTrack/Assets/PlatformGraphics.dart';
 import 'package:TeamTrack/EventView.dart';
 
 class EventsList extends StatefulWidget {
@@ -15,12 +15,11 @@ class EventsList extends StatefulWidget {
 }
 
 class _EventsList extends State<EventsList> {
-  final slider = SlidableDrawerActionPane();
+  final slider = SlidableStrechActionPane();
   _EventsList({this.dataModel});
   DataModel dataModel;
   final secondaryActions = <Widget>[
     IconSlideAction(
-      caption: 'Delete',
       icon: Icons.delete,
       color: Colors.red,
     )
@@ -28,7 +27,40 @@ class _EventsList extends State<EventsList> {
   List<Widget> localEvents() {
     return dataModel.localEvents
         .map((e) => Slidable(
-              secondaryActions: secondaryActions,
+              secondaryActions: [
+                IconSlideAction(
+                  onTap: () {
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) => PlatformAlert(
+                              title: Text('Delete Event'),
+                              content: Text('Are you sure?'),
+                              actions: [
+                                PlatformDialogAction(
+                                  isDefaultAction: true,
+                                  child: Text('Cancel'),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                                PlatformDialogAction(
+                                  isDefaultAction: false,
+                                  isDestructive: true,
+                                  child: Text('Confirm'),
+                                  onPressed: () {
+                                    setState(() {
+                                      widget.dataModel.localEvents.remove(e);
+                                    });
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            ));
+                  },
+                  icon: Icons.delete,
+                  color: Colors.red,
+                )
+              ],
               child: ListTileTheme(
                   iconColor: Theme.of(context).primaryColor,
                   child: ListTile(
@@ -41,24 +73,6 @@ class _EventsList extends State<EventsList> {
                       color: Theme.of(context).accentColor,
                     ),
                     title: Text(e.name),
-                    onLongPress: () {
-                      showModalBottomSheet(
-                          context: context,
-                          builder: (context) {
-                            return Column(
-                              children: [
-                                ListTile(
-                                  focusColor: Colors.white,
-                                  onTap: () {},
-                                  leading: Icon(Icons.delete),
-                                  title: Text('Delete'),
-                                  tileColor: Colors.red,
-                                  shape: RoundedRectangleBorder(),
-                                )
-                              ],
-                            );
-                          });
-                    },
                     onTap: () {
                       if (Platform.isIOS) {
                         Navigator.push(
@@ -204,6 +218,7 @@ class _EventsList extends State<EventsList> {
                 onChanged: (String input) {
                   _newName = input;
                 },
+                placeholder: 'Enter name',
               ),
               actions: [
                 PlatformDialogAction(

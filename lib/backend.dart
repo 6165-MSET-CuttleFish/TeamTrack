@@ -1,9 +1,7 @@
 import 'dart:math';
 import 'score.dart';
 import 'package:uuid/uuid.dart';
-import 'package:tuple/tuple.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class DataModel {
   List<Event> localEvents = [];

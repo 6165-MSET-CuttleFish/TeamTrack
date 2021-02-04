@@ -1,4 +1,4 @@
-import 'package:TeamTrack/Graphic Assets/PlatformGraphics.dart';
+import 'package:TeamTrack/Assets/PlatformGraphics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -9,23 +9,23 @@ import 'dart:io' show Platform;
 class MatchView extends StatefulWidget {
   MatchView({Key key, this.match}) : super(key: key);
   final Match match;
-
   @override
   _MatchView createState() => _MatchView(match);
 }
 
 class _MatchView extends State<MatchView> {
-  Match _match;
   Team _selectedTeam;
   Color _color = CupertinoColors.systemRed;
   Score _score;
   int _view = 0;
-
+  Match _match;
   _MatchView(Match match) {
-    this._match = match;
+    _match = match;
     _selectedTeam = match.red.item1;
     _score =
-        _selectedTeam.scores.firstWhere((element) => element.id == _match.id);
+        _selectedTeam.scores.firstWhere((element) => element.id == match.id);
+    // if (_match.type == EventType.remote)
+    //   _color = CupertinoColors.systemGreen;
   }
 
   @override

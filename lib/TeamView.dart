@@ -1,7 +1,9 @@
 import 'dart:io';
-import 'dart:math';
-import 'package:TeamTrack/Graphic%20Assets/BarGraph.dart';
-import 'package:TeamTrack/Graphic%20Assets/CardView.dart';
+import 'package:TeamTrack/Assets/BarGraph.dart';
+import 'package:TeamTrack/Assets/CardView.dart';
+import 'package:TeamTrack/Assets/PlatformGraphics.dart';
+import 'package:TeamTrack/MatchList.dart';
+import 'package:TeamTrack/MatchView.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -99,53 +101,87 @@ class _TeamView extends State<TeamView> {
       Padding(
         padding: EdgeInsets.all(40),
       ),
-      Wrap(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(
-                  Radius.circular(18),
+      widget.team.scores.length >= 2
+          ? Wrap(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(18),
+                      ),
+                      color: Colors.orange),
+                  child: Padding(
+                      padding: EdgeInsets.all(8),
+                      child: Text('Alliance Total')),
                 ),
-                color: Colors.orange),
-            child: Padding(
-                padding: EdgeInsets.all(8), child: Text('Alliance Total')),
-          ),
-          Container(
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(
-                  Radius.circular(18),
+                Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(18),
+                      ),
+                      color: Colors.deepPurple),
+                  child: Padding(
+                      padding: EdgeInsets.all(8), child: Text('Timeline')),
                 ),
-                color: Colors.deepPurple),
-            child: Padding(padding: EdgeInsets.all(8), child: Text('Timeline')),
-          ),
-          Container(
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(
-                  Radius.circular(18),
+                Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(18),
+                      ),
+                      color: Colors.green),
+                  child: Padding(
+                      padding: EdgeInsets.all(8), child: Text('Autonomous')),
                 ),
-                color: Colors.green),
-            child:
-                Padding(padding: EdgeInsets.all(8), child: Text('Autonomous')),
-          ),
-          Container(
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(
-                  Radius.circular(18),
+                Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(18),
+                      ),
+                      color: Colors.blue),
+                  child: Padding(
+                      padding: EdgeInsets.all(8), child: Text('Tele-Op')),
                 ),
-                color: Colors.blue),
-            child: Padding(padding: EdgeInsets.all(8), child: Text('Tele-Op')),
-          ),
-          Container(
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(
-                  Radius.circular(18),
+                Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(18),
+                      ),
+                      color: Colors.red),
+                  child: Padding(
+                      padding: EdgeInsets.all(8), child: Text('Endgame')),
                 ),
-                color: Colors.red),
-            child: Padding(padding: EdgeInsets.all(8), child: Text('Endgame')),
-          ),
-        ],
-      ),
+              ],
+            )
+          : Text(''),
       _lineChart(),
+      Container(
+          width: MediaQuery.of(context).size.width,
+          child: PlatformButton(
+            onPressed: () {
+              if (Platform.isIOS) {
+                Navigator.push(
+                    context,
+                    CupertinoPageRoute(
+                        builder: (context) => MatchView(
+                              match: Match.defaultMatch(EventType.local),
+                            )));
+              } else {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => Scaffold(
+                              appBar: AppBar(
+                                title: Text('Matches'),
+                              ),
+                              body: MatchList(
+                                event: widget.event,
+                              ),
+                            )));
+              }
+            },
+            color: CupertinoColors.systemGreen,
+            child: Text('Matches'),
+          )),
       Padding(
         padding: EdgeInsets.all(10),
       ),

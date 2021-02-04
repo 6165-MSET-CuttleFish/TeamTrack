@@ -91,7 +91,7 @@ class EndgameScore {
 
   Map<String, dynamic> toJson() => {
         'WobblesInDrop': wobbleGoalsInDrop,
-        'MiddleGoals': wobbleGoalsInStart,
+        'WobblesInStart': wobbleGoalsInStart,
         'PowerShots': pwrShots,
         'RingsOnWobble': ringsOnWobble
       };
