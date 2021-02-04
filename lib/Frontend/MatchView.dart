@@ -1,4 +1,4 @@
-import 'package:TeamTrack/Assets/PlatformGraphics.dart';
+import 'package:TeamTrack/Frontend/Assets/PlatformGraphics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';

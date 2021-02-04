@@ -1,13 +1,13 @@
 import 'dart:io';
-import 'package:TeamTrack/Assets/BarGraph.dart';
-import 'package:TeamTrack/Assets/CardView.dart';
-import 'package:TeamTrack/Assets/PlatformGraphics.dart';
-import 'package:TeamTrack/MatchList.dart';
-import 'package:TeamTrack/MatchView.dart';
+import 'package:TeamTrack/Frontend/Assets/BarGraph.dart';
+import 'package:TeamTrack/Frontend/Assets/CardView.dart';
+import 'package:TeamTrack/Frontend/Assets/PlatformGraphics.dart';
+import 'package:TeamTrack/Frontend/MatchList.dart';
+import 'package:TeamTrack/Frontend/MatchView.dart';
+import 'package:TeamTrack/backend.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'backend.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class TeamView extends StatefulWidget {
@@ -176,6 +176,20 @@ class _TeamView extends State<TeamView> {
                               body: MatchList(
                                 event: widget.event,
                               ),
+                              floatingActionButton:
+                                  widget.event.type == EventType.remote
+                                      ? FloatingActionButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              widget.event.matches.add(
+                                                Match.defaultMatch(
+                                                    EventType.remote),
+                                              );
+                                            });
+                                          },
+                                          child: Icon(Icons.add),
+                                        )
+                                      : null,
                             )));
               }
             },

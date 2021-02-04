@@ -4,9 +4,19 @@ import 'package:uuid/uuid.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class DataModel {
-  List<Event> localEvents = [];
-  List<Event> remoteEvents = [];
-  List<Event> liveEvents = [];
+  List<Event> localEvents() {
+    return events.where((e) => e.type == EventType.local).toList();
+  }
+
+  List<Event> remoteEvents() {
+    return events.where((e) => e.type == EventType.remote).toList();
+  }
+
+  List<Event> liveEvents() {
+    return events.where((e) => e.type == EventType.live).toList();
+  }
+
+  List<Event> events = [];
 }
 
 class Event {
@@ -114,6 +124,9 @@ class Match {
   }
 
   String score() {
+    if (type == EventType.remote) {
+      return red.item1.scores.firstWhere((e) => e.id == id).total().toString();
+    }
     return redScore() + " - " + blueScore();
   }
 

@@ -1,11 +1,11 @@
 import 'dart:io';
 
+import 'package:TeamTrack/backend.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'backend.dart';
-import 'package:TeamTrack/Assets/PlatformGraphics.dart';
-import 'package:TeamTrack/EventView.dart';
+import 'package:TeamTrack/Frontend/Assets/PlatformGraphics.dart';
+import 'package:TeamTrack/Frontend/EventView.dart';
 
 class EventsList extends StatefulWidget {
   EventsList({Key key, this.dataModel}) : super(key: key);
@@ -25,7 +25,8 @@ class _EventsList extends State<EventsList> {
     )
   ];
   List<Widget> localEvents() {
-    return dataModel.localEvents
+    return dataModel
+        .localEvents()
         .map((e) => Slidable(
               secondaryActions: [
                 IconSlideAction(
@@ -49,7 +50,7 @@ class _EventsList extends State<EventsList> {
                                   child: Text('Confirm'),
                                   onPressed: () {
                                     setState(() {
-                                      widget.dataModel.localEvents.remove(e);
+                                      widget.dataModel.localEvents().remove(e);
                                     });
                                     Navigator.of(context).pop();
                                   },
@@ -97,7 +98,8 @@ class _EventsList extends State<EventsList> {
   }
 
   List<Widget> remoteEvents() {
-    return dataModel.remoteEvents
+    return dataModel
+        .remoteEvents()
         .map((e) => ListTileTheme(
             iconColor: Theme.of(context).primaryColor,
             child: ListTile(
@@ -132,7 +134,8 @@ class _EventsList extends State<EventsList> {
   }
 
   List<Widget> liveEvents() {
-    return dataModel.liveEvents
+    return dataModel
+        .liveEvents()
         .map((e) => ListTileTheme(
             iconColor: Theme.of(context).primaryColor,
             child: ListTile(
@@ -195,9 +198,20 @@ class _EventsList extends State<EventsList> {
           title: Text('Events'),
         ),
         body: SafeArea(
-          child: ListView(
-            children: localEvents(),
-          ),
+          child: ListView(children: [
+            ExpansionTile(
+              title: Text('Local Events'),
+              children: localEvents(),
+            ),
+            ExpansionTile(
+              title: Text('Remote Events'),
+              children: remoteEvents(),
+            ),
+            ExpansionTile(
+              title: Text('Live Events'),
+              children: liveEvents(),
+            ),
+          ]),
         ),
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.add),
@@ -208,6 +222,56 @@ class _EventsList extends State<EventsList> {
   }
 
   void _onPressed() {
+    showModalBottomSheet(
+        context: context,
+        builder: (context) => Column(
+              children: [
+                ListTileTheme(
+                  iconColor: Theme.of(context).accentColor,
+                  child: ListTile(
+                    onTap: () {
+                      _newType = EventType.local;
+                      setState(() {});
+                      Navigator.pop(context);
+                      _chosen();
+                    },
+                    leading: Icon(CupertinoIcons.lock_shield_fill),
+                    title: Text('Local Event'),
+                  ),
+                ),
+                ListTileTheme(
+                  iconColor: Theme.of(context).accentColor,
+                  child: ListTile(
+                    onTap: () {
+                      _newType = EventType.remote;
+                      setState(() {});
+                      Navigator.pop(context);
+                      _chosen();
+                    },
+                    leading:
+                        Icon(CupertinoIcons.rectangle_stack_person_crop_fill),
+                    title: Text('Remote Event'),
+                  ),
+                ),
+                ListTileTheme(
+                  iconColor: Theme.of(context).accentColor,
+                  child: ListTile(
+                    onTap: () {
+                      _newType = EventType.live;
+                      setState(() {});
+                      Navigator.pop(context);
+                      _chosen();
+                    },
+                    leading: Icon(CupertinoIcons.cloud_fill),
+                    title: Text('Live Event'),
+                  ),
+                )
+              ],
+            ));
+  }
+
+  EventType _newType;
+  void _chosen() {
     showDialog(
         context: context,
         builder: (BuildContext context) => PlatformAlert(
@@ -235,8 +299,8 @@ class _EventsList extends State<EventsList> {
                   onPressed: () {
                     setState(() {
                       if (_newName.isNotEmpty)
-                        dataModel.localEvents
-                            .add(Event(name: _newName, type: EventType.local));
+                        dataModel.events
+                            .add(Event(name: _newName, type: _newType));
                       _newName = '';
                     });
                     Navigator.of(context).pop();

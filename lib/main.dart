@@ -1,4 +1,4 @@
-import 'package:TeamTrack/EventsList.dart';
+import 'package:TeamTrack/Frontend/EventsList.dart';
 import 'package:TeamTrack/backend.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
