@@ -99,74 +99,77 @@ class _TeamView extends State<TeamView> {
 
   List<Widget> body() {
     return <Widget>[
-      Padding(
-        padding: EdgeInsets.all(40),
-      ),
-      widget.team.scores.length >= 2
-          ? Wrap(
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(18),
-                      ),
-                      color: Colors.orange),
-                  child: Padding(
-                      padding: EdgeInsets.all(8),
-                      child: Text('Alliance Total')),
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(18),
-                      ),
-                      color: Colors.deepPurple),
-                  child: Padding(
-                      padding: EdgeInsets.all(8), child: Text('Timeline')),
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(18),
-                      ),
-                      color: Colors.green),
-                  child: Padding(
-                      padding: EdgeInsets.all(8), child: Text('Autonomous')),
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(18),
-                      ),
-                      color: Colors.blue),
-                  child: Padding(
-                      padding: EdgeInsets.all(8), child: Text('Tele-Op')),
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(18),
-                      ),
-                      color: Colors.red),
-                  child: Padding(
-                      padding: EdgeInsets.all(8), child: Text('Endgame')),
-                ),
-              ],
-            )
-          : Text(''),
+      if (widget.team.scores.length >= 2)
+        Padding(
+          padding: EdgeInsets.all(40),
+        ),
+      if (widget.team.scores.length >= 2)
+        Wrap(
+          children: [
+            if (widget.event.type != EventType.remote)
+              Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(18),
+                    ),
+                    color: Colors.orange),
+                child: Padding(
+                    padding: EdgeInsets.all(8), child: Text('Alliance Total')),
+              ),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(18),
+                  ),
+                  color: Colors.deepPurple),
+              child:
+                  Padding(padding: EdgeInsets.all(8), child: Text('Timeline')),
+            ),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(18),
+                  ),
+                  color: Colors.green),
+              child: Padding(
+                  padding: EdgeInsets.all(8), child: Text('Autonomous')),
+            ),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(18),
+                  ),
+                  color: Colors.blue),
+              child:
+                  Padding(padding: EdgeInsets.all(8), child: Text('Tele-Op')),
+            ),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(18),
+                  ),
+                  color: Colors.red),
+              child:
+                  Padding(padding: EdgeInsets.all(8), child: Text('Endgame')),
+            ),
+          ],
+        ),
       _lineChart(),
       Container(
           width: MediaQuery.of(context).size.width,
           child: PlatformButton(
             onPressed: () {
               if (Platform.isIOS) {
+                setState(() {});
                 Navigator.push(
                     context,
                     CupertinoPageRoute(
-                        builder: (context) => MatchView(
-                              match: Match.defaultMatch(EventType.local),
+                        builder: (context) => MatchList(
+                              event: widget.event,
+                              team: widget.team,
                             )));
               } else {
+                setState(() {});
                 Navigator.push(
                     context,
                     MaterialPageRoute(

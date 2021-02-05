@@ -340,7 +340,7 @@ class _EventView extends State<EventView> {
                           .firstWhere((element) =>
                               element.number ==
                               val
-                                  .replaceAll(new RegExp(r' [^\w\s]+'), '')
+                                  .replaceAll(new RegExp(r' ,-.[^\w\s]+'), '')
                                   .replaceAll(' ', ''))
                           .name,
                       selection: TextSelection.fromPosition(

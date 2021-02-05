@@ -50,7 +50,8 @@ class Alliance {
     this.item2 = item2;
   }
   int allianceTotal(Uuid id) {
-    return 0 + item1?.scores?.firstWhere((e) => e.id == id)?.total() +
+    return 0 +
+        item1?.scores?.firstWhere((e) => e.id == id)?.total() +
         item2?.scores?.firstWhere((e) => e.id == id)?.total();
   }
 
@@ -106,7 +107,7 @@ class Match {
   }
 
   Alliance alliance(Team team) {
-    if (red.item2 == null) {
+    if (!red.item2.equals(Team.nullTeam())) {
       if (red.item1.equals(team) || red.item2.equals(team)) {
         return red;
       } else if (blue.item1.equals(team) || blue.item2.equals(team)) {
@@ -231,19 +232,23 @@ extension TeamsExtension on List<Team> {
     bool found = false;
     for (Team team in this) {
       if (team.number ==
-          number.replaceAll(new RegExp(r' [^\w\s]+'), '').replaceAll(' ', '')) {
+          number
+              .replaceAll(new RegExp(r' -,[^\w\s]+'), '')
+              .replaceAll(' ', '')) {
         found = true;
       }
     }
     if (found) {
       var team = this.firstWhere((e) =>
           e.number ==
-          number.replaceAll(new RegExp(r' [^\w\s]+'), '').replaceAll(' ', ''));
+          number
+              .replaceAll(new RegExp(r' -,[^\w\s]+'), '')
+              .replaceAll(' ', ''));
       team.name = name;
       return team;
     } else {
       var newTeam = Team(
-          number.replaceAll(new RegExp(r' [^\w\s]+'), '').replaceAll(' ', ''),
+          number.replaceAll(new RegExp(r' -,[^\w\s]+'), '').replaceAll(' ', ''),
           name);
       this.add(newTeam);
       this.sortTeams();

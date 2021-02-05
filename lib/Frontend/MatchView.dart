@@ -24,8 +24,7 @@ class _MatchView extends State<MatchView> {
     _selectedTeam = match.red.item1;
     _score =
         _selectedTeam.scores.firstWhere((element) => element.id == match.id);
-    // if (_match.type == EventType.remote)
-    //   _color = CupertinoColors.systemGreen;
+    if (_match.type == EventType.remote) _color = CupertinoColors.systemGreen;
   }
 
   @override
