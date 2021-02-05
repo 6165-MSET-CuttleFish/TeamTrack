@@ -138,7 +138,7 @@ class PlatformButton extends PlatformWidget<CupertinoButton, MaterialButton> {
       this.child,
       this.onPressed,
       this.disabledColor = Colors.transparent,
-      this.color = null})
+      this.color})
       : super(key: key);
   final Widget child;
   final Function onPressed;
@@ -169,7 +169,7 @@ class PlatformScaffold extends PlatformWidget<CupertinoPageScaffold, Scaffold> {
   PlatformScaffold(
       {Key key,
       this.child,
-      this.backgroundColor = null,
+      this.backgroundColor,
       this.resizeToAvoidBottomInset = true})
       : super(key: key);
   final Widget child;

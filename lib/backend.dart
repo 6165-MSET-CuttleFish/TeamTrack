@@ -50,8 +50,8 @@ class Alliance {
     this.item2 = item2;
   }
   int allianceTotal(Uuid id) {
-    return item1.scores.firstWhere((e) => e.id == id).total() +
-        item2.scores.firstWhere((e) => e.id == id).total();
+    return 0 + item1?.scores?.firstWhere((e) => e.id == id)?.total() +
+        item2?.scores?.firstWhere((e) => e.id == id)?.total();
   }
 
   Map<String, dynamic> toJson() => {
@@ -95,10 +95,10 @@ class Match {
     this.red = red;
     this.blue = blue;
     id = Uuid();
-    red.item1.scores.addScore(Score(id, dice));
-    red.item2.scores.addScore(Score(id, dice));
-    blue.item1.scores.addScore(Score(id, dice));
-    blue.item2.scores.addScore(Score(id, dice));
+    red?.item1?.scores?.addScore(Score(id, dice));
+    red?.item2?.scores?.addScore(Score(id, dice));
+    blue?.item1?.scores?.addScore(Score(id, dice));
+    blue?.item2?.scores?.addScore(Score(id, dice));
   }
   static Match defaultMatch(EventType type) {
     return Match(Alliance(Team('1', 'Alpha'), Team('2', 'Beta')),
@@ -106,12 +106,20 @@ class Match {
   }
 
   Alliance alliance(Team team) {
-    if (red.item1.equals(team) || red.item2.equals(team)) {
-      return red;
-    } else if (blue.item1.equals(team) || blue.item2.equals(team)) {
-      return blue;
+    if (red.item2 == null) {
+      if (red.item1.equals(team) || red.item2.equals(team)) {
+        return red;
+      } else if (blue.item1.equals(team) || blue.item2.equals(team)) {
+        return blue;
+      } else {
+        return null;
+      }
     } else {
-      return null;
+      if (red.item1.equals(team)) {
+        return red;
+      } else {
+        return null;
+      }
     }
   }
 

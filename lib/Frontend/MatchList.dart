@@ -25,6 +25,56 @@ class _MatchList extends State<MatchList> {
   ];
   @override
   Widget build(BuildContext context) {
+    if (widget.team == null) {
+      return _matches();
+    }
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Matches'),
+        backgroundColor: Theme.of(context).accentColor,
+      ),
+      body: _matches(),
+      floatingActionButton: widget.event.type == EventType.remote
+          ? FloatingActionButton(
+              onPressed: () {
+                showDialog(
+                    context: context,
+                    builder: (context) => PlatformAlert(
+                          title: Text('New Match'),
+                          actions: [
+                            PlatformDialogAction(
+                              child: Text('Cancel'),
+                              onPressed: () {
+                                setState(() {
+                                  Navigator.pop(context);
+                                });
+                              },
+                            ),
+                            PlatformDialogAction(
+                              child: Text('Add'),
+                              onPressed: () {
+                                setState(() {
+                                  widget.event.matches.add(
+                                    Match(
+                                        Alliance(widget.team, Team.nullTeam()),
+                                        Alliance(
+                                            Team.nullTeam(), Team.nullTeam()),
+                                        EventType.remote),
+                                  );
+                                  Navigator.pop(context);
+                                });
+                              },
+                            ),
+                          ],
+                        ));
+              },
+              child: Icon(Icons.add),
+            )
+          : null,
+    );
+  }
+
+  Widget _matches() {
     if (widget.event.type != EventType.remote) {
       return ListView(
         semanticChildCount: widget.event.matches.length,
@@ -105,7 +155,10 @@ class _MatchList extends State<MatchList> {
       );
     } else {
       var arr = <Slidable>[];
-      for (int i = 0; i < widget.event.matches.length; i++) {
+      var matches = widget.event.matches
+          .where((e) => e.alliance(widget.team) != null)
+          .toList();
+      for (int i = 0; i < matches.length; i++) {
         arr.add(Slidable(
             actionPane: slider,
             secondaryActions: [
@@ -132,11 +185,9 @@ class _MatchList extends State<MatchList> {
                                 child: Text('Confirm'),
                                 onPressed: () {
                                   setState(() {
-                                    widget.event.matches[i].red.item1.scores
-                                        .removeWhere((f) =>
-                                            f.id == widget.event.matches[i].id);
-                                    widget.event.matches
-                                        .remove(widget.event.matches[i]);
+                                    matches[i].red.item1.scores.removeWhere(
+                                        (f) => f.id == matches[i].id);
+                                    matches.remove(matches[i]);
                                   });
                                   Navigator.of(context).pop();
                                 },
@@ -154,15 +205,15 @@ class _MatchList extends State<MatchList> {
                   ),
                 ),
                 child: ListTile(
-                  leading: Text(i.toString()),
+                  leading: Text((i + 1).toString()),
                   title: Text(widget.team.name),
-                  trailing: Text(widget.event.matches[i].score()),
+                  trailing: Text(matches[i].score()),
                   onTap: () {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) =>
-                                MatchView(match: widget.event.matches[i])));
+                                MatchView(match: matches[i])));
                   },
                 ))));
       }

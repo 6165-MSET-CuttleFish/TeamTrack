@@ -55,29 +55,30 @@ class _MatchView extends State<MatchView> {
             ),
             child: Center(
               child: Column(children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Container(
-                      width: 100,
-                      child: Text(_match.redScore(),
-                          style: Theme.of(context).textTheme.headline4),
-                    ),
-                    Container(
-                      child: Text('-',
-                          style: Theme.of(context).textTheme.headline4),
-                    ),
-                    Container(
-                      width: 100,
-                      child: Text(_match.blueScore(),
-                          style: Theme.of(context).textTheme.headline4),
-                    )
-                  ],
-                ),
+                if (widget.match.type != EventType.remote)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Container(
+                        width: 100,
+                        child: Text(_match.redScore(),
+                            style: Theme.of(context).textTheme.headline4),
+                      ),
+                      Container(
+                        child: Text('-',
+                            style: Theme.of(context).textTheme.headline4),
+                      ),
+                      Container(
+                        width: 100,
+                        child: Text(_match.blueScore(),
+                            style: Theme.of(context).textTheme.headline4),
+                      )
+                    ],
+                  ),
                 Padding(
                   padding: EdgeInsets.all(10),
                 ),
-                buttonRow(),
+                if (widget.match.type != EventType.remote) buttonRow(),
                 Text(_selectedTeam.name + ' : ' + _score.total().toString(),
                     style: Theme.of(context).textTheme.headline6),
                 Row(
