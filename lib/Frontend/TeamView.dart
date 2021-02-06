@@ -3,13 +3,11 @@ import 'package:TeamTrack/Frontend/Assets/BarGraph.dart';
 import 'package:TeamTrack/Frontend/Assets/CardView.dart';
 import 'package:TeamTrack/Frontend/Assets/PlatformGraphics.dart';
 import 'package:TeamTrack/Frontend/MatchList.dart';
-import 'package:TeamTrack/Frontend/MatchView.dart';
 import 'package:TeamTrack/backend.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 
 class TeamView extends StatefulWidget {
   TeamView({Key key, this.team, this.event}) : super(key: key);
@@ -416,81 +414,6 @@ class _TeamView extends State<TeamView> {
       ),
     ];
   }
-
-  List<Match> _matches() {
-    return widget.event.matches
-        .where((e) => e.alliance(widget.team) != null)
-        .toList();
-  }
-
-  final slider = SlidableStrechActionPane();
-  Widget _matchList() {
-    var arr = <Slidable>[];
-
-    for (int i = 0; i < _matches().length; i++) {
-      arr.add(Slidable(
-          actionPane: slider,
-          secondaryActions: [
-            IconSlideAction(
-              icon: Icons.delete,
-              color: Colors.red,
-              onTap: () {
-                showDialog(
-                    context: context,
-                    builder: (BuildContext context) => PlatformAlert(
-                          title: Text('Delete Match'),
-                          content: Text('Are you sure?'),
-                          actions: [
-                            PlatformDialogAction(
-                              isDefaultAction: true,
-                              child: Text('Cancel'),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                            PlatformDialogAction(
-                              isDefaultAction: false,
-                              isDestructive: true,
-                              child: Text('Confirm'),
-                              onPressed: () {
-                                setState(() {
-                                  _matches()[i].red.item1.scores.removeWhere(
-                                      (f) => f.id == _matches()[i].id);
-                                  _matches().remove(_matches()[i]);
-                                });
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ],
-                        ));
-              },
-            )
-          ],
-          child: Container(
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: Colors.grey,
-                  width: 1,
-                ),
-              ),
-              child: ListTile(
-                leading: Text((i + 1).toString()),
-                title: Text(widget.team.name),
-                trailing: Text(_matches()[i].score()),
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              MatchView(match: _matches()[i])));
-                },
-              ))));
-    }
-    return ListView(
-      children: arr,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     if (Platform.isAndroid) {
