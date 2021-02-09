@@ -291,6 +291,7 @@ class _MatchView extends State<MatchView> {
         RawMaterialButton(
           onPressed: _score.endgameScore.pwrShots > 0
               ? () {
+                  dataModel.saveEvents();
                   setState(() {
                     _score.endgameScore.pwrShots--;
                   });
@@ -312,6 +313,7 @@ class _MatchView extends State<MatchView> {
         RawMaterialButton(
           onPressed: _score.endgameScore.pwrShots < 3
               ? () {
+                  dataModel.saveEvents();
                   setState(() {
                     _score.endgameScore.pwrShots++;
                   });
@@ -336,6 +338,7 @@ class _MatchView extends State<MatchView> {
         RawMaterialButton(
           onPressed: _score.endgameScore.wobbleGoalsInDrop > 0
               ? () {
+                  dataModel.saveEvents();
                   setState(() {
                     _score.endgameScore.wobbleGoalsInDrop--;
                   });
@@ -359,6 +362,7 @@ class _MatchView extends State<MatchView> {
                       _score.endgameScore.wobbleGoalsInStart <
                   2
               ? () {
+                  dataModel.saveEvents();
                   setState(() {
                     _score.endgameScore.wobbleGoalsInDrop++;
                   });
@@ -383,6 +387,7 @@ class _MatchView extends State<MatchView> {
         RawMaterialButton(
           onPressed: _score.endgameScore.wobbleGoalsInStart > 0
               ? () {
+                  dataModel.saveEvents();
                   setState(() {
                     _score.endgameScore.wobbleGoalsInStart--;
                   });
@@ -406,6 +411,7 @@ class _MatchView extends State<MatchView> {
                       _score.endgameScore.wobbleGoalsInStart <
                   2
               ? () {
+                  dataModel.saveEvents();
                   setState(() {
                     _score.endgameScore.wobbleGoalsInStart++;
                   });
@@ -430,6 +436,7 @@ class _MatchView extends State<MatchView> {
         RawMaterialButton(
           onPressed: _score.endgameScore.ringsOnWobble > 0
               ? () {
+                  dataModel.saveEvents();
                   setState(() {
                     _score.endgameScore.ringsOnWobble--;
                   });
@@ -450,6 +457,7 @@ class _MatchView extends State<MatchView> {
         ),
         RawMaterialButton(
           onPressed: () {
+            dataModel.saveEvents();
             setState(() {
               _score.endgameScore.ringsOnWobble++;
             });
@@ -475,6 +483,7 @@ class _MatchView extends State<MatchView> {
         RawMaterialButton(
           onPressed: _score.teleScore.hiGoals > 0
               ? () {
+                  dataModel.saveEvents();
                   setState(() {
                     _score.teleScore.hiGoals--;
                   });
@@ -495,6 +504,7 @@ class _MatchView extends State<MatchView> {
         ),
         RawMaterialButton(
           onPressed: () {
+            dataModel.saveEvents();
             setState(() {
               _score.teleScore.hiGoals++;
             });
@@ -518,6 +528,7 @@ class _MatchView extends State<MatchView> {
         RawMaterialButton(
           onPressed: _score.teleScore.midGoals > 0
               ? () {
+                  dataModel.saveEvents();
                   setState(() {
                     _score.teleScore.midGoals--;
                   });
@@ -538,6 +549,7 @@ class _MatchView extends State<MatchView> {
         ),
         RawMaterialButton(
           onPressed: () {
+            dataModel.saveEvents();
             setState(() {
               _score.teleScore.midGoals++;
             });
@@ -561,6 +573,7 @@ class _MatchView extends State<MatchView> {
         RawMaterialButton(
           onPressed: _score.teleScore.lowGoals > 0
               ? () {
+                  dataModel.saveEvents();
                   setState(() {
                     _score.teleScore.lowGoals--;
                   });
@@ -581,6 +594,7 @@ class _MatchView extends State<MatchView> {
         ),
         RawMaterialButton(
           onPressed: () {
+            dataModel.saveEvents();
             setState(() {
               _score.teleScore.lowGoals++;
             });
@@ -606,6 +620,7 @@ class _MatchView extends State<MatchView> {
         RawMaterialButton(
           onPressed: _score.autoScore.hiGoals > 0
               ? () {
+                  dataModel.saveEvents();
                   setState(() {
                     _score.autoScore.hiGoals--;
                   });
@@ -626,6 +641,7 @@ class _MatchView extends State<MatchView> {
         ),
         RawMaterialButton(
           onPressed: () {
+            dataModel.saveEvents();
             setState(() {
               _score.autoScore.hiGoals++;
             });
@@ -649,6 +665,7 @@ class _MatchView extends State<MatchView> {
         RawMaterialButton(
           onPressed: _score.autoScore.midGoals > 0
               ? () {
+                  dataModel.saveEvents();
                   setState(() {
                     _score.autoScore.midGoals--;
                   });
@@ -669,6 +686,7 @@ class _MatchView extends State<MatchView> {
         ),
         RawMaterialButton(
           onPressed: () {
+            dataModel.saveEvents();
             setState(() {
               _score.autoScore.midGoals++;
             });
@@ -692,6 +710,7 @@ class _MatchView extends State<MatchView> {
         RawMaterialButton(
           onPressed: _score.autoScore.lowGoals > 0
               ? () {
+                  dataModel.saveEvents();
                   setState(() {
                     _score.autoScore.lowGoals--;
                   });
@@ -712,6 +731,7 @@ class _MatchView extends State<MatchView> {
         ),
         RawMaterialButton(
           onPressed: () {
+            dataModel.saveEvents();
             setState(() {
               _score.autoScore.lowGoals++;
             });
@@ -735,6 +755,7 @@ class _MatchView extends State<MatchView> {
         RawMaterialButton(
           onPressed: _score.autoScore.wobbleGoals > 0
               ? () {
+                  dataModel.saveEvents();
                   setState(() {
                     _score.autoScore.wobbleGoals--;
                   });
@@ -756,6 +777,7 @@ class _MatchView extends State<MatchView> {
         RawMaterialButton(
           onPressed: _score.autoScore.wobbleGoals < 2
               ? () {
+                  dataModel.saveEvents();
                   setState(() {
                     _score.autoScore.wobbleGoals++;
                   });
@@ -780,6 +802,7 @@ class _MatchView extends State<MatchView> {
         RawMaterialButton(
           onPressed: _score.autoScore.pwrShots > 0
               ? () {
+                  dataModel.saveEvents();
                   setState(() {
                     _score.autoScore.pwrShots--;
                   });
@@ -801,6 +824,7 @@ class _MatchView extends State<MatchView> {
         RawMaterialButton(
           onPressed: _score.autoScore.pwrShots < 3
               ? () {
+                  dataModel.saveEvents();
                   setState(() {
                     _score.autoScore.pwrShots++;
                   });
@@ -825,6 +849,7 @@ class _MatchView extends State<MatchView> {
         PlatformSwitch(
           value: _score.autoScore.navigated,
           onChanged: (bool newVal) {
+            dataModel.saveEvents();
             setState(() {
               _score.autoScore.navigated = newVal;
             });

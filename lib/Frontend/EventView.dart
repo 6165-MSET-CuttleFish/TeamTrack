@@ -12,8 +12,9 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:TeamTrack/Frontend/Assets/PlatformGraphics.dart';
 
 class EventView extends StatefulWidget {
-  EventView({Key key, this.event}) : super(key: key);
+  EventView({Key key, this.event, this.dataModel}) : super(key: key);
   final Event event;
+  final DataModel dataModel;
   @override
   _EventView createState() => _EventView();
 }
@@ -137,6 +138,14 @@ class _EventView extends State<EventView> {
         appBar: AppBar(
           title: _tab == 0 ? Text('Teams') : Text('Matches'),
           backgroundColor: Theme.of(context).accentColor,
+          actions: [
+            PlatformButton(
+              child: Text('Refresh'),
+              onPressed: () {
+                setState(() {});
+              },
+            )
+          ],
         ),
         bottomNavigationBar: widget.event.type != EventType.remote
             ? BottomNavigationBar(

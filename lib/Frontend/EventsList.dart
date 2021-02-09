@@ -81,6 +81,7 @@ class _EventsList extends State<EventsList> {
                             CupertinoPageRoute(
                                 builder: (context) => EventView(
                                       event: e,
+                                      dataModel: dataModel,
                                     )));
                       } else {
                         Navigator.push(
@@ -88,6 +89,7 @@ class _EventsList extends State<EventsList> {
                             MaterialPageRoute(
                                 builder: (context) => EventView(
                                       event: e,
+                                      dataModel: dataModel,
                                     )));
                       }
                     },
@@ -100,72 +102,150 @@ class _EventsList extends State<EventsList> {
   List<Widget> remoteEvents() {
     return dataModel
         .remoteEvents()
-        .map((e) => ListTileTheme(
-            iconColor: Theme.of(context).primaryColor,
-            child: ListTile(
-              leading: Icon(
-                CupertinoIcons.lock_shield_fill,
-                color: Theme.of(context).accentColor,
-              ),
-              trailing: Icon(
-                CupertinoIcons.rectangle_stack_person_crop_fill,
-                color: Theme.of(context).accentColor,
-              ),
-              title: Text(e.name),
-              onTap: () {
-                if (Platform.isIOS) {
-                  Navigator.push(
-                      context,
-                      CupertinoPageRoute(
-                          builder: (context) => EventView(
-                                event: e,
-                              )));
-                } else {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => EventView(
-                                event: e,
-                              )));
-                }
-              },
-            )))
+        .map((e) => Slidable(
+              secondaryActions: [
+                IconSlideAction(
+                  onTap: () {
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) => PlatformAlert(
+                              title: Text('Delete Event'),
+                              content: Text('Are you sure?'),
+                              actions: [
+                                PlatformDialogAction(
+                                  isDefaultAction: true,
+                                  child: Text('Cancel'),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                                PlatformDialogAction(
+                                  isDefaultAction: false,
+                                  isDestructive: true,
+                                  child: Text('Confirm'),
+                                  onPressed: () {
+                                    setState(() {
+                                      widget.dataModel.localEvents().remove(e);
+                                    });
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            ));
+                  },
+                  icon: Icons.delete,
+                  color: Colors.red,
+                )
+              ],
+              child: ListTileTheme(
+                  iconColor: Theme.of(context).primaryColor,
+                  child: ListTile(
+                    leading: Icon(
+                      CupertinoIcons.lock_shield_fill,
+                      color: Theme.of(context).accentColor,
+                    ),
+                    trailing: Icon(
+                      CupertinoIcons.rectangle_stack_person_crop_fill,
+                      color: Theme.of(context).accentColor,
+                    ),
+                    title: Text(e.name),
+                    onTap: () {
+                      if (Platform.isIOS) {
+                        Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                                builder: (context) => EventView(
+                                      event: e,
+                                      dataModel: dataModel,
+                                    )));
+                      } else {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => EventView(
+                                      event: e,
+                                      dataModel: dataModel,
+                                    )));
+                      }
+                    },
+                  )),
+              actionPane: slider,
+            ))
         .toList();
   }
 
   List<Widget> liveEvents() {
     return dataModel
         .liveEvents()
-        .map((e) => ListTileTheme(
-            iconColor: Theme.of(context).primaryColor,
-            child: ListTile(
-              leading: Icon(
-                CupertinoIcons.cloud_fill,
-                color: Theme.of(context).accentColor,
-              ),
-              trailing: Icon(
-                CupertinoIcons.person_3_fill,
-                color: Theme.of(context).accentColor,
-              ),
-              title: Text(e.name),
-              onTap: () {
-                if (Platform.isIOS) {
-                  Navigator.push(
-                      context,
-                      CupertinoPageRoute(
-                          builder: (context) => EventView(
-                                event: e,
-                              )));
-                } else {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => EventView(
-                                event: e,
-                              )));
-                }
-              },
-            )))
+        .map((e) => Slidable(
+              secondaryActions: [
+                IconSlideAction(
+                  onTap: () {
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) => PlatformAlert(
+                              title: Text('Delete Event'),
+                              content: Text('Are you sure?'),
+                              actions: [
+                                PlatformDialogAction(
+                                  isDefaultAction: true,
+                                  child: Text('Cancel'),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                                PlatformDialogAction(
+                                  isDefaultAction: false,
+                                  isDestructive: true,
+                                  child: Text('Confirm'),
+                                  onPressed: () {
+                                    setState(() {
+                                      widget.dataModel.localEvents().remove(e);
+                                    });
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            ));
+                  },
+                  icon: Icons.delete,
+                  color: Colors.red,
+                )
+              ],
+              child: ListTileTheme(
+                  iconColor: Theme.of(context).primaryColor,
+                  child: ListTile(
+                    leading: Icon(
+                      CupertinoIcons.cloud_fill,
+                      color: Theme.of(context).accentColor,
+                    ),
+                    trailing: Icon(
+                      CupertinoIcons.person_3_fill,
+                      color: Theme.of(context).accentColor,
+                    ),
+                    title: Text(e.name),
+                    onTap: () {
+                      if (Platform.isIOS) {
+                        Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                                builder: (context) => EventView(
+                                      event: e,
+                                      dataModel: dataModel,
+                                    )));
+                      } else {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => EventView(
+                                      event: e,
+                                      dataModel: dataModel,
+                                    )));
+                      }
+                    },
+                  )),
+              actionPane: slider,
+            ))
         .toList();
   }
 
@@ -207,10 +287,10 @@ class _EventsList extends State<EventsList> {
               title: Text('Remote Events'),
               children: remoteEvents(),
             ),
-            ExpansionTile(
-              title: Text('Live Events'),
-              children: liveEvents(),
-            ),
+            // ExpansionTile(
+            //   title: Text('Live Events'),
+            //   children: liveEvents(),
+            // ),
           ]),
         ),
         floatingActionButton: FloatingActionButton(
@@ -224,7 +304,15 @@ class _EventsList extends State<EventsList> {
   void _onPressed() {
     showModalBottomSheet(
         context: context,
-        builder: (context) => Column(
+        builder: (context) => Container(
+            //color: Colors.red,
+            height: 120,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(10),
+                    topRight: Radius.circular(10))),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 ListTileTheme(
                   iconColor: Theme.of(context).accentColor,
@@ -253,21 +341,21 @@ class _EventsList extends State<EventsList> {
                     title: Text('Remote Event'),
                   ),
                 ),
-                ListTileTheme(
-                  iconColor: Theme.of(context).accentColor,
-                  child: ListTile(
-                    onTap: () {
-                      _newType = EventType.live;
-                      setState(() {});
-                      Navigator.pop(context);
-                      _chosen();
-                    },
-                    leading: Icon(CupertinoIcons.cloud_fill),
-                    title: Text('Live Event'),
-                  ),
-                )
+                // ListTileTheme(
+                //   iconColor: Theme.of(context).accentColor,
+                //   child: ListTile(
+                //     onTap: () {
+                //       _newType = EventType.live;
+                //       setState(() {});
+                //       Navigator.pop(context);
+                //       _chosen();
+                //     },
+                //     leading: Icon(CupertinoIcons.cloud_fill),
+                //     title: Text('Live Event'),
+                //   ),
+                // )
               ],
-            ));
+            )));
   }
 
   EventType _newType;
@@ -301,6 +389,7 @@ class _EventsList extends State<EventsList> {
                       if (_newName.isNotEmpty)
                         dataModel.events
                             .add(Event(name: _newName, type: _newType));
+                      dataModel.saveEvents();
                       _newName = '';
                     });
                     Navigator.of(context).pop();

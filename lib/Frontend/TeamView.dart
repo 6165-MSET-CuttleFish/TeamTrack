@@ -414,6 +414,7 @@ class _TeamView extends State<TeamView> {
       ),
     ];
   }
+
   @override
   Widget build(BuildContext context) {
     if (Platform.isAndroid) {
@@ -421,6 +422,14 @@ class _TeamView extends State<TeamView> {
         appBar: AppBar(
           title: Text(widget.team.name),
           backgroundColor: Theme.of(context).accentColor,
+          actions: [
+            PlatformButton(
+              child: Text('Refresh'),
+              onPressed: () {
+                setState(() {});
+              },
+            )
+          ],
         ),
         body: ListView(children: [
           Column(

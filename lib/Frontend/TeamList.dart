@@ -6,8 +6,9 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:TeamTrack/Frontend/Assets/PlatformGraphics.dart';
 
 class TeamList extends StatefulWidget {
-  TeamList({Key key, this.event}) : super(key: key);
+  TeamList({Key key, this.event, this.dataModel}) : super(key: key);
   final Event event;
+  final DataModel dataModel;
   @override
   State<StatefulWidget> createState() => _TeamList();
 }

@@ -1,9 +1,35 @@
+import 'dart:convert';
 import 'dart:math';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'score.dart';
 import 'package:uuid/uuid.dart';
 import 'package:fl_chart/fl_chart.dart';
 
+read(String key) async {
+  final prefs = await SharedPreferences.getInstance();
+  return json.decode(prefs.getString(key));
+}
+
+save(String key, value) async {
+  final prefs = await SharedPreferences.getInstance();
+  prefs.setString(key, json.encode(value));
+}
+
+DataModel dataModel;
+
 class DataModel {
+  final List<String> keys = ['localEvents', 'remoteEvents', 'liveEvents'];
+  DataModel() {
+    try {
+      events.add(read(keys[0]) as Event);
+      events.add(read(keys[1]) as Event);
+    } catch (Exception) {
+      print('No events');
+    }
+    dataModel = this;
+  }
+  List<Event> events = [];
+
   List<Event> localEvents() {
     return events.where((e) => e.type == EventType.local).toList();
   }
@@ -16,7 +42,10 @@ class DataModel {
     return events.where((e) => e.type == EventType.live).toList();
   }
 
-  List<Event> events = [];
+  void saveEvents() async {
+    await save(keys[0], localEvents());
+    await save(keys[1], remoteEvents());
+  }
 }
 
 class Event {
@@ -34,6 +63,11 @@ class Event {
     teams.sortTeams();
   }
 
+  Event.fromJSON(Map<String, dynamic> json)
+      : name = json['name'],
+        teams = json['teams'],
+        matches = json['matches'],
+        type = json['type'];
   Map<String, dynamic> toJson() => {
         'name': name,
         'teams': teams,
@@ -55,9 +89,12 @@ class Alliance {
         item2?.scores?.firstWhere((e) => e.id == id)?.total();
   }
 
+  Alliance.fromJSON(Map<String, dynamic> json)
+      : item1 = json['team1'],
+        item2 = json['team2'];
   Map<String, dynamic> toJson() => {
-        'item1': item1,
-        'item2': item2,
+        'team1': item1.toJson(),
+        'team2': item2.toJson(),
       };
 }
 
@@ -71,13 +108,17 @@ class Team {
     scores = List();
   }
   static Team nullTeam() {
-    return Team("1", "1");
+    return Team("?", "?");
   }
 
   bool equals(Team other) {
     return this.number == other.number;
   }
 
+  Team.fromJSON(Map<String, dynamic> json)
+      : number = json['number'],
+        name = json['name'],
+        scores = json['scores'];
   Map<String, dynamic> toJson() => {
         'name': name,
         'number': number,
@@ -151,11 +192,12 @@ class Match {
     return (b0 + b1).toString();
   }
 
+  Match.fromJSON(Map<String, dynamic> json)
+      : red = json['red'],
+        blue = json['blue'];
   Map<String, dynamic> toJson() => {
-        'red1': red.item1,
-        'red2': red.item2,
-        'blue1': blue.item1,
-        'blue2': blue.item2,
+        'red': red,
+        'blue': blue,
       };
 }
 
@@ -431,8 +473,5 @@ extension ScoresExtension on List<Score> {
 }
 
 bool toggle(bool init) {
-  if (init)
-    return false;
-  else
-    return true;
+  return !init;
 }

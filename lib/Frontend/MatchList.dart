@@ -6,9 +6,10 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:TeamTrack/Frontend/Assets/PlatformGraphics.dart';
 
 class MatchList extends StatefulWidget {
-  MatchList({Key key, this.event, this.team}) : super(key: key);
+  MatchList({Key key, this.event, this.team, this.dataModel}) : super(key: key);
   final Event event;
   final Team team;
+  final DataModel dataModel;
   @override
   State<StatefulWidget> createState() => _MatchList();
 }
@@ -32,6 +33,14 @@ class _MatchList extends State<MatchList> {
       appBar: AppBar(
         title: Text('Matches'),
         backgroundColor: Theme.of(context).accentColor,
+        actions: [
+          PlatformButton(
+            child: Text('Refresh'),
+            onPressed: () {
+              setState(() {});
+            },
+          )
+        ],
       ),
       body: _matches(),
       floatingActionButton: widget.event.type == EventType.remote
