@@ -40,173 +40,69 @@ class _EventView extends State<EventView> {
     ];
   }
 
-  List<Widget> cupertinoTabs() {
-    return <Widget>[
-      CupertinoPageScaffold(
-          child: SafeArea(
-              child: Scaffold(
-                  body: CustomScrollView(
-        slivers: [
-          CupertinoSliverNavigationBar(
-            largeTitle: Text('Teams'),
-            previousPageTitle: 'Events',
-            trailing: CupertinoButton(
-              child: Text('Add'),
-              onPressed: () {
-                setState(() {
-                  widget.event.teams.add(Team('7390', 'JCjos'));
-                });
-              },
-            ),
-          ),
-          SliverList(
-            delegate: SliverChildListDelegate(widget.event.teams
-                .map((e) => ListTile(
-                      title: Text(e.name),
-                      leading: Text(e.number,
-                          style: Theme.of(context).textTheme.caption),
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            CupertinoPageRoute(
-                                builder: (context) => TeamView(team: e)));
-                      },
-                    ))
-                .toList()),
-          ),
-        ],
-      )))),
-      CupertinoPageScaffold(
-          child: SafeArea(
-              child: Scaffold(
-                  body: CustomScrollView(
-        slivers: [
-          CupertinoSliverNavigationBar(
-            largeTitle: Text('Matches'),
-            previousPageTitle: 'Events',
-            trailing: CupertinoButton(
-              child: Text('Add'),
-              onPressed: () {
-                setState(() {
-                  widget.event.matches.add(Match.defaultMatch(EventType.local));
-                });
-              },
-            ),
-            leading: CupertinoButton(
-              child: Text('Events'),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ),
-          SliverList(
-            delegate: SliverChildListDelegate(widget.event.matches
-                .map((e) => ListTile(
-                      leading: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(e.red.item1.name + ' & ' + e.red.item2.name),
-                            Text(
-                              'VS',
-                              style: TextStyle(
-                                  color: Colors.red,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                            Text(e.blue.item1.name + ' & ' + e.blue.item2.name)
-                          ]),
-                      trailing: Text(e.score()),
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            CupertinoPageRoute(
-                                builder: (context) => MatchView(match: e)));
-                      },
-                    ))
-                .toList()),
-          ),
-        ],
-      )))),
-    ];
-  }
-
   int _tab = 0;
-
   @override
   Widget build(BuildContext context) {
-    if (Platform.isAndroid) {
-      return Scaffold(
-        appBar: AppBar(
-          title: _tab == 0 ? Text('Teams') : Text('Matches'),
-          backgroundColor: Theme.of(context).accentColor,
-          actions: [
+    return Scaffold(
+      appBar: AppBar(
+        title: _tab == 0 ? Text('Teams') : Text('Matches'),
+        backgroundColor: Theme.of(context).accentColor,
+        actions: [
+          if (Platform.isAndroid)
             PlatformButton(
               child: Text('Refresh'),
               onPressed: () {
                 setState(() {});
               },
             )
-          ],
-        ),
-        bottomNavigationBar: widget.event.type != EventType.remote
-            ? BottomNavigationBar(
-                currentIndex: _tab,
-                onTap: (int index) {
-                  setState(() {
-                    _tab = index;
-                  });
-                },
-                items: [
-                  BottomNavigationBarItem(
-                    icon: Icon(CupertinoIcons.person_3_fill),
-                    label: 'Teams',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(CupertinoIcons.sportscourt_fill),
-                    label: 'Matches',
-                  )
-                ],
-              )
-            : null,
-        body: materialTabs()[_tab],
-        floatingActionButton: FloatingActionButton(
-          tooltip: _tab == 0 ? 'Add Team' : 'Add Match',
-          child: Icon(Icons.add),
-          onPressed: () {
-            if (_tab == 0) {
-              _teamConfig();
-            } else {
-              _matchConfig();
-            }
-          },
-        ),
-      );
-    } else {
-      return CupertinoTabScaffold(
-        tabBuilder: (BuildContext context, int index) {
-          return CupertinoTabView(
-            builder: (BuildContext context) {
-              return CupertinoPageScaffold(child: cupertinoTabs()[_tab]);
-            },
-          );
-        },
-        tabBar: CupertinoTabBar(
-          currentIndex: _tab,
-          items: [
-            BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.person_3_fill),
-              label: 'Teams',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.sportscourt_fill),
-              label: 'Matches',
+          else
+            PlatformButton(
+              child: Text('Add'),
+              onPressed: () {
+                if (_tab == 0) {
+                  _teamConfig();
+                } else {
+                  _matchConfig();
+                }
+              },
             )
-          ],
-          onTap: (int x) {
-            _tab = x;
-          },
-        ),
-      );
-    }
+        ],
+      ),
+      bottomNavigationBar: widget.event.type != EventType.remote
+          ? BottomNavigationBar(
+              currentIndex: _tab,
+              onTap: (int index) {
+                setState(() {
+                  _tab = index;
+                });
+              },
+              items: [
+                BottomNavigationBarItem(
+                  icon: Icon(CupertinoIcons.person_3_fill),
+                  label: 'Teams',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(CupertinoIcons.sportscourt_fill),
+                  label: 'Matches',
+                )
+              ],
+            )
+          : null,
+      body: materialTabs()[_tab],
+      floatingActionButton: Platform.isAndroid
+          ? FloatingActionButton(
+              tooltip: _tab == 0 ? 'Add Team' : 'Add Match',
+              child: Icon(Icons.add),
+              onPressed: () {
+                if (_tab == 0) {
+                  _teamConfig();
+                } else {
+                  _matchConfig();
+                }
+              },
+            )
+          : null,
+    );
   }
 
   void _matchConfig() {

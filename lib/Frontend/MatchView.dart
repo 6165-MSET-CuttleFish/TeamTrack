@@ -50,6 +50,7 @@ class _MatchView extends State<MatchView> {
                     Theme.of(context).canvasColor,
                     Theme.of(context).canvasColor,
                     Theme.of(context).canvasColor,
+                    Theme.of(context).canvasColor,
                   ]),
             ),
             child: Center(
@@ -198,45 +199,35 @@ class _MatchView extends State<MatchView> {
             child: SafeArea(
               child: Column(
                 children: [
-                  // Row(
-                  // mainAxisAlignment: MainAxisAlignment.start,
-                  // children: [Text(' Match Stats', style: Theme.of(context).textTheme.headline4)]
-                  // ),
                   Text(_match.score(),
                       style: Theme.of(context).textTheme.headline4),
                   buttonRow(),
                   Text(_selectedTeam.name + ' : ' + _score.total().toString(),
                       style: Theme.of(context).textTheme.headline6),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      DropdownButton<Dice>(
-                        value: _match.dice,
-                        icon: Icon(Icons.height_rounded),
-                        iconSize: 24,
-                        elevation: 16,
-                        style: TextStyle(color: Theme.of(context).accentColor),
-                        underline: Container(
-                          height: 0.5,
-                          color: Colors.deepPurpleAccent,
-                        ),
-                        onChanged: (Dice newValue) {
-                          setState(() {
-                            _match.dice = newValue;
-                          });
-                        },
-                        items: <Dice>[Dice.one, Dice.two, Dice.three]
-                            .map<DropdownMenuItem<Dice>>((Dice value) {
-                          return DropdownMenuItem<Dice>(
-                            value: value,
-                            child: Text('Stack Height : ' +
-                                value.stackHeight().toString()),
-                          );
-                        }).toList(),
-                      ),
-                    ],
+                  DropdownButton<Dice>(
+                    value: _match.dice,
+                    icon: Icon(Icons.height_rounded),
+                    iconSize: 24,
+                    elevation: 16,
+                    style: TextStyle(color: Theme.of(context).accentColor),
+                    underline: Container(
+                      height: 0.5,
+                      color: Colors.deepPurpleAccent,
+                    ),
+                    onChanged: (Dice newValue) {
+                      setState(() {
+                        _match.dice = newValue;
+                      });
+                    },
+                    items: <Dice>[Dice.one, Dice.two, Dice.three]
+                        .map<DropdownMenuItem<Dice>>((Dice value) {
+                      return DropdownMenuItem<Dice>(
+                        value: value,
+                        child: Text(
+                            'Stack Height : ' + value.stackHeight().toString()),
+                      );
+                    }).toList(),
                   ),
-
                   CupertinoSlidingSegmentedControl(
                     groupValue: _view,
                     children: <int, Widget>{

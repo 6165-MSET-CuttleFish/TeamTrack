@@ -26,6 +26,7 @@ dependencies:
   fl_chart: ^0.12.2
   flutter_slidable: ^0.5.7
   shared_preferences: ^0.5.12+4
+  toggle_switch: "^0.1.8"
   flutter:
     sdk: flutter
 

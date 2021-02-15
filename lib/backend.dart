@@ -205,14 +205,16 @@ enum EventType { live, local, remote }
 enum Dice { one, two, three, none }
 
 extension DiceExtension on Dice {
-  int stackHeight() {
+  String stackHeight() {
     switch (this) {
       case Dice.one:
-        return 0;
+        return '0';
       case Dice.two:
-        return 1;
+        return '1';
+      case Dice.three:
+        return '4';
       default:
-        return 4;
+        return 'All Cases';
     }
   }
 }
@@ -244,12 +246,13 @@ extension IterableExtensions on Iterable<int> {
 }
 
 extension MatchExtensions on List<Match> {
-  List<FlSpot> spots(Team team) {
+  List<FlSpot> spots(Team team, Dice dice) {
     List<FlSpot> val = [];
-    for (int i = 0; i < this.length; i++) {
-      final alliance = this[i].alliance(team);
+    final arr = (dice != Dice.none ? this.where((e)=> e.dice == dice) : this).toList();
+    for (int i = 0; i < arr.length; i++) {
+      final alliance = arr[i].alliance(team);
       if (alliance != null) {
-        final allianceTotal = alliance.allianceTotal(this[i].id);
+        final allianceTotal = alliance.allianceTotal(arr[i].id);
         val.add(FlSpot(i.toDouble(), allianceTotal.toDouble()));
       }
     }
@@ -302,14 +305,14 @@ extension TeamsExtension on List<Team> {
     this.sort((a, b) => int.parse(a.number).compareTo(int.parse(b.number)));
   }
 
-  double maxScore() {
+  double maxScore(Dice dice) {
     if (this.length == 0) return 1;
-    return this.map((e) => e.scores.maxScore()).reduce(max);
+    return this.map((e) => e.scores.maxScore(dice)).reduce(max);
   }
 
-  double lowestMadScore() {
+  double lowestMadScore(Dice dice) {
     if (this.length == 0) return 1;
-    return this.map((e) => e.scores.madScore()).reduce(min);
+    return this.map((e) => e.scores.madScore(dice)).reduce(min);
   }
 
   double maxAutoScore(Dice dice) {
@@ -322,24 +325,24 @@ extension TeamsExtension on List<Team> {
     return this.map((e) => e.scores.autoMADScore(dice)).reduce(min);
   }
 
-  double maxTeleScore() {
+  double maxTeleScore(Dice dice) {
     if (this.length == 0) return 1;
-    return this.map((e) => e.scores.teleMaxScore()).reduce(max);
+    return this.map((e) => e.scores.teleMaxScore(dice)).reduce(max);
   }
 
-  double lowestTeleMadScore() {
+  double lowestTeleMadScore(Dice dice) {
     if (this.length == 0) return 1;
-    return this.map((e) => e.scores.teleMADScore()).reduce(min);
+    return this.map((e) => e.scores.teleMADScore(dice)).reduce(min);
   }
 
-  double maxEndScore() {
+  double maxEndScore(Dice dice) {
     if (this.length == 0) return 1;
-    return this.map((e) => e.scores.endMaxScore()).reduce(max);
+    return this.map((e) => e.scores.endMaxScore(dice)).reduce(max);
   }
 
-  double lowestEndMadScore() {
+  double lowestEndMadScore(Dice dice) {
     if (this.length == 0) return 1;
-    return this.map((e) => e.scores.endMADScore()).reduce(min);
+    return this.map((e) => e.scores.endMADScore(dice)).reduce(min);
   }
 }
 
@@ -380,47 +383,56 @@ extension ScoresExtension on List<Score> {
     return val;
   }
 
-  double maxScore() {
-    if (this.length == 0) return 0;
-    return this.map((e) => e.total()).reduce(max).toDouble();
+  double maxScore(Dice dice) {
+    final arr = this.diceScores(dice);
+    if (arr.length == 0) return 0;
+    return arr.map((e) => e.total()).reduce(max).toDouble();
   }
 
-  double minScore() {
-    return this.map((e) => e.total()).reduce(min).toDouble();
+  double minScore(Dice dice) {
+    final arr = this.diceScores(dice);
+    if (arr.length == 0) return 0;
+    return arr.map((e) => e.total()).reduce(min).toDouble();
   }
 
-  double meanScore() {
-    if (this.length == 0) return 0;
-    return this.map((e) => e.total()).mean();
+  double meanScore(Dice dice) {
+    final arr = this.diceScores(dice);
+    if (arr.length == 0) return 0;
+    return arr.map((e) => e.total()).mean();
   }
 
-  double madScore() {
-    if (this.length == 0) return 0;
-    return this.map((e) => e.total()).mad();
+  double madScore(Dice dice) {
+    final arr = this.diceScores(dice);
+    if (arr.length == 0) return 0;
+    return arr.map((e) => e.total()).mad();
   }
 
-  double teleMaxScore() {
-    if (this.length == 0) return 0;
-    return this.map((e) => e.teleScore.total()).reduce(max).toDouble();
+  double teleMaxScore(Dice dice) {
+    final arr = this.diceScores(dice);
+    if (arr.length == 0) return 0;
+    return arr.map((e) => e.teleScore.total()).reduce(max).toDouble();
   }
 
-  double teleMinScore() {
-    if (this.length == 0) return 0;
-    return this.map((e) => e.teleScore.total()).reduce(min).toDouble();
+  double teleMinScore(Dice dice) {
+    final arr = this.diceScores(dice);
+    if (arr.length == 0) return 0;
+    return arr.map((e) => e.teleScore.total()).reduce(min).toDouble();
   }
 
-  double teleMeanScore() {
-    if (this.length == 0) return 0;
-    return this.map((e) => e.teleScore.total()).mean();
+  double teleMeanScore(Dice dice) {
+    final arr = this.diceScores(dice);
+    if (arr.length == 0) return 0;
+    return arr.map((e) => e.teleScore.total()).mean();
   }
 
-  double teleMADScore() {
-    if (this.length == 0) return 0;
-    return this.map((e) => e.teleScore.total()).mad();
+  double teleMADScore(Dice dice) {
+    final arr = this.diceScores(dice);
+    if (arr.length == 0) return 0;
+    return arr.map((e) => e.teleScore.total()).mad();
   }
 
   double autoMaxScore(Dice dice) {
-    final arr = dice != Dice.none ? this.where((e) => e.dice == dice) : this;
+    final arr = this.diceScores(dice);
     if (arr.length == 0)
       return 0;
     else
@@ -428,7 +440,7 @@ extension ScoresExtension on List<Score> {
   }
 
   double autoMinScore(Dice dice) {
-    final arr = dice != Dice.none ? this.where((e) => e.dice == dice) : this;
+    final arr = this.diceScores(dice);
     if (arr.length == 0)
       return 0;
     else
@@ -436,7 +448,7 @@ extension ScoresExtension on List<Score> {
   }
 
   double autoMeanScore(Dice dice) {
-    final arr = dice != Dice.none ? this.where((e) => e.dice == dice) : this;
+    final arr = this.diceScores(dice);
     if (arr.length == 0)
       return 0;
     else
@@ -444,31 +456,36 @@ extension ScoresExtension on List<Score> {
   }
 
   double autoMADScore(Dice dice) {
-    final arr = dice != Dice.none ? this.where((e) => e.dice == dice) : this;
+    final arr = this.diceScores(dice);
     if (arr.length == 0)
       return 0;
     else
       return arr.map((e) => e.autoScore.total()).mad();
   }
 
-  double endMaxScore() {
+  double endMaxScore(Dice dice) {
     if (this.length == 0) return 0;
     return this.map((e) => e.endgameScore.total()).reduce(max).toDouble();
   }
 
-  double endMinScore() {
+  double endMinScore(Dice dice) {
     if (this.length == 0) return 0;
     return this.map((e) => e.endgameScore.total()).reduce(min).toDouble();
   }
 
-  double endMeanScore() {
+  double endMeanScore(Dice dice) {
     if (this.length == 0) return 0;
     return this.map((e) => e.endgameScore.total()).mean();
   }
 
-  double endMADScore() {
+  double endMADScore(Dice dice) {
     if (this.length == 0) return 0;
     return this.map((e) => e.endgameScore.total()).mad();
+  }
+
+  List<Score> diceScores(Dice dice) {
+    return (dice != Dice.none ? this.where((e) => e.dice == dice) : this)
+        .toList();
   }
 }
 

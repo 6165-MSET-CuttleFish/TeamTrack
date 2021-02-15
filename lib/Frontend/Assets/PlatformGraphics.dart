@@ -157,6 +157,7 @@ class PlatformButton extends PlatformWidget<CupertinoButton, MaterialButton> {
   @override
   MaterialButton buildMaterialWidget(BuildContext context) {
     return MaterialButton(
+      elevation: 0,
       child: child,
       onPressed: onPressed,
       color: color,
