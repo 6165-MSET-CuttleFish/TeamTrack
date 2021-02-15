@@ -319,9 +319,11 @@ class _EventView extends State<EventView> {
           child: Center(
               child: Form(
                   key: _formKey,
-                  child: ListView(
-                    children: _textFields(),
-                  ))),
+                  child: Padding(
+                      padding: EdgeInsets.only(left: 5, right: 5),
+                      child: ListView(
+                        children: _textFields(),
+                      )))),
         ));
   }
 }

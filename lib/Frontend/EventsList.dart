@@ -50,7 +50,7 @@ class _EventsList extends State<EventsList> {
                                   child: Text('Confirm'),
                                   onPressed: () {
                                     setState(() {
-                                      widget.dataModel.localEvents().remove(e);
+                                      widget.dataModel.events.remove(e);
                                     });
                                     Navigator.of(context).pop();
                                   },
@@ -65,11 +65,11 @@ class _EventsList extends State<EventsList> {
               child: ListTileTheme(
                   iconColor: Theme.of(context).primaryColor,
                   child: ListTile(
-                    leading: Icon(
+                    trailing: Icon(
                       CupertinoIcons.lock_shield_fill,
                       color: Theme.of(context).accentColor,
                     ),
-                    trailing: Icon(
+                    leading: Icon(
                       CupertinoIcons.person_3_fill,
                       color: Theme.of(context).accentColor,
                     ),
@@ -125,7 +125,7 @@ class _EventsList extends State<EventsList> {
                                   child: Text('Confirm'),
                                   onPressed: () {
                                     setState(() {
-                                      widget.dataModel.localEvents().remove(e);
+                                      widget.dataModel.events.remove(e);
                                     });
                                     Navigator.of(context).pop();
                                   },
@@ -140,11 +140,11 @@ class _EventsList extends State<EventsList> {
               child: ListTileTheme(
                   iconColor: Theme.of(context).primaryColor,
                   child: ListTile(
-                    leading: Icon(
+                    trailing: Icon(
                       CupertinoIcons.lock_shield_fill,
                       color: Theme.of(context).accentColor,
                     ),
-                    trailing: Icon(
+                    leading: Icon(
                       CupertinoIcons.rectangle_stack_person_crop_fill,
                       color: Theme.of(context).accentColor,
                     ),
@@ -215,11 +215,11 @@ class _EventsList extends State<EventsList> {
               child: ListTileTheme(
                   iconColor: Theme.of(context).primaryColor,
                   child: ListTile(
-                    leading: Icon(
-                      CupertinoIcons.cloud_fill,
+                    trailing: Icon(
+                      CupertinoIcons.location,
                       color: Theme.of(context).accentColor,
                     ),
-                    trailing: Icon(
+                    leading: Icon(
                       CupertinoIcons.person_3_fill,
                       color: Theme.of(context).accentColor,
                     ),

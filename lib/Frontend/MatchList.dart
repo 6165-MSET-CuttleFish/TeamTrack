@@ -123,7 +123,7 @@ class _MatchList extends State<MatchList> {
                                                 (f) => f.id == e.id);
                                             e.blue.item2.scores.removeWhere(
                                                 (f) => f.id == e.id);
-                                            widget.event.matches.remove(e);
+                                            //widget.event.matches.remove(e);
                                           });
                                           Navigator.of(context).pop();
                                         },
@@ -167,6 +167,7 @@ class _MatchList extends State<MatchList> {
       var matches = widget.event.matches
           .where((e) => e.alliance(widget.team) != null)
           .toList();
+      print(matches.length);
       for (int i = 0; i < matches.length; i++) {
         arr.add(Slidable(
             actionPane: slider,
@@ -193,11 +194,10 @@ class _MatchList extends State<MatchList> {
                                 isDestructive: true,
                                 child: Text('Confirm'),
                                 onPressed: () {
-                                  setState(() {
-                                    matches[i].red.item1.scores.removeWhere(
-                                        (f) => f.id == matches[i].id);
-                                    matches.remove(matches[i]);
-                                  });
+                                  matches[i].red.item1.scores.removeWhere(
+                                      (f) => f.id == matches[i].id);
+                                  widget.event.matches.remove(matches[i]);
+                                  setState(() {});
                                   Navigator.of(context).pop();
                                 },
                               ),

@@ -8,7 +8,7 @@ class BarGraph extends StatelessWidget {
       this.max = 2,
       this.val = 9,
       this.inverted = false,
-      this.height = 150,
+      this.height = 120,
       this.title = 'Default'})
       : super(key: key);
   final String title;
@@ -29,7 +29,7 @@ class BarGraph extends StatelessWidget {
           alignment: AlignmentDirectional.bottomStart,
           children: [
             Container(
-              width: 40,
+              width: 30,
               height: height,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(60),
@@ -39,9 +39,9 @@ class BarGraph extends StatelessWidget {
             AnimatedContainer(
               curve: Curves.fastLinearToSlowEaseIn,
               duration: Duration(milliseconds: 600),
-              width: 40,
+              width: 30,
               height: inverted
-                  ? (val != 0 ? max / val : 0) * height
+                  ? (val != 0 ? max / val : 1) * height
                   : (max != 0 ? val / max : 0) * height,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(60),

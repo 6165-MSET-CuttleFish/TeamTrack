@@ -86,78 +86,77 @@ class _TeamView extends State<TeamView> {
                         .maxAllianceScore(widget.team)
                         .toDouble(),
                     lineBarsData: [
-                      if (widget.event.type != EventType.remote &&
-                          _selections[0])
-                        LineChartBarData(
-                            spots:
-                                widget.event.matches.spots(widget.team, _dice),
-                            colors: [
-                              Colors.orange,
-                            ],
-                            isCurved: true,
-                            preventCurveOverShooting: true,
-                            barWidth: 5,
-                            shadow: Shadow(color: Colors.green, blurRadius: 5)),
-                      if (_selections[1])
-                        LineChartBarData(
-                            spots: _dice != Dice.none
-                                ? widget.team.scores
-                                    .where((e) => e.dice == _dice)
-                                    .toList()
-                                    .spots()
-                                : widget.team.scores.spots(),
-                            colors: [
-                              Colors.deepPurple,
-                            ],
-                            isCurved: true,
-                            preventCurveOverShooting: true,
-                            barWidth: 5,
-                            shadow: Shadow(color: Colors.green, blurRadius: 5)),
-                      if (_selections[2])
-                        LineChartBarData(
-                            spots: _dice != Dice.none
-                                ? widget.team.scores
-                                    .where((e) => e.dice == _dice)
-                                    .toList()
-                                    .autoSpots()
-                                : widget.team.scores.autoSpots(),
-                            colors: [
-                              Colors.green,
-                            ],
-                            isCurved: true,
-                            preventCurveOverShooting: true,
-                            barWidth: 5,
-                            shadow: Shadow(color: Colors.green, blurRadius: 5)),
-                      if (_selections[4])
-                        LineChartBarData(
-                            spots: _dice != Dice.none
-                                ? widget.team.scores
-                                    .where((e) => e.dice == _dice)
-                                    .toList()
-                                    .endSpots()
-                                : widget.team.scores.endSpots(),
-                            colors: [
-                              Colors.red,
-                            ],
-                            isCurved: true,
-                            preventCurveOverShooting: true,
-                            barWidth: 5,
-                            shadow: Shadow(color: Colors.green, blurRadius: 5)),
-                      if (_selections[3])
-                        LineChartBarData(
-                            spots: _dice != Dice.none
-                                ? widget.team.scores
-                                    .where((e) => e.dice == _dice)
-                                    .toList()
-                                    .teleSpots()
-                                : widget.team.scores.teleSpots(),
-                            colors: [
-                              Colors.blue,
-                            ],
-                            isCurved: true,
-                            preventCurveOverShooting: true,
-                            barWidth: 5,
-                            shadow: Shadow(color: Colors.green, blurRadius: 5)),
+                      LineChartBarData(
+                          show: _selections[0] &&
+                              widget.event.type != EventType.remote,
+                          spots: widget.event.matches.spots(widget.team, _dice),
+                          colors: [
+                            Colors.orange,
+                          ],
+                          isCurved: true,
+                          preventCurveOverShooting: true,
+                          barWidth: 5,
+                          shadow: Shadow(color: Colors.green, blurRadius: 5)),
+                      LineChartBarData(
+                          show: _selections[1],
+                          spots: _dice != Dice.none
+                              ? widget.team.scores
+                                  .where((e) => e.dice == _dice)
+                                  .toList()
+                                  .spots()
+                              : widget.team.scores.spots(),
+                          colors: [
+                            Colors.deepPurple,
+                          ],
+                          isCurved: true,
+                          preventCurveOverShooting: true,
+                          barWidth: 5,
+                          shadow: Shadow(color: Colors.green, blurRadius: 5)),
+                      LineChartBarData(
+                          show: _selections[2],
+                          spots: _dice != Dice.none
+                              ? widget.team.scores
+                                  .where((e) => e.dice == _dice)
+                                  .toList()
+                                  .autoSpots()
+                              : widget.team.scores.autoSpots(),
+                          colors: [
+                            Colors.green,
+                          ],
+                          isCurved: true,
+                          preventCurveOverShooting: true,
+                          barWidth: 5,
+                          shadow: Shadow(color: Colors.green, blurRadius: 5)),
+                      LineChartBarData(
+                          show: _selections[3],
+                          spots: _dice != Dice.none
+                              ? widget.team.scores
+                                  .where((e) => e.dice == _dice)
+                                  .toList()
+                                  .teleSpots()
+                              : widget.team.scores.teleSpots(),
+                          colors: [
+                            Colors.blue,
+                          ],
+                          isCurved: true,
+                          preventCurveOverShooting: true,
+                          barWidth: 5,
+                          shadow: Shadow(color: Colors.green, blurRadius: 5)),
+                      LineChartBarData(
+                          show: _selections[4],
+                          spots: _dice != Dice.none
+                              ? widget.team.scores
+                                  .where((e) => e.dice == _dice)
+                                  .toList()
+                                  .endSpots()
+                              : widget.team.scores.endSpots(),
+                          colors: [
+                            Colors.red,
+                          ],
+                          isCurved: true,
+                          preventCurveOverShooting: true,
+                          barWidth: 5,
+                          shadow: Shadow(color: Colors.green, blurRadius: 5)),
                     ],
                   ))),
             ),
@@ -173,9 +172,11 @@ class _TeamView extends State<TeamView> {
           Padding(
             padding: widget.event.type != EventType.remote
                 ? EdgeInsets.all(40)
-                : EdgeInsets.all(30),
+                : EdgeInsets.all(20),
           ),
           Wrap(
+            crossAxisAlignment: WrapCrossAlignment.start,
+            spacing: 5,
             children: [
               if (widget.event.type != EventType.remote)
                 FlatButton(
@@ -781,10 +782,13 @@ class _TeamView extends State<TeamView> {
         ],
       ),
       body: ListView(children: [
-        Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: body(),
+        Padding(
+          padding: EdgeInsets.only(left: 5, right: 5),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: body(),
+          ),
         )
       ]),
     );
