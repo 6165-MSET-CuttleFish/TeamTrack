@@ -248,7 +248,8 @@ extension IterableExtensions on Iterable<int> {
 extension MatchExtensions on List<Match> {
   List<FlSpot> spots(Team team, Dice dice) {
     List<FlSpot> val = [];
-    final arr = (dice != Dice.none ? this.where((e)=> e.dice == dice) : this).toList();
+    final arr =
+        (dice != Dice.none ? this.where((e) => e.dice == dice) : this).toList();
     for (int i = 0; i < arr.length; i++) {
       final alliance = arr[i].alliance(team);
       if (alliance != null) {
@@ -464,23 +465,27 @@ extension ScoresExtension on List<Score> {
   }
 
   double endMaxScore(Dice dice) {
-    if (this.length == 0) return 0;
-    return this.map((e) => e.endgameScore.total()).reduce(max).toDouble();
+    final arr = this.diceScores(dice);
+    if (arr.length == 0) return 0;
+    return arr.map((e) => e.endgameScore.total()).reduce(max).toDouble();
   }
 
   double endMinScore(Dice dice) {
-    if (this.length == 0) return 0;
-    return this.map((e) => e.endgameScore.total()).reduce(min).toDouble();
+    final arr = this.diceScores(dice);
+    if (arr.length == 0) return 0;
+    return arr.map((e) => e.endgameScore.total()).reduce(min).toDouble();
   }
 
   double endMeanScore(Dice dice) {
-    if (this.length == 0) return 0;
-    return this.map((e) => e.endgameScore.total()).mean();
+    final arr = this.diceScores(dice);
+    if (arr.length == 0) return 0;
+    return arr.map((e) => e.endgameScore.total()).mean();
   }
 
   double endMADScore(Dice dice) {
-    if (this.length == 0) return 0;
-    return this.map((e) => e.endgameScore.total()).mad();
+    final arr = this.diceScores(dice);
+    if (arr.length == 0) return 0;
+    return arr.map((e) => e.endgameScore.total()).mad();
   }
 
   List<Score> diceScores(Dice dice) {

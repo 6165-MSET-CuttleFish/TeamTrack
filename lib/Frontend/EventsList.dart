@@ -252,53 +252,34 @@ class _EventsList extends State<EventsList> {
   String _newName;
   @override
   Widget build(BuildContext context) {
-    if (Platform.isIOS) {
-      return CupertinoPageScaffold(
-          child: SafeArea(
-              child: Scaffold(
-                  body: CustomScrollView(
-        slivers: [
-          CupertinoSliverNavigationBar(
-            largeTitle: Text('Events'),
-            previousPageTitle: 'Events',
-            trailing: CupertinoButton(
-              child: Text('Add'),
-              onPressed: _onPressed,
-            ),
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).accentColor,
+        title: Text('Events'),
+      ),
+      body: SafeArea(
+        child: ListView(children: [
+          ExpansionTile(
+            initiallyExpanded: true,
+            title: Text('Local Events'),
+            children: localEvents(),
           ),
-          SliverList(
-            delegate: SliverChildListDelegate(localEvents()),
+          ExpansionTile(
+            initiallyExpanded: true,
+            title: Text('Remote Events'),
+            children: remoteEvents(),
           ),
-        ],
-      ))));
-    } else {
-      return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).accentColor,
-          title: Text('Events'),
-        ),
-        body: SafeArea(
-          child: ListView(children: [
-            ExpansionTile(
-              title: Text('Local Events'),
-              children: localEvents(),
-            ),
-            ExpansionTile(
-              title: Text('Remote Events'),
-              children: remoteEvents(),
-            ),
-            // ExpansionTile(
-            //   title: Text('Live Events'),
-            //   children: liveEvents(),
-            // ),
-          ]),
-        ),
-        floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.add),
-          onPressed: _onPressed,
-        ),
-      );
-    }
+          // ExpansionTile(
+          //   title: Text('Live Events'),
+          //   children: liveEvents(),
+          // ),
+        ]),
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: _onPressed,
+      ),
+    );
   }
 
   void _onPressed() {

@@ -29,7 +29,7 @@ class _TeamView extends State<TeamView> {
   final Duration finalDuration = Duration(milliseconds: 800);
   final _selections = [true, true, false, false, false];
   Widget _lineChart() {
-    return widget.team.scores.diceScores(_dice).length >= 1
+    return widget.team.scores.diceScores(_dice).length >= 2
         ? AspectRatio(
             aspectRatio: 1.20,
             child: Container(
@@ -171,13 +171,16 @@ class _TeamView extends State<TeamView> {
         isCollapsed: widget.team.scores.diceScores(_dice).length < 2,
         child: Column(children: [
           Padding(
-            padding: EdgeInsets.all(40),
+            padding: widget.event.type != EventType.remote
+                ? EdgeInsets.all(40)
+                : EdgeInsets.all(30),
           ),
           Wrap(
             children: [
               if (widget.event.type != EventType.remote)
                 FlatButton(
                   color: _selections[0] ? Colors.orange : null,
+                  splashColor: Colors.orange,
                   onPressed: () {
                     setState(() {
                       _selections[0] = !_selections[0];
@@ -190,6 +193,7 @@ class _TeamView extends State<TeamView> {
                 ),
               FlatButton(
                 color: _selections[1] ? Colors.deepPurple : null,
+                splashColor: Colors.deepPurple,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(18.0),
                     side: BorderSide(color: Colors.deepPurple)),
@@ -202,6 +206,7 @@ class _TeamView extends State<TeamView> {
               ),
               FlatButton(
                 color: _selections[2] ? Colors.green : null,
+                splashColor: Colors.green,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(18.0),
                     side: BorderSide(color: Colors.green)),
@@ -214,6 +219,7 @@ class _TeamView extends State<TeamView> {
               ),
               FlatButton(
                 color: _selections[3] ? Colors.blue : null,
+                splashColor: Colors.blue,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(18.0),
                     side: BorderSide(color: Colors.blue)),
@@ -284,7 +290,7 @@ class _TeamView extends State<TeamView> {
         padding: EdgeInsets.all(5),
       ),
       CardView(
-          isActive: widget.team.scores.length >= 2,
+          isActive: widget.team.scores.diceScores(_dice).length >= 1,
           child: Padding(
               padding: EdgeInsets.only(left: 5, right: 5),
               child: Row(
@@ -307,7 +313,7 @@ class _TeamView extends State<TeamView> {
                   ),
                 ],
               )),
-          collapsed: widget.team.scores.length >= 1
+          collapsed: widget.team.scores.diceScores(_dice).length >= 1
               ? AspectRatio(
                   aspectRatio: 2,
                   child: Container(
@@ -381,9 +387,7 @@ class _TeamView extends State<TeamView> {
         padding: EdgeInsets.all(5),
       ),
       CardView(
-        isActive: _dice == Dice.none
-            ? widget.team.scores.length >= 2
-            : widget.team.scores.where((e) => e.dice == _dice).length >= 2,
+        isActive: widget.team.scores.diceScores(_dice).length >= 1,
         child: Padding(
             padding: EdgeInsets.only(left: 5, right: 5),
             child: Row(
@@ -406,10 +410,7 @@ class _TeamView extends State<TeamView> {
                 ),
               ],
             )),
-        collapsed: widget.team.scores
-                    .where((e) => _dice != Dice.none ? e.dice == _dice : true)
-                    .length >=
-                1
+        collapsed: widget.team.scores.diceScores(_dice).length >= 1
             ? AspectRatio(
                 aspectRatio: 2,
                 child: Container(
@@ -467,10 +468,7 @@ class _TeamView extends State<TeamView> {
                             lineBarsData: [
                               LineChartBarData(
                                   spots: widget.team.scores
-                                      .where((e) => _dice != Dice.none
-                                          ? e.dice == _dice
-                                          : true)
-                                      .toList()
+                                      .diceScores(_dice)
                                       .autoSpots(),
                                   colors: [Colors.green, Colors.blue],
                                   isCurved: true,
@@ -492,7 +490,7 @@ class _TeamView extends State<TeamView> {
         padding: EdgeInsets.all(5),
       ),
       CardView(
-          isActive: widget.team.scores.length >= 2,
+          isActive: widget.team.scores.diceScores(_dice).length >= 1,
           child: Padding(
               padding: EdgeInsets.only(left: 5, right: 5),
               child: Row(
@@ -515,7 +513,7 @@ class _TeamView extends State<TeamView> {
                   ),
                 ],
               )),
-          collapsed: widget.team.scores.length >= 1
+          collapsed: widget.team.scores.diceScores(_dice).length >= 1
               ? AspectRatio(
                   aspectRatio: 2,
                   child: Container(
@@ -562,14 +560,20 @@ class _TeamView extends State<TeamView> {
                                       color: const Color(0xff37434d),
                                       width: 1)),
                               minX: 0,
-                              maxX: widget.team.scores.length.toDouble() - 1,
+                              maxX: widget.team.scores
+                                      .diceScores(_dice)
+                                      .length
+                                      .toDouble() -
+                                  1,
                               minY: widget.team.scores.teleMinScore(_dice),
                               maxY: widget.team.scores
                                   .teleMaxScore(_dice)
                                   .toDouble(),
                               lineBarsData: [
                                 LineChartBarData(
-                                    spots: widget.team.scores.teleSpots(),
+                                    spots: widget.team.scores
+                                        .diceScores(_dice)
+                                        .teleSpots(),
                                     colors: [Colors.green, Colors.blue],
                                     isCurved: true,
                                     preventCurveOverShooting: true,
@@ -589,7 +593,7 @@ class _TeamView extends State<TeamView> {
         padding: EdgeInsets.all(5),
       ),
       CardView(
-          isActive: widget.team.scores.length >= 2,
+          isActive: widget.team.scores.diceScores(_dice).length >= 1,
           child: Padding(
               padding: EdgeInsets.only(left: 5, right: 5),
               child: Row(
@@ -612,7 +616,7 @@ class _TeamView extends State<TeamView> {
                   ),
                 ],
               )),
-          collapsed: widget.team.scores.length >= 1
+          collapsed: widget.team.scores.diceScores(_dice).length >= 1
               ? AspectRatio(
                   aspectRatio: 2,
                   child: Container(
@@ -659,12 +663,18 @@ class _TeamView extends State<TeamView> {
                                       color: const Color(0xff37434d),
                                       width: 1)),
                               minX: 0,
-                              maxX: widget.team.scores.length.toDouble() - 1,
+                              maxX: widget.team.scores
+                                      .diceScores(_dice)
+                                      .length
+                                      .toDouble() -
+                                  1,
                               minY: widget.team.scores.endMinScore(_dice),
                               maxY: widget.team.scores.endMaxScore(_dice),
                               lineBarsData: [
                                 LineChartBarData(
-                                    spots: widget.team.scores.endSpots(),
+                                    spots: widget.team.scores
+                                        .diceScores(_dice)
+                                        .endSpots(),
                                     colors: [Colors.green, Colors.blue],
                                     isCurved: true,
                                     preventCurveOverShooting: true,
