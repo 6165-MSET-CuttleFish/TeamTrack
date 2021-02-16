@@ -89,7 +89,11 @@ class _TeamView extends State<TeamView> {
                       LineChartBarData(
                           show: _selections[0] &&
                               widget.event.type != EventType.remote,
-                          spots: widget.event.matches.spots(widget.team, _dice),
+                          spots: widget.event.matches
+                              .where(
+                                  (e) => e.dice == _dice || _dice == Dice.none)
+                              .toList()
+                              .spots(widget.team, _dice),
                           colors: [
                             Colors.orange,
                           ],

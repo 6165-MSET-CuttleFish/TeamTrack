@@ -85,8 +85,14 @@ class Alliance {
   }
   int allianceTotal(Uuid id) {
     return 0 +
-        item1?.scores?.firstWhere((e) => e.id == id)?.total() +
-        item2?.scores?.firstWhere((e) => e.id == id)?.total();
+        item1?.scores
+            ?.firstWhere((e) => e.id == id,
+                orElse: () => Score(Uuid(), Dice.none))
+            ?.total() +
+        item2?.scores
+            ?.firstWhere((e) => e.id == id,
+                orElse: () => Score(Uuid(), Dice.none))
+            ?.total();
   }
 
   Alliance.fromJSON(Map<String, dynamic> json)
@@ -148,29 +154,29 @@ class Match {
   }
 
   Alliance alliance(Team team) {
-    if (!red.item2.equals(Team.nullTeam())) {
-      if (red.item1.equals(team) || red.item2.equals(team)) {
-        return red;
-      } else if (blue.item1.equals(team) || blue.item2.equals(team)) {
-        return blue;
-      } else {
-        return null;
-      }
+    if (red.item1.equals(team) || red.item2.equals(team)) {
+      return red;
+    } else if (blue.item1.equals(team) || blue.item2.equals(team)) {
+      return blue;
     } else {
-      if (red.item1.equals(team)) {
-        return red;
-      } else {
-        return null;
-      }
+      return null;
     }
   }
 
   void setDice(Dice dice) {
     this.dice = dice;
-    red.item1.scores.firstWhere((e) => e.id == id).dice = dice;
-    red.item2.scores.firstWhere((e) => e.id == id).dice = dice;
-    blue.item1.scores.firstWhere((e) => e.id == id).dice = dice;
-    blue.item2.scores.firstWhere((e) => e.id == id).dice = dice;
+    red.item1.scores
+        .firstWhere((e) => e.id == id, orElse: () => Score(Uuid(), Dice.none))
+        .dice = dice;
+    red.item2.scores
+        .firstWhere((e) => e.id == id, orElse: () => Score(Uuid(), Dice.none))
+        .dice = dice;
+    blue.item1.scores
+        .firstWhere((e) => e.id == id, orElse: () => Score(Uuid(), Dice.none))
+        .dice = dice;
+    blue.item2.scores
+        .firstWhere((e) => e.id == id, orElse: () => Score(Uuid(), Dice.none))
+        .dice = dice;
   }
 
   String score() {
@@ -181,14 +187,22 @@ class Match {
   }
 
   String redScore() {
-    final r0 = red.item1.scores.firstWhere((e) => e.id == id).total();
-    final r1 = red.item2.scores.firstWhere((e) => e.id == id).total();
+    final r0 = red.item1.scores
+        .firstWhere((e) => e.id == id, orElse: () => Score(Uuid(), Dice.none))
+        .total();
+    final r1 = red.item2.scores
+        .firstWhere((e) => e.id == id, orElse: () => Score(Uuid(), Dice.none))
+        .total();
     return (r0 + r1).toString();
   }
 
   String blueScore() {
-    final b0 = blue.item1.scores.firstWhere((e) => e.id == id).total();
-    final b1 = blue.item2.scores.firstWhere((e) => e.id == id).total();
+    final b0 = blue.item1.scores
+        .firstWhere((e) => e.id == id, orElse: () => Score(Uuid(), Dice.none))
+        .total();
+    final b1 = blue.item2.scores
+        .firstWhere((e) => e.id == id, orElse: () => Score(Uuid(), Dice.none))
+        .total();
     return (b0 + b1).toString();
   }
 

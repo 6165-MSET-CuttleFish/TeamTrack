@@ -85,8 +85,8 @@ class _MatchList extends State<MatchList> {
 
   Widget _matches() {
     if (widget.event.type != EventType.remote) {
+      print(widget.event.matches.length);
       return ListView(
-        semanticChildCount: widget.event.matches.length,
         children: widget.team == null
             ? widget.event.matches
                 .map((e) => Slidable(
@@ -123,7 +123,7 @@ class _MatchList extends State<MatchList> {
                                                 (f) => f.id == e.id);
                                             e.blue.item2.scores.removeWhere(
                                                 (f) => f.id == e.id);
-                                            //widget.event.matches.remove(e);
+                                            widget.event.matches.remove(e);
                                           });
                                           Navigator.of(context).pop();
                                         },

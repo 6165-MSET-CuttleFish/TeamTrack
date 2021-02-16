@@ -6,6 +6,8 @@ import 'package:TeamTrack/backend.dart';
 import 'package:TeamTrack/score.dart';
 import 'dart:io' show Platform;
 
+import 'package:uuid/uuid.dart';
+
 class MatchView extends StatefulWidget {
   MatchView({Key key, this.match}) : super(key: key);
   final Match match;
@@ -22,8 +24,9 @@ class _MatchView extends State<MatchView> {
   _MatchView(Match match) {
     _match = match;
     _selectedTeam = match.red.item1;
-    _score =
-        _selectedTeam.scores.firstWhere((element) => element.id == match.id);
+    _score = _selectedTeam.scores.firstWhere(
+        (element) => element.id == match.id,
+        orElse: () => Score(Uuid(), Dice.none));
     if (_match.type == EventType.remote) _color = CupertinoColors.systemGreen;
   }
 

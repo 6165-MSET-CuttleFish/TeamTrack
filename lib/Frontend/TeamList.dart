@@ -52,6 +52,17 @@ class _TeamList extends State<TeamList> {
                                     child: Text('Confirm'),
                                     onPressed: () {
                                       setState(() {
+                                        for (Match match
+                                            in widget.event.matches) {
+                                          if (match.red.item1.equals(e))
+                                            match.red.item1 = Team.nullTeam();
+                                          if (match.red.item2.equals(e))
+                                            match.red.item2 = Team.nullTeam();
+                                          if (match.blue.item1.equals(e))
+                                            match.blue.item1 = Team.nullTeam();
+                                          if (match.blue.item2.equals(e))
+                                            match.blue.item2 = Team.nullTeam();
+                                        }
                                         widget.event.teams.remove(e);
                                       });
                                       Navigator.of(context).pop();
