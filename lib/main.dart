@@ -29,9 +29,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
         title: 'TeamTrack',
-        theme: darkTheme,
+        theme: dataModel.darkMode ? darkTheme : lightTheme,
         home: EventsList(
-          dataModel: DataModel(),
+          dataModel: dataModel,
         ));
   }
 }

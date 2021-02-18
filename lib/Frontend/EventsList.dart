@@ -260,11 +260,13 @@ class _EventsList extends State<EventsList> {
       body: SafeArea(
         child: ListView(children: [
           ExpansionTile(
+            leading: Icon(CupertinoIcons.person_3),
             initiallyExpanded: true,
             title: Text('Local Events'),
             children: localEvents(),
           ),
           ExpansionTile(
+            leading: Icon(CupertinoIcons.rectangle_stack_person_crop),
             initiallyExpanded: true,
             title: Text('Remote Events'),
             children: remoteEvents(),
@@ -304,7 +306,7 @@ class _EventsList extends State<EventsList> {
                       Navigator.pop(context);
                       _chosen();
                     },
-                    leading: Icon(CupertinoIcons.lock_shield_fill),
+                    leading: Icon(CupertinoIcons.person_3_fill),
                     title: Text('Local Event'),
                   ),
                 ),

@@ -125,6 +125,7 @@ class _MatchList extends State<MatchList> {
                                                 (f) => f.id == e.id);
                                             widget.event.matches.remove(e);
                                           });
+                                          dataModel.saveEvents();
                                           Navigator.of(context).pop();
                                         },
                                       ),
@@ -198,6 +199,7 @@ class _MatchList extends State<MatchList> {
                                       (f) => f.id == matches[i].id);
                                   widget.event.matches.remove(matches[i]);
                                   setState(() {});
+                                  dataModel.saveEvents();
                                   Navigator.of(context).pop();
                                 },
                               ),
@@ -273,6 +275,7 @@ class _MatchList extends State<MatchList> {
                                           .removeWhere((f) => f.id == e.id);
                                       widget.event.matches.remove(e);
                                     });
+                                    dataModel.saveEvents();
                                     Navigator.of(context).pop();
                                   },
                                 ),

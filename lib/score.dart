@@ -1,13 +1,12 @@
 import 'package:TeamTrack/backend.dart';
-import 'package:uuid/uuid.dart';
 
 class Score {
   TeleScore teleScore = TeleScore();
   AutoScore autoScore = AutoScore();
   EndgameScore endgameScore = EndgameScore();
-  Uuid id;
+  String id;
   Dice dice;
-  Score(Uuid id, Dice dice) {
+  Score(String id, Dice dice) {
     this.id = id;
     this.dice = dice;
   }
@@ -16,9 +15,11 @@ class Score {
   }
 
   Map<String, dynamic> toJson() => {
-        'AutoScore': autoScore,
-        'TeleScore': teleScore,
-        'EndgameScore': endgameScore,
+        'AutoScore': autoScore.toJson(),
+        'TeleScore': teleScore.toJson(),
+        'EndgameScore': endgameScore.toJson(),
+        'id': id.toString(),
+        'dice': dice.toString()
       };
 }
 

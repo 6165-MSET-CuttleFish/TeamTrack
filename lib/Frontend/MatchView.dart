@@ -26,7 +26,7 @@ class _MatchView extends State<MatchView> {
     _selectedTeam = match.red.item1;
     _score = _selectedTeam.scores.firstWhere(
         (element) => element.id == match.id,
-        orElse: () => Score(Uuid(), Dice.none));
+        orElse: () => Score(Uuid().v4(), Dice.none));
     if (_match.type == EventType.remote) _color = CupertinoColors.systemGreen;
   }
 
@@ -84,45 +84,64 @@ class _MatchView extends State<MatchView> {
                 if (widget.match.type != EventType.remote) buttonRow(),
                 Text(_selectedTeam.name + ' : ' + _score.total().toString(),
                     style: Theme.of(context).textTheme.headline6),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    DropdownButton<Dice>(
-                      value: _match.dice,
-                      icon: Icon(Icons.height_rounded),
-                      iconSize: 24,
-                      elevation: 16,
-                      style: TextStyle(color: Theme.of(context).accentColor),
-                      underline: Container(
-                        height: 0.5,
-                        color: Colors.deepPurpleAccent,
+                DropdownButton<Dice>(
+                  value: _match.dice,
+                  icon: Icon(Icons.height_rounded),
+                  iconSize: 24,
+                  elevation: 16,
+                  style: TextStyle(color: Theme.of(context).accentColor),
+                  underline: Container(
+                    height: 0.5,
+                    color: Colors.deepPurpleAccent,
+                  ),
+                  onChanged: (Dice newValue) {
+                    setState(() {
+                      _match.setDice(newValue);
+                    });
+                  },
+                  items: <Dice>[Dice.one, Dice.two, Dice.three]
+                      .map<DropdownMenuItem<Dice>>((Dice value) {
+                    return DropdownMenuItem<Dice>(
+                      value: value,
+                      child: Text(
+                          'Stack Height : ' + value.stackHeight().toString()),
+                    );
+                  }).toList(),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      SizedBox(
+                          child: Text(
+                        'Autonomous : ' + _score.autoScore.total().toString(),
+                        style: Theme.of(context).textTheme.caption,
+                      )),
+                      SizedBox(
+                        child: Text(
+                            'Tele-Op : ' + _score.teleScore.total().toString(),
+                            style: Theme.of(context).textTheme.caption),
                       ),
-                      onChanged: (Dice newValue) {
-                        setState(() {
-                          _match.setDice(newValue);
-                        });
-                      },
-                      items: <Dice>[Dice.one, Dice.two, Dice.three]
-                          .map<DropdownMenuItem<Dice>>((Dice value) {
-                        return DropdownMenuItem<Dice>(
-                          value: value,
-                          child: Text('Stack Height : ' +
-                              value.stackHeight().toString()),
-                        );
-                      }).toList(),
-                    ),
-                  ],
+                      SizedBox(
+                          child: Text(
+                              'Endgame : ' +
+                                  _score.endgameScore.total().toString(),
+                              style: Theme.of(context).textTheme.caption))
+                    ],
+                  ),
+                ),
+                Divider(
+                  height: 5,
+                  thickness: 2,
                 ),
                 if (Platform.isIOS)
                   CupertinoSlidingSegmentedControl(
                     groupValue: _view,
                     children: <int, Widget>{
-                      0: Text('Autonomous : ' +
-                          _score.autoScore.total().toString()),
-                      1: Text(
-                          'Tele-Op : ' + _score.teleScore.total().toString()),
-                      2: Text(
-                          'Endgame : ' + _score.endgameScore.total().toString())
+                      0: Text('Autonomous'),
+                      1: Text('Tele-Op'),
+                      2: Text('Endgame')
                     },
                     onValueChanged: (int x) {
                       setState(() {
@@ -136,27 +155,24 @@ class _MatchView extends State<MatchView> {
                     child: TabBar(
                       labelColor: Theme.of(context).accentColor,
                       unselectedLabelColor: Colors.grey,
-                      labelStyle: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: '.SF UI Display'),
+                      labelStyle: TextStyle(fontFamily: '.SF UI Display'),
                       tabs: [
                         Tab(
-                          text: 'Autonomous : ' +
-                              _score.autoScore.total().toString(),
-                          //icon: Icon(Icons.ac_unit_outlined),
+                          text: 'Autonomous',
                         ),
                         Tab(
-                          text: 'Tele-Op : ' +
-                              _score.teleScore.total().toString(),
+                          text: 'Tele-Op',
                         ),
                         Tab(
-                          text: 'Endgame : ' +
-                              _score.endgameScore.total().toString(),
+                          text: 'Endgame',
                         )
                       ],
                     ),
                   ),
+                Divider(
+                  height: 5,
+                  thickness: 2,
+                ),
                 if (Platform.isAndroid)
                   Expanded(
                     child: TabBarView(
@@ -285,10 +301,10 @@ class _MatchView extends State<MatchView> {
         RawMaterialButton(
           onPressed: _score.endgameScore.pwrShots > 0
               ? () {
-                  dataModel.saveEvents();
                   setState(() {
                     _score.endgameScore.pwrShots--;
                   });
+                  dataModel.saveEvents();
                 }
               : null,
           elevation: 2.0,
@@ -307,10 +323,10 @@ class _MatchView extends State<MatchView> {
         RawMaterialButton(
           onPressed: _score.endgameScore.pwrShots < 3
               ? () {
-                  dataModel.saveEvents();
                   setState(() {
                     _score.endgameScore.pwrShots++;
                   });
+                  dataModel.saveEvents();
                 }
               : null,
           elevation: 2.0,
@@ -332,10 +348,10 @@ class _MatchView extends State<MatchView> {
         RawMaterialButton(
           onPressed: _score.endgameScore.wobbleGoalsInDrop > 0
               ? () {
-                  dataModel.saveEvents();
                   setState(() {
                     _score.endgameScore.wobbleGoalsInDrop--;
                   });
+                  dataModel.saveEvents();
                 }
               : null,
           elevation: 2.0,
@@ -356,10 +372,10 @@ class _MatchView extends State<MatchView> {
                       _score.endgameScore.wobbleGoalsInStart <
                   2
               ? () {
-                  dataModel.saveEvents();
                   setState(() {
                     _score.endgameScore.wobbleGoalsInDrop++;
                   });
+                  dataModel.saveEvents();
                 }
               : null,
           elevation: 2.0,
@@ -381,10 +397,10 @@ class _MatchView extends State<MatchView> {
         RawMaterialButton(
           onPressed: _score.endgameScore.wobbleGoalsInStart > 0
               ? () {
-                  dataModel.saveEvents();
                   setState(() {
                     _score.endgameScore.wobbleGoalsInStart--;
                   });
+                  dataModel.saveEvents();
                 }
               : null,
           elevation: 2.0,
@@ -405,10 +421,10 @@ class _MatchView extends State<MatchView> {
                       _score.endgameScore.wobbleGoalsInStart <
                   2
               ? () {
-                  dataModel.saveEvents();
                   setState(() {
                     _score.endgameScore.wobbleGoalsInStart++;
                   });
+                  dataModel.saveEvents();
                 }
               : null,
           elevation: 2.0,
@@ -430,10 +446,10 @@ class _MatchView extends State<MatchView> {
         RawMaterialButton(
           onPressed: _score.endgameScore.ringsOnWobble > 0
               ? () {
-                  dataModel.saveEvents();
                   setState(() {
                     _score.endgameScore.ringsOnWobble--;
                   });
+                  dataModel.saveEvents();
                 }
               : null,
           elevation: 2.0,
@@ -451,10 +467,10 @@ class _MatchView extends State<MatchView> {
         ),
         RawMaterialButton(
           onPressed: () {
-            dataModel.saveEvents();
             setState(() {
               _score.endgameScore.ringsOnWobble++;
             });
+            dataModel.saveEvents();
           },
           elevation: 2.0,
           fillColor: Theme.of(context).canvasColor,
@@ -477,10 +493,10 @@ class _MatchView extends State<MatchView> {
         RawMaterialButton(
           onPressed: _score.teleScore.hiGoals > 0
               ? () {
-                  dataModel.saveEvents();
                   setState(() {
                     _score.teleScore.hiGoals--;
                   });
+                  dataModel.saveEvents();
                 }
               : null,
           elevation: 2.0,
@@ -498,10 +514,10 @@ class _MatchView extends State<MatchView> {
         ),
         RawMaterialButton(
           onPressed: () {
-            dataModel.saveEvents();
             setState(() {
               _score.teleScore.hiGoals++;
             });
+            dataModel.saveEvents();
           },
           elevation: 2.0,
           fillColor: Theme.of(context).canvasColor,
@@ -522,10 +538,10 @@ class _MatchView extends State<MatchView> {
         RawMaterialButton(
           onPressed: _score.teleScore.midGoals > 0
               ? () {
-                  dataModel.saveEvents();
                   setState(() {
                     _score.teleScore.midGoals--;
                   });
+                  dataModel.saveEvents();
                 }
               : null,
           elevation: 2.0,
@@ -543,10 +559,10 @@ class _MatchView extends State<MatchView> {
         ),
         RawMaterialButton(
           onPressed: () {
-            dataModel.saveEvents();
             setState(() {
               _score.teleScore.midGoals++;
             });
+            dataModel.saveEvents();
           },
           elevation: 2.0,
           fillColor: Theme.of(context).canvasColor,
@@ -567,10 +583,10 @@ class _MatchView extends State<MatchView> {
         RawMaterialButton(
           onPressed: _score.teleScore.lowGoals > 0
               ? () {
-                  dataModel.saveEvents();
                   setState(() {
                     _score.teleScore.lowGoals--;
                   });
+                  dataModel.saveEvents();
                 }
               : null,
           elevation: 2.0,
@@ -588,10 +604,10 @@ class _MatchView extends State<MatchView> {
         ),
         RawMaterialButton(
           onPressed: () {
-            dataModel.saveEvents();
             setState(() {
               _score.teleScore.lowGoals++;
             });
+            dataModel.saveEvents();
           },
           elevation: 2.0,
           fillColor: Theme.of(context).canvasColor,
@@ -614,10 +630,10 @@ class _MatchView extends State<MatchView> {
         RawMaterialButton(
           onPressed: _score.autoScore.hiGoals > 0
               ? () {
-                  dataModel.saveEvents();
                   setState(() {
                     _score.autoScore.hiGoals--;
                   });
+                  dataModel.saveEvents();
                 }
               : null,
           elevation: 2.0,
@@ -635,10 +651,10 @@ class _MatchView extends State<MatchView> {
         ),
         RawMaterialButton(
           onPressed: () {
-            dataModel.saveEvents();
             setState(() {
               _score.autoScore.hiGoals++;
             });
+            dataModel.saveEvents();
           },
           elevation: 2.0,
           fillColor: Theme.of(context).canvasColor,
@@ -659,10 +675,10 @@ class _MatchView extends State<MatchView> {
         RawMaterialButton(
           onPressed: _score.autoScore.midGoals > 0
               ? () {
-                  dataModel.saveEvents();
                   setState(() {
                     _score.autoScore.midGoals--;
                   });
+                  dataModel.saveEvents();
                 }
               : null,
           elevation: 2.0,
@@ -680,10 +696,10 @@ class _MatchView extends State<MatchView> {
         ),
         RawMaterialButton(
           onPressed: () {
-            dataModel.saveEvents();
             setState(() {
               _score.autoScore.midGoals++;
             });
+            dataModel.saveEvents();
           },
           elevation: 2.0,
           fillColor: Theme.of(context).canvasColor,
@@ -704,10 +720,10 @@ class _MatchView extends State<MatchView> {
         RawMaterialButton(
           onPressed: _score.autoScore.lowGoals > 0
               ? () {
-                  dataModel.saveEvents();
                   setState(() {
                     _score.autoScore.lowGoals--;
                   });
+                  dataModel.saveEvents();
                 }
               : null,
           elevation: 2.0,
@@ -725,10 +741,10 @@ class _MatchView extends State<MatchView> {
         ),
         RawMaterialButton(
           onPressed: () {
-            dataModel.saveEvents();
             setState(() {
               _score.autoScore.lowGoals++;
             });
+            dataModel.saveEvents();
           },
           elevation: 2.0,
           fillColor: Theme.of(context).canvasColor,
@@ -749,10 +765,10 @@ class _MatchView extends State<MatchView> {
         RawMaterialButton(
           onPressed: _score.autoScore.wobbleGoals > 0
               ? () {
-                  dataModel.saveEvents();
                   setState(() {
                     _score.autoScore.wobbleGoals--;
                   });
+                  dataModel.saveEvents();
                 }
               : null,
           elevation: 2.0,
@@ -771,10 +787,10 @@ class _MatchView extends State<MatchView> {
         RawMaterialButton(
           onPressed: _score.autoScore.wobbleGoals < 2
               ? () {
-                  dataModel.saveEvents();
                   setState(() {
                     _score.autoScore.wobbleGoals++;
                   });
+                  dataModel.saveEvents();
                 }
               : null,
           elevation: 2.0,
@@ -796,10 +812,10 @@ class _MatchView extends State<MatchView> {
         RawMaterialButton(
           onPressed: _score.autoScore.pwrShots > 0
               ? () {
-                  dataModel.saveEvents();
                   setState(() {
                     _score.autoScore.pwrShots--;
                   });
+                  dataModel.saveEvents();
                 }
               : null,
           elevation: 2.0,
@@ -818,10 +834,10 @@ class _MatchView extends State<MatchView> {
         RawMaterialButton(
           onPressed: _score.autoScore.pwrShots < 3
               ? () {
-                  dataModel.saveEvents();
                   setState(() {
                     _score.autoScore.pwrShots++;
                   });
+                  dataModel.saveEvents();
                 }
               : null,
           elevation: 2.0,
@@ -843,10 +859,10 @@ class _MatchView extends State<MatchView> {
         PlatformSwitch(
           value: _score.autoScore.navigated,
           onChanged: (bool newVal) {
-            dataModel.saveEvents();
             setState(() {
               _score.autoScore.navigated = newVal;
             });
+            dataModel.saveEvents();
           },
         ),
       ])

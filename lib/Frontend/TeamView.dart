@@ -180,7 +180,7 @@ class _TeamView extends State<TeamView> {
           ),
           Wrap(
             crossAxisAlignment: WrapCrossAlignment.start,
-            spacing: 5,
+            spacing: 0,
             children: [
               if (widget.event.type != EventType.remote)
                 FlatButton(

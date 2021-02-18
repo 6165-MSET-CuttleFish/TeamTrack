@@ -15,7 +15,7 @@ save(String key, value) async {
   prefs.setString(key, json.encode(value));
 }
 
-DataModel dataModel;
+DataModel dataModel = DataModel();
 
 class DataModel {
   final List<String> keys = ['localEvents', 'remoteEvents', 'liveEvents'];
@@ -29,6 +29,7 @@ class DataModel {
     dataModel = this;
   }
   List<Event> events = [];
+  bool darkMode = true;
 
   List<Event> localEvents() {
     return events.where((e) => e.type == EventType.local).toList();
@@ -42,9 +43,11 @@ class DataModel {
     return events.where((e) => e.type == EventType.live).toList();
   }
 
-  void saveEvents() async {
-    await save(keys[0], localEvents());
-    await save(keys[1], remoteEvents());
+  void saveEvents() {
+    print(events.map((e) => e.toJson()));
+    //print(Uuid().v4().toString());
+    // await save(keys[0], localEvents());
+    // await save(keys[1], remoteEvents());
   }
 }
 
@@ -70,9 +73,9 @@ class Event {
         type = json['type'];
   Map<String, dynamic> toJson() => {
         'name': name,
-        'teams': teams,
-        'matches': matches,
-        'type': type,
+        'teams': teams.map((e) => e.toJson()),
+        'matches': matches.map((e) => e.toJson()),
+        'type': type.toString(),
       };
 }
 
@@ -83,15 +86,15 @@ class Alliance {
     this.item1 = item1;
     this.item2 = item2;
   }
-  int allianceTotal(Uuid id) {
+  int allianceTotal(String id) {
     return 0 +
         item1?.scores
             ?.firstWhere((e) => e.id == id,
-                orElse: () => Score(Uuid(), Dice.none))
+                orElse: () => Score(Uuid().v4(), Dice.none))
             ?.total() +
         item2?.scores
             ?.firstWhere((e) => e.id == id,
-                orElse: () => Score(Uuid(), Dice.none))
+                orElse: () => Score(Uuid().v4(), Dice.none))
             ?.total();
   }
 
@@ -108,6 +111,7 @@ class Team {
   String name;
   String number;
   List<Score> scores;
+  Score targetScore;
   Team(String number, String name) {
     this.name = name;
     this.number = number;
@@ -124,11 +128,13 @@ class Team {
   Team.fromJSON(Map<String, dynamic> json)
       : number = json['number'],
         name = json['name'],
-        scores = json['scores'];
+        scores = json['scores'],
+        targetScore = json['targetScore'];
   Map<String, dynamic> toJson() => {
         'name': name,
         'number': number,
-        'scores': scores,
+        'scores': scores.map((e) => e.toJson()),
+        'targetScore': targetScore != null ? targetScore.toJson() : null
       };
 }
 
@@ -137,12 +143,12 @@ class Match {
   Dice dice = Dice.one;
   Alliance red;
   Alliance blue;
-  Uuid id;
+  String id;
   Match(Alliance red, Alliance blue, EventType type) {
     this.type = type;
     this.red = red;
     this.blue = blue;
-    id = Uuid();
+    id = Uuid().v4();
     red?.item1?.scores?.addScore(Score(id, dice));
     red?.item2?.scores?.addScore(Score(id, dice));
     blue?.item1?.scores?.addScore(Score(id, dice));
@@ -166,16 +172,20 @@ class Match {
   void setDice(Dice dice) {
     this.dice = dice;
     red.item1.scores
-        .firstWhere((e) => e.id == id, orElse: () => Score(Uuid(), Dice.none))
+        .firstWhere((e) => e.id == id,
+            orElse: () => Score(Uuid().v4(), Dice.none))
         .dice = dice;
     red.item2.scores
-        .firstWhere((e) => e.id == id, orElse: () => Score(Uuid(), Dice.none))
+        .firstWhere((e) => e.id == id,
+            orElse: () => Score(Uuid().v4(), Dice.none))
         .dice = dice;
     blue.item1.scores
-        .firstWhere((e) => e.id == id, orElse: () => Score(Uuid(), Dice.none))
+        .firstWhere((e) => e.id == id,
+            orElse: () => Score(Uuid().v4(), Dice.none))
         .dice = dice;
     blue.item2.scores
-        .firstWhere((e) => e.id == id, orElse: () => Score(Uuid(), Dice.none))
+        .firstWhere((e) => e.id == id,
+            orElse: () => Score(Uuid().v4(), Dice.none))
         .dice = dice;
   }
 
@@ -188,30 +198,40 @@ class Match {
 
   String redScore() {
     final r0 = red.item1.scores
-        .firstWhere((e) => e.id == id, orElse: () => Score(Uuid(), Dice.none))
+        .firstWhere((e) => e.id == id,
+            orElse: () => Score(Uuid().v4(), Dice.none))
         .total();
     final r1 = red.item2.scores
-        .firstWhere((e) => e.id == id, orElse: () => Score(Uuid(), Dice.none))
+        .firstWhere((e) => e.id == id,
+            orElse: () => Score(Uuid().v4(), Dice.none))
         .total();
     return (r0 + r1).toString();
   }
 
   String blueScore() {
     final b0 = blue.item1.scores
-        .firstWhere((e) => e.id == id, orElse: () => Score(Uuid(), Dice.none))
+        .firstWhere((e) => e.id == id,
+            orElse: () => Score(Uuid().v4(), Dice.none))
         .total();
     final b1 = blue.item2.scores
-        .firstWhere((e) => e.id == id, orElse: () => Score(Uuid(), Dice.none))
+        .firstWhere((e) => e.id == id,
+            orElse: () => Score(Uuid().v4(), Dice.none))
         .total();
     return (b0 + b1).toString();
   }
 
   Match.fromJSON(Map<String, dynamic> json)
       : red = json['red'],
-        blue = json['blue'];
+        blue = json['blue'],
+        id = json['id'],
+        dice = json['dice'],
+        type = json['type'];
   Map<String, dynamic> toJson() => {
-        'red': red,
-        'blue': blue,
+        'red': red.toJson(),
+        'blue': blue.toJson(),
+        'type': type.toString(),
+        'dice': dice.toString(),
+        'id': id.toString()
       };
 }
 
