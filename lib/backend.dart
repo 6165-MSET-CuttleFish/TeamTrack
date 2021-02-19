@@ -15,18 +15,25 @@ save(String key, value) async {
   prefs.setString(key, json.encode(value));
 }
 
-DataModel dataModel = DataModel();
+DataModel dataModel;
+// restoreEvents() async {
+//   final prefs = await SharedPreferences.getInstance();
+//   var x = jsonDecode(prefs.getString('UltimateGoal')) as List;
+//   return x.map((e) => Event.fromJson(e)).toList();
+//   //.map((e) => Event.fromJson(e));
+// }
 
 class DataModel {
-  final List<String> keys = ['localEvents', 'remoteEvents', 'liveEvents'];
+  final List<String> keys = ['UltimateGoal'];
   DataModel() {
     try {
-      events.add(read(keys[0]) as Event);
-      events.add(read(keys[1]) as Event);
+      restoreEvents();
+      //restoreEvents();
+      // events = List<Event>.from(
+      //     jsonDecode[keys[0]].map((model) => Event.fromJson(model)));
     } catch (Exception) {
       print('No events');
     }
-    dataModel = this;
   }
   List<Event> events = [];
   bool darkMode = true;
@@ -43,11 +50,53 @@ class DataModel {
     return events.where((e) => e.type == EventType.live).toList();
   }
 
-  void saveEvents() {
-    print(events.map((e) => e.toJson()));
-    //print(Uuid().v4().toString());
-    // await save(keys[0], localEvents());
-    // await save(keys[1], remoteEvents());
+  void saveEvents() async {
+    var coded = events.map((e) => e.toJson()).toList();
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString(keys[0], jsonEncode(coded));
+    print(coded);
+    //save(keys[0], events.map((e) => e.toJson()));
+  }
+
+  void restoreEvents() async {
+    final prefs = await SharedPreferences.getInstance();
+    var x = jsonDecode(prefs.getString(keys[0])) as List;
+    var y = x.map((e) => Event.fromJson(e)).toList();
+    // for (Event event in y) {
+    //   for (Match match in event.matches) {
+    //     match.red.item1 =
+    //         event.teams.firstWhere((e) => e.number == match.red.item1.number);
+    //     match.red.item2 =
+    //         event.teams.firstWhere((e) => e.number == match.red.item2.number);
+    //     match.blue.item1 =
+    //         event.teams.firstWhere((e) => e.number == match.blue.item1.number);
+    //     match.blue.item2 =
+    //         event.teams.firstWhere((e) => e.number == match.blue.item2.number);
+    //   }
+    // }
+    events = y;
+    organize();
+    print('reloaded');
+    //.map((e) => Event.fromJson(e));
+  }
+
+  void organize() {
+    for (Event event in events) {
+      for (Match match in event.matches) {
+        match.red.item1 = event.teams.firstWhere(
+            (e) => e.number == match.red.item1.number,
+            orElse: () => Team.nullTeam());
+        match.red.item2 = event.teams.firstWhere(
+            (e) => e.number == match.red.item2.number,
+            orElse: () => Team.nullTeam());
+        match.blue.item1 = event.teams.firstWhere(
+            (e) => e.number == match.blue.item1.number,
+            orElse: () => Team.nullTeam());
+        match.blue.item2 = event.teams.firstWhere(
+            (e) => e.number == match.blue.item2.number,
+            orElse: () => Team.nullTeam());
+      }
+    }
   }
 }
 
@@ -66,15 +115,17 @@ class Event {
     teams.sortTeams();
   }
 
-  Event.fromJSON(Map<String, dynamic> json)
+  Event.fromJson(Map<String, dynamic> json)
       : name = json['name'],
-        teams = json['teams'],
-        matches = json['matches'],
-        type = json['type'];
+        teams =
+            List<Team>.from(json['teams'].map((model) => Team.fromJson(model))),
+        matches = List<Match>.from(
+            json['matches'].map((model) => Match.fromJson(model))),
+        type = getTypeFromString(json['type']);
   Map<String, dynamic> toJson() => {
         'name': name,
-        'teams': teams.map((e) => e.toJson()),
-        'matches': matches.map((e) => e.toJson()),
+        'teams': teams.map((e) => e.toJson()).toList(),
+        'matches': matches.map((e) => e.toJson()).toList(),
         'type': type.toString(),
       };
 }
@@ -98,9 +149,9 @@ class Alliance {
             ?.total();
   }
 
-  Alliance.fromJSON(Map<String, dynamic> json)
-      : item1 = json['team1'],
-        item2 = json['team2'];
+  Alliance.fromJson(Map<String, dynamic> json)
+      : item1 = Team.fromJson(json['team1']),
+        item2 = Team.fromJson(json['team2']);
   Map<String, dynamic> toJson() => {
         'team1': item1.toJson(),
         'team2': item2.toJson(),
@@ -116,6 +167,7 @@ class Team {
     this.name = name;
     this.number = number;
     scores = List();
+    dataModel.saveEvents();
   }
   static Team nullTeam() {
     return Team("?", "?");
@@ -125,15 +177,16 @@ class Team {
     return this.number == other.number;
   }
 
-  Team.fromJSON(Map<String, dynamic> json)
+  Team.fromJson(Map<String, dynamic> json)
       : number = json['number'],
         name = json['name'],
-        scores = json['scores'],
+        scores = List<Score>.from(
+            json['scores'].map((model) => Score.fromJson(model))),
         targetScore = json['targetScore'];
   Map<String, dynamic> toJson() => {
         'name': name,
         'number': number,
-        'scores': scores.map((e) => e.toJson()),
+        'scores': scores.map((e) => e.toJson()).toList(),
         'targetScore': targetScore != null ? targetScore.toJson() : null
       };
 }
@@ -153,6 +206,7 @@ class Match {
     red?.item2?.scores?.addScore(Score(id, dice));
     blue?.item1?.scores?.addScore(Score(id, dice));
     blue?.item2?.scores?.addScore(Score(id, dice));
+    dataModel.saveEvents();
   }
   static Match defaultMatch(EventType type) {
     return Match(Alliance(Team('1', 'Alpha'), Team('2', 'Beta')),
@@ -220,12 +274,12 @@ class Match {
     return (b0 + b1).toString();
   }
 
-  Match.fromJSON(Map<String, dynamic> json)
-      : red = json['red'],
-        blue = json['blue'],
+  Match.fromJson(Map<String, dynamic> json)
+      : red = Alliance.fromJson(json['red']),
+        blue = Alliance.fromJson(json['blue']),
         id = json['id'],
-        dice = json['dice'],
-        type = json['type'];
+        dice = getDiceFromString(json['dice']),
+        type = getTypeFromString(json['type']);
   Map<String, dynamic> toJson() => {
         'red': red.toJson(),
         'blue': blue.toJson(),

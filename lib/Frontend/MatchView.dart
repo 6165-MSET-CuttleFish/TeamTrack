@@ -109,7 +109,7 @@ class _MatchView extends State<MatchView> {
                   }).toList(),
                 ),
                 Padding(
-                  padding: EdgeInsets.all(10),
+                  padding: EdgeInsets.all(25),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [

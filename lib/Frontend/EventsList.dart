@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:TeamTrack/Frontend/Assets/PlatformGraphics.dart';
 import 'package:TeamTrack/Frontend/EventView.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class EventsList extends StatefulWidget {
   EventsList({Key key, this.dataModel}) : super(key: key);
@@ -50,8 +51,9 @@ class _EventsList extends State<EventsList> {
                                   child: Text('Confirm'),
                                   onPressed: () {
                                     setState(() {
-                                      widget.dataModel.events.remove(e);
+                                      dataModel.events.remove(e);
                                     });
+                                    dataModel.saveEvents();
                                     Navigator.of(context).pop();
                                   },
                                 ),
@@ -125,8 +127,9 @@ class _EventsList extends State<EventsList> {
                                   child: Text('Confirm'),
                                   onPressed: () {
                                     setState(() {
-                                      widget.dataModel.events.remove(e);
+                                      dataModel.events.remove(e);
                                     });
+                                    dataModel.saveEvents();
                                     Navigator.of(context).pop();
                                   },
                                 ),
@@ -200,8 +203,9 @@ class _EventsList extends State<EventsList> {
                                   child: Text('Confirm'),
                                   onPressed: () {
                                     setState(() {
-                                      widget.dataModel.localEvents().remove(e);
+                                      dataModel.localEvents().remove(e);
                                     });
+                                    dataModel.saveEvents();
                                     Navigator.of(context).pop();
                                   },
                                 ),
@@ -252,36 +256,51 @@ class _EventsList extends State<EventsList> {
   String _newName;
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).accentColor,
-        title: Text('Events'),
-      ),
-      body: SafeArea(
-        child: ListView(children: [
-          ExpansionTile(
-            leading: Icon(CupertinoIcons.person_3),
-            initiallyExpanded: true,
-            title: Text('Local Events'),
-            children: localEvents(),
-          ),
-          ExpansionTile(
-            leading: Icon(CupertinoIcons.rectangle_stack_person_crop),
-            initiallyExpanded: true,
-            title: Text('Remote Events'),
-            children: remoteEvents(),
-          ),
-          // ExpansionTile(
-          //   title: Text('Live Events'),
-          //   children: liveEvents(),
-          // ),
-        ]),
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: _onPressed,
-      ),
-    );
+    restoreEvents();
+    if (isLoaded) {
+      return Scaffold(
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).accentColor,
+          title: Text('Events'),
+        ),
+        body: SafeArea(
+          child: ListView(children: [
+            ExpansionTile(
+              leading: Icon(CupertinoIcons.person_3),
+              initiallyExpanded: true,
+              title: Text('Local Events'),
+              children: localEvents(),
+            ),
+            ExpansionTile(
+              leading: Icon(CupertinoIcons.rectangle_stack_person_crop),
+              initiallyExpanded: true,
+              title: Text('Remote Events'),
+              children: remoteEvents(),
+            ),
+            // ExpansionTile(
+            //   title: Text('Live Events'),
+            //   children: liveEvents(),
+            // ),
+          ]),
+        ),
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.add),
+          onPressed: _onPressed,
+        ),
+      );
+    } else {
+      return Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+  }
+
+  bool isLoaded = false;
+  restoreEvents() async {
+    await SharedPreferences.getInstance();
+    setState(() {
+      isLoaded = true;
+    });
   }
 
   void _onPressed() {

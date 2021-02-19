@@ -85,7 +85,6 @@ class _MatchList extends State<MatchList> {
 
   Widget _matches() {
     if (widget.event.type != EventType.remote) {
-      print(widget.event.matches.length);
       return ListView(
         children: widget.team == null
             ? widget.event.matches
@@ -168,7 +167,6 @@ class _MatchList extends State<MatchList> {
       var matches = widget.event.matches
           .where((e) => e.alliance(widget.team) != null)
           .toList();
-      print(matches.length);
       for (int i = 0; i < matches.length; i++) {
         arr.add(Slidable(
             actionPane: slider,

@@ -14,6 +14,12 @@ class Score {
     return teleScore.total() + autoScore.total() + endgameScore.total();
   }
 
+  Score.fromJson(Map<String, dynamic> json)
+      : autoScore = AutoScore.fromJson(json['AutoScore']),
+        teleScore = TeleScore.fromJson(json['TeleScore']),
+        endgameScore = EndgameScore.fromJson(json['EndgameScore']),
+        id = json['id'],
+        dice = getDiceFromString(json['dice']);
   Map<String, dynamic> toJson() => {
         'AutoScore': autoScore.toJson(),
         'TeleScore': teleScore.toJson(),
@@ -21,6 +27,24 @@ class Score {
         'id': id.toString(),
         'dice': dice.toString()
       };
+}
+
+Dice getDiceFromString(String statusAsString) {
+  for (Dice element in Dice.values) {
+    if (element.toString() == statusAsString) {
+      return element;
+    }
+  }
+  return null;
+}
+
+EventType getTypeFromString(String statusAsString) {
+  for (EventType element in EventType.values) {
+    if (element.toString() == statusAsString) {
+      return element;
+    }
+  }
+  return null;
 }
 
 extension scoreList on List<Score> {
@@ -45,6 +69,11 @@ class TeleScore {
     return lowGoals * 2 + midGoals * 4 + hiGoals * 6;
   }
 
+  TeleScore() {}
+  TeleScore.fromJson(Map<String, dynamic> json)
+      : hiGoals = json['HighGoals'],
+        midGoals = json['MiddleGoals'],
+        lowGoals = json['LowGoals'];
   Map<String, dynamic> toJson() => {
         'HighGoals': hiGoals,
         'MiddleGoals': midGoals,
@@ -68,6 +97,14 @@ class AutoScore {
         (navigated ? 5 : 0);
   }
 
+  AutoScore() {}
+  AutoScore.fromJson(Map<String, dynamic> json)
+      : hiGoals = json['HighGoals'],
+        midGoals = json['MiddleGoals'],
+        lowGoals = json['LowGoals'],
+        wobbleGoals = json['WobbleGoals'],
+        pwrShots = json['PowerShots'],
+        navigated = json['Navigated'];
   Map<String, dynamic> toJson() => {
         'HighGoals': hiGoals,
         'MiddleGoals': midGoals,
@@ -90,6 +127,12 @@ class EndgameScore {
         pwrShots * 15;
   }
 
+  EndgameScore() {}
+  EndgameScore.fromJson(Map<String, dynamic> json)
+      : wobbleGoalsInDrop = json['WobblesInDrop'],
+        wobbleGoalsInStart = json['WobblesInStart'],
+        pwrShots = json['PowerShots'],
+        ringsOnWobble = json['RingsOnWobble'];
   Map<String, dynamic> toJson() => {
         'WobblesInDrop': wobbleGoalsInDrop,
         'WobblesInStart': wobbleGoalsInStart,
