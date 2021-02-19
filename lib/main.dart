@@ -1,10 +1,7 @@
-import 'dart:convert';
-
 import 'package:TeamTrack/Frontend/EventsList.dart';
 import 'package:TeamTrack/backend.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(MyApp());

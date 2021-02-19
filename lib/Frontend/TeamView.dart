@@ -4,7 +4,6 @@ import 'package:TeamTrack/Frontend/Assets/CardView.dart';
 import 'package:TeamTrack/Frontend/Assets/Collapsible.dart';
 import 'package:TeamTrack/Frontend/Assets/PlatformGraphics.dart';
 import 'package:TeamTrack/Frontend/MatchList.dart';
-import 'package:TeamTrack/Frontend/testChart.dart';
 import 'package:TeamTrack/backend.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -42,6 +41,24 @@ class _TeamView extends State<TeamView> {
                   padding: const EdgeInsets.only(
                       right: 50.0, left: 12.0, top: 24, bottom: 12),
                   child: LineChart(LineChartData(
+                    gridData: FlGridData(
+                      show: true,
+                      drawVerticalLine: true,
+                      getDrawingHorizontalLine: (value) {
+                        return FlLine(
+                          color: value % 10 == 0
+                              ? Color(0xff37434d)
+                              : Colors.transparent,
+                          strokeWidth: value % 10 == 0 ? 1 : 0,
+                        );
+                      },
+                      getDrawingVerticalLine: (value) {
+                        return FlLine(
+                          color: const Color(0xff37434d),
+                          strokeWidth: 1,
+                        );
+                      },
+                    ),
                     titlesData: FlTitlesData(
                       show: true,
                       bottomTitles: SideTitles(
@@ -98,6 +115,7 @@ class _TeamView extends State<TeamView> {
                             Colors.orange,
                           ],
                           isCurved: true,
+                          isStrokeCapRound: true,
                           preventCurveOverShooting: true,
                           barWidth: 5,
                           shadow: Shadow(color: Colors.green, blurRadius: 5)),
@@ -113,6 +131,7 @@ class _TeamView extends State<TeamView> {
                             Colors.deepPurple,
                           ],
                           isCurved: true,
+                          isStrokeCapRound: true,
                           preventCurveOverShooting: true,
                           barWidth: 5,
                           shadow: Shadow(color: Colors.green, blurRadius: 5)),
@@ -128,6 +147,7 @@ class _TeamView extends State<TeamView> {
                             Colors.green,
                           ],
                           isCurved: true,
+                          isStrokeCapRound: true,
                           preventCurveOverShooting: true,
                           barWidth: 5,
                           shadow: Shadow(color: Colors.green, blurRadius: 5)),
@@ -143,6 +163,7 @@ class _TeamView extends State<TeamView> {
                             Colors.blue,
                           ],
                           isCurved: true,
+                          isStrokeCapRound: true,
                           preventCurveOverShooting: true,
                           barWidth: 5,
                           shadow: Shadow(color: Colors.green, blurRadius: 5)),
@@ -158,6 +179,7 @@ class _TeamView extends State<TeamView> {
                             Colors.red,
                           ],
                           isCurved: true,
+                          isStrokeCapRound: true,
                           preventCurveOverShooting: true,
                           barWidth: 5,
                           shadow: Shadow(color: Colors.green, blurRadius: 5)),
@@ -275,10 +297,6 @@ class _TeamView extends State<TeamView> {
                               event: widget.event,
                               team: widget.team,
                             )));
-                // Navigator.push(
-                //     context,
-                //     MaterialPageRoute(
-                //         builder: (context) => LineChartSample2()));
               }
             },
             color: CupertinoColors.systemGreen,
@@ -331,6 +349,24 @@ class _TeamView extends State<TeamView> {
                           padding: const EdgeInsets.only(
                               right: 50.0, left: 12.0, top: 24, bottom: 12),
                           child: LineChart(LineChartData(
+                              gridData: FlGridData(
+                                show: true,
+                                drawVerticalLine: true,
+                                getDrawingHorizontalLine: (value) {
+                                  return FlLine(
+                                    color: value % 10 == 0
+                                        ? Color(0xff37434d)
+                                        : Colors.transparent,
+                                    strokeWidth: value % 10 == 0 ? 1 : 0,
+                                  );
+                                },
+                                getDrawingVerticalLine: (value) {
+                                  return FlLine(
+                                    color: const Color(0xff37434d),
+                                    strokeWidth: 1,
+                                  );
+                                },
+                              ),
                               titlesData: FlTitlesData(
                                 show: true,
                                 bottomTitles: SideTitles(
@@ -428,6 +464,24 @@ class _TeamView extends State<TeamView> {
                         padding: const EdgeInsets.only(
                             right: 50.0, left: 12.0, top: 24, bottom: 12),
                         child: LineChart(LineChartData(
+                            gridData: FlGridData(
+                              show: true,
+                              drawVerticalLine: true,
+                              getDrawingHorizontalLine: (value) {
+                                return FlLine(
+                                  color: value % 10 == 0
+                                      ? Color(0xff37434d)
+                                      : Colors.transparent,
+                                  strokeWidth: value % 10 == 0 ? 1 : 0,
+                                );
+                              },
+                              getDrawingVerticalLine: (value) {
+                                return FlLine(
+                                  color: const Color(0xff37434d),
+                                  strokeWidth: 1,
+                                );
+                              },
+                            ),
                             titlesData: FlTitlesData(
                               show: true,
                               bottomTitles: SideTitles(
@@ -531,6 +585,24 @@ class _TeamView extends State<TeamView> {
                           padding: const EdgeInsets.only(
                               right: 50.0, left: 12.0, top: 24, bottom: 12),
                           child: LineChart(LineChartData(
+                              gridData: FlGridData(
+                                show: true,
+                                drawVerticalLine: true,
+                                getDrawingHorizontalLine: (value) {
+                                  return FlLine(
+                                    color: value % 10 == 0
+                                        ? Color(0xff37434d)
+                                        : Colors.transparent,
+                                    strokeWidth: value % 10 == 0 ? 1 : 0,
+                                  );
+                                },
+                                getDrawingVerticalLine: (value) {
+                                  return FlLine(
+                                    color: const Color(0xff37434d),
+                                    strokeWidth: 1,
+                                  );
+                                },
+                              ),
                               titlesData: FlTitlesData(
                                 show: true,
                                 bottomTitles: SideTitles(
@@ -634,6 +706,24 @@ class _TeamView extends State<TeamView> {
                           padding: const EdgeInsets.only(
                               right: 50.0, left: 12.0, top: 24, bottom: 12),
                           child: LineChart(LineChartData(
+                              gridData: FlGridData(
+                                show: true,
+                                drawVerticalLine: true,
+                                getDrawingHorizontalLine: (value) {
+                                  return FlLine(
+                                    color: value % 10 == 0
+                                        ? Color(0xff37434d)
+                                        : Colors.transparent,
+                                    strokeWidth: value % 10 == 0 ? 1 : 0,
+                                  );
+                                },
+                                getDrawingVerticalLine: (value) {
+                                  return FlLine(
+                                    color: const Color(0xff37434d),
+                                    strokeWidth: 1,
+                                  );
+                                },
+                              ),
                               titlesData: FlTitlesData(
                                 show: true,
                                 bottomTitles: SideTitles(
