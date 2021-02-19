@@ -62,22 +62,9 @@ class DataModel {
     final prefs = await SharedPreferences.getInstance();
     var x = jsonDecode(prefs.getString(keys[0])) as List;
     var y = x.map((e) => Event.fromJson(e)).toList();
-    // for (Event event in y) {
-    //   for (Match match in event.matches) {
-    //     match.red.item1 =
-    //         event.teams.firstWhere((e) => e.number == match.red.item1.number);
-    //     match.red.item2 =
-    //         event.teams.firstWhere((e) => e.number == match.red.item2.number);
-    //     match.blue.item1 =
-    //         event.teams.firstWhere((e) => e.number == match.blue.item1.number);
-    //     match.blue.item2 =
-    //         event.teams.firstWhere((e) => e.number == match.blue.item2.number);
-    //   }
-    // }
     events = y;
     organize();
     print('reloaded');
-    //.map((e) => Event.fromJson(e));
   }
 
   void organize() {
@@ -167,6 +154,7 @@ class Team {
     this.name = name;
     this.number = number;
     scores = List();
+    targetScore = Score(Uuid().v4(), Dice.none);
     dataModel.saveEvents();
   }
   static Team nullTeam() {
@@ -182,7 +170,7 @@ class Team {
         name = json['name'],
         scores = List<Score>.from(
             json['scores'].map((model) => Score.fromJson(model))),
-        targetScore = json['targetScore'];
+        targetScore = Score.fromJson(json['targetScore']);
   Map<String, dynamic> toJson() => {
         'name': name,
         'number': number,

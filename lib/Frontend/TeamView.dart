@@ -1,14 +1,18 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:TeamTrack/Frontend/Assets/BarGraph.dart';
 import 'package:TeamTrack/Frontend/Assets/CardView.dart';
 import 'package:TeamTrack/Frontend/Assets/Collapsible.dart';
 import 'package:TeamTrack/Frontend/Assets/PlatformGraphics.dart';
 import 'package:TeamTrack/Frontend/MatchList.dart';
+import 'package:TeamTrack/Frontend/MatchView.dart';
 import 'package:TeamTrack/backend.dart';
+import 'package:TeamTrack/score.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:uuid/uuid.dart';
 
 class TeamView extends StatefulWidget {
   TeamView({Key key, this.team, this.event}) : super(key: key);
@@ -99,11 +103,38 @@ class _TeamView extends State<TeamView> {
                         widget.team.scores.diceScores(_dice).length.toDouble() -
                             1,
                     minY: 0,
-                    maxY: widget.event.matches
-                        .maxAllianceScore(widget.team)
-                        .toDouble(),
+                    maxY: [
+                      widget.event.matches
+                          .maxAllianceScore(widget.team)
+                          .toDouble(),
+                      widget.team.targetScore != null
+                          ? widget.team.targetScore.total().toDouble()
+                          : 0.0
+                    ].reduce(max),
                     lineBarsData: [
                       LineChartBarData(
+                          belowBarData: widget.team.targetScore != null
+                              ? BarAreaData(
+                                  show: true,
+                                  colors: [
+                                    Colors.lightGreenAccent.withOpacity(0.6)
+                                  ],
+                                  cutOffY: widget.team.targetScore
+                                      ?.total()
+                                      ?.toDouble(),
+                                  applyCutOffY: true,
+                                )
+                              : null,
+                          aboveBarData: widget.team.targetScore != null
+                              ? BarAreaData(
+                                  show: true,
+                                  colors: [Colors.redAccent.withOpacity(0.5)],
+                                  cutOffY: widget.team.targetScore
+                                      ?.total()
+                                      ?.toDouble(),
+                                  applyCutOffY: true,
+                                )
+                              : null,
                           show: _selections[0] &&
                               widget.event.type != EventType.remote,
                           spots: widget.event.matches
@@ -120,6 +151,28 @@ class _TeamView extends State<TeamView> {
                           barWidth: 5,
                           shadow: Shadow(color: Colors.green, blurRadius: 5)),
                       LineChartBarData(
+                          belowBarData: widget.team.targetScore != null
+                              ? BarAreaData(
+                                  show: true,
+                                  colors: [
+                                    Colors.lightGreenAccent.withOpacity(0.6)
+                                  ],
+                                  cutOffY: widget.team.targetScore
+                                      ?.total()
+                                      ?.toDouble(),
+                                  applyCutOffY: true,
+                                )
+                              : null,
+                          aboveBarData: widget.team.targetScore != null
+                              ? BarAreaData(
+                                  show: true,
+                                  colors: [Colors.redAccent.withOpacity(0.5)],
+                                  cutOffY: widget.team.targetScore
+                                      ?.total()
+                                      ?.toDouble(),
+                                  applyCutOffY: true,
+                                )
+                              : null,
                           show: _selections[1],
                           spots: _dice != Dice.none
                               ? widget.team.scores
@@ -302,6 +355,35 @@ class _TeamView extends State<TeamView> {
             color: CupertinoColors.systemGreen,
             child: Text('Matches'),
           )),
+      Container(
+          width: MediaQuery.of(context).size.width / 2,
+          child: PlatformButton(
+            onPressed: () {
+              if (widget.team.targetScore == null) {
+                widget.team.targetScore = Score(Uuid().v4(), Dice.none);
+              }
+              if (Platform.isIOS) {
+                setState(() {});
+                Navigator.push(
+                    context,
+                    CupertinoPageRoute(
+                        builder: (context) => MatchView(
+                              team: widget.team,
+                            )));
+              } else {
+                setState(() {});
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => MatchView(
+                              match: Match.defaultMatch(EventType.remote),
+                              team: widget.team,
+                            )));
+              }
+            },
+            color: Colors.indigoAccent,
+            child: Text('Target Score'),
+          )),
       Padding(
         padding: EdgeInsets.all(10),
       ),
@@ -403,9 +485,41 @@ class _TeamView extends State<TeamView> {
                               minX: 0,
                               maxX: widget.team.scores.length.toDouble() - 1,
                               minY: widget.team.scores.minScore(_dice),
-                              maxY: widget.team.scores.maxScore(_dice),
+                              maxY: [
+                                widget.team.scores.maxScore(_dice),
+                                widget.team.targetScore != null
+                                    ? widget.team.targetScore.total().toDouble()
+                                    : 0.0
+                              ].reduce(max),
                               lineBarsData: [
                                 LineChartBarData(
+                                    belowBarData:
+                                        widget.team.targetScore != null
+                                            ? BarAreaData(
+                                                show: true,
+                                                colors: [
+                                                  Colors.lightGreenAccent
+                                                      .withOpacity(0.6)
+                                                ],
+                                                cutOffY: widget.team.targetScore
+                                                    ?.total()
+                                                    ?.toDouble(),
+                                                applyCutOffY: true,
+                                              )
+                                            : null,
+                                    aboveBarData: widget.team.targetScore !=
+                                            null
+                                        ? BarAreaData(
+                                            show: true,
+                                            colors: [
+                                              Colors.redAccent.withOpacity(0.5)
+                                            ],
+                                            cutOffY: widget.team.targetScore
+                                                ?.total()
+                                                ?.toDouble(),
+                                            applyCutOffY: true,
+                                          )
+                                        : null,
                                     spots: widget.team.scores
                                         .diceScores(_dice)
                                         .spots(),
@@ -523,9 +637,43 @@ class _TeamView extends State<TeamView> {
                                     .toDouble() -
                                 1,
                             minY: widget.team.scores.autoMinScore(_dice),
-                            maxY: widget.team.scores.autoMaxScore(_dice),
+                            maxY: [
+                              widget.team.scores.autoMaxScore(_dice),
+                              widget.team.targetScore != null
+                                  ? widget.team.targetScore.autoScore
+                                      .total()
+                                      .toDouble()
+                                  : 0.0
+                            ].reduce(max),
                             lineBarsData: [
                               LineChartBarData(
+                                  belowBarData: widget.team.targetScore != null
+                                      ? BarAreaData(
+                                          show: true,
+                                          colors: [
+                                            Colors.lightGreenAccent
+                                                .withOpacity(0.6)
+                                          ],
+                                          cutOffY: widget
+                                              .team.targetScore?.autoScore
+                                              ?.total()
+                                              ?.toDouble(),
+                                          applyCutOffY: true,
+                                        )
+                                      : null,
+                                  aboveBarData: widget.team.targetScore != null
+                                      ? BarAreaData(
+                                          show: true,
+                                          colors: [
+                                            Colors.redAccent.withOpacity(0.5)
+                                          ],
+                                          cutOffY: widget
+                                              .team.targetScore?.autoScore
+                                              ?.total()
+                                              ?.toDouble(),
+                                          applyCutOffY: true,
+                                        )
+                                      : null,
                                   spots: widget.team.scores
                                       .diceScores(_dice)
                                       .autoSpots(),
@@ -643,11 +791,47 @@ class _TeamView extends State<TeamView> {
                                       .toDouble() -
                                   1,
                               minY: widget.team.scores.teleMinScore(_dice),
-                              maxY: widget.team.scores
-                                  .teleMaxScore(_dice)
-                                  .toDouble(),
+                              maxY: [
+                                widget.team.scores
+                                    .teleMaxScore(_dice)
+                                    .toDouble(),
+                                widget.team.targetScore != null
+                                    ? widget.team.targetScore.teleScore
+                                        .total()
+                                        .toDouble()
+                                    : 0.0
+                              ].reduce(max),
                               lineBarsData: [
                                 LineChartBarData(
+                                    belowBarData:
+                                        widget.team.targetScore != null
+                                            ? BarAreaData(
+                                                show: true,
+                                                colors: [
+                                                  Colors.lightGreenAccent
+                                                      .withOpacity(0.6)
+                                                ],
+                                                cutOffY: widget
+                                                    .team.targetScore?.teleScore
+                                                    ?.total()
+                                                    ?.toDouble(),
+                                                applyCutOffY: true,
+                                              )
+                                            : null,
+                                    aboveBarData: widget.team.targetScore !=
+                                            null
+                                        ? BarAreaData(
+                                            show: true,
+                                            colors: [
+                                              Colors.redAccent.withOpacity(0.5)
+                                            ],
+                                            cutOffY: widget
+                                                .team.targetScore?.teleScore
+                                                ?.total()
+                                                ?.toDouble(),
+                                            applyCutOffY: true,
+                                          )
+                                        : null,
                                     spots: widget.team.scores
                                         .diceScores(_dice)
                                         .teleSpots(),
@@ -764,9 +948,45 @@ class _TeamView extends State<TeamView> {
                                       .toDouble() -
                                   1,
                               minY: widget.team.scores.endMinScore(_dice),
-                              maxY: widget.team.scores.endMaxScore(_dice),
+                              maxY: [
+                                widget.team.scores.endMaxScore(_dice),
+                                widget.team.targetScore != null
+                                    ? widget.team.targetScore.endgameScore
+                                        .total()
+                                        .toDouble()
+                                    : 0.0
+                              ].reduce(max),
                               lineBarsData: [
                                 LineChartBarData(
+                                    belowBarData:
+                                        widget.team.targetScore != null
+                                            ? BarAreaData(
+                                                show: true,
+                                                colors: [
+                                                  Colors.lightGreenAccent
+                                                      .withOpacity(0.6)
+                                                ],
+                                                cutOffY: widget.team.targetScore
+                                                    ?.endgameScore
+                                                    ?.total()
+                                                    ?.toDouble(),
+                                                applyCutOffY: true,
+                                              )
+                                            : null,
+                                    aboveBarData: widget.team.targetScore !=
+                                            null
+                                        ? BarAreaData(
+                                            show: true,
+                                            colors: [
+                                              Colors.redAccent.withOpacity(0.5)
+                                            ],
+                                            cutOffY: widget
+                                                .team.targetScore?.endgameScore
+                                                ?.total()
+                                                ?.toDouble(),
+                                            applyCutOffY: true,
+                                          )
+                                        : null,
                                     spots: widget.team.scores
                                         .diceScores(_dice)
                                         .endSpots(),
