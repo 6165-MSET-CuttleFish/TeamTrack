@@ -9,9 +9,10 @@ import 'dart:io' show Platform;
 import 'package:uuid/uuid.dart';
 
 class MatchView extends StatefulWidget {
-  MatchView({Key key, this.match, this.team}) : super(key: key);
+  MatchView({Key key, this.match, this.team, this.event}) : super(key: key);
   final Match match;
   final Team team;
+  final Event event;
   @override
   _MatchView createState() => _MatchView(match, team);
 }
@@ -36,6 +37,35 @@ class _MatchView extends State<MatchView> {
       if (_match.type == EventType.remote) _color = CupertinoColors.systemGreen;
     }
   }
+  void _choice(String c) {
+    showDialog(
+        context: context,
+        child: PlatformAlert(
+          title: Text('Delete Match'),
+          content: Text('Are you sure?'),
+          actions: [
+            PlatformDialogAction(
+              isDefaultAction: true,
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            PlatformDialogAction(
+              isDefaultAction: false,
+              isDestructive: true,
+              child: Text('Confirm'),
+              onPressed: () {
+                setState(() {
+                  widget.event.deleteMatch(widget.match);
+                });
+                dataModel.saveEvents();
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        ));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +76,19 @@ class _MatchView extends State<MatchView> {
           backgroundColor: _color,
           title: Text('Match Stats'),
           elevation: 0.0,
+          actions: [
+            PopupMenuButton<String>(
+              onSelected: _choice,
+              itemBuilder: (context) {
+                return [
+                  PopupMenuItem<String>(
+                    child: Text('Delete Match'),
+                    value: 'Delete',
+                  ),
+                ];
+              },
+            ),
+          ],
         ),
         body: Container(
           decoration: BoxDecoration(

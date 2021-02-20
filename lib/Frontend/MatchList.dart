@@ -33,14 +33,6 @@ class _MatchList extends State<MatchList> {
       appBar: AppBar(
         title: Text('Matches'),
         backgroundColor: Theme.of(context).accentColor,
-        actions: [
-          PlatformButton(
-            child: Text('Refresh'),
-            onPressed: () {
-              setState(() {});
-            },
-          )
-        ],
       ),
       body: _matches(),
       floatingActionButton: widget.event.type == EventType.remote
@@ -114,15 +106,7 @@ class _MatchList extends State<MatchList> {
                                         child: Text('Confirm'),
                                         onPressed: () {
                                           setState(() {
-                                            e.red.item1.scores.removeWhere(
-                                                (f) => f.id == e.id);
-                                            e.red.item2.scores.removeWhere(
-                                                (f) => f.id == e.id);
-                                            e.blue.item1.scores.removeWhere(
-                                                (f) => f.id == e.id);
-                                            e.blue.item2.scores.removeWhere(
-                                                (f) => f.id == e.id);
-                                            widget.event.matches.remove(e);
+                                            widget.event.deleteMatch(e);
                                           });
                                           dataModel.saveEvents();
                                           Navigator.of(context).pop();
@@ -152,11 +136,12 @@ class _MatchList extends State<MatchList> {
                             Text(e.blue.item1.name + ' & ' + e.blue.item2.name)
                           ]),
                           trailing: Text(e.score()),
-                          onTap: () {
-                            Navigator.push(
+                          onTap: () async {
+                            await Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => MatchView(match: e)));
+                            setState(() {});
                           },
                         ))))
                 .toList()
@@ -217,12 +202,13 @@ class _MatchList extends State<MatchList> {
                   leading: Text((i + 1).toString()),
                   title: Text(widget.team.name),
                   trailing: Text(matches[i].score()),
-                  onTap: () {
-                    Navigator.push(
+                  onTap: () async {
+                    await Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) =>
                                 MatchView(match: matches[i])));
+                    setState(() {});
                   },
                 ))));
       }
@@ -300,11 +286,12 @@ class _MatchList extends State<MatchList> {
                       Text(e.blue.item1.name + ' & ' + e.blue.item2.name)
                     ]),
                     trailing: Text(e.score()),
-                    onTap: () {
-                      Navigator.push(
+                    onTap: () async {
+                      await Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => MatchView(match: e)));
+                      setState(() {});
                     },
                   ))))
           .toList();

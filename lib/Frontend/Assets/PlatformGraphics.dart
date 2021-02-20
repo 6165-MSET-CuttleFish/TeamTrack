@@ -128,7 +128,11 @@ class PlatformDialogAction
 
   @override
   FlatButton buildMaterialWidget(BuildContext context) {
-    return FlatButton(onPressed: onPressed, child: child);
+    return FlatButton(
+      onPressed: onPressed,
+      child: child,
+      textColor: isDestructive ? Colors.red : null,
+    );
   }
 }
 

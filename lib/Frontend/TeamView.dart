@@ -117,7 +117,7 @@ class _TeamView extends State<TeamView> {
                               ? BarAreaData(
                                   show: true,
                                   colors: [
-                                    Colors.lightGreenAccent.withOpacity(0.6)
+                                    Colors.lightGreenAccent.withOpacity(0.5)
                                   ],
                                   cutOffY: widget.team.targetScore
                                       ?.total()
@@ -155,7 +155,7 @@ class _TeamView extends State<TeamView> {
                               ? BarAreaData(
                                   show: true,
                                   colors: [
-                                    Colors.lightGreenAccent.withOpacity(0.6)
+                                    Colors.lightGreenAccent.withOpacity(0.5)
                                   ],
                                   cutOffY: widget.team.targetScore
                                       ?.total()
@@ -331,25 +331,25 @@ class _TeamView extends State<TeamView> {
       Container(
           width: MediaQuery.of(context).size.width,
           child: PlatformButton(
-            onPressed: () {
+            onPressed: () async {
               if (Platform.isIOS) {
-                setState(() {});
-                Navigator.push(
+                await Navigator.push(
                     context,
                     CupertinoPageRoute(
                         builder: (context) => MatchList(
                               event: widget.event,
                               team: widget.team,
                             )));
-              } else {
                 setState(() {});
-                Navigator.push(
+              } else {
+                await Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (context) => MatchList(
                               event: widget.event,
                               team: widget.team,
                             )));
+                setState(() {});
               }
             },
             color: CupertinoColors.systemGreen,
@@ -358,27 +358,27 @@ class _TeamView extends State<TeamView> {
       Container(
           width: MediaQuery.of(context).size.width / 2,
           child: PlatformButton(
-            onPressed: () {
+            onPressed: () async {
               if (widget.team.targetScore == null) {
                 widget.team.targetScore = Score(Uuid().v4(), Dice.none);
               }
               if (Platform.isIOS) {
-                setState(() {});
-                Navigator.push(
+                await Navigator.push(
                     context,
                     CupertinoPageRoute(
                         builder: (context) => MatchView(
                               team: widget.team,
                             )));
-              } else {
                 setState(() {});
-                Navigator.push(
+              } else {
+                await Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (context) => MatchView(
                               match: Match.defaultMatch(EventType.remote),
                               team: widget.team,
                             )));
+                setState(() {});
               }
             },
             color: Colors.indigoAccent,
@@ -414,7 +414,7 @@ class _TeamView extends State<TeamView> {
                     val: widget.team.scores.madScore(_dice),
                     max: widget.event.teams.lowestMadScore(_dice),
                     inverted: true,
-                    title: 'Deviance',
+                    title: 'Deviation',
                   ),
                 ],
               )),
@@ -499,7 +499,7 @@ class _TeamView extends State<TeamView> {
                                                 show: true,
                                                 colors: [
                                                   Colors.lightGreenAccent
-                                                      .withOpacity(0.6)
+                                                      .withOpacity(0.5)
                                                 ],
                                                 cutOffY: widget.team.targetScore
                                                     ?.total()
@@ -561,7 +561,7 @@ class _TeamView extends State<TeamView> {
                   val: widget.team.scores.autoMADScore(_dice),
                   max: widget.event.teams.lowestAutoMadScore(_dice),
                   inverted: true,
-                  title: 'Deviance',
+                  title: 'Deviation',
                 ),
               ],
             )),
@@ -652,7 +652,7 @@ class _TeamView extends State<TeamView> {
                                           show: true,
                                           colors: [
                                             Colors.lightGreenAccent
-                                                .withOpacity(0.6)
+                                                .withOpacity(0.5)
                                           ],
                                           cutOffY: widget
                                               .team.targetScore?.autoScore
@@ -716,7 +716,7 @@ class _TeamView extends State<TeamView> {
                     val: widget.team.scores.teleMADScore(_dice),
                     max: widget.event.teams.lowestTeleMadScore(_dice),
                     inverted: true,
-                    title: 'Deviance',
+                    title: 'Deviation',
                   ),
                 ],
               )),
@@ -809,7 +809,7 @@ class _TeamView extends State<TeamView> {
                                                 show: true,
                                                 colors: [
                                                   Colors.lightGreenAccent
-                                                      .withOpacity(0.6)
+                                                      .withOpacity(0.5)
                                                 ],
                                                 cutOffY: widget
                                                     .team.targetScore?.teleScore
@@ -873,7 +873,7 @@ class _TeamView extends State<TeamView> {
                     val: widget.team.scores.endMADScore(_dice),
                     max: widget.event.teams.lowestEndMadScore(_dice),
                     inverted: true,
-                    title: 'Deviance',
+                    title: 'Deviation',
                   ),
                 ],
               )),
@@ -964,7 +964,7 @@ class _TeamView extends State<TeamView> {
                                                 show: true,
                                                 colors: [
                                                   Colors.lightGreenAccent
-                                                      .withOpacity(0.6)
+                                                      .withOpacity(0.5)
                                                 ],
                                                 cutOffY: widget.team.targetScore
                                                     ?.endgameScore
@@ -1087,12 +1087,17 @@ class _TeamView extends State<TeamView> {
         title: Text(widget.team.name),
         backgroundColor: Theme.of(context).accentColor,
         actions: [
-          PlatformButton(
-            child: Text('Refresh'),
-            onPressed: () {
-              setState(() {});
+          PopupMenuButton<String>(
+            onSelected: _choice,
+            itemBuilder: (context) {
+              return [
+                PopupMenuItem<String>(
+                  child: Text('Delete Team'),
+                  value: 'Delete',
+                ),
+              ];
             },
-          )
+          ),
         ],
       ),
       body: ListView(children: [
@@ -1106,5 +1111,65 @@ class _TeamView extends State<TeamView> {
         )
       ]),
     );
+  }
+
+  void _choice(String c) {
+    if (c == 'Delete') {
+      showDialog(
+          context: context,
+          child: PlatformAlert(
+            title: Text('Delete Team'),
+            content: Text('Are you sure?'),
+            actions: [
+              PlatformDialogAction(
+                isDefaultAction: true,
+                child: Text('Cancel'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              PlatformDialogAction(
+                isDefaultAction: false,
+                isDestructive: true,
+                child: Text('Confirm'),
+                onPressed: () {
+                  setState(() {
+                    widget.event.deleteTeam(widget.team);
+                  });
+                  dataModel.saveEvents();
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ));
+    } else {
+      showDialog(
+          context: context,
+          child: PlatformAlert(
+            title: Text('Delete Team'),
+            content: Text('Are you sure?'),
+            actions: [
+              PlatformDialogAction(
+                isDefaultAction: true,
+                child: Text('Cancel'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              PlatformDialogAction(
+                isDefaultAction: false,
+                isDestructive: true,
+                child: Text('Confirm'),
+                onPressed: () {
+                  setState(() {
+                    widget.event.deleteTeam(widget.team);
+                  });
+                  dataModel.saveEvents();
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ));
+    }
   }
 }

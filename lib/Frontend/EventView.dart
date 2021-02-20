@@ -46,14 +46,7 @@ class _EventView extends State<EventView> {
         title: _tab == 0 ? Text('Teams') : Text('Matches'),
         backgroundColor: Theme.of(context).accentColor,
         actions: [
-          if (Platform.isAndroid)
-            PlatformButton(
-              child: Text('Refresh'),
-              onPressed: () {
-                setState(() {});
-              },
-            )
-          else
+          if (Platform.isIOS)
             PlatformButton(
               child: Text('Add'),
               onPressed: () {

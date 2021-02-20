@@ -16,12 +16,6 @@ save(String key, value) async {
 }
 
 DataModel dataModel;
-// restoreEvents() async {
-//   final prefs = await SharedPreferences.getInstance();
-//   var x = jsonDecode(prefs.getString('UltimateGoal')) as List;
-//   return x.map((e) => Event.fromJson(e)).toList();
-//   //.map((e) => Event.fromJson(e));
-// }
 
 class DataModel {
   final List<String> keys = ['UltimateGoal'];
@@ -63,6 +57,14 @@ class DataModel {
     var x = jsonDecode(prefs.getString(keys[0])) as List;
     var y = x.map((e) => Event.fromJson(e)).toList();
     events = y;
+    try {
+      darkMode = prefs.getBool('darkMode');
+      if (darkMode == null) {
+        darkMode = true;
+      }
+    } catch (Exception) {
+      print('');
+    }
     organize();
     print('reloaded');
   }
@@ -100,6 +102,24 @@ class Event {
     });
     if (!isIn) teams.add(newTeam);
     teams.sortTeams();
+  }
+
+  void deleteTeam(Team team) {
+    for (Match match in matches) {
+      if (match.red.item1.equals(team)) match.red.item1 = Team.nullTeam();
+      if (match.red.item2.equals(team)) match.red.item2 = Team.nullTeam();
+      if (match.blue.item1.equals(team)) match.blue.item1 = Team.nullTeam();
+      if (match.blue.item2.equals(team)) match.blue.item2 = Team.nullTeam();
+    }
+    teams.remove(e);
+  }
+
+  void deleteMatch(Match e) {
+    e.red.item1.scores.removeWhere((f) => f.id == e.id);
+    e.red.item2.scores.removeWhere((f) => f.id == e.id);
+    e.blue.item1.scores.removeWhere((f) => f.id == e.id);
+    e.blue.item2.scores.removeWhere((f) => f.id == e.id);
+    matches.remove(e);
   }
 
   Event.fromJson(Map<String, dynamic> json)
@@ -191,9 +211,11 @@ class Match {
     this.blue = blue;
     id = Uuid().v4();
     red?.item1?.scores?.addScore(Score(id, dice));
-    red?.item2?.scores?.addScore(Score(id, dice));
-    blue?.item1?.scores?.addScore(Score(id, dice));
-    blue?.item2?.scores?.addScore(Score(id, dice));
+    if (type != EventType.remote) {
+      red?.item2?.scores?.addScore(Score(id, dice));
+      blue?.item1?.scores?.addScore(Score(id, dice));
+      blue?.item2?.scores?.addScore(Score(id, dice));
+    }
     dataModel.saveEvents();
   }
   static Match defaultMatch(EventType type) {

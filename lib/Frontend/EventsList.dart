@@ -253,6 +253,11 @@ class _EventsList extends State<EventsList> {
         .toList();
   }
 
+  void saveBool(String key, value) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setBool(key, value);
+  }
+
   String _newName;
   @override
   Widget build(BuildContext context) {
@@ -262,6 +267,19 @@ class _EventsList extends State<EventsList> {
         appBar: AppBar(
           backgroundColor: Theme.of(context).accentColor,
           title: Text('Events'),
+          actions: [
+            IconButton(
+              icon: dataModel.darkMode
+                  ? Icon(CupertinoIcons.sun_max)
+                  : Icon(CupertinoIcons.moon),
+              onPressed: () {
+                setState(() {
+                  dataModel.darkMode = !dataModel.darkMode;
+                });
+                saveBool('darkMode', dataModel.darkMode);
+              },
+            )
+          ],
         ),
         body: SafeArea(
           child: ListView(children: [
@@ -307,9 +325,12 @@ class _EventsList extends State<EventsList> {
     showModalBottomSheet(
         context: context,
         builder: (context) => Container(
-            //color: Colors.red,
             height: 120,
             decoration: BoxDecoration(
+                border: Border.all(
+                  color: Theme.of(context).splashColor,
+                  width: 1.0,
+                ),
                 borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(10),
                     topRight: Radius.circular(10))),
