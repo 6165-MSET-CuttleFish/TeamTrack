@@ -37,7 +37,7 @@ class PlatformSwitch extends PlatformWidget<CupertinoSwitch, Switch> {
     return Switch(
       value: value,
       onChanged: onChanged,
-      activeColor: Colors.green,
+      activeColor: Colors.white,
       activeTrackColor: Theme.of(context).accentColor,
     );
   }

@@ -69,7 +69,7 @@ class TeleScore {
     return lowGoals * 2 + midGoals * 4 + hiGoals * 6;
   }
 
-  TeleScore() {}
+  TeleScore();
   TeleScore.fromJson(Map<String, dynamic> json)
       : hiGoals = json['HighGoals'],
         midGoals = json['MiddleGoals'],
@@ -97,7 +97,7 @@ class AutoScore {
         (navigated ? 5 : 0);
   }
 
-  AutoScore() {}
+  AutoScore();
   AutoScore.fromJson(Map<String, dynamic> json)
       : hiGoals = json['HighGoals'],
         midGoals = json['MiddleGoals'],
@@ -127,7 +127,7 @@ class EndgameScore {
         pwrShots * 15;
   }
 
-  EndgameScore() {}
+  EndgameScore();
   EndgameScore.fromJson(Map<String, dynamic> json)
       : wobbleGoalsInDrop = json['WobblesInDrop'],
         wobbleGoalsInStart = json['WobblesInStart'],

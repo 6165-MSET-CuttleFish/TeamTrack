@@ -117,7 +117,7 @@ class _TeamView extends State<TeamView> {
                               ? BarAreaData(
                                   show: true,
                                   colors: [
-                                    Colors.lightGreenAccent.withOpacity(0.5)
+                                    Colors.lightGreenAccent.withOpacity(0.2)
                                   ],
                                   cutOffY: widget.team.targetScore
                                       ?.total()
@@ -128,7 +128,7 @@ class _TeamView extends State<TeamView> {
                           aboveBarData: widget.team.targetScore != null
                               ? BarAreaData(
                                   show: true,
-                                  colors: [Colors.redAccent.withOpacity(0.5)],
+                                  colors: [Colors.redAccent.withOpacity(0.2)],
                                   cutOffY: widget.team.targetScore
                                       ?.total()
                                       ?.toDouble(),
@@ -142,9 +142,7 @@ class _TeamView extends State<TeamView> {
                                   (e) => e.dice == _dice || _dice == Dice.none)
                               .toList()
                               .spots(widget.team, _dice),
-                          colors: [
-                            Colors.orange,
-                          ],
+                          colors: [Color.fromRGBO(255, 166, 0, 1)],
                           isCurved: true,
                           isStrokeCapRound: true,
                           preventCurveOverShooting: true,
@@ -155,7 +153,7 @@ class _TeamView extends State<TeamView> {
                               ? BarAreaData(
                                   show: true,
                                   colors: [
-                                    Colors.lightGreenAccent.withOpacity(0.5)
+                                    Colors.lightGreenAccent.withOpacity(0.2)
                                   ],
                                   cutOffY: widget.team.targetScore
                                       ?.total()
@@ -166,7 +164,7 @@ class _TeamView extends State<TeamView> {
                           aboveBarData: widget.team.targetScore != null
                               ? BarAreaData(
                                   show: true,
-                                  colors: [Colors.redAccent.withOpacity(0.5)],
+                                  colors: [Colors.redAccent.withOpacity(0.2)],
                                   cutOffY: widget.team.targetScore
                                       ?.total()
                                       ?.toDouble(),
@@ -181,7 +179,7 @@ class _TeamView extends State<TeamView> {
                                   .spots()
                               : widget.team.scores.spots(),
                           colors: [
-                            Colors.deepPurple,
+                            Color.fromRGBO(230, 30, 213, 1),
                           ],
                           isCurved: true,
                           isStrokeCapRound: true,
@@ -259,8 +257,8 @@ class _TeamView extends State<TeamView> {
             children: [
               if (widget.event.type != EventType.remote)
                 FlatButton(
-                  color: _selections[0] ? Colors.orange : null,
-                  splashColor: Colors.orange,
+                  color: _selections[0] ? Color.fromRGBO(255, 166, 0, 1) : null,
+                  splashColor: Color.fromRGBO(255, 166, 0, 1),
                   onPressed: () {
                     setState(() {
                       _selections[0] = !_selections[0];
@@ -268,15 +266,15 @@ class _TeamView extends State<TeamView> {
                   },
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(18.0),
-                      side: BorderSide(color: Colors.orange)),
+                      side: BorderSide(color: Color.fromRGBO(255, 166, 0, 1))),
                   child: Text('Alliance Total'),
                 ),
               FlatButton(
-                color: _selections[1] ? Colors.deepPurple : null,
-                splashColor: Colors.deepPurple,
+                color: _selections[1] ? Color.fromRGBO(230, 30, 213, 1) : null,
+                splashColor: Color.fromRGBO(230, 30, 213, 1),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(18.0),
-                    side: BorderSide(color: Colors.deepPurple)),
+                    side: BorderSide(color: Color.fromRGBO(230, 30, 213, 1))),
                 child: Text('General'),
                 onPressed: () {
                   setState(() {
@@ -484,7 +482,10 @@ class _TeamView extends State<TeamView> {
                                       width: 1)),
                               minX: 0,
                               maxX: widget.team.scores.length.toDouble() - 1,
-                              minY: widget.team.scores.minScore(_dice),
+                              minY: [
+                                widget.team.scores.minScore(_dice),
+                                widget.team.targetScore.total().toDouble()
+                              ].reduce(min),
                               maxY: [
                                 widget.team.scores.maxScore(_dice),
                                 widget.team.targetScore != null
@@ -523,7 +524,7 @@ class _TeamView extends State<TeamView> {
                                     spots: widget.team.scores
                                         .diceScores(_dice)
                                         .spots(),
-                                    colors: [Colors.green, Colors.blue],
+                                    colors: [Colors.orange],
                                     isCurved: true,
                                     preventCurveOverShooting: true,
                                     barWidth: 5,
@@ -636,7 +637,12 @@ class _TeamView extends State<TeamView> {
                                     .length
                                     .toDouble() -
                                 1,
-                            minY: widget.team.scores.autoMinScore(_dice),
+                            minY: [
+                              widget.team.scores.autoMinScore(_dice),
+                              widget.team.targetScore.autoScore
+                                  .total()
+                                  .toDouble()
+                            ].reduce(min),
                             maxY: [
                               widget.team.scores.autoMaxScore(_dice),
                               widget.team.targetScore != null
@@ -677,7 +683,7 @@ class _TeamView extends State<TeamView> {
                                   spots: widget.team.scores
                                       .diceScores(_dice)
                                       .autoSpots(),
-                                  colors: [Colors.green, Colors.blue],
+                                  colors: [Colors.orange],
                                   isCurved: true,
                                   preventCurveOverShooting: true,
                                   barWidth: 5,
@@ -790,7 +796,12 @@ class _TeamView extends State<TeamView> {
                                       .length
                                       .toDouble() -
                                   1,
-                              minY: widget.team.scores.teleMinScore(_dice),
+                              minY: [
+                                widget.team.scores.teleMinScore(_dice),
+                                widget.team.targetScore.teleScore
+                                    .total()
+                                    .toDouble()
+                              ].reduce(min),
                               maxY: [
                                 widget.team.scores
                                     .teleMaxScore(_dice)
@@ -835,7 +846,7 @@ class _TeamView extends State<TeamView> {
                                     spots: widget.team.scores
                                         .diceScores(_dice)
                                         .teleSpots(),
-                                    colors: [Colors.green, Colors.blue],
+                                    colors: [Colors.orange],
                                     isCurved: true,
                                     preventCurveOverShooting: true,
                                     barWidth: 5,
@@ -947,7 +958,12 @@ class _TeamView extends State<TeamView> {
                                       .length
                                       .toDouble() -
                                   1,
-                              minY: widget.team.scores.endMinScore(_dice),
+                              minY: [
+                                widget.team.scores.endMinScore(_dice),
+                                widget.team.targetScore.endgameScore
+                                    .total()
+                                    .toDouble()
+                              ].reduce(min),
                               maxY: [
                                 widget.team.scores.endMaxScore(_dice),
                                 widget.team.targetScore != null
@@ -990,7 +1006,7 @@ class _TeamView extends State<TeamView> {
                                     spots: widget.team.scores
                                         .diceScores(_dice)
                                         .endSpots(),
-                                    colors: [Colors.green, Colors.blue],
+                                    colors: [Colors.orange],
                                     isCurved: true,
                                     preventCurveOverShooting: true,
                                     barWidth: 5,
@@ -1086,19 +1102,19 @@ class _TeamView extends State<TeamView> {
       appBar: AppBar(
         title: Text(widget.team.name),
         backgroundColor: Theme.of(context).accentColor,
-        actions: [
-          PopupMenuButton<String>(
-            onSelected: _choice,
-            itemBuilder: (context) {
-              return [
-                PopupMenuItem<String>(
-                  child: Text('Delete Team'),
-                  value: 'Delete',
-                ),
-              ];
-            },
-          ),
-        ],
+        // actions: [
+        //   PopupMenuButton<String>(
+        //     onSelected: _choice,
+        //     itemBuilder: (context) {
+        //       return [
+        //         PopupMenuItem<String>(
+        //           child: Text('Delete Team'),
+        //           value: 'Delete',
+        //         ),
+        //       ];
+        //     },
+        //   ),
+        // ],
       ),
       body: ListView(children: [
         Padding(

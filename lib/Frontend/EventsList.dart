@@ -6,11 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:TeamTrack/Frontend/Assets/PlatformGraphics.dart';
 import 'package:TeamTrack/Frontend/EventView.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class EventsList extends StatefulWidget {
   EventsList({Key key, this.dataModel}) : super(key: key);
   final DataModel dataModel;
+
   @override
   _EventsList createState() => _EventsList(dataModel: dataModel);
 }
@@ -262,6 +264,7 @@ class _EventsList extends State<EventsList> {
   @override
   Widget build(BuildContext context) {
     restoreEvents();
+    final themeChange = Provider.of<DarkThemeProvider>(context);
     if (isLoaded) {
       return Scaffold(
         appBar: AppBar(
@@ -269,14 +272,13 @@ class _EventsList extends State<EventsList> {
           title: Text('Events'),
           actions: [
             IconButton(
-              icon: dataModel.darkMode
+              icon: themeChange.darkTheme
                   ? Icon(CupertinoIcons.sun_max)
                   : Icon(CupertinoIcons.moon),
-              onPressed: () {
+              onPressed: () async {
                 setState(() {
-                  dataModel.darkMode = !dataModel.darkMode;
+                  themeChange.darkTheme = !themeChangeProvider.darkTheme;
                 });
-                saveBool('darkMode', dataModel.darkMode);
               },
             )
           ],

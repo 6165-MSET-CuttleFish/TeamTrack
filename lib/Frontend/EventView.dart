@@ -161,6 +161,7 @@ class _EventView extends State<EventView> {
                       _newName = '';
                       _newNumber = '';
                     });
+                    dataModel.saveEvents();
                     Navigator.of(context).pop();
                   },
                 ),
@@ -293,6 +294,7 @@ class _EventView extends State<EventView> {
           for (TextEditingController controller in controllers) {
             controller.text = '';
           }
+          dataModel.saveEvents();
           Navigator.pop(context);
         }
       },

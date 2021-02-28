@@ -76,19 +76,19 @@ class _MatchView extends State<MatchView> {
           backgroundColor: _color,
           title: Text('Match Stats'),
           elevation: 0.0,
-          actions: [
-            PopupMenuButton<String>(
-              onSelected: _choice,
-              itemBuilder: (context) {
-                return [
-                  PopupMenuItem<String>(
-                    child: Text('Delete Match'),
-                    value: 'Delete',
-                  ),
-                ];
-              },
-            ),
-          ],
+          // actions: [
+          //   PopupMenuButton<String>(
+          //     onSelected: _choice,
+          //     itemBuilder: (context) {
+          //       return [
+          //         PopupMenuItem<String>(
+          //           child: Text('Delete Match'),
+          //           value: 'Delete',
+          //         ),
+          //       ];
+          //     },
+          //   ),
+          // ],
         ),
         body: Container(
           decoration: BoxDecoration(

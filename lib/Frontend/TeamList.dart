@@ -74,14 +74,15 @@ class _TeamList extends State<TeamList> {
                       title: Text(e.name),
                       leading: Text(e.number,
                           style: Theme.of(context).textTheme.caption),
-                      onTap: () {
-                        Navigator.push(
+                      onTap: () async {
+                        await Navigator.push(
                             context,
                             MaterialPageRoute(
                                 builder: (context) => TeamView(
                                       team: e,
                                       event: widget.event,
                                     )));
+                        setState(() {});
                       },
                     )),
               ))

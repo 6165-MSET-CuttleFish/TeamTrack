@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
+import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'score.dart';
 import 'package:uuid/uuid.dart';
@@ -15,7 +16,34 @@ save(String key, value) async {
   prefs.setString(key, json.encode(value));
 }
 
+class DarkThemeProvider with ChangeNotifier {
+  DarkThemePreference darkThemePreference = DarkThemePreference();
+  bool _darkTheme = false;
+
+  bool get darkTheme => _darkTheme;
+
+  set darkTheme(bool value) {
+    _darkTheme = value;
+    darkThemePreference.setDarkTheme(value);
+    notifyListeners();
+  }
+}
+class DarkThemePreference {
+  static const THEME_STATUS = "THEMESTATUS";
+
+  setDarkTheme(bool value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool(THEME_STATUS, value);
+  }
+
+  Future<bool> getTheme() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(THEME_STATUS) ?? false;
+  }
+}
+
 DataModel dataModel;
+DarkThemeProvider themeChangeProvider = new DarkThemeProvider();
 
 class DataModel {
   final List<String> keys = ['UltimateGoal'];
@@ -30,7 +58,6 @@ class DataModel {
     }
   }
   List<Event> events = [];
-  bool darkMode = true;
 
   List<Event> localEvents() {
     return events.where((e) => e.type == EventType.local).toList();
@@ -57,15 +84,7 @@ class DataModel {
     var x = jsonDecode(prefs.getString(keys[0])) as List;
     var y = x.map((e) => Event.fromJson(e)).toList();
     events = y;
-    try {
-      darkMode = prefs.getBool('darkMode');
-      if (darkMode == null) {
-        darkMode = true;
-      }
-    } catch (Exception) {
-      print('');
-    }
-    organize();
+    // organize();
     print('reloaded');
   }
 
@@ -111,7 +130,7 @@ class Event {
       if (match.blue.item1.equals(team)) match.blue.item1 = Team.nullTeam();
       if (match.blue.item2.equals(team)) match.blue.item2 = Team.nullTeam();
     }
-    teams.remove(e);
+    teams.remove(team);
   }
 
   void deleteMatch(Match e) {
@@ -122,13 +141,13 @@ class Event {
     matches.remove(e);
   }
 
-  Event.fromJson(Map<String, dynamic> json)
-      : name = json['name'],
-        teams =
-            List<Team>.from(json['teams'].map((model) => Team.fromJson(model))),
-        matches = List<Match>.from(
-            json['matches'].map((model) => Match.fromJson(model))),
-        type = getTypeFromString(json['type']);
+  Event.fromJson(Map<String, dynamic> json) {
+    name = json['name'];
+    teams = List<Team>.from(json['teams'].map((model) => Team.fromJson(model)));
+    matches = List<Match>.from(
+        json['matches'].map((model) => Match.fromJson(model, teams)));
+    type = getTypeFromString(json['type']);
+  }
   Map<String, dynamic> toJson() => {
         'name': name,
         'teams': teams.map((e) => e.toJson()).toList(),
@@ -156,12 +175,16 @@ class Alliance {
             ?.total();
   }
 
-  Alliance.fromJson(Map<String, dynamic> json)
-      : item1 = Team.fromJson(json['team1']),
-        item2 = Team.fromJson(json['team2']);
+  Alliance.fromJson(Map<String, dynamic> json, List<Team> teamList)
+      : item1 = teamList.firstWhere(
+            (e) => e.number.trim() == json['team1'].trim(),
+            orElse: () => Team.nullTeam()),
+        item2 = teamList.firstWhere(
+            (e) => e.number.trim() == json['team2'].trim(),
+            orElse: () => Team.nullTeam());
   Map<String, dynamic> toJson() => {
-        'team1': item1.toJson(),
-        'team2': item2.toJson(),
+        'team1': item1.number,
+        'team2': item2.number,
       };
 }
 
@@ -175,7 +198,6 @@ class Team {
     this.number = number;
     scores = List();
     targetScore = Score(Uuid().v4(), Dice.none);
-    dataModel.saveEvents();
   }
   static Team nullTeam() {
     return Team("?", "?");
@@ -195,7 +217,7 @@ class Team {
         'name': name,
         'number': number,
         'scores': scores.map((e) => e.toJson()).toList(),
-        'targetScore': targetScore != null ? targetScore.toJson() : null
+        'targetScore': targetScore.toJson()
       };
 }
 
@@ -216,7 +238,6 @@ class Match {
       blue?.item1?.scores?.addScore(Score(id, dice));
       blue?.item2?.scores?.addScore(Score(id, dice));
     }
-    dataModel.saveEvents();
   }
   static Match defaultMatch(EventType type) {
     return Match(Alliance(Team('1', 'Alpha'), Team('2', 'Beta')),
@@ -255,7 +276,11 @@ class Match {
 
   String score() {
     if (type == EventType.remote) {
-      return red.item1.scores.firstWhere((e) => e.id == id).total().toString();
+      return red.item1.scores
+          .firstWhere((e) => e.id == id,
+              orElse: () => Score(Uuid().v4(), Dice.none))
+          .total()
+          .toString();
     }
     return redScore() + " - " + blueScore();
   }
@@ -284,9 +309,9 @@ class Match {
     return (b0 + b1).toString();
   }
 
-  Match.fromJson(Map<String, dynamic> json)
-      : red = Alliance.fromJson(json['red']),
-        blue = Alliance.fromJson(json['blue']),
+  Match.fromJson(Map<String, dynamic> json, List<Team> teamList)
+      : red = Alliance.fromJson(json['red'], teamList),
+        blue = Alliance.fromJson(json['blue'], teamList),
         id = json['id'],
         dice = getDiceFromString(json['dice']),
         type = getTypeFromString(json['type']);

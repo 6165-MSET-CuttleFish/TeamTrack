@@ -62,6 +62,7 @@ class _MatchList extends State<MatchList> {
                                             Team.nullTeam(), Team.nullTeam()),
                                         EventType.remote),
                                   );
+                                  dataModel.saveEvents();
                                   Navigator.pop(context);
                                 });
                               },
