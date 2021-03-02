@@ -1129,63 +1129,63 @@ class _TeamView extends State<TeamView> {
     );
   }
 
-  void _choice(String c) {
-    if (c == 'Delete') {
-      showDialog(
-          context: context,
-          child: PlatformAlert(
-            title: Text('Delete Team'),
-            content: Text('Are you sure?'),
-            actions: [
-              PlatformDialogAction(
-                isDefaultAction: true,
-                child: Text('Cancel'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              PlatformDialogAction(
-                isDefaultAction: false,
-                isDestructive: true,
-                child: Text('Confirm'),
-                onPressed: () {
-                  setState(() {
-                    widget.event.deleteTeam(widget.team);
-                  });
-                  dataModel.saveEvents();
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          ));
-    } else {
-      showDialog(
-          context: context,
-          child: PlatformAlert(
-            title: Text('Delete Team'),
-            content: Text('Are you sure?'),
-            actions: [
-              PlatformDialogAction(
-                isDefaultAction: true,
-                child: Text('Cancel'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              PlatformDialogAction(
-                isDefaultAction: false,
-                isDestructive: true,
-                child: Text('Confirm'),
-                onPressed: () {
-                  setState(() {
-                    widget.event.deleteTeam(widget.team);
-                  });
-                  dataModel.saveEvents();
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          ));
-    }
-  }
+  // void _choice(String c) {
+  //   if (c == 'Delete') {
+  //     showDialog(
+  //         context: context,
+  //         child: PlatformAlert(
+  //           title: Text('Delete Team'),
+  //           content: Text('Are you sure?'),
+  //           actions: [
+  //             PlatformDialogAction(
+  //               isDefaultAction: true,
+  //               child: Text('Cancel'),
+  //               onPressed: () {
+  //                 Navigator.of(context).pop();
+  //               },
+  //             ),
+  //             PlatformDialogAction(
+  //               isDefaultAction: false,
+  //               isDestructive: true,
+  //               child: Text('Confirm'),
+  //               onPressed: () {
+  //                 setState(() {
+  //                   widget.event.deleteTeam(widget.team);
+  //                 });
+  //                 dataModel.saveEvents();
+  //                 Navigator.of(context).pop();
+  //               },
+  //             ),
+  //           ],
+  //         ));
+  //   } else {
+  //     showDialog(
+  //         context: context,
+  //         child: PlatformAlert(
+  //           title: Text('Delete Team'),
+  //           content: Text('Are you sure?'),
+  //           actions: [
+  //             PlatformDialogAction(
+  //               isDefaultAction: true,
+  //               child: Text('Cancel'),
+  //               onPressed: () {
+  //                 Navigator.of(context).pop();
+  //               },
+  //             ),
+  //             PlatformDialogAction(
+  //               isDefaultAction: false,
+  //               isDestructive: true,
+  //               child: Text('Confirm'),
+  //               onPressed: () {
+  //                 setState(() {
+  //                   widget.event.deleteTeam(widget.team);
+  //                 });
+  //                 dataModel.saveEvents();
+  //                 Navigator.of(context).pop();
+  //               },
+  //             ),
+  //           ],
+  //         ));
+  //   }
+  // }
 }

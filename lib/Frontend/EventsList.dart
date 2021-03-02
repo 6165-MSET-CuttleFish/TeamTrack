@@ -328,59 +328,59 @@ class _EventsList extends State<EventsList> {
         context: context,
         builder: (context) => Container(
             height: 120,
-            decoration: BoxDecoration(
-                border: Border.all(
-                  color: Theme.of(context).splashColor,
-                  width: 1.0,
-                ),
-                borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(10),
-                    topRight: Radius.circular(10))),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                ListTileTheme(
-                  iconColor: Theme.of(context).accentColor,
-                  child: ListTile(
-                    onTap: () {
-                      _newType = EventType.local;
-                      setState(() {});
-                      Navigator.pop(context);
-                      _chosen();
-                    },
-                    leading: Icon(CupertinoIcons.person_3_fill),
-                    title: Text('Local Event'),
+            child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Theme.of(context).splashColor,
+                    width: 1.0,
                   ),
+                  color: Theme.of(context).canvasColor,
                 ),
-                ListTileTheme(
-                  iconColor: Theme.of(context).accentColor,
-                  child: ListTile(
-                    onTap: () {
-                      _newType = EventType.remote;
-                      setState(() {});
-                      Navigator.pop(context);
-                      _chosen();
-                    },
-                    leading:
-                        Icon(CupertinoIcons.rectangle_stack_person_crop_fill),
-                    title: Text('Remote Event'),
-                  ),
-                ),
-                // ListTileTheme(
-                //   iconColor: Theme.of(context).accentColor,
-                //   child: ListTile(
-                //     onTap: () {
-                //       _newType = EventType.live;
-                //       setState(() {});
-                //       Navigator.pop(context);
-                //       _chosen();
-                //     },
-                //     leading: Icon(CupertinoIcons.cloud_fill),
-                //     title: Text('Live Event'),
-                //   ),
-                // )
-              ],
-            )));
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ListTileTheme(
+                      iconColor: Theme.of(context).accentColor,
+                      child: ListTile(
+                        onTap: () {
+                          _newType = EventType.local;
+                          setState(() {});
+                          Navigator.pop(context);
+                          _chosen();
+                        },
+                        leading: Icon(CupertinoIcons.person_3_fill),
+                        title: Text('Local Event'),
+                      ),
+                    ),
+                    ListTileTheme(
+                      iconColor: Theme.of(context).accentColor,
+                      child: ListTile(
+                        onTap: () {
+                          _newType = EventType.remote;
+                          setState(() {});
+                          Navigator.pop(context);
+                          _chosen();
+                        },
+                        leading: Icon(
+                            CupertinoIcons.rectangle_stack_person_crop_fill),
+                        title: Text('Remote Event'),
+                      ),
+                    ),
+                    // ListTileTheme(
+                    //   iconColor: Theme.of(context).accentColor,
+                    //   child: ListTile(
+                    //     onTap: () {
+                    //       _newType = EventType.live;
+                    //       setState(() {});
+                    //       Navigator.pop(context);
+                    //       _chosen();
+                    //     },
+                    //     leading: Icon(CupertinoIcons.cloud_fill),
+                    //     title: Text('Live Event'),
+                    //   ),
+                    // )
+                  ],
+                ))));
   }
 
   EventType _newType;

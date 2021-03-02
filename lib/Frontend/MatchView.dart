@@ -37,35 +37,35 @@ class _MatchView extends State<MatchView> {
       if (_match.type == EventType.remote) _color = CupertinoColors.systemGreen;
     }
   }
-  void _choice(String c) {
-    showDialog(
-        context: context,
-        child: PlatformAlert(
-          title: Text('Delete Match'),
-          content: Text('Are you sure?'),
-          actions: [
-            PlatformDialogAction(
-              isDefaultAction: true,
-              child: Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            PlatformDialogAction(
-              isDefaultAction: false,
-              isDestructive: true,
-              child: Text('Confirm'),
-              onPressed: () {
-                setState(() {
-                  widget.event.deleteMatch(widget.match);
-                });
-                dataModel.saveEvents();
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        ));
-  }
+  // void _choice(String c) {
+  //   showDialog(
+  //       context: context,
+  //       child: PlatformAlert(
+  //         title: Text('Delete Match'),
+  //         content: Text('Are you sure?'),
+  //         actions: [
+  //           PlatformDialogAction(
+  //             isDefaultAction: true,
+  //             child: Text('Cancel'),
+  //             onPressed: () {
+  //               Navigator.of(context).pop();
+  //             },
+  //           ),
+  //           PlatformDialogAction(
+  //             isDefaultAction: false,
+  //             isDestructive: true,
+  //             child: Text('Confirm'),
+  //             onPressed: () {
+  //               setState(() {
+  //                 widget.event.deleteMatch(widget.match);
+  //               });
+  //               dataModel.saveEvents();
+  //               Navigator.of(context).pop();
+  //             },
+  //           ),
+  //         ],
+  //       ));
+  // }
 
   @override
   Widget build(BuildContext context) {
