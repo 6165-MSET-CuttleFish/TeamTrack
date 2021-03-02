@@ -1,4 +1,4 @@
-package com.example.teamtrack
+package com.msetcuttlefish.teamtrack
 
 import io.flutter.embedding.android.FlutterActivity
 
