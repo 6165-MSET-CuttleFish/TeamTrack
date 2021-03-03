@@ -4,6 +4,7 @@ import 'package:TeamTrack/backend.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 
 class CardView extends StatefulWidget {
   CardView({Key key, this.child, this.collapsed, this.isActive = true})
@@ -23,6 +24,7 @@ class _CardView extends State<CardView> {
     return Center(
       child: GestureDetector(
         onTap: () {
+          HapticFeedback.mediumImpact();
           if (widget.isActive) {
             setState(() {
               _genBool = toggle(_genBool);
