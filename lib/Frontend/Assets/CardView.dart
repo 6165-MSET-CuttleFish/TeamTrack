@@ -1,6 +1,6 @@
-import 'package:TeamTrack/Frontend/Assets/Collapsible.dart';
-import 'package:TeamTrack/Frontend/Assets/PlatformGraphics.dart';
-import 'package:TeamTrack/backend.dart';
+import 'package:teamtrack/Frontend/Assets/Collapsible.dart';
+import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
+import 'package:teamtrack/backend.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';

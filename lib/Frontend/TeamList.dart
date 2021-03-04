@@ -1,9 +1,9 @@
-import 'package:TeamTrack/Frontend/TeamView.dart';
-import 'package:TeamTrack/backend.dart';
+import 'package:teamtrack/Frontend/TeamView.dart';
+import 'package:teamtrack/backend.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:TeamTrack/Frontend/Assets/PlatformGraphics.dart';
+import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
 
 class TeamList extends StatefulWidget {
   TeamList({Key key, this.event, this.dataModel}) : super(key: key);

@@ -1,9 +1,9 @@
-import 'package:TeamTrack/Frontend/Assets/PlatformGraphics.dart';
+import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:TeamTrack/backend.dart';
-import 'package:TeamTrack/score.dart';
+import 'package:teamtrack/backend.dart';
+import 'package:teamtrack/score.dart';
 import 'dart:io' show Platform;
 import 'package:flutter/services.dart';
 

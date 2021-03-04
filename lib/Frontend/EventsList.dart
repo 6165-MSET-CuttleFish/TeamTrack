@@ -1,11 +1,11 @@
 import 'dart:io';
 
-import 'package:TeamTrack/backend.dart';
+import 'package:teamtrack/backend.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:TeamTrack/Frontend/Assets/PlatformGraphics.dart';
-import 'package:TeamTrack/Frontend/EventView.dart';
+import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
+import 'package:teamtrack/Frontend/EventView.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

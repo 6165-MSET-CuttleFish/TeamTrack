@@ -1,5 +1,5 @@
-import 'package:TeamTrack/Frontend/EventsList.dart';
-import 'package:TeamTrack/backend.dart';
+import 'package:teamtrack/Frontend/EventsList.dart';
+import 'package:teamtrack/backend.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

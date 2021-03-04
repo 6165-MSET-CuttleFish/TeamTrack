@@ -1,4 +1,4 @@
-import 'package:TeamTrack/backend.dart';
+import 'package:teamtrack/backend.dart';
 
 class Score {
   TeleScore teleScore = TeleScore();

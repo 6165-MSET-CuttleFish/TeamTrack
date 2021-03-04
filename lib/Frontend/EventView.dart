@@ -1,13 +1,13 @@
 import 'dart:io';
 
-import 'package:TeamTrack/Frontend/MatchList.dart';
-import 'package:TeamTrack/Frontend/TeamList.dart';
-import 'package:TeamTrack/backend.dart';
+import 'package:teamtrack/Frontend/MatchList.dart';
+import 'package:teamtrack/Frontend/TeamList.dart';
+import 'package:teamtrack/backend.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:TeamTrack/Frontend/Assets/PlatformGraphics.dart';
+import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
 
 class EventView extends StatefulWidget {
   EventView({Key key, this.event, this.dataModel}) : super(key: key);

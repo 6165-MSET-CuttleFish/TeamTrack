@@ -28,6 +28,7 @@ class DarkThemeProvider with ChangeNotifier {
     notifyListeners();
   }
 }
+
 class DarkThemePreference {
   static const THEME_STATUS = "THEMESTATUS";
 
@@ -196,7 +197,7 @@ class Team {
   Team(String number, String name) {
     this.name = name;
     this.number = number;
-    scores = List();
+    scores = [];
     targetScore = Score(Uuid().v4(), Dice.none);
   }
   static Team nullTeam() {
