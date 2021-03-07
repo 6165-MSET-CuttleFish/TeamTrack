@@ -12,7 +12,7 @@ abstract class PlatformWidget<C extends Widget, M extends Widget>
   @override
   Widget build(BuildContext context) {
     try {
-      if (Platform.isIOS) {
+      if (true) {
         return buildCupertinoWidget(context);
       } else {
         return buildMaterialWidget(context);
@@ -89,6 +89,7 @@ class PlatformTextField
   @override
   CupertinoTextField buildCupertinoWidget(BuildContext context) {
     return CupertinoTextField(
+      style: TextStyle(color: Theme.of(context).textTheme.bodyText2.color),
       onChanged: onChanged,
       keyboardType: keyboardType,
       textCapitalization: textCapitalization,
@@ -99,6 +100,7 @@ class PlatformTextField
   @override
   TextFormField buildMaterialWidget(BuildContext context) {
     return TextFormField(
+      style: TextStyle(color: Theme.of(context).textTheme.bodyText2.color),
       onChanged: onChanged,
       keyboardType: keyboardType,
       textCapitalization: textCapitalization,
@@ -123,6 +125,7 @@ class PlatformDialogAction
   @override
   CupertinoDialogAction buildCupertinoWidget(BuildContext context) {
     return CupertinoDialogAction(
+      //textStyle: TextStyle(color: Theme.of(context).textTheme.bodyText2.color),
       isDefaultAction: isDefaultAction,
       child: child,
       onPressed: onPressed,

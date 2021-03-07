@@ -21,6 +21,7 @@ class _TeamTrack extends State<TeamTrack> {
   );
 
   final darkTheme = ThemeData(
+    textTheme: TextTheme(bodyText2: TextStyle(color: Colors.white)),
     backgroundColor: Colors.black,
     splashColor: Colors.deepPurple,
     shadowColor: Colors.white,
