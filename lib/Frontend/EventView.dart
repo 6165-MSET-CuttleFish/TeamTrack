@@ -45,19 +45,6 @@ class _EventView extends State<EventView> {
       appBar: AppBar(
         title: _tab == 0 ? Text('Teams') : Text('Matches'),
         backgroundColor: Theme.of(context).accentColor,
-        actions: [
-          if (Platform.isIOS)
-            PlatformButton(
-              child: Text('Add'),
-              onPressed: () {
-                if (_tab == 0) {
-                  _teamConfig();
-                } else {
-                  _matchConfig();
-                }
-              },
-            )
-        ],
       ),
       bottomNavigationBar: widget.event.type != EventType.remote
           ? BottomNavigationBar(
@@ -80,29 +67,27 @@ class _EventView extends State<EventView> {
             )
           : null,
       body: materialTabs()[_tab],
-      floatingActionButton: Platform.isAndroid
-          ? FloatingActionButton(
-              tooltip: _tab == 0 ? 'Add Team' : 'Add Match',
-              child: Icon(Icons.add),
-              onPressed: () {
-                if (_tab == 0) {
-                  _teamConfig();
-                } else {
-                  _matchConfig();
-                }
-              },
-            )
-          : null,
+      floatingActionButton: FloatingActionButton(
+        tooltip: _tab == 0 ? 'Add Team' : 'Add Match',
+        child: Icon(Icons.add),
+        onPressed: () {
+          if (_tab == 0) {
+            _teamConfig();
+          } else {
+            _matchConfig();
+          }
+        },
+      ),
     );
   }
 
   void _matchConfig() {
-    if (Platform.isAndroid) {
+    if (true) {
       showModalBottomSheet(
           context: context,
           isScrollControlled: true,
           builder: (context) {
-            return _addMatch();
+            return SafeArea(child: _addMatch());
           });
     } else {
       showCupertinoModalPopup(

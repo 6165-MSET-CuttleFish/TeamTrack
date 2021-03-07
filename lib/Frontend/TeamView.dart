@@ -365,6 +365,7 @@ class _TeamView extends State<TeamView> {
                     context,
                     CupertinoPageRoute(
                         builder: (context) => MatchView(
+                              match: Match.defaultMatch(EventType.remote),
                               team: widget.team,
                             )));
                 setState(() {});
@@ -380,7 +381,7 @@ class _TeamView extends State<TeamView> {
               }
             },
             color: Colors.indigoAccent,
-            child: Text('Target Score'),
+            child: Text('Target'),
           )),
       Padding(
         padding: EdgeInsets.all(10),
@@ -1024,7 +1025,8 @@ class _TeamView extends State<TeamView> {
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: Platform.isIOS
-          ? CupertinoSlidingSegmentedControl(
+          ? SafeArea(
+              child: CupertinoSlidingSegmentedControl(
               groupValue: _dice,
               children: <Dice, Widget>{
                 Dice.one: Text('0'),
@@ -1037,7 +1039,7 @@ class _TeamView extends State<TeamView> {
                   _dice = newDice;
                 });
               },
-            )
+            ))
           : ButtonBar(
               alignment: MainAxisAlignment.center,
               children: [
