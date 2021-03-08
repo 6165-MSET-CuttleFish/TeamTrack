@@ -328,6 +328,8 @@ class _EventsList extends State<EventsList> {
       showCupertinoModalPopup(
           context: context,
           builder: (context) => CupertinoActionSheet(
+                //title: Text('New Event'),
+                message: Text('Select Event Type'),
                 actions: [
                   CupertinoActionSheetAction(
                       onPressed: () {

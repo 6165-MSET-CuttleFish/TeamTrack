@@ -82,20 +82,15 @@ class _EventView extends State<EventView> {
   }
 
   void _matchConfig() {
-    if (true) {
-      showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          builder: (context) {
-            return SafeArea(child: _addMatch());
-          });
-    } else {
-      showCupertinoModalPopup(
-          context: null,
-          builder: (context) {
-            return CupertinoPageScaffold(child: Text('Hello'));
-          });
-    }
+    showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        builder: (context) {
+          return SafeArea(
+              child: Container(
+                  height: MediaQuery.of(context).size.height * 0.85,
+                  child: _addMatch()));
+        });
   }
 
   String _newName;
@@ -116,6 +111,7 @@ class _EventView extends State<EventView> {
                       _newNumber = input;
                     },
                   ),
+                  Padding(padding: EdgeInsets.all(5)),
                   PlatformTextField(
                     placeholder: 'Team name',
                     keyboardType: TextInputType.name,

@@ -66,7 +66,7 @@ class PlatformAlert extends PlatformWidget<CupertinoAlertDialog, AlertDialog> {
   @override
   CupertinoAlertDialog buildCupertinoWidget(BuildContext context) {
     return CupertinoAlertDialog(
-      title: title,
+      title: Padding(child: title, padding: EdgeInsets.only(bottom: 10)),
       content: content,
       actions: actions,
     );
