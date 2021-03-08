@@ -38,7 +38,7 @@ class _MatchList extends State<MatchList> {
       floatingActionButton: widget.event.type == EventType.remote
           ? FloatingActionButton(
               onPressed: () {
-                showDialog(
+                showPlatformDialog(
                     context: context,
                     builder: (context) => PlatformAlert(
                           title: Text('New Match'),
@@ -88,7 +88,7 @@ class _MatchList extends State<MatchList> {
                         icon: Icons.delete,
                         color: Colors.red,
                         onTap: () {
-                          showDialog(
+                          showPlatformDialog(
                               context: context,
                               builder: (BuildContext context) => PlatformAlert(
                                     title: Text('Delete Match'),
@@ -161,7 +161,7 @@ class _MatchList extends State<MatchList> {
                 icon: Icons.delete,
                 color: Colors.red,
                 onTap: () {
-                  showDialog(
+                  showPlatformDialog(
                       context: context,
                       builder: (BuildContext context) => PlatformAlert(
                             title: Text('Delete Match'),
@@ -231,7 +231,7 @@ class _MatchList extends State<MatchList> {
                   icon: Icons.delete,
                   color: Colors.red,
                   onTap: () {
-                    showDialog(
+                    showPlatformDialog(
                         context: context,
                         builder: (BuildContext context) => PlatformAlert(
                               title: Text('Delete Match'),

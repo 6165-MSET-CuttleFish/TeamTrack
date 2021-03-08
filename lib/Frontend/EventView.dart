@@ -101,7 +101,7 @@ class _EventView extends State<EventView> {
   String _newName;
   String _newNumber;
   void _teamConfig() {
-    showDialog(
+    showPlatformDialog(
         context: context,
         builder: (BuildContext context) => PlatformAlert(
               title: Text('New Team'),

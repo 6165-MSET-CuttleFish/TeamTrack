@@ -33,7 +33,7 @@ class _TeamList extends State<TeamList> {
                     icon: Icons.delete,
                     color: Colors.red,
                     onTap: () {
-                      showDialog(
+                      showPlatformDialog(
                           context: context,
                           builder: (BuildContext context) => PlatformAlert(
                                 title: Text('Delete Team'),

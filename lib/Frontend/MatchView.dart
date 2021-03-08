@@ -39,7 +39,7 @@ class _MatchView extends State<MatchView> {
     }
   }
   // void _choice(String c) {
-  //   showDialog(
+  //   showPlatformDialog(
   //       context: context,
   //       child: PlatformAlert(
   //         title: Text('Delete Match'),

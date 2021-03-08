@@ -3,6 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'dart:io' show Platform;
 
+void showPlatformDialog(
+    {BuildContext context, Widget Function(BuildContext) builder}) {
+  if (Platform.isIOS) {
+    showCupertinoDialog(
+        context: context, builder: builder, barrierDismissible: false);
+  } else {
+    showDialog(context: context, builder: builder, barrierDismissible: false);
+  }
+}
+
 abstract class PlatformWidget<C extends Widget, M extends Widget>
     extends StatelessWidget {
   PlatformWidget({Key key}) : super(key: key);
@@ -12,7 +22,7 @@ abstract class PlatformWidget<C extends Widget, M extends Widget>
   @override
   Widget build(BuildContext context) {
     try {
-      if (true) {
+      if (Platform.isIOS) {
         return buildCupertinoWidget(context);
       } else {
         return buildMaterialWidget(context);

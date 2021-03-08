@@ -30,7 +30,7 @@ class _CardView extends State<CardView> {
               _genBool = toggle(_genBool);
             });
           } else {
-            showDialog(
+            showPlatformDialog(
                 context: context,
                 builder: (BuildContext context) => PlatformAlert(
                       title: Text('Not Enough Data'),

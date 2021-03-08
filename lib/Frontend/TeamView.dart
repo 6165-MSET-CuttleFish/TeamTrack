@@ -1133,7 +1133,7 @@ class _TeamView extends State<TeamView> {
 
   // void _choice(String c) {
   //   if (c == 'Delete') {
-  //     showDialog(
+  //     showPlatformDialog(
   //         context: context,
   //         child: PlatformAlert(
   //           title: Text('Delete Team'),
@@ -1161,7 +1161,7 @@ class _TeamView extends State<TeamView> {
   //           ],
   //         ));
   //   } else {
-  //     showDialog(
+  //     showPlatformDialog(
   //         context: context,
   //         child: PlatformAlert(
   //           title: Text('Delete Team'),
