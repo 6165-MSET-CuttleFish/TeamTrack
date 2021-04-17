@@ -8,6 +8,7 @@ import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
 import 'package:teamtrack/Frontend/EventView.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class EventsList extends StatefulWidget {
   EventsList({Key key, this.dataModel}) : super(key: key);
@@ -271,6 +272,15 @@ class _EventsList extends State<EventsList> {
           backgroundColor: Theme.of(context).accentColor,
           title: Text('Events'),
           actions: [
+            RawMaterialButton(
+              shape: CircleBorder(),
+              fillColor: Colors.grey,
+            child: Text('👀', style: TextStyle(fontSize: 30),),
+              onPressed: (){
+                launch("https://www.youtube.com/playlist?list=PLDxjFQFO9emFugiSoMBMbJpAlyqztXKce");
+              },
+            ),
+            Padding(padding: EdgeInsets.only(left: 30),),
             IconButton(
               icon: themeChange.darkTheme
                   ? Icon(CupertinoIcons.sun_max)
