@@ -482,7 +482,11 @@ class _TeamView extends State<TeamView> {
                                       color: const Color(0xff37434d),
                                       width: 1)),
                               minX: 0,
-                              maxX: widget.team.scores.length.toDouble() - 1,
+                              maxX: widget.team.scores
+                                      .diceScores(_dice)
+                                      .length
+                                      .toDouble() -
+                                  1,
                               minY: [
                                 widget.team.scores.minScore(_dice),
                                 widget.team.targetScore.total().toDouble()
