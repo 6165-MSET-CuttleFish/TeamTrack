@@ -70,7 +70,7 @@ class _EventView extends State<EventView> {
       floatingActionButton: FloatingActionButton(
         tooltip: _tab == 0 ? 'Add Team' : 'Add Match',
         child: Icon(Icons.add),
-        onPressed: () {
+        onPressed: () async {
           if (_tab == 0) {
             _teamConfig();
           } else {
@@ -82,15 +82,16 @@ class _EventView extends State<EventView> {
   }
 
   void _matchConfig() {
-    showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        builder: (context) {
-          return SafeArea(
-              child: Container(
-                  height: MediaQuery.of(context).size.height * 0.85,
-                  child: _addMatch()));
-        });
+    // showModalBottomSheet(
+    //     context: context,
+    //     builder: (context) {
+    //       return SafeArea(
+    //           child: Container(
+    //               height: MediaQuery.of(context).size.height * 0.85,
+    //               child: _addMatch()));
+    //     });
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => _addMatch()));
   }
 
   String _newName;
