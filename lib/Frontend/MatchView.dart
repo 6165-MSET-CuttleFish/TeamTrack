@@ -57,7 +57,7 @@ class _MatchView extends State<MatchView> {
   //             isDestructive: true,
   //             child: Text('Confirm'),
   //             onPressed: () {
-  //               setState(() { HapticFeedback.lightImpact();
+  //               setState(() { HapticFeedback.mediumImpact();
   //                 widget.event.deleteMatch(widget.match);
   //               });
   //               dataModel.saveEvents();
@@ -147,7 +147,7 @@ class _MatchView extends State<MatchView> {
                   ),
                   onChanged: (Dice newValue) {
                     setState(() {
-                      HapticFeedback.lightImpact();
+                      HapticFeedback.mediumImpact();
                       _match.setDice(newValue);
                     });
                     dataModel.saveEvents();
@@ -200,7 +200,7 @@ class _MatchView extends State<MatchView> {
                       },
                       onValueChanged: (int x) {
                         setState(() {
-                          HapticFeedback.lightImpact();
+                          HapticFeedback.mediumImpact();
                           _view = x;
                         });
                       },
@@ -285,7 +285,7 @@ class _MatchView extends State<MatchView> {
           onPressed: _score.endgameScore.pwrShots > 0
               ? () {
                   setState(() {
-                    HapticFeedback.lightImpact();
+                    HapticFeedback.mediumImpact();
                     _score.endgameScore.pwrShots--;
                   });
                   dataModel.saveEvents();
@@ -308,7 +308,7 @@ class _MatchView extends State<MatchView> {
           onPressed: _score.endgameScore.pwrShots < 3
               ? () {
                   setState(() {
-                    HapticFeedback.lightImpact();
+                    HapticFeedback.mediumImpact();
                     _score.endgameScore.pwrShots++;
                   });
                   dataModel.saveEvents();
@@ -334,7 +334,7 @@ class _MatchView extends State<MatchView> {
           onPressed: _score.endgameScore.wobbleGoalsInDrop > 0
               ? () {
                   setState(() {
-                    HapticFeedback.lightImpact();
+                    HapticFeedback.mediumImpact();
                     _score.endgameScore.wobbleGoalsInDrop--;
                   });
                   dataModel.saveEvents();
@@ -359,7 +359,7 @@ class _MatchView extends State<MatchView> {
                   2
               ? () {
                   setState(() {
-                    HapticFeedback.lightImpact();
+                    HapticFeedback.mediumImpact();
                     _score.endgameScore.wobbleGoalsInDrop++;
                   });
                   dataModel.saveEvents();
@@ -385,7 +385,7 @@ class _MatchView extends State<MatchView> {
           onPressed: _score.endgameScore.wobbleGoalsInStart > 0
               ? () {
                   setState(() {
-                    HapticFeedback.lightImpact();
+                    HapticFeedback.mediumImpact();
                     _score.endgameScore.wobbleGoalsInStart--;
                   });
                   dataModel.saveEvents();
@@ -410,7 +410,7 @@ class _MatchView extends State<MatchView> {
                   2
               ? () {
                   setState(() {
-                    HapticFeedback.lightImpact();
+                    HapticFeedback.mediumImpact();
                     _score.endgameScore.wobbleGoalsInStart++;
                   });
                   dataModel.saveEvents();
@@ -436,7 +436,7 @@ class _MatchView extends State<MatchView> {
           onPressed: _score.endgameScore.ringsOnWobble > 0
               ? () {
                   setState(() {
-                    HapticFeedback.lightImpact();
+                    HapticFeedback.mediumImpact();
                     _score.endgameScore.ringsOnWobble--;
                   });
                   dataModel.saveEvents();
@@ -458,7 +458,7 @@ class _MatchView extends State<MatchView> {
         RawMaterialButton(
           onPressed: () {
             setState(() {
-              HapticFeedback.lightImpact();
+              HapticFeedback.mediumImpact();
               _score.endgameScore.ringsOnWobble++;
             });
             dataModel.saveEvents();
@@ -485,7 +485,7 @@ class _MatchView extends State<MatchView> {
           onPressed: _score.teleScore.hiGoals > 0
               ? () {
                   setState(() {
-                    HapticFeedback.lightImpact();
+                    HapticFeedback.mediumImpact();
                     _score.teleScore.hiGoals--;
                   });
                   dataModel.saveEvents();
@@ -507,7 +507,7 @@ class _MatchView extends State<MatchView> {
         RawMaterialButton(
           onPressed: () {
             setState(() {
-              HapticFeedback.lightImpact();
+              HapticFeedback.mediumImpact();
               _score.teleScore.hiGoals++;
             });
             dataModel.saveEvents();
@@ -532,7 +532,7 @@ class _MatchView extends State<MatchView> {
           onPressed: _score.teleScore.midGoals > 0
               ? () {
                   setState(() {
-                    HapticFeedback.lightImpact();
+                    HapticFeedback.mediumImpact();
                     _score.teleScore.midGoals--;
                   });
                   dataModel.saveEvents();
@@ -554,7 +554,7 @@ class _MatchView extends State<MatchView> {
         RawMaterialButton(
           onPressed: () {
             setState(() {
-              HapticFeedback.lightImpact();
+              HapticFeedback.mediumImpact();
               _score.teleScore.midGoals++;
             });
             dataModel.saveEvents();
@@ -579,7 +579,7 @@ class _MatchView extends State<MatchView> {
           onPressed: _score.teleScore.lowGoals > 0
               ? () {
                   setState(() {
-                    HapticFeedback.lightImpact();
+                    HapticFeedback.mediumImpact();
                     _score.teleScore.lowGoals--;
                   });
                   dataModel.saveEvents();
@@ -601,7 +601,7 @@ class _MatchView extends State<MatchView> {
         RawMaterialButton(
           onPressed: () {
             setState(() {
-              HapticFeedback.lightImpact();
+              HapticFeedback.mediumImpact();
               _score.teleScore.lowGoals++;
             });
             dataModel.saveEvents();
@@ -628,7 +628,7 @@ class _MatchView extends State<MatchView> {
           onPressed: _score.autoScore.hiGoals > 0
               ? () {
                   setState(() {
-                    HapticFeedback.lightImpact();
+                    HapticFeedback.mediumImpact();
                     _score.autoScore.hiGoals--;
                   });
                   dataModel.saveEvents();
@@ -650,7 +650,7 @@ class _MatchView extends State<MatchView> {
         RawMaterialButton(
           onPressed: () {
             setState(() {
-              HapticFeedback.lightImpact();
+              HapticFeedback.mediumImpact();
               _score.autoScore.hiGoals++;
             });
             dataModel.saveEvents();
@@ -675,7 +675,7 @@ class _MatchView extends State<MatchView> {
           onPressed: _score.autoScore.midGoals > 0
               ? () {
                   setState(() {
-                    HapticFeedback.lightImpact();
+                    HapticFeedback.mediumImpact();
                     _score.autoScore.midGoals--;
                   });
                   dataModel.saveEvents();
@@ -697,7 +697,7 @@ class _MatchView extends State<MatchView> {
         RawMaterialButton(
           onPressed: () {
             setState(() {
-              HapticFeedback.lightImpact();
+              HapticFeedback.mediumImpact();
               _score.autoScore.midGoals++;
             });
             dataModel.saveEvents();
@@ -722,7 +722,7 @@ class _MatchView extends State<MatchView> {
           onPressed: _score.autoScore.lowGoals > 0
               ? () {
                   setState(() {
-                    HapticFeedback.lightImpact();
+                    HapticFeedback.mediumImpact();
                     _score.autoScore.lowGoals--;
                   });
                   dataModel.saveEvents();
@@ -744,7 +744,7 @@ class _MatchView extends State<MatchView> {
         RawMaterialButton(
           onPressed: () {
             setState(() {
-              HapticFeedback.lightImpact();
+              HapticFeedback.mediumImpact();
               _score.autoScore.lowGoals++;
             });
             dataModel.saveEvents();
@@ -769,7 +769,7 @@ class _MatchView extends State<MatchView> {
           onPressed: _score.autoScore.wobbleGoals > 0
               ? () {
                   setState(() {
-                    HapticFeedback.lightImpact();
+                    HapticFeedback.mediumImpact();
                     _score.autoScore.wobbleGoals--;
                   });
                   dataModel.saveEvents();
@@ -792,7 +792,7 @@ class _MatchView extends State<MatchView> {
           onPressed: _score.autoScore.wobbleGoals < 2
               ? () {
                   setState(() {
-                    HapticFeedback.lightImpact();
+                    HapticFeedback.mediumImpact();
                     _score.autoScore.wobbleGoals++;
                   });
                   dataModel.saveEvents();
@@ -818,7 +818,7 @@ class _MatchView extends State<MatchView> {
           onPressed: _score.autoScore.pwrShots > 0
               ? () {
                   setState(() {
-                    HapticFeedback.lightImpact();
+                    HapticFeedback.mediumImpact();
                     _score.autoScore.pwrShots--;
                   });
                   dataModel.saveEvents();
@@ -841,7 +841,7 @@ class _MatchView extends State<MatchView> {
           onPressed: _score.autoScore.pwrShots < 3
               ? () {
                   setState(() {
-                    HapticFeedback.lightImpact();
+                    HapticFeedback.mediumImpact();
                     _score.autoScore.pwrShots++;
                   });
                   dataModel.saveEvents();
@@ -867,7 +867,7 @@ class _MatchView extends State<MatchView> {
           value: _score.autoScore.navigated,
           onChanged: (bool newVal) {
             setState(() {
-              HapticFeedback.lightImpact();
+              HapticFeedback.mediumImpact();
               _score.autoScore.navigated = newVal;
             });
             dataModel.saveEvents();
