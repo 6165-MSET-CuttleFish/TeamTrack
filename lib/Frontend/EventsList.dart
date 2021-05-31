@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:teamtrack/Frontend/Login.dart';
 import 'package:teamtrack/backend.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -275,12 +276,23 @@ class _EventsList extends State<EventsList> {
             RawMaterialButton(
               shape: CircleBorder(),
               fillColor: Colors.grey,
-            child: Text('👀', style: TextStyle(fontSize: 30),),
-              onPressed: (){
-                launch("https://www.youtube.com/playlist?list=PLDxjFQFO9emFugiSoMBMbJpAlyqztXKce");
+              child: Text(
+                '👀',
+                style: TextStyle(fontSize: 30),
+              ),
+              onPressed: () {
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => LoginView(
+                              dataModel: dataModel,
+                            )));
+                //launch("https://www.youtube.com/playlist?list=PLDxjFQFO9emFugiSoMBMbJpAlyqztXKce");
               },
             ),
-            Padding(padding: EdgeInsets.only(left: 30),),
+            Padding(
+              padding: EdgeInsets.only(left: 30),
+            ),
             IconButton(
               icon: themeChange.darkTheme
                   ? Icon(CupertinoIcons.sun_max)

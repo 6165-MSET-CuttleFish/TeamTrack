@@ -37,28 +37,30 @@ class _LoginView extends State<LoginView> {
               Colors.black
             ])),
       ),
-      Image.asset("LoadingScreen2.png"),
+      Column(children: [Image.asset("LoadingScreen2.png"), Spacer()]),
 
       //Image.asset("LoadingScreen2.png"),
-      Card(
-        color: Colors.transparent,
-        child: Container(
-          width: size.width - 20,
-          height: size.height * 4 / 13,
-          child: PageView(
-            controller: _controller,
-            children: <Widget>[
-              signInList(),
-              emailPassword(),
-            ],
+      SafeArea(
+        child: Card(
+          color: Colors.transparent,
+          child: Container(
+            width: size.width - 20,
+            height: 190,
+            child: PageView(
+              controller: _controller,
+              children: <Widget>[
+                signInList(),
+                emailPassword(),
+              ],
+            ),
           ),
+          semanticContainer: true,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+          elevation: 1,
+          margin: EdgeInsets.all(10),
         ),
-        semanticContainer: true,
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-        elevation: 1,
-        margin: EdgeInsets.all(10),
-      ),
+      )
     ]));
   }
 
@@ -71,6 +73,7 @@ class _LoginView extends State<LoginView> {
               keyboardType: TextInputType.emailAddress,
               placeholder: "Email",
             ),
+            Padding(padding: EdgeInsets.all(10)),
             PlatformTextField(
               keyboardType: TextInputType.visiblePassword,
               placeholder: "Password",
