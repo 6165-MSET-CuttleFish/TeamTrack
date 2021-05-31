@@ -15,52 +15,50 @@ class LoginView extends StatefulWidget {
 
 class _LoginView extends State<LoginView> {
   PageController _controller = PageController(initialPage: 0);
+  Size size;
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
+    size = MediaQuery.of(context).size;
     return Scaffold(
-        body: Stack(alignment: Alignment.center, children: [
+        body: Stack(alignment: Alignment.bottomCenter, children: [
       Container(
         decoration: BoxDecoration(
             gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [Colors.cyan, Colors.deepPurple])),
+                colors: [
+              Color.fromRGBO(25, 25, 112, 1),
+              Color.fromRGBO(25, 25, 112, 1),
+              Color.fromRGBO(25, 25, 112, 1),
+              Colors.grey,
+              Colors.grey,
+              Colors.black,
+              Colors.black,
+              Colors.black
+            ])),
       ),
-      SafeArea(
-          child: ListView(
-        children: [
-          Image.asset("loadingscreen.png"),
-          Card(
-            color: Colors.transparent,
-            child: Container(
-              width: size.width - 60,
-              height: 200,
-              child: PageView(
-                controller: _controller,
-                children: <Widget>[
-                  signInList(),
-                  emailPassword(),
-                ],
-              ),
-            ),
-            semanticContainer: true,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0)),
-            elevation: 1,
-            margin: EdgeInsets.all(10),
+      Image.asset("LoadingScreen2.png"),
+
+      //Image.asset("LoadingScreen2.png"),
+      Card(
+        color: Colors.transparent,
+        child: Container(
+          width: size.width - 20,
+          height: size.height * 4 / 13,
+          child: PageView(
+            controller: _controller,
+            children: <Widget>[
+              signInList(),
+              emailPassword(),
+            ],
           ),
-          // GoogleAuthButton(
-          //   onPressed: () {},
-          //   darkMode: false,
-          //   style: AuthButtonStyle(
-          //       borderRadius: 8,
-          //       iconSize: 20,
-          //       shadowColor: Colors.transparent,
-          //       textStyle: TextStyle(fontSize: 12)),
-          // )
-        ],
-      )),
+        ),
+        semanticContainer: true,
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+        elevation: 1,
+        margin: EdgeInsets.all(10),
+      ),
     ]));
   }
 
@@ -78,6 +76,7 @@ class _LoginView extends State<LoginView> {
               placeholder: "Password",
               obscureText: true,
             ),
+            Padding(padding: EdgeInsets.all(5)),
             PlatformButton(
               child: Text("Login"),
               color: Colors.green,
@@ -95,18 +94,28 @@ class _LoginView extends State<LoginView> {
   }
 
   Widget signInList() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
+    return ListView(
       children: [
+        GithubAuthButton(
+            onPressed: () {},
+            style: AuthButtonStyle(
+                iconSize: 20,
+                textStyle: TextStyle(fontSize: 14),
+                width: size.width - 80)),
         GoogleAuthButton(
           onPressed: () {},
-          style:
-              AuthButtonStyle(iconSize: 20, textStyle: TextStyle(fontSize: 14)),
+          darkMode: true,
+          style: AuthButtonStyle(
+              iconSize: 20,
+              textStyle: TextStyle(fontSize: 14, color: Colors.white),
+              width: size.width - 80),
         ),
         FacebookAuthButton(
           onPressed: () {},
-          style:
-              AuthButtonStyle(iconSize: 20, textStyle: TextStyle(fontSize: 14)),
+          style: AuthButtonStyle(
+              iconSize: 20,
+              textStyle: TextStyle(fontSize: 14, color: Colors.white),
+              width: size.width - 80),
         ),
         EmailAuthButton(
           onPressed: () {
@@ -115,13 +124,11 @@ class _LoginView extends State<LoginView> {
                   duration: Duration(milliseconds: 500), curve: Curves.linear);
             });
           },
-          style:
-              AuthButtonStyle(iconSize: 20, textStyle: TextStyle(fontSize: 14)),
+          style: AuthButtonStyle(
+              iconSize: 20,
+              textStyle: TextStyle(fontSize: 14),
+              width: size.width - 80),
         ),
-        GithubAuthButton(
-            onPressed: () {},
-            style: AuthButtonStyle(
-                iconSize: 20, textStyle: TextStyle(fontSize: 14)))
       ],
     );
   }
