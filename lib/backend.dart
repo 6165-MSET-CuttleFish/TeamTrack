@@ -46,6 +46,14 @@ class DarkThemePreference {
 DataModel dataModel;
 DarkThemeProvider themeChangeProvider = new DarkThemeProvider();
 
+class User {
+  String name;
+  String password;
+  User.fromStatics(String name, String password)
+      : name = name,
+        password = password;
+}
+
 class DataModel {
   final List<String> keys = ['UltimateGoal'];
   DataModel() {
@@ -59,7 +67,7 @@ class DataModel {
     }
   }
   List<Event> events = [];
-
+  User user;
   List<Event> localEvents() {
     return events.where((e) => e.type == EventType.local).toList();
   }

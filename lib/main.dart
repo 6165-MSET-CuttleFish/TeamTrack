@@ -1,8 +1,10 @@
 import 'package:teamtrack/Frontend/EventsList.dart';
+import 'package:teamtrack/Frontend/Login.dart';
 import 'package:teamtrack/backend.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'dart:io' show Platform;
 
 void main() {
   runApp(MyApp());
@@ -16,14 +18,14 @@ class TeamTrack extends StatefulWidget {
 class _TeamTrack extends State<TeamTrack> {
   final lightTheme = ThemeData(
     primarySwatch: Colors.deepPurple,
-    splashColor: Colors.cyan,
+    splashColor: Platform.isAndroid ? Colors.cyan : Colors.transparent,
     visualDensity: VisualDensity.adaptivePlatformDensity,
   );
 
   final darkTheme = ThemeData(
     textTheme: TextTheme(bodyText2: TextStyle(color: Colors.white)),
     backgroundColor: Colors.black,
-    splashColor: Colors.deepPurple,
+    splashColor: Platform.isAndroid ? Colors.deepPurple : Colors.transparent,
     shadowColor: Colors.white,
     brightness: Brightness.dark,
     canvasColor: Colors.black,
@@ -61,7 +63,7 @@ class _TeamTrack extends State<TeamTrack> {
           title: 'TeamTrack',
           theme: themeChangeProvider.darkTheme ? darkTheme : lightTheme,
           darkTheme: darkTheme,
-          home: EventsList(
+          home: LoginView(
             dataModel: dataModel,
           ));
     }));

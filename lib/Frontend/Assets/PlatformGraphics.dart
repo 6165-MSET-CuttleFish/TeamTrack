@@ -89,13 +89,15 @@ class PlatformTextField
       {Key key,
       this.onChanged,
       this.keyboardType,
-      this.textCapitalization,
-      this.placeholder})
+      this.textCapitalization = TextCapitalization.none,
+      this.placeholder,
+      this.obscureText = false})
       : super(key: key);
   final ValueChanged<String> onChanged;
   final TextInputType keyboardType;
   final TextCapitalization textCapitalization;
   final String placeholder;
+  final bool obscureText;
   @override
   CupertinoTextField buildCupertinoWidget(BuildContext context) {
     return CupertinoTextField(
@@ -104,6 +106,7 @@ class PlatformTextField
       keyboardType: keyboardType,
       textCapitalization: textCapitalization,
       placeholder: placeholder,
+      obscureText: obscureText,
     );
   }
 
@@ -115,6 +118,7 @@ class PlatformTextField
       keyboardType: keyboardType,
       textCapitalization: textCapitalization,
       decoration: InputDecoration(labelText: placeholder),
+      obscureText: obscureText,
     );
   }
 }
