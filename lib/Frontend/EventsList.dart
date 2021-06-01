@@ -10,6 +10,7 @@ import 'package:teamtrack/Frontend/EventView.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:provider/provider.dart';
 
 class EventsList extends StatefulWidget {
   EventsList({Key key, this.dataModel}) : super(key: key);
@@ -280,13 +281,14 @@ class _EventsList extends State<EventsList> {
                 '👀',
                 style: TextStyle(fontSize: 30),
               ),
-              onPressed: () {
-                Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => LoginView(
-                              dataModel: dataModel,
-                            )));
+              onPressed: () async {
+                await context.read<AuthenticationService>().signOut();
+                // Navigator.pushReplacement(
+                //     context,
+                //     MaterialPageRoute(
+                //         builder: (context) => LoginView(
+                //               dataModel: dataModel,
+                //             )));
                 //launch("https://www.youtube.com/playlist?list=PLDxjFQFO9emFugiSoMBMbJpAlyqztXKce");
               },
             ),

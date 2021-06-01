@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:teamtrack/Frontend/EventsList.dart';
 import 'package:teamtrack/Frontend/Login.dart';
 import 'package:teamtrack/backend.dart';
@@ -6,7 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'dart:io' show Platform;
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
 
@@ -63,10 +67,20 @@ class _TeamTrack extends State<TeamTrack> {
           title: 'TeamTrack',
           theme: themeChangeProvider.darkTheme ? darkTheme : lightTheme,
           darkTheme: darkTheme,
-          home: LoginView(
-            dataModel: dataModel,
-          ));
+          home: AuthenticationWrapper());
     }));
+  }
+}
+
+class AuthenticationWrapper extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final firebaseUser = context.watch<User>();
+    if (firebaseUser == null) {
+      return LoginView(dataModel: dataModel);
+    } else {
+      return EventsList(dataModel: dataModel);
+    }
   }
 }
 
@@ -91,6 +105,16 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     dataModel = DataModel();
-    return TeamTrack();
+    return MultiProvider(
+      providers: [
+        Provider<AuthenticationService>(
+          create: (_) => AuthenticationService(FirebaseAuth.instance),
+        ),
+        StreamProvider(
+            create: (context) =>
+                context.read<AuthenticationService>().authStateChanges)
+      ],
+      child: TeamTrack(),
+    );
   }
 }

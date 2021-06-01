@@ -4,6 +4,7 @@ import 'package:teamtrack/backend.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:auth_buttons/auth_buttons.dart';
+import 'package:provider/provider.dart';
 
 class LoginView extends StatefulWidget {
   LoginView({Key key, this.dataModel}) : super(key: key);
@@ -16,9 +17,11 @@ class LoginView extends StatefulWidget {
 class _LoginView extends State<LoginView> {
   PageController _controller = PageController(initialPage: 0);
   Size size;
+  BuildContext context;
   @override
   Widget build(BuildContext context) {
     size = MediaQuery.of(context).size;
+    this.context = context;
     return Scaffold(
         body: Stack(alignment: Alignment.bottomCenter, children: [
       Container(
@@ -38,20 +41,15 @@ class _LoginView extends State<LoginView> {
             ])),
       ),
       Column(children: [Image.asset("LoadingScreen2.png"), Spacer()]),
-
-      //Image.asset("LoadingScreen2.png"),
       SafeArea(
         child: Card(
           color: Colors.transparent,
           child: Container(
             width: size.width - 20,
-            height: 190,
+            height: 250,
             child: PageView(
               controller: _controller,
-              children: <Widget>[
-                signInList(),
-                emailPassword(),
-              ],
+              children: <Widget>[signInList(), signInSheet(), signUpSheet()],
             ),
           ),
           semanticContainer: true,
@@ -64,32 +62,54 @@ class _LoginView extends State<LoginView> {
     ]));
   }
 
-  Widget emailPassword() {
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  Widget signInSheet() {
     return Padding(
         padding: EdgeInsets.all(5),
         child: Column(
           children: [
             PlatformTextField(
+              controller: emailController,
               keyboardType: TextInputType.emailAddress,
               placeholder: "Email",
             ),
             Padding(padding: EdgeInsets.all(10)),
             PlatformTextField(
+              controller: passwordController,
               keyboardType: TextInputType.visiblePassword,
               placeholder: "Password",
               obscureText: true,
             ),
             Padding(padding: EdgeInsets.all(5)),
             PlatformButton(
-              child: Text("Login"),
+              child: Text("Sign In"),
               color: Colors.green,
-              onPressed: () {
-                Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => EventsList(
-                              dataModel: dataModel,
-                            )));
+              onPressed: () async {
+                String s = await context.read<AuthenticationService>().signIn(
+                      email: emailController.text.trim(),
+                      password: passwordController.text.trim(),
+                    );
+                if (s != "Signed in") {
+                  showPlatformDialog(
+                      context: context,
+                      builder: (BuildContext context) => PlatformAlert(
+                            title: Text('Error'),
+                            content: Text(
+                              s,
+                              style: Theme.of(context).textTheme.bodyText1,
+                            ),
+                            actions: [
+                              PlatformDialogAction(
+                                isDefaultAction: true,
+                                child: Text('Okay'),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ],
+                          ));
+                }
               },
             ),
           ],
@@ -97,8 +117,17 @@ class _LoginView extends State<LoginView> {
   }
 
   Widget signInList() {
-    return ListView(
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
+        PlatformButton(
+          onPressed: () {},
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [Icon(Icons.person), Text('Sign Up')],
+          ),
+        ),
         GithubAuthButton(
             onPressed: () {},
             style: AuthButtonStyle(
@@ -106,15 +135,20 @@ class _LoginView extends State<LoginView> {
                 textStyle: TextStyle(fontSize: 14),
                 width: size.width - 80)),
         GoogleAuthButton(
-          onPressed: () {},
+          onPressed: () async {
+            await context.read<AuthenticationService>().signInWithGoogle();
+          },
           darkMode: true,
           style: AuthButtonStyle(
               iconSize: 20,
               textStyle: TextStyle(fontSize: 14, color: Colors.white),
               width: size.width - 80),
         ),
-        FacebookAuthButton(
-          onPressed: () {},
+        AppleAuthButton(
+          onPressed: () async {
+            await context.read<AuthenticationService>().signInWithApple();
+          },
+          darkMode: true,
           style: AuthButtonStyle(
               iconSize: 20,
               textStyle: TextStyle(fontSize: 14, color: Colors.white),
@@ -134,5 +168,41 @@ class _LoginView extends State<LoginView> {
         ),
       ],
     );
+  }
+
+  Widget signUpSheet() {
+    return Padding(
+        padding: EdgeInsets.all(5),
+        child: Column(
+          children: [
+            PlatformTextField(
+              keyboardType: TextInputType.emailAddress,
+              placeholder: "Email",
+            ),
+            Padding(padding: EdgeInsets.all(10)),
+            PlatformTextField(
+              keyboardType: TextInputType.visiblePassword,
+              placeholder: "Password",
+              obscureText: true,
+            ),
+            Padding(padding: EdgeInsets.all(5)),
+            PlatformButton(
+              child: Text("Sign Up"),
+              color: Colors.green,
+              onPressed: () async {
+                String s = await context.read<AuthenticationService>().signIn(
+                      email: emailController.text.trim(),
+                      password: passwordController.text.trim(),
+                    );
+                // Navigator.pushReplacement(
+                //     context,
+                //     MaterialPageRoute(
+                //         builder: (context) => EventsList(
+                //               dataModel: dataModel,
+                //             )));
+              },
+            ),
+          ],
+        ));
   }
 }

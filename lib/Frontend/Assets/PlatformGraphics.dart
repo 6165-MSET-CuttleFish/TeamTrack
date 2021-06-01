@@ -91,16 +91,19 @@ class PlatformTextField
       this.keyboardType,
       this.textCapitalization = TextCapitalization.none,
       this.placeholder,
-      this.obscureText = false})
+      this.obscureText = false,
+      this.controller})
       : super(key: key);
   final ValueChanged<String> onChanged;
   final TextInputType keyboardType;
   final TextCapitalization textCapitalization;
   final String placeholder;
   final bool obscureText;
+  final TextEditingController controller;
   @override
   CupertinoTextField buildCupertinoWidget(BuildContext context) {
     return CupertinoTextField(
+      controller: controller,
       style: TextStyle(color: Theme.of(context).textTheme.bodyText2.color),
       onChanged: onChanged,
       keyboardType: keyboardType,
@@ -113,6 +116,7 @@ class PlatformTextField
   @override
   TextFormField buildMaterialWidget(BuildContext context) {
     return TextFormField(
+      controller: controller,
       style: TextStyle(color: Theme.of(context).textTheme.bodyText2.color),
       onChanged: onChanged,
       keyboardType: keyboardType,
