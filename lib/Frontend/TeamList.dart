@@ -55,6 +55,7 @@ class _TeamList extends State<TeamList> {
                                         widget.event.deleteTeam(e);
                                       });
                                       dataModel.saveEvents();
+                                      dataModel.uploadEvent(widget.event);
                                       Navigator.of(context).pop();
                                     },
                                   ),

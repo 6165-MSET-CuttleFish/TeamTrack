@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:teamtrack/Frontend/Login.dart';
 import 'package:teamtrack/backend.dart';
 import 'package:flutter/cupertino.dart';
@@ -34,6 +35,13 @@ class _EventsList extends State<EventsList> {
     return dataModel
         .localEvents()
         .map((e) => Slidable(
+              actions: [
+                IconSlideAction(
+                  onTap: () {},
+                  icon: Icons.share,
+                  color: Colors.blue,
+                )
+              ],
               secondaryActions: [
                 IconSlideAction(
                   onTap: () {
@@ -110,6 +118,17 @@ class _EventsList extends State<EventsList> {
     return dataModel
         .remoteEvents()
         .map((e) => Slidable(
+              actions: [
+                IconSlideAction(
+                  onTap: () async {
+                    e.shared = true;
+                    firebaseDatabase.reference().child(e.id).set(e.toJson());
+                    dataModel.saveEvents();
+                  },
+                  icon: Icons.share,
+                  color: Colors.blue,
+                )
+              ],
               secondaryActions: [
                 IconSlideAction(
                   onTap: () {
@@ -149,7 +168,7 @@ class _EventsList extends State<EventsList> {
                   iconColor: Theme.of(context).primaryColor,
                   child: ListTile(
                     trailing: Icon(
-                      CupertinoIcons.lock_shield_fill,
+                      e.shared ? CupertinoIcons.cloud_fill : CupertinoIcons.lock_shield_fill,
                       color: Theme.of(context).accentColor,
                     ),
                     leading: Icon(
@@ -186,6 +205,13 @@ class _EventsList extends State<EventsList> {
     return dataModel
         .liveEvents()
         .map((e) => Slidable(
+              actions: [
+                IconSlideAction(
+                  onTap: () {},
+                  icon: Icons.share,
+                  color: Colors.blue,
+                )
+              ],
               secondaryActions: [
                 IconSlideAction(
                   onTap: () {

@@ -1,9 +1,12 @@
+import 'package:firebase_database/firebase_database.dart' as Database;
+import 'package:provider/provider.dart';
 import 'package:teamtrack/Frontend/MatchView.dart';
 import 'package:teamtrack/backend.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
+import 'dart:convert';
 
 class MatchList extends StatefulWidget {
   MatchList({Key key, this.event, this.team, this.dataModel}) : super(key: key);
@@ -26,54 +29,64 @@ class _MatchList extends State<MatchList> {
   ];
   @override
   Widget build(BuildContext context) {
-    if (widget.team == null) {
-      return _matches();
-    }
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Matches'),
-        backgroundColor: Theme.of(context).accentColor,
-      ),
-      body: _matches(),
-      floatingActionButton: widget.event.type == EventType.remote
-          ? FloatingActionButton(
-              onPressed: () {
-                showPlatformDialog(
-                    context: context,
-                    builder: (context) => PlatformAlert(
-                          title: Text('New Match'),
-                          actions: [
-                            PlatformDialogAction(
-                              child: Text('Cancel'),
-                              onPressed: () {
-                                setState(() {
-                                  Navigator.pop(context);
-                                });
-                              },
-                            ),
-                            PlatformDialogAction(
-                              child: Text('Add'),
-                              onPressed: () {
-                                setState(() {
-                                  widget.event.matches.add(
-                                    Match(
-                                        Alliance(widget.team, Team.nullTeam()),
-                                        Alliance(
-                                            Team.nullTeam(), Team.nullTeam()),
-                                        EventType.remote),
-                                  );
-                                  dataModel.saveEvents();
-                                  Navigator.pop(context);
-                                });
-                              },
-                            ),
-                          ],
-                        ));
-              },
-              child: Icon(Icons.add),
-            )
-          : null,
-    );
+    return StreamBuilder<Database.Event>(
+        stream: DatabaseServices(id: widget.event.id).getEventChanges,
+        builder: (context, eventHandler) {
+          if (eventHandler.hasData && !eventHandler.hasError) {
+            widget.event.updateLocal(
+                json.decode(json.encode(eventHandler.data.snapshot.value)));
+          }
+          if (widget.team == null) {
+            return _matches();
+          }
+          return Scaffold(
+            appBar: AppBar(
+              title: Text('Matches'),
+              backgroundColor: Theme.of(context).accentColor,
+            ),
+            body: _matches(),
+            floatingActionButton: widget.event.type == EventType.remote
+                ? FloatingActionButton(
+                    onPressed: () {
+                      showPlatformDialog(
+                          context: context,
+                          builder: (context) => PlatformAlert(
+                                title: Text('New Match'),
+                                actions: [
+                                  PlatformDialogAction(
+                                    child: Text('Cancel'),
+                                    onPressed: () {
+                                      setState(() {
+                                        Navigator.pop(context);
+                                      });
+                                    },
+                                  ),
+                                  PlatformDialogAction(
+                                    child: Text('Add'),
+                                    onPressed: () {
+                                      setState(() {
+                                        widget.event.matches.add(
+                                          Match(
+                                              Alliance(
+                                                  widget.team, Team.nullTeam()),
+                                              Alliance(Team.nullTeam(),
+                                                  Team.nullTeam()),
+                                              EventType.remote),
+                                        );
+                                        dataModel.saveEvents();
+                                        dataModel.uploadEvent(widget.event);
+                                        Navigator.pop(context);
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ));
+                    },
+                    child: Icon(Icons.add),
+                  )
+                : null,
+          );
+        });
   }
 
   Widget _matches() {
@@ -110,6 +123,7 @@ class _MatchList extends State<MatchList> {
                                             widget.event.deleteMatch(e);
                                           });
                                           dataModel.saveEvents();
+                                          dataModel.uploadEvent(widget.event);
                                           Navigator.of(context).pop();
                                         },
                                       ),
@@ -141,7 +155,10 @@ class _MatchList extends State<MatchList> {
                             await Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => MatchView(match: e)));
+                                    builder: (context) => MatchView(
+                                          match: e,
+                                          event: widget.event,
+                                        )));
                             setState(() {});
                           },
                         ))))
@@ -184,6 +201,7 @@ class _MatchList extends State<MatchList> {
                                   widget.event.matches.remove(matches[i]);
                                   setState(() {});
                                   dataModel.saveEvents();
+                                  dataModel.uploadEvent(widget.event);
                                   Navigator.of(context).pop();
                                 },
                               ),
@@ -207,8 +225,10 @@ class _MatchList extends State<MatchList> {
                     await Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) =>
-                                MatchView(match: matches[i])));
+                            builder: (context) => MatchView(
+                                  match: matches[i],
+                                  event: widget.event,
+                                )));
                     setState(() {});
                   },
                 ))));
@@ -261,6 +281,7 @@ class _MatchList extends State<MatchList> {
                                       widget.event.matches.remove(e);
                                     });
                                     dataModel.saveEvents();
+                                    dataModel.uploadEvent(widget.event);
                                     Navigator.of(context).pop();
                                   },
                                 ),
@@ -291,7 +312,10 @@ class _MatchList extends State<MatchList> {
                       await Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => MatchView(match: e)));
+                              builder: (context) => MatchView(
+                                    match: e,
+                                    event: widget.event,
+                                  )));
                       setState(() {});
                     },
                   ))))

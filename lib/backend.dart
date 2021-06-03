@@ -1,6 +1,9 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart' as Database;
 import 'package:flutter/cupertino.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -48,6 +51,15 @@ class DarkThemePreference {
   }
 }
 
+class DatabaseServices {
+  String id;
+  DatabaseServices({this.id});
+  Stream<Database.Event> get getEventChanges =>
+      firebaseDatabase.reference().child(id).onValue;
+}
+
+DatabaseServices db = DatabaseServices();
+
 class AuthenticationService {
   final FirebaseAuth _firebaseAuth;
   AuthenticationService(this._firebaseAuth);
@@ -77,67 +89,71 @@ class AuthenticationService {
   }
 
   Future<UserCredential> signInWithGoogle() async {
-  // Trigger the authentication flow
-  final GoogleSignInAccount googleUser = await GoogleSignIn().signIn();
+    // Trigger the authentication flow
+    final GoogleSignInAccount googleUser = await GoogleSignIn().signIn();
 
-  // Obtain the auth details from the request
-  final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+    // Obtain the auth details from the request
+    final GoogleSignInAuthentication googleAuth =
+        await googleUser.authentication;
 
-  // Create a new credential
-  final credential = GoogleAuthProvider.credential(
-    accessToken: googleAuth.accessToken,
-    idToken: googleAuth.idToken,
-  );
+    // Create a new credential
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
 
-  // Once signed in, return the UserCredential
-  return await _firebaseAuth.signInWithCredential(credential);
-}
-String generateNonce([int length = 32]) {
-  final charset =
-      '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
-  final random = Random.secure();
-  return List.generate(length, (_) => charset[random.nextInt(charset.length)])
-      .join();
-}
+    // Once signed in, return the UserCredential
+    return await _firebaseAuth.signInWithCredential(credential);
+  }
 
-/// Returns the sha256 hash of [input] in hex notation.
-String sha256ofString(String input) {
-  final bytes = utf8.encode(input);
-  final digest = sha256.convert(bytes);
-  return digest.toString();
-}
+  String generateNonce([int length = 32]) {
+    final charset =
+        '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
+    final random = Random.secure();
+    return List.generate(length, (_) => charset[random.nextInt(charset.length)])
+        .join();
+  }
 
-Future<UserCredential> signInWithApple() async {
-  // To prevent replay attacks with the credential returned from Apple, we
-  // include a nonce in the credential request. When signing in with
-  // Firebase, the nonce in the id token returned by Apple, is expected to
-  // match the sha256 hash of `rawNonce`.
-  final rawNonce = generateNonce();
-  final nonce = sha256ofString(rawNonce);
+  /// Returns the sha256 hash of [input] in hex notation.
+  String sha256ofString(String input) {
+    final bytes = utf8.encode(input);
+    final digest = sha256.convert(bytes);
+    return digest.toString();
+  }
 
-  // Request credential for the currently signed in Apple account.
-  final appleCredential = await SignInWithApple.getAppleIDCredential(
-    scopes: [
-      AppleIDAuthorizationScopes.email,
-      AppleIDAuthorizationScopes.fullName,
-    ],
-    nonce: nonce,
-  );
+  Future<UserCredential> signInWithApple() async {
+    // To prevent replay attacks with the credential returned from Apple, we
+    // include a nonce in the credential request. When signing in with
+    // Firebase, the nonce in the id token returned by Apple, is expected to
+    // match the sha256 hash of `rawNonce`.
+    final rawNonce = generateNonce();
+    final nonce = sha256ofString(rawNonce);
 
-  // Create an `OAuthCredential` from the credential returned by Apple.
-  final oauthCredential = OAuthProvider("apple.com").credential(
-    idToken: appleCredential.identityToken,
-    rawNonce: rawNonce,
-  );
+    // Request credential for the currently signed in Apple account.
+    final appleCredential = await SignInWithApple.getAppleIDCredential(
+      scopes: [
+        AppleIDAuthorizationScopes.email,
+        AppleIDAuthorizationScopes.fullName,
+      ],
+      nonce: nonce,
+    );
 
-  // Sign in the user with Firebase. If the nonce we generated earlier does
-  // not match the nonce in `appleCredential.identityToken`, sign in will fail.
-  return await _firebaseAuth.signInWithCredential(oauthCredential);
-}
+    // Create an `OAuthCredential` from the credential returned by Apple.
+    final oauthCredential = OAuthProvider("apple.com").credential(
+      idToken: appleCredential.identityToken,
+      rawNonce: rawNonce,
+    );
+
+    // Sign in the user with Firebase. If the nonce we generated earlier does
+    // not match the nonce in `appleCredential.identityToken`, sign in will fail.
+    return await _firebaseAuth.signInWithCredential(oauthCredential);
+  }
 }
 
 DataModel dataModel;
 DarkThemeProvider themeChangeProvider = new DarkThemeProvider();
+Database.FirebaseDatabase firebaseDatabase = Database.FirebaseDatabase.instance;
+FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 
 class DataModel {
   final List<String> keys = ['UltimateGoal'];
@@ -169,7 +185,21 @@ class DataModel {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString(keys[0], jsonEncode(coded));
     print(coded);
-    //save(keys[0], events.map((e) => e.toJson()));
+    // for (Event event in events) {
+    //   if (event.shared) {
+    //     var ref = firebaseDatabase.reference().child(event.id);
+    //     ref.update(event.toJson());
+    //   }
+    // }
+  }
+
+  void uploadEvent(Event event) {
+    if (event.shared) {
+      var ref = firebaseDatabase.reference().child(event.id);
+      ref.update(event.toJson());
+      var x = event.toJson();
+      print(x);
+    }
   }
 
   void restoreEvents() async {
@@ -203,6 +233,8 @@ class DataModel {
 
 class Event {
   Event({this.name, this.type});
+  String id = Uuid().v4();
+  bool shared = false;
   EventType type;
   List<Team> teams = [];
   List<Match> matches = [];
@@ -234,18 +266,53 @@ class Event {
     matches.remove(e);
   }
 
+  void share() {
+    shared = true;
+  }
+
+  void updateLocal(Map<String, dynamic> json) {
+    if (json != null) {
+      name = json['name'];
+      try {
+        teams =
+            List<Team>.from(json['teams'].map((model) => Team.fromJson(model)));
+      } catch (e) {
+        teams = [];
+      }
+      try {
+        matches = List<Match>.from(
+            json['matches'].map((model) => Match.fromJson(model, teams)));
+      } catch (e) {
+        matches = [];
+      }
+      type = getTypeFromString(json['type']);
+      shared = json['shared'] ?? true;
+      id = json['id'] ?? Uuid().v4();
+    }
+  }
+
+  Future<void> updateRemote() async {
+    if (id.isNotEmpty) {
+      await firebaseDatabase.reference().child(id).update(toJson());
+    }
+  }
+
   Event.fromJson(Map<String, dynamic> json) {
     name = json['name'];
     teams = List<Team>.from(json['teams'].map((model) => Team.fromJson(model)));
     matches = List<Match>.from(
         json['matches'].map((model) => Match.fromJson(model, teams)));
     type = getTypeFromString(json['type']);
+    shared = json['shared'] ?? false;
+    id = json['id'] ?? Uuid().v4();
   }
   Map<String, dynamic> toJson() => {
         'name': name,
         'teams': teams.map((e) => e.toJson()).toList(),
         'matches': matches.map((e) => e.toJson()).toList(),
         'type': type.toString(),
+        'shared': shared,
+        'id': id,
       };
 }
 
@@ -300,12 +367,17 @@ class Team {
     return this.number == other.number;
   }
 
-  Team.fromJson(Map<String, dynamic> json)
-      : number = json['number'],
-        name = json['name'],
-        scores = List<Score>.from(
-            json['scores'].map((model) => Score.fromJson(model))),
-        targetScore = Score.fromJson(json['targetScore']);
+  Team.fromJson(Map<String, dynamic> json) {
+    number = json['number'];
+    name = json['name'];
+    try {
+      scores = List<Score>.from(
+          json['scores'].map((model) => Score.fromJson(model)));
+    } catch (e) {
+      scores = [];
+    }
+    targetScore = Score.fromJson(json['targetScore']);
+  }
   Map<String, dynamic> toJson() => {
         'name': name,
         'number': number,

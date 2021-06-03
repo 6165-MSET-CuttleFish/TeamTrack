@@ -367,6 +367,7 @@ class _TeamView extends State<TeamView> {
                         builder: (context) => MatchView(
                               match: Match.defaultMatch(EventType.remote),
                               team: widget.team,
+                              event: widget.event,
                             )));
                 setState(() {});
               } else {
@@ -376,6 +377,7 @@ class _TeamView extends State<TeamView> {
                         builder: (context) => MatchView(
                               match: Match.defaultMatch(EventType.remote),
                               team: widget.team,
+                              event: widget.event,
                             )));
                 setState(() {});
               }

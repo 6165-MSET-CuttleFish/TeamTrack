@@ -1,5 +1,4 @@
 import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
-import 'package:teamtrack/Frontend/EventsList.dart';
 import 'package:teamtrack/backend.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -26,19 +25,10 @@ class _LoginView extends State<LoginView> {
         body: Stack(alignment: Alignment.bottomCenter, children: [
       Container(
         decoration: BoxDecoration(
-            gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-              Color.fromRGBO(25, 25, 112, 1),
-              Color.fromRGBO(25, 25, 112, 1),
-              Color.fromRGBO(25, 25, 112, 1),
-              Colors.grey,
-              Colors.grey,
-              Colors.black,
-              Colors.black,
-              Colors.black
-            ])),
+            gradient: RadialGradient(colors: [
+          Color.fromRGBO(25, 25, 112, 1),
+          Colors.black,
+        ])),
       ),
       Column(children: [Image.asset("LoadingScreen2.png"), Spacer()]),
       SafeArea(
@@ -46,10 +36,10 @@ class _LoginView extends State<LoginView> {
           color: Colors.transparent,
           child: Container(
             width: size.width - 20,
-            height: 250,
+            height: 310,
             child: PageView(
               controller: _controller,
-              children: <Widget>[signInList(), signInSheet(), signUpSheet()],
+              children: <Widget>[signInList(), signInSheet()],
             ),
           ),
           semanticContainer: true,
@@ -66,7 +56,7 @@ class _LoginView extends State<LoginView> {
   TextEditingController passwordController = TextEditingController();
   Widget signInSheet() {
     return Padding(
-        padding: EdgeInsets.all(5),
+        padding: EdgeInsets.all(20),
         child: Column(
           children: [
             PlatformTextField(
@@ -90,6 +80,8 @@ class _LoginView extends State<LoginView> {
                       email: emailController.text.trim(),
                       password: passwordController.text.trim(),
                     );
+                emailController.clear();
+                passwordController.clear();
                 if (s != "Signed in") {
                   showPlatformDialog(
                       context: context,
@@ -121,7 +113,10 @@ class _LoginView extends State<LoginView> {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         PlatformButton(
-          onPressed: () {},
+          onPressed: () {
+            showModalBottomSheet(
+                context: context, builder: (context) => signUpSheet());
+          },
           child: Row(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -172,15 +167,17 @@ class _LoginView extends State<LoginView> {
 
   Widget signUpSheet() {
     return Padding(
-        padding: EdgeInsets.all(5),
+        padding: EdgeInsets.all(20),
         child: Column(
           children: [
             PlatformTextField(
+              controller: emailController,
               keyboardType: TextInputType.emailAddress,
               placeholder: "Email",
             ),
             Padding(padding: EdgeInsets.all(10)),
             PlatformTextField(
+              controller: passwordController,
               keyboardType: TextInputType.visiblePassword,
               placeholder: "Password",
               obscureText: true,
@@ -190,16 +187,38 @@ class _LoginView extends State<LoginView> {
               child: Text("Sign Up"),
               color: Colors.green,
               onPressed: () async {
-                String s = await context.read<AuthenticationService>().signIn(
+                String s = await context.read<AuthenticationService>().signUp(
                       email: emailController.text.trim(),
                       password: passwordController.text.trim(),
                     );
-                // Navigator.pushReplacement(
-                //     context,
-                //     MaterialPageRoute(
-                //         builder: (context) => EventsList(
-                //               dataModel: dataModel,
-                //             )));
+                if (s == "Signed up") {
+                  emailController.clear();
+                  passwordController.clear();
+                  Navigator.of(context).pop();
+                  await context.read<AuthenticationService>().signIn(
+                        email: emailController.text.trim(),
+                        password: passwordController.text.trim(),
+                      );
+                } else {
+                  showPlatformDialog(
+                      context: context,
+                      builder: (BuildContext context) => PlatformAlert(
+                            title: Text('Error'),
+                            content: Text(
+                              s,
+                              style: Theme.of(context).textTheme.bodyText1,
+                            ),
+                            actions: [
+                              PlatformDialogAction(
+                                isDefaultAction: true,
+                                child: Text('Okay'),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ],
+                          ));
+                }
               },
             ),
           ],

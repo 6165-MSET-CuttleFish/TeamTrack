@@ -1,3 +1,5 @@
+import 'package:firebase_database/firebase_database.dart' as Database;
+import 'package:provider/provider.dart';
 import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -6,7 +8,7 @@ import 'package:teamtrack/backend.dart';
 import 'package:teamtrack/score.dart';
 import 'dart:io' show Platform;
 import 'package:flutter/services.dart';
-
+import 'dart:convert';
 import 'package:uuid/uuid.dart';
 
 class MatchView extends StatefulWidget {
@@ -38,222 +40,200 @@ class _MatchView extends State<MatchView> {
       if (_match.type == EventType.remote) _color = CupertinoColors.systemGreen;
     }
   }
-  // void _choice(String c) {
-  //   showPlatformDialog(
-  //       context: context,
-  //       child: PlatformAlert(
-  //         title: Text('Delete Match'),
-  //         content: Text('Are you sure?'),
-  //         actions: [
-  //           PlatformDialogAction(
-  //             isDefaultAction: true,
-  //             child: Text('Cancel'),
-  //             onPressed: () {
-  //               Navigator.of(context).pop();
-  //             },
-  //           ),
-  //           PlatformDialogAction(
-  //             isDefaultAction: false,
-  //             isDestructive: true,
-  //             child: Text('Confirm'),
-  //             onPressed: () {
-  //               setState(() { HapticFeedback.mediumImpact();
-  //                 widget.event.deleteMatch(widget.match);
-  //               });
-  //               dataModel.saveEvents();
-  //               Navigator.of(context).pop();
-  //             },
-  //           ),
-  //         ],
-  //       ));
-  // }
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3,
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: _color,
-          title: Text('Match Stats'),
-          elevation: 0.0,
-          // actions: [
-          //   PopupMenuButton<String>(
-          //     onSelected: _choice,
-          //     itemBuilder: (context) {
-          //       return [
-          //         PopupMenuItem<String>(
-          //           child: Text('Delete Match'),
-          //           value: 'Delete',
-          //         ),
-          //       ];
-          //     },
-          //   ),
-          // ],
-        ),
-        body: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  _color,
-                  Theme.of(context).canvasColor,
-                  Theme.of(context).canvasColor,
-                  Theme.of(context).canvasColor,
-                  Theme.of(context).canvasColor,
-                  Theme.of(context).canvasColor,
-                  Theme.of(context).canvasColor,
-                ]),
-          ),
-          child: Center(
-            child: Column(children: [
-              if (widget.match != null && widget.match.type != EventType.remote)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Container(
-                      width: 100,
-                      child: Text(_match.redScore(),
-                          style: Theme.of(context).textTheme.headline4),
-                    ),
-                    Container(
-                      child: Text('-',
-                          style: Theme.of(context).textTheme.headline4),
-                    ),
-                    Container(
-                      width: 100,
-                      child: Text(_match.blueScore(),
-                          style: Theme.of(context).textTheme.headline4),
-                    )
-                  ],
-                ),
-              Padding(
-                padding: EdgeInsets.all(10),
+    return StreamBuilder<Database.Event>(
+        stream: DatabaseServices(id: widget.event.id).getEventChanges,
+        builder: (context, eventHandler) {
+          if (eventHandler.hasData && !eventHandler.hasError) {
+            widget.event.updateLocal(
+                json.decode(json.encode(eventHandler.data.snapshot.value)));
+            _selectedTeam = widget.event.teams.firstWhere(
+                (team) => team.number == _selectedTeam.number, orElse: () {
+              Navigator.pop(context);
+              return Team.nullTeam();
+            });
+            _score = _selectedTeam.scores.firstWhere(
+                (element) => element.id == _match.id,
+                orElse: () => Score(Uuid().v4(), Dice.none));
+          }
+          return DefaultTabController(
+            length: 3,
+            child: Scaffold(
+              appBar: AppBar(
+                backgroundColor: _color,
+                title: Text('Match Stats'),
+                elevation: 0.0,
               ),
-              if (widget.match.type != EventType.remote) buttonRow(),
-              Text(_selectedTeam.name + ' : ' + _score.total().toString(),
-                  style: Theme.of(context).textTheme.headline6),
-              if (widget.team == null)
-                DropdownButton<Dice>(
-                  value: _match.dice,
-                  icon: Icon(Icons.height_rounded),
-                  iconSize: 24,
-                  elevation: 16,
-                  style: TextStyle(color: Theme.of(context).accentColor),
-                  underline: Container(
-                    height: 0.5,
-                    color: Colors.deepPurpleAccent,
-                  ),
-                  onChanged: (Dice newValue) {
-                    setState(() {
-                      HapticFeedback.mediumImpact();
-                      _match.setDice(newValue);
-                    });
-                    dataModel.saveEvents();
-                  },
-                  items: <Dice>[Dice.one, Dice.two, Dice.three]
-                      .map<DropdownMenuItem<Dice>>((Dice value) {
-                    return DropdownMenuItem<Dice>(
-                      value: value,
-                      child: Text(
-                          'Stack Height : ' + value.stackHeight().toString()),
-                    );
-                  }).toList(),
+              body: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        _color,
+                        Theme.of(context).canvasColor,
+                        Theme.of(context).canvasColor,
+                        Theme.of(context).canvasColor,
+                        Theme.of(context).canvasColor,
+                        Theme.of(context).canvasColor,
+                        Theme.of(context).canvasColor,
+                      ]),
                 ),
-              Padding(
-                padding: EdgeInsets.all(25),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    SizedBox(
-                        child: Text(
-                      'Autonomous : ' + _score.autoScore.total().toString(),
-                      style: Theme.of(context).textTheme.caption,
-                    )),
-                    SizedBox(
-                      child: Text(
-                          'Tele-Op : ' + _score.teleScore.total().toString(),
-                          style: Theme.of(context).textTheme.caption),
-                    ),
-                    SizedBox(
-                        child: Text(
-                            'Endgame : ' +
-                                _score.endgameScore.total().toString(),
-                            style: Theme.of(context).textTheme.caption))
-                  ],
-                ),
-              ),
-              Divider(
-                height: 5,
-                thickness: 2,
-              ),
-              if (Platform.isIOS)
-                SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    child: CupertinoSlidingSegmentedControl(
-                      groupValue: _view,
-                      children: <int, Widget>{
-                        0: Text('Autonomous'),
-                        1: Text('Tele-Op'),
-                        2: Text('Endgame')
-                      },
-                      onValueChanged: (int x) {
-                        setState(() {
-                          HapticFeedback.mediumImpact();
-                          _view = x;
-                        });
-                      },
-                    )),
-              if (Platform.isAndroid)
-                SizedBox(
-                  height: 50,
-                  child: TabBar(
-                    labelColor: Theme.of(context).accentColor,
-                    unselectedLabelColor: Colors.grey,
-                    labelStyle: TextStyle(fontFamily: '.SF UI Display'),
-                    tabs: [
-                      Tab(
-                        text: 'Autonomous',
+                child: Center(
+                  child: Column(children: [
+                    if (widget.match != null &&
+                        widget.match.type != EventType.remote)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Container(
+                            width: 100,
+                            child: Text(_match.redScore(),
+                                style: Theme.of(context).textTheme.headline4),
+                          ),
+                          Container(
+                            child: Text('-',
+                                style: Theme.of(context).textTheme.headline4),
+                          ),
+                          Container(
+                            width: 100,
+                            child: Text(_match.blueScore(),
+                                style: Theme.of(context).textTheme.headline4),
+                          )
+                        ],
                       ),
-                      Tab(
-                        text: 'Tele-Op',
+                    Padding(
+                      padding: EdgeInsets.all(10),
+                    ),
+                    if (widget.match.type != EventType.remote) buttonRow(),
+                    Text(_selectedTeam.name + ' : ' + _score.total().toString(),
+                        style: Theme.of(context).textTheme.headline6),
+                    if (widget.team == null)
+                      DropdownButton<Dice>(
+                        value: _match.dice,
+                        icon: Icon(Icons.height_rounded),
+                        iconSize: 24,
+                        elevation: 16,
+                        style: TextStyle(color: Theme.of(context).accentColor),
+                        underline: Container(
+                          height: 0.5,
+                          color: Colors.deepPurpleAccent,
+                        ),
+                        onChanged: (Dice newValue) {
+                          setState(() {
+                            HapticFeedback.mediumImpact();
+                            _match.setDice(newValue);
+                          });
+                          dataModel.saveEvents();
+                          dataModel.uploadEvent(widget.event);
+                        },
+                        items: <Dice>[Dice.one, Dice.two, Dice.three]
+                            .map<DropdownMenuItem<Dice>>((Dice value) {
+                          return DropdownMenuItem<Dice>(
+                            value: value,
+                            child: Text('Stack Height : ' +
+                                value.stackHeight().toString()),
+                          );
+                        }).toList(),
                       ),
-                      Tab(
-                        text: 'Endgame',
+                    Padding(
+                      padding: EdgeInsets.all(25),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          SizedBox(
+                              child: Text(
+                            'Autonomous : ' +
+                                _score.autoScore.total().toString(),
+                            style: Theme.of(context).textTheme.caption,
+                          )),
+                          SizedBox(
+                            child: Text(
+                                'Tele-Op : ' +
+                                    _score.teleScore.total().toString(),
+                                style: Theme.of(context).textTheme.caption),
+                          ),
+                          SizedBox(
+                              child: Text(
+                                  'Endgame : ' +
+                                      _score.endgameScore.total().toString(),
+                                  style: Theme.of(context).textTheme.caption))
+                        ],
+                      ),
+                    ),
+                    Divider(
+                      height: 5,
+                      thickness: 2,
+                    ),
+                    if (Platform.isIOS)
+                      SizedBox(
+                          width: MediaQuery.of(context).size.width,
+                          child: CupertinoSlidingSegmentedControl(
+                            groupValue: _view,
+                            children: <int, Widget>{
+                              0: Text('Autonomous'),
+                              1: Text('Tele-Op'),
+                              2: Text('Endgame')
+                            },
+                            onValueChanged: (int x) {
+                              setState(() {
+                                HapticFeedback.mediumImpact();
+                                _view = x;
+                              });
+                            },
+                          )),
+                    if (Platform.isAndroid)
+                      SizedBox(
+                        height: 50,
+                        child: TabBar(
+                          labelColor: Theme.of(context).accentColor,
+                          unselectedLabelColor: Colors.grey,
+                          labelStyle: TextStyle(fontFamily: '.SF UI Display'),
+                          tabs: [
+                            Tab(
+                              text: 'Autonomous',
+                            ),
+                            Tab(
+                              text: 'Tele-Op',
+                            ),
+                            Tab(
+                              text: 'Endgame',
+                            )
+                          ],
+                        ),
+                      ),
+                    Divider(
+                      height: 5,
+                      thickness: 2,
+                    ),
+                    if (Platform.isAndroid)
+                      Expanded(
+                        child: TabBarView(
+                          children: [
+                            ListView(
+                              children: autoView(),
+                            ),
+                            ListView(
+                              children: teleView(),
+                            ),
+                            ListView(
+                              children: endView(),
+                            )
+                          ],
+                        ),
+                      ),
+                    if (Platform.isIOS)
+                      Expanded(
+                        child: viewSelect(),
                       )
-                    ],
-                  ),
+                  ]),
                 ),
-              Divider(
-                height: 5,
-                thickness: 2,
               ),
-              if (Platform.isAndroid)
-                Expanded(
-                  child: TabBarView(
-                    children: [
-                      ListView(
-                        children: autoView(),
-                      ),
-                      ListView(
-                        children: teleView(),
-                      ),
-                      ListView(
-                        children: endView(),
-                      )
-                    ],
-                  ),
-                ),
-              if (Platform.isIOS)
-                Expanded(
-                  child: viewSelect(),
-                )
-            ]),
-          ),
-        ),
-      ),
-    );
+            ),
+          );
+        });
   }
 
   ListView viewSelect() {
@@ -289,6 +269,7 @@ class _MatchView extends State<MatchView> {
                     _score.endgameScore.pwrShots--;
                   });
                   dataModel.saveEvents();
+                  dataModel.uploadEvent(widget.event);
                 }
               : null,
           elevation: 2.0,
@@ -312,6 +293,7 @@ class _MatchView extends State<MatchView> {
                     _score.endgameScore.pwrShots++;
                   });
                   dataModel.saveEvents();
+                  dataModel.uploadEvent(widget.event);
                 }
               : null,
           elevation: 2.0,
@@ -338,6 +320,7 @@ class _MatchView extends State<MatchView> {
                     _score.endgameScore.wobbleGoalsInDrop--;
                   });
                   dataModel.saveEvents();
+                  dataModel.uploadEvent(widget.event);
                 }
               : null,
           elevation: 2.0,
@@ -363,6 +346,7 @@ class _MatchView extends State<MatchView> {
                     _score.endgameScore.wobbleGoalsInDrop++;
                   });
                   dataModel.saveEvents();
+                  dataModel.uploadEvent(widget.event);
                 }
               : null,
           elevation: 2.0,
@@ -389,6 +373,7 @@ class _MatchView extends State<MatchView> {
                     _score.endgameScore.wobbleGoalsInStart--;
                   });
                   dataModel.saveEvents();
+                  dataModel.uploadEvent(widget.event);
                 }
               : null,
           elevation: 2.0,
@@ -414,6 +399,7 @@ class _MatchView extends State<MatchView> {
                     _score.endgameScore.wobbleGoalsInStart++;
                   });
                   dataModel.saveEvents();
+                  dataModel.uploadEvent(widget.event);
                 }
               : null,
           elevation: 2.0,
@@ -440,6 +426,7 @@ class _MatchView extends State<MatchView> {
                     _score.endgameScore.ringsOnWobble--;
                   });
                   dataModel.saveEvents();
+                  dataModel.uploadEvent(widget.event);
                 }
               : null,
           elevation: 2.0,
@@ -462,6 +449,7 @@ class _MatchView extends State<MatchView> {
               _score.endgameScore.ringsOnWobble++;
             });
             dataModel.saveEvents();
+            dataModel.uploadEvent(widget.event);
           },
           elevation: 2.0,
           fillColor: Theme.of(context).canvasColor,
@@ -489,6 +477,7 @@ class _MatchView extends State<MatchView> {
                     _score.teleScore.hiGoals--;
                   });
                   dataModel.saveEvents();
+                  dataModel.uploadEvent(widget.event);
                 }
               : null,
           elevation: 2.0,
@@ -511,6 +500,7 @@ class _MatchView extends State<MatchView> {
               _score.teleScore.hiGoals++;
             });
             dataModel.saveEvents();
+            dataModel.uploadEvent(widget.event);
           },
           elevation: 2.0,
           fillColor: Theme.of(context).canvasColor,
@@ -536,6 +526,7 @@ class _MatchView extends State<MatchView> {
                     _score.teleScore.midGoals--;
                   });
                   dataModel.saveEvents();
+                  dataModel.uploadEvent(widget.event);
                 }
               : null,
           elevation: 2.0,
@@ -558,6 +549,7 @@ class _MatchView extends State<MatchView> {
               _score.teleScore.midGoals++;
             });
             dataModel.saveEvents();
+            dataModel.uploadEvent(widget.event);
           },
           elevation: 2.0,
           fillColor: Theme.of(context).canvasColor,
@@ -583,6 +575,7 @@ class _MatchView extends State<MatchView> {
                     _score.teleScore.lowGoals--;
                   });
                   dataModel.saveEvents();
+                  dataModel.uploadEvent(widget.event);
                 }
               : null,
           elevation: 2.0,
@@ -605,6 +598,7 @@ class _MatchView extends State<MatchView> {
               _score.teleScore.lowGoals++;
             });
             dataModel.saveEvents();
+            dataModel.uploadEvent(widget.event);
           },
           elevation: 2.0,
           fillColor: Theme.of(context).canvasColor,
@@ -632,6 +626,7 @@ class _MatchView extends State<MatchView> {
                     _score.autoScore.hiGoals--;
                   });
                   dataModel.saveEvents();
+                  dataModel.uploadEvent(widget.event);
                 }
               : null,
           elevation: 2.0,
@@ -654,6 +649,7 @@ class _MatchView extends State<MatchView> {
               _score.autoScore.hiGoals++;
             });
             dataModel.saveEvents();
+            dataModel.uploadEvent(widget.event);
           },
           elevation: 2.0,
           fillColor: Theme.of(context).canvasColor,
@@ -679,6 +675,7 @@ class _MatchView extends State<MatchView> {
                     _score.autoScore.midGoals--;
                   });
                   dataModel.saveEvents();
+                  dataModel.uploadEvent(widget.event);
                 }
               : null,
           elevation: 2.0,
@@ -701,6 +698,7 @@ class _MatchView extends State<MatchView> {
               _score.autoScore.midGoals++;
             });
             dataModel.saveEvents();
+            dataModel.uploadEvent(widget.event);
           },
           elevation: 2.0,
           fillColor: Theme.of(context).canvasColor,
@@ -726,6 +724,7 @@ class _MatchView extends State<MatchView> {
                     _score.autoScore.lowGoals--;
                   });
                   dataModel.saveEvents();
+                  dataModel.uploadEvent(widget.event);
                 }
               : null,
           elevation: 2.0,
@@ -748,6 +747,7 @@ class _MatchView extends State<MatchView> {
               _score.autoScore.lowGoals++;
             });
             dataModel.saveEvents();
+            dataModel.uploadEvent(widget.event);
           },
           elevation: 2.0,
           fillColor: Theme.of(context).canvasColor,
@@ -773,6 +773,7 @@ class _MatchView extends State<MatchView> {
                     _score.autoScore.wobbleGoals--;
                   });
                   dataModel.saveEvents();
+                  dataModel.uploadEvent(widget.event);
                 }
               : null,
           elevation: 2.0,
@@ -796,6 +797,7 @@ class _MatchView extends State<MatchView> {
                     _score.autoScore.wobbleGoals++;
                   });
                   dataModel.saveEvents();
+                  dataModel.uploadEvent(widget.event);
                 }
               : null,
           elevation: 2.0,
@@ -822,6 +824,7 @@ class _MatchView extends State<MatchView> {
                     _score.autoScore.pwrShots--;
                   });
                   dataModel.saveEvents();
+                  dataModel.uploadEvent(widget.event);
                 }
               : null,
           elevation: 2.0,
@@ -845,6 +848,7 @@ class _MatchView extends State<MatchView> {
                     _score.autoScore.pwrShots++;
                   });
                   dataModel.saveEvents();
+                  dataModel.uploadEvent(widget.event);
                 }
               : null,
           elevation: 2.0,
@@ -871,6 +875,7 @@ class _MatchView extends State<MatchView> {
               _score.autoScore.navigated = newVal;
             });
             dataModel.saveEvents();
+            dataModel.uploadEvent(widget.event);
           },
         ),
       ])
@@ -897,8 +902,9 @@ class _MatchView extends State<MatchView> {
                       setState(() {
                         _selectedTeam = _match.red.item1;
                         _color = CupertinoColors.systemRed;
-                        _score = _selectedTeam.scores
-                            .firstWhere((element) => element.id == _match.id);
+                        _score = _selectedTeam.scores.firstWhere(
+                            (element) => element.id == _match.id,
+                            orElse: () => Score(Uuid().v4(), Dice.none));
                       });
                     },
             )),
@@ -919,8 +925,9 @@ class _MatchView extends State<MatchView> {
                       setState(() {
                         _selectedTeam = _match.red.item2;
                         _color = CupertinoColors.systemRed;
-                        _score = _selectedTeam.scores
-                            .firstWhere((element) => element.id == _match.id);
+                        _score = _selectedTeam.scores.firstWhere(
+                            (element) => element.id == _match.id,
+                            orElse: () => Score(Uuid().v4(), Dice.none));
                       });
                     },
             )),
@@ -941,8 +948,9 @@ class _MatchView extends State<MatchView> {
                       setState(() {
                         _selectedTeam = _match.blue.item1;
                         _color = Colors.blue;
-                        _score = _selectedTeam.scores
-                            .firstWhere((element) => element.id == _match.id);
+                        _score = _selectedTeam.scores.firstWhere(
+                            (element) => element.id == _match.id,
+                            orElse: () => Score(Uuid().v4(), Dice.none));
                       });
                     },
             )),
@@ -962,8 +970,9 @@ class _MatchView extends State<MatchView> {
                       setState(() {
                         _selectedTeam = _match.blue.item2;
                         _color = Colors.blue;
-                        _score = _selectedTeam.scores
-                            .firstWhere((element) => element.id == _match.id);
+                        _score = _selectedTeam.scores.firstWhere(
+                            (element) => element.id == _match.id,
+                            orElse: () => Score(Uuid().v4(), Dice.none));
                       });
                     },
             ))

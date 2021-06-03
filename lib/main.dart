@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart' as Database;
+import 'package:flutter/services.dart';
 import 'package:teamtrack/Frontend/EventsList.dart';
 import 'package:teamtrack/Frontend/Login.dart';
 import 'package:teamtrack/backend.dart';
@@ -80,6 +82,17 @@ class AuthenticationWrapper extends StatelessWidget {
       return LoginView(dataModel: dataModel);
     } else {
       return EventsList(dataModel: dataModel);
+      // return StreamBuilder<Database.Event>(
+      //     stream: firebaseDatabase.reference().child('alpha').onValue,
+      //     builder: (context, snapshot) {
+      //       return Container(
+      //         height: MediaQuery.of(context).size.height,
+      //         width: MediaQuery.of(context).size.width,
+      //         child: Center(
+      //           child: Text(snapshot.data.snapshot.value['number']),
+      //         ),
+      //       );
+      //     });
     }
   }
 }
@@ -105,6 +118,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     dataModel = DataModel();
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     return MultiProvider(
       providers: [
         Provider<AuthenticationService>(
@@ -112,7 +126,13 @@ class MyApp extends StatelessWidget {
         ),
         StreamProvider(
             create: (context) =>
-                context.read<AuthenticationService>().authStateChanges)
+                context.read<AuthenticationService>().authStateChanges),
+        Provider<DatabaseServices>(
+          create: (_) => DatabaseServices(),
+        ),
+        StreamProvider(
+            create: (context) =>
+                context.read<DatabaseServices>().getEventChanges),
       ],
       child: TeamTrack(),
     );

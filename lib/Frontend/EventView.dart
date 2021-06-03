@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:firebase_database/firebase_database.dart' as Database;
+import 'package:provider/provider.dart';
 import 'package:teamtrack/Frontend/MatchList.dart';
 import 'package:teamtrack/Frontend/TeamList.dart';
 import 'package:teamtrack/backend.dart';
@@ -8,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
+import 'dart:convert';
 
 class EventView extends StatefulWidget {
   EventView({Key key, this.event, this.dataModel}) : super(key: key);
@@ -41,6 +44,7 @@ class _EventView extends State<EventView> {
   int _tab = 0;
   @override
   Widget build(BuildContext context) {
+    //DatabaseServices.id = widget.event.id;
     return Scaffold(
       appBar: AppBar(
         title: _tab == 0 ? Text('Teams') : Text('Matches'),
@@ -144,6 +148,7 @@ class _EventView extends State<EventView> {
                       _newNumber = '';
                     });
                     dataModel.saveEvents();
+                    dataModel.uploadEvent(widget.event);
                     Navigator.of(context).pop();
                   },
                 ),
@@ -277,6 +282,7 @@ class _EventView extends State<EventView> {
             controller.text = '';
           }
           dataModel.saveEvents();
+          dataModel.uploadEvent(widget.event);
           Navigator.pop(context);
         }
       },
