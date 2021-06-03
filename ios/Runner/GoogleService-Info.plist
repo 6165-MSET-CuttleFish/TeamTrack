@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>770921195022-mi8n44p8m0c7o4hudoufgu600nuh2pre.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.770921195022-mi8n44p8m0c7o4hudoufgu600nuh2pre</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>770921195022-2nodfl5h2ne4i5vbn6vbbulhgajcqk7q.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyD46rByCYhz_DIGxP-Domw8eG8N_EwekOA</string>
+	<key>GCM_SENDER_ID</key>
+	<string>770921195022</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.msetcuttlefish.teamtrack</string>
+	<key>PROJECT_ID</key>
+	<string>teamtrack-cf8f3</string>
+	<key>STORAGE_BUCKET</key>
+	<string>teamtrack-cf8f3.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:770921195022:ios:fb16a0ebde7a5c86cfbe5f</string>
+	<key>DATABASE_URL</key>
+	<string>https://teamtrack-cf8f3-default-rtdb.firebaseio.com</string>
+</dict>
+</plist>
