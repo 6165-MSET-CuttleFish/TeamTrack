@@ -13,6 +13,7 @@ import 'package:uuid/uuid.dart';
 
 class MatchView extends StatefulWidget {
   MatchView({Key key, this.match, this.team, this.event}) : super(key: key);
+  @required
   final Match match;
   final Team team;
   final Event event;
@@ -49,6 +50,11 @@ class _MatchView extends State<MatchView> {
           if (eventHandler.hasData && !eventHandler.hasError) {
             widget.event.updateLocal(
                 json.decode(json.encode(eventHandler.data.snapshot.value)));
+            _match = widget.event.matches
+                .firstWhere((element) => element.id == _match.id, orElse: () {
+              Navigator.pop(context);
+              return null;
+            });
             _selectedTeam = widget.event.teams.firstWhere(
                 (team) => team.number == _selectedTeam.number, orElse: () {
               Navigator.pop(context);
@@ -83,8 +89,8 @@ class _MatchView extends State<MatchView> {
                 ),
                 child: Center(
                   child: Column(children: [
-                    if (widget.match != null &&
-                        widget.match.type != EventType.remote)
+                    if (_match != null &&
+                        _match.type != EventType.remote)
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
@@ -107,7 +113,7 @@ class _MatchView extends State<MatchView> {
                     Padding(
                       padding: EdgeInsets.all(10),
                     ),
-                    if (widget.match.type != EventType.remote) buttonRow(),
+                    if (_match.type != EventType.remote) buttonRow(),
                     Text(_selectedTeam.name + ' : ' + _score.total().toString(),
                         style: Theme.of(context).textTheme.headline6),
                     if (widget.team == null)

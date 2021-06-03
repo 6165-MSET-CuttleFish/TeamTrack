@@ -19,14 +19,6 @@ class MatchList extends StatefulWidget {
 
 class _MatchList extends State<MatchList> {
   final slider = SlidableStrechActionPane();
-  final secondaryActions = <Widget>[
-    IconSlideAction(
-      caption: 'Delete',
-      icon: Icons.delete,
-      color: Colors.red,
-      onTap: () {},
-    )
-  ];
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<Database.Event>(
@@ -36,7 +28,13 @@ class _MatchList extends State<MatchList> {
             widget.event.updateLocal(
                 json.decode(json.encode(eventHandler.data.snapshot.value)));
           }
-          if (widget.team == null) {
+          if (widget.event.teams
+                  .firstWhere((element) => element.number == widget.team.number,
+                      orElse: () {
+                Navigator.of(context).pop();
+                return Team.nullTeam();
+              }) ==
+              null) {
             return _matches();
           }
           return Scaffold(
@@ -68,7 +66,11 @@ class _MatchList extends State<MatchList> {
                                         widget.event.matches.add(
                                           Match(
                                               Alliance(
-                                                  widget.team, Team.nullTeam()),
+                                                  widget.event.teams.firstWhere(
+                                                      (element) =>
+                                                          element.number ==
+                                                          widget.team.number),
+                                                  Team.nullTeam()),
                                               Alliance(Team.nullTeam(),
                                                   Team.nullTeam()),
                                               EventType.remote),
@@ -92,7 +94,9 @@ class _MatchList extends State<MatchList> {
   Widget _matches() {
     if (widget.event.type != EventType.remote) {
       return ListView(
-        children: widget.team == null
+        children: widget.event.teams.firstWhere(
+                    (element) => element.number == widget.team.number) ==
+                null
             ? widget.event.matches
                 .map((e) => Slidable(
                     actionPane: slider,
@@ -168,7 +172,10 @@ class _MatchList extends State<MatchList> {
     } else {
       var arr = <Slidable>[];
       var matches = widget.event.matches
-          .where((e) => e.alliance(widget.team) != null)
+          .where((e) =>
+              e.alliance(widget.event.teams.firstWhere(
+                  (element) => element.number == widget.team.number)) !=
+              null)
           .toList();
       for (int i = 0; i < matches.length; i++) {
         arr.add(Slidable(
@@ -219,7 +226,10 @@ class _MatchList extends State<MatchList> {
                 ),
                 child: ListTile(
                   leading: Text((i + 1).toString()),
-                  title: Text(widget.team.name),
+                  title: Text(widget.event.teams
+                      .firstWhere(
+                          (element) => element.number == widget.team.number)
+                      .name),
                   trailing: Text(matches[i].score()),
                   onTap: () async {
                     await Navigator.push(
@@ -240,9 +250,14 @@ class _MatchList extends State<MatchList> {
   }
 
   List<Widget> _teamSpecMatches() {
-    if (widget.team != null) {
+    if (widget.event.teams
+            .firstWhere((element) => element.number == widget.team.number) !=
+        null) {
       return widget.event.matches
-          .where((e) => e.alliance(widget.team) != null)
+          .where((e) =>
+              e.alliance(widget.event.teams.firstWhere(
+                  (element) => element.number == widget.team.number)) !=
+              null)
           .toList()
           .map((e) => Slidable(
               actionPane: slider,

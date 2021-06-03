@@ -33,7 +33,7 @@ class _LoginView extends State<LoginView> {
       Column(children: [Image.asset("LoadingScreen2.png"), Spacer()]),
       SafeArea(
         child: Card(
-          color: Colors.transparent,
+          color: Theme.of(context).cardColor.withOpacity(0.7),
           child: Container(
             width: size.width - 20,
             height: 310,
