@@ -12,7 +12,8 @@ import 'dart:convert';
 import 'package:uuid/uuid.dart';
 
 class MatchView extends StatefulWidget {
-  MatchView({Key key, this.match, this.team, this.event}) : super(key: key);
+  MatchView({Key key, @required this.match, this.team, this.event})
+      : super(key: key);
   @required
   final Match match;
   final Team team;
@@ -50,19 +51,25 @@ class _MatchView extends State<MatchView> {
           if (eventHandler.hasData && !eventHandler.hasError) {
             widget.event.updateLocal(
                 json.decode(json.encode(eventHandler.data.snapshot.value)));
-            _match = widget.event.matches
-                .firstWhere((element) => element.id == _match.id, orElse: () {
-              Navigator.pop(context);
-              return null;
-            });
+            if (widget.team == null) {
+              _match = widget.event.matches
+                  .firstWhere((element) => element.id == _match.id, orElse: () {
+                Navigator.pop(context);
+                return Match.defaultMatch(EventType.remote);
+              });
+            }
             _selectedTeam = widget.event.teams.firstWhere(
                 (team) => team.number == _selectedTeam.number, orElse: () {
               Navigator.pop(context);
               return Team.nullTeam();
             });
-            _score = _selectedTeam.scores.firstWhere(
-                (element) => element.id == _match.id,
-                orElse: () => Score(Uuid().v4(), Dice.none));
+            if (widget.team != null) {
+              _score = _selectedTeam.targetScore;
+            } else {
+              _score = _selectedTeam.scores.firstWhere(
+                  (element) => element.id == _match.id,
+                  orElse: () => Score(Uuid().v4(), Dice.none));
+            }
           }
           return DefaultTabController(
             length: 3,
@@ -89,8 +96,7 @@ class _MatchView extends State<MatchView> {
                 ),
                 child: Center(
                   child: Column(children: [
-                    if (_match != null &&
-                        _match.type != EventType.remote)
+                    if (_match != null && _match.type != EventType.remote)
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
@@ -113,7 +119,8 @@ class _MatchView extends State<MatchView> {
                     Padding(
                       padding: EdgeInsets.all(10),
                     ),
-                    if (_match.type != EventType.remote) buttonRow(),
+                    if (_match != null && _match.type != EventType.remote)
+                      buttonRow(),
                     Text(_selectedTeam.name + ' : ' + _score.total().toString(),
                         style: Theme.of(context).textTheme.headline6),
                     if (widget.team == null)
