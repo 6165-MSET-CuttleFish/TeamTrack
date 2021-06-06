@@ -24,17 +24,11 @@ class _MatchList extends State<MatchList> {
     return StreamBuilder<Database.Event>(
         stream: DatabaseServices(id: widget.event.id).getEventChanges,
         builder: (context, eventHandler) {
-          if (eventHandler.hasData && !eventHandler.hasError) {
+          if (eventHandler.hasData && !eventHandler.hasError && !dataModel.isProcessing) {
             widget.event.updateLocal(
                 json.decode(json.encode(eventHandler.data.snapshot.value)));
           }
-          if (widget.event.teams
-                  .firstWhere((element) => element.number == widget.team.number,
-                      orElse: () {
-                Navigator.of(context).pop();
-                return Team.nullTeam();
-              }) ==
-              null) {
+          if (widget.team == null) {
             return _matches();
           }
           return Scaffold(
@@ -94,9 +88,7 @@ class _MatchList extends State<MatchList> {
   Widget _matches() {
     if (widget.event.type != EventType.remote) {
       return ListView(
-        children: widget.event.teams.firstWhere(
-                    (element) => element.number == widget.team.number) ==
-                null
+        children: widget.team == null
             ? widget.event.matches
                 .map((e) => Slidable(
                     actionPane: slider,

@@ -193,12 +193,13 @@ class DataModel {
     // }
   }
 
-  void uploadEvent(Event event) {
+  bool isProcessing = false;
+  void uploadEvent(Event event) async {
     if (event.shared) {
+      isProcessing = true;
       var ref = firebaseDatabase.reference().child(event.id);
-      ref.update(event.toJson());
-      var x = event.toJson();
-      print(x);
+      await ref.update(event.toJson());
+      isProcessing = false;
     }
   }
 

@@ -127,12 +127,6 @@ class MyApp extends StatelessWidget {
         StreamProvider(
             create: (context) =>
                 context.read<AuthenticationService>().authStateChanges),
-        // Provider<DatabaseServices>(
-        //   create: (_) => DatabaseServices(),
-        // ),
-        // StreamProvider(
-        //     create: (context) =>
-        //         context.read<DatabaseServices>().getEventChanges),
       ],
       child: TeamTrack(),
     );

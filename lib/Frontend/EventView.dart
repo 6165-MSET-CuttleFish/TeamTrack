@@ -44,7 +44,6 @@ class _EventView extends State<EventView> {
   int _tab = 0;
   @override
   Widget build(BuildContext context) {
-    //DatabaseServices.id = widget.event.id;
     return Scaffold(
       appBar: AppBar(
         title: _tab == 0 ? Text('Teams') : Text('Matches'),

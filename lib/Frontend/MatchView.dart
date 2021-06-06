@@ -48,7 +48,7 @@ class _MatchView extends State<MatchView> {
     return StreamBuilder<Database.Event>(
         stream: DatabaseServices(id: widget.event.id).getEventChanges,
         builder: (context, eventHandler) {
-          if (eventHandler.hasData && !eventHandler.hasError) {
+          if (eventHandler.hasData && !eventHandler.hasError && !dataModel.isProcessing) {
             widget.event.updateLocal(
                 json.decode(json.encode(eventHandler.data.snapshot.value)));
             if (widget.team == null) {
