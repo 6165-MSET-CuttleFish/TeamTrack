@@ -48,7 +48,9 @@ class _MatchView extends State<MatchView> {
     return StreamBuilder<Database.Event>(
         stream: DatabaseServices(id: widget.event.id).getEventChanges,
         builder: (context, eventHandler) {
-          if (eventHandler.hasData && !eventHandler.hasError && !dataModel.isProcessing) {
+          if (eventHandler.hasData &&
+              !eventHandler.hasError &&
+              !dataModel.isProcessing) {
             widget.event.updateLocal(
                 json.decode(json.encode(eventHandler.data.snapshot.value)));
             if (widget.team == null) {
@@ -249,649 +251,88 @@ class _MatchView extends State<MatchView> {
         });
   }
 
+  void stateSetter() {
+    setState(() {});
+    dataModel.saveEvents();
+    dataModel.uploadEvent(widget.event);
+  }
+
   ListView viewSelect() {
     switch (_view) {
       case 0:
-        return ListView(
-          children: autoView(),
-        );
+        return ListView(children: autoView());
       case 1:
-        return ListView(
-          children: teleView(),
-        );
+        return ListView(children: teleView());
       default:
-        return ListView(
-          children: endView(),
-        );
+        return ListView(children: endView());
     }
   }
 
   List<Widget> endView() {
     return [
-      Row(children: [
-        Padding(
-          padding: EdgeInsets.all(5),
-        ),
-        Text('Power Shots'),
-        Spacer(),
-        RawMaterialButton(
-          onPressed: _score.endgameScore.pwrShots > 0
-              ? () {
-                  setState(() {
-                    HapticFeedback.mediumImpact();
-                    _score.endgameScore.pwrShots--;
-                  });
-                  dataModel.saveEvents();
-                  dataModel.uploadEvent(widget.event);
-                }
-              : null,
-          elevation: 2.0,
-          fillColor: Theme.of(context).canvasColor,
-          splashColor: Colors.red,
-          child: Icon(Icons.remove_circle_outline_rounded),
-          shape: CircleBorder(),
-        ),
-        SizedBox(
-          width: 20,
-          child: Text(
-            _score.endgameScore.pwrShots.toString(),
-            textAlign: TextAlign.center,
-          ),
-        ),
-        RawMaterialButton(
-          onPressed: _score.endgameScore.pwrShots < 3
-              ? () {
-                  setState(() {
-                    HapticFeedback.mediumImpact();
-                    _score.endgameScore.pwrShots++;
-                  });
-                  dataModel.saveEvents();
-                  dataModel.uploadEvent(widget.event);
-                }
-              : null,
-          elevation: 2.0,
-          fillColor: Theme.of(context).canvasColor,
-          splashColor: Colors.green,
-          child: Icon(Icons.add_circle_outline_rounded),
-          shape: CircleBorder(),
-        )
-      ]),
-      Divider(
-        height: 3,
+      Incrementor(
+        element: _score.endgameScore.pwrShots,
+        onPressed: stateSetter,
       ),
-      Row(children: [
-        Padding(
-          padding: EdgeInsets.all(5),
-        ),
-        Text('Wobbles in Drop'),
-        Spacer(),
-        RawMaterialButton(
-          onPressed: _score.endgameScore.wobbleGoalsInDrop > 0
-              ? () {
-                  setState(() {
-                    HapticFeedback.mediumImpact();
-                    _score.endgameScore.wobbleGoalsInDrop--;
-                  });
-                  dataModel.saveEvents();
-                  dataModel.uploadEvent(widget.event);
-                }
-              : null,
-          elevation: 2.0,
-          fillColor: Theme.of(context).canvasColor,
-          splashColor: Colors.red,
-          child: Icon(Icons.remove_circle_outline_rounded),
-          shape: CircleBorder(),
-        ),
-        SizedBox(
-          width: 20,
-          child: Text(
-            _score.endgameScore.wobbleGoalsInDrop.toString(),
-            textAlign: TextAlign.center,
-          ),
-        ),
-        RawMaterialButton(
-          onPressed: _score.endgameScore.wobbleGoalsInDrop +
-                      _score.endgameScore.wobbleGoalsInStart <
-                  2
-              ? () {
-                  setState(() {
-                    HapticFeedback.mediumImpact();
-                    _score.endgameScore.wobbleGoalsInDrop++;
-                  });
-                  dataModel.saveEvents();
-                  dataModel.uploadEvent(widget.event);
-                }
-              : null,
-          elevation: 2.0,
-          fillColor: Theme.of(context).canvasColor,
-          splashColor: Colors.green,
-          child: Icon(Icons.add_circle_outline_rounded),
-          shape: CircleBorder(),
-        )
-      ]),
-      Divider(
-        height: 3,
+      Incrementor(
+        element: _score.endgameScore.wobbleGoalsInDrop,
+        onPressed: stateSetter,
       ),
-      Row(children: [
-        Padding(
-          padding: EdgeInsets.all(5),
-        ),
-        Text('Wobbles in Start'),
-        Spacer(),
-        RawMaterialButton(
-          onPressed: _score.endgameScore.wobbleGoalsInStart > 0
-              ? () {
-                  setState(() {
-                    HapticFeedback.mediumImpact();
-                    _score.endgameScore.wobbleGoalsInStart--;
-                  });
-                  dataModel.saveEvents();
-                  dataModel.uploadEvent(widget.event);
-                }
-              : null,
-          elevation: 2.0,
-          fillColor: Theme.of(context).canvasColor,
-          splashColor: Colors.red,
-          child: Icon(Icons.remove_circle_outline_rounded),
-          shape: CircleBorder(),
-        ),
-        SizedBox(
-          width: 20,
-          child: Text(
-            _score.endgameScore.wobbleGoalsInStart.toString(),
-            textAlign: TextAlign.center,
-          ),
-        ),
-        RawMaterialButton(
-          onPressed: _score.endgameScore.wobbleGoalsInDrop +
-                      _score.endgameScore.wobbleGoalsInStart <
-                  2
-              ? () {
-                  setState(() {
-                    HapticFeedback.mediumImpact();
-                    _score.endgameScore.wobbleGoalsInStart++;
-                  });
-                  dataModel.saveEvents();
-                  dataModel.uploadEvent(widget.event);
-                }
-              : null,
-          elevation: 2.0,
-          fillColor: Theme.of(context).canvasColor,
-          splashColor: Colors.green,
-          child: Icon(Icons.add_circle_outline_rounded),
-          shape: CircleBorder(),
-        )
-      ]),
-      Divider(
-        height: 3,
+      Incrementor(
+        element: _score.endgameScore.wobbleGoalsInStart,
+        onPressed: stateSetter,
       ),
-      Row(children: [
-        Padding(
-          padding: EdgeInsets.all(5),
-        ),
-        Text('Rings on Wobble'),
-        Spacer(),
-        RawMaterialButton(
-          onPressed: _score.endgameScore.ringsOnWobble > 0
-              ? () {
-                  setState(() {
-                    HapticFeedback.mediumImpact();
-                    _score.endgameScore.ringsOnWobble--;
-                  });
-                  dataModel.saveEvents();
-                  dataModel.uploadEvent(widget.event);
-                }
-              : null,
-          elevation: 2.0,
-          fillColor: Theme.of(context).canvasColor,
-          splashColor: Colors.red,
-          child: Icon(Icons.remove_circle_outline_rounded),
-          shape: CircleBorder(),
-        ),
-        SizedBox(
-          width: 20,
-          child: Text(
-            _score.endgameScore.ringsOnWobble.toString(),
-            textAlign: TextAlign.center,
-          ),
-        ),
-        RawMaterialButton(
-          onPressed: () {
-            setState(() {
-              HapticFeedback.mediumImpact();
-              _score.endgameScore.ringsOnWobble++;
-            });
-            dataModel.saveEvents();
-            dataModel.uploadEvent(widget.event);
-          },
-          elevation: 2.0,
-          fillColor: Theme.of(context).canvasColor,
-          splashColor: Colors.green,
-          child: Icon(Icons.add_circle_outline_rounded),
-          shape: CircleBorder(),
-        )
-      ])
+      Incrementor(
+        element: _score.endgameScore.ringsOnWobble,
+        onPressed: stateSetter,
+      ),
     ];
   }
 
   List<Widget> teleView() {
     return [
-      Row(children: [
-        Padding(
-          padding: EdgeInsets.all(5),
-        ),
-        Text('High Goals'),
-        Spacer(),
-        RawMaterialButton(
-          onPressed: _score.teleScore.hiGoals > 0
-              ? () {
-                  setState(() {
-                    HapticFeedback.mediumImpact();
-                    _score.teleScore.hiGoals--;
-                  });
-                  dataModel.saveEvents();
-                  dataModel.uploadEvent(widget.event);
-                }
-              : null,
-          elevation: 2.0,
-          fillColor: Theme.of(context).canvasColor,
-          splashColor: Colors.red,
-          child: Icon(Icons.remove_circle_outline_rounded),
-          shape: CircleBorder(),
-        ),
-        SizedBox(
-          width: 20,
-          child: Text(
-            _score.teleScore.hiGoals.toString(),
-            textAlign: TextAlign.center,
-          ),
-        ),
-        RawMaterialButton(
-          onPressed: () {
-            setState(() {
-              HapticFeedback.mediumImpact();
-              _score.teleScore.hiGoals++;
-            });
-            dataModel.saveEvents();
-            dataModel.uploadEvent(widget.event);
-          },
-          elevation: 2.0,
-          fillColor: Theme.of(context).canvasColor,
-          splashColor: Colors.green,
-          child: Icon(Icons.add_circle_outline_rounded),
-          shape: CircleBorder(),
-        )
-      ]),
-      Divider(
-        height: 3,
+      Incrementor(
+        element: _score.teleScore.hiGoals,
+        onPressed: stateSetter,
       ),
-      Row(children: [
-        Padding(
-          padding: EdgeInsets.all(5),
-        ),
-        Text('Middle Goals'),
-        Spacer(),
-        RawMaterialButton(
-          onPressed: _score.teleScore.midGoals > 0
-              ? () {
-                  setState(() {
-                    HapticFeedback.mediumImpact();
-                    _score.teleScore.midGoals--;
-                  });
-                  dataModel.saveEvents();
-                  dataModel.uploadEvent(widget.event);
-                }
-              : null,
-          elevation: 2.0,
-          fillColor: Theme.of(context).canvasColor,
-          splashColor: Colors.red,
-          child: Icon(Icons.remove_circle_outline_rounded),
-          shape: CircleBorder(),
-        ),
-        SizedBox(
-          width: 20,
-          child: Text(
-            _score.teleScore.midGoals.toString(),
-            textAlign: TextAlign.center,
-          ),
-        ),
-        RawMaterialButton(
-          onPressed: () {
-            setState(() {
-              HapticFeedback.mediumImpact();
-              _score.teleScore.midGoals++;
-            });
-            dataModel.saveEvents();
-            dataModel.uploadEvent(widget.event);
-          },
-          elevation: 2.0,
-          fillColor: Theme.of(context).canvasColor,
-          splashColor: Colors.green,
-          child: Icon(Icons.add_circle_outline_rounded),
-          shape: CircleBorder(),
-        )
-      ]),
-      Divider(
-        height: 3,
+      Incrementor(
+        element: _score.teleScore.midGoals,
+        onPressed: stateSetter,
       ),
-      Row(children: [
-        Padding(
-          padding: EdgeInsets.all(5),
-        ),
-        Text('Low Goals'),
-        Spacer(),
-        RawMaterialButton(
-          onPressed: _score.teleScore.lowGoals > 0
-              ? () {
-                  setState(() {
-                    HapticFeedback.mediumImpact();
-                    _score.teleScore.lowGoals--;
-                  });
-                  dataModel.saveEvents();
-                  dataModel.uploadEvent(widget.event);
-                }
-              : null,
-          elevation: 2.0,
-          fillColor: Theme.of(context).canvasColor,
-          splashColor: Colors.red,
-          child: Icon(Icons.remove_circle_outline_rounded),
-          shape: CircleBorder(),
-        ),
-        SizedBox(
-          width: 20,
-          child: Text(
-            _score.teleScore.lowGoals.toString(),
-            textAlign: TextAlign.center,
-          ),
-        ),
-        RawMaterialButton(
-          onPressed: () {
-            setState(() {
-              HapticFeedback.mediumImpact();
-              _score.teleScore.lowGoals++;
-            });
-            dataModel.saveEvents();
-            dataModel.uploadEvent(widget.event);
-          },
-          elevation: 2.0,
-          fillColor: Theme.of(context).canvasColor,
-          splashColor: Colors.green,
-          child: Icon(Icons.add_circle_outline_rounded),
-          shape: CircleBorder(),
-        )
-      ]),
+      Incrementor(
+        element: _score.teleScore.lowGoals,
+        onPressed: stateSetter,
+      ),
     ];
   }
 
   List<Widget> autoView() {
     return [
-      Row(children: [
-        Padding(
-          padding: EdgeInsets.all(5),
-        ),
-        Text('High Goals'),
-        Spacer(),
-        RawMaterialButton(
-          onPressed: _score.autoScore.hiGoals > 0
-              ? () {
-                  setState(() {
-                    HapticFeedback.mediumImpact();
-                    _score.autoScore.hiGoals--;
-                  });
-                  dataModel.saveEvents();
-                  dataModel.uploadEvent(widget.event);
-                }
-              : null,
-          elevation: 2.0,
-          fillColor: Theme.of(context).canvasColor,
-          splashColor: Colors.red,
-          child: Icon(Icons.remove_circle_outline_rounded),
-          shape: CircleBorder(),
-        ),
-        SizedBox(
-          width: 20,
-          child: Text(
-            _score.autoScore.hiGoals.toString(),
-            textAlign: TextAlign.center,
-          ),
-        ),
-        RawMaterialButton(
-          onPressed: () {
-            setState(() {
-              HapticFeedback.mediumImpact();
-              _score.autoScore.hiGoals++;
-            });
-            dataModel.saveEvents();
-            dataModel.uploadEvent(widget.event);
-          },
-          elevation: 2.0,
-          fillColor: Theme.of(context).canvasColor,
-          splashColor: Colors.green,
-          child: Icon(Icons.add_circle_outline_rounded),
-          shape: CircleBorder(),
-        )
-      ]),
-      Divider(
-        height: 3,
+      Incrementor(
+        element: _score.autoScore.hiGoals,
+        onPressed: stateSetter,
       ),
-      Row(children: [
-        Padding(
-          padding: EdgeInsets.all(5),
-        ),
-        Text('Middle Goals'),
-        Spacer(),
-        RawMaterialButton(
-          onPressed: _score.autoScore.midGoals > 0
-              ? () {
-                  setState(() {
-                    HapticFeedback.mediumImpact();
-                    _score.autoScore.midGoals--;
-                  });
-                  dataModel.saveEvents();
-                  dataModel.uploadEvent(widget.event);
-                }
-              : null,
-          elevation: 2.0,
-          fillColor: Theme.of(context).canvasColor,
-          splashColor: Colors.red,
-          child: Icon(Icons.remove_circle_outline_rounded),
-          shape: CircleBorder(),
-        ),
-        SizedBox(
-          width: 20,
-          child: Text(
-            _score.autoScore.midGoals.toString(),
-            textAlign: TextAlign.center,
-          ),
-        ),
-        RawMaterialButton(
-          onPressed: () {
-            setState(() {
-              HapticFeedback.mediumImpact();
-              _score.autoScore.midGoals++;
-            });
-            dataModel.saveEvents();
-            dataModel.uploadEvent(widget.event);
-          },
-          elevation: 2.0,
-          fillColor: Theme.of(context).canvasColor,
-          splashColor: Colors.green,
-          child: Icon(Icons.add_circle_outline_rounded),
-          shape: CircleBorder(),
-        )
-      ]),
-      Divider(
-        height: 3,
+      Incrementor(
+        element: _score.autoScore.midGoals,
+        onPressed: stateSetter,
       ),
-      Row(children: [
-        Padding(
-          padding: EdgeInsets.all(5),
-        ),
-        Text('Low Goals'),
-        Spacer(),
-        RawMaterialButton(
-          onPressed: _score.autoScore.lowGoals > 0
-              ? () {
-                  setState(() {
-                    HapticFeedback.mediumImpact();
-                    _score.autoScore.lowGoals--;
-                  });
-                  dataModel.saveEvents();
-                  dataModel.uploadEvent(widget.event);
-                }
-              : null,
-          elevation: 2.0,
-          fillColor: Theme.of(context).canvasColor,
-          splashColor: Colors.red,
-          child: Icon(Icons.remove_circle_outline_rounded),
-          shape: CircleBorder(),
-        ),
-        SizedBox(
-          width: 20,
-          child: Text(
-            _score.autoScore.lowGoals.toString(),
-            textAlign: TextAlign.center,
-          ),
-        ),
-        RawMaterialButton(
-          onPressed: () {
-            setState(() {
-              HapticFeedback.mediumImpact();
-              _score.autoScore.lowGoals++;
-            });
-            dataModel.saveEvents();
-            dataModel.uploadEvent(widget.event);
-          },
-          elevation: 2.0,
-          fillColor: Theme.of(context).canvasColor,
-          splashColor: Colors.green,
-          child: Icon(Icons.add_circle_outline_rounded),
-          shape: CircleBorder(),
-        )
-      ]),
-      Divider(
-        height: 3,
+      Incrementor(
+        element: _score.autoScore.lowGoals,
+        onPressed: stateSetter,
       ),
-      Row(children: [
-        Padding(
-          padding: EdgeInsets.all(5),
-        ),
-        Text('Wobble Goals'),
-        Spacer(),
-        RawMaterialButton(
-          onPressed: _score.autoScore.wobbleGoals > 0
-              ? () {
-                  setState(() {
-                    HapticFeedback.mediumImpact();
-                    _score.autoScore.wobbleGoals--;
-                  });
-                  dataModel.saveEvents();
-                  dataModel.uploadEvent(widget.event);
-                }
-              : null,
-          elevation: 2.0,
-          fillColor: Theme.of(context).canvasColor,
-          splashColor: Colors.red,
-          child: Icon(Icons.remove_circle_outline_rounded),
-          shape: CircleBorder(),
-        ),
-        SizedBox(
-          width: 20,
-          child: Text(
-            _score.autoScore.wobbleGoals.toString(),
-            textAlign: TextAlign.center,
-          ),
-        ),
-        RawMaterialButton(
-          onPressed: _score.autoScore.wobbleGoals < 2
-              ? () {
-                  setState(() {
-                    HapticFeedback.mediumImpact();
-                    _score.autoScore.wobbleGoals++;
-                  });
-                  dataModel.saveEvents();
-                  dataModel.uploadEvent(widget.event);
-                }
-              : null,
-          elevation: 2.0,
-          fillColor: Theme.of(context).canvasColor,
-          splashColor: Colors.green,
-          child: Icon(Icons.add_circle_outline_rounded),
-          shape: CircleBorder(),
-        )
-      ]),
-      Divider(
-        height: 3,
+      Incrementor(
+        element: _score.autoScore.wobbleGoals,
+        onPressed: stateSetter,
       ),
-      Row(children: [
-        Padding(
-          padding: EdgeInsets.all(5),
-        ),
-        Text('Power Shots'),
-        Spacer(),
-        RawMaterialButton(
-          onPressed: _score.autoScore.pwrShots > 0
-              ? () {
-                  setState(() {
-                    HapticFeedback.mediumImpact();
-                    _score.autoScore.pwrShots--;
-                  });
-                  dataModel.saveEvents();
-                  dataModel.uploadEvent(widget.event);
-                }
-              : null,
-          elevation: 2.0,
-          fillColor: Theme.of(context).canvasColor,
-          splashColor: Colors.red,
-          child: Icon(Icons.remove_circle_outline_rounded),
-          shape: CircleBorder(),
-        ),
-        SizedBox(
-          width: 20,
-          child: Text(
-            _score.autoScore.pwrShots.toString(),
-            textAlign: TextAlign.center,
-          ),
-        ),
-        RawMaterialButton(
-          onPressed: _score.autoScore.pwrShots < 3
-              ? () {
-                  setState(() {
-                    HapticFeedback.mediumImpact();
-                    _score.autoScore.pwrShots++;
-                  });
-                  dataModel.saveEvents();
-                  dataModel.uploadEvent(widget.event);
-                }
-              : null,
-          elevation: 2.0,
-          fillColor: Theme.of(context).canvasColor,
-          splashColor: Colors.green,
-          child: Icon(Icons.add_circle_outline_rounded),
-          shape: CircleBorder(),
-        )
-      ]),
-      Divider(
-        height: 3,
+      Incrementor(
+        element: _score.autoScore.pwrShots,
+        onPressed: stateSetter,
       ),
-      Row(children: [
-        Padding(
-          padding: EdgeInsets.all(5),
-        ),
-        Text('Navigated'),
-        Spacer(),
-        PlatformSwitch(
-          value: _score.autoScore.navigated,
-          onChanged: (bool newVal) {
-            setState(() {
-              HapticFeedback.mediumImpact();
-              _score.autoScore.navigated = newVal;
-            });
-            dataModel.saveEvents();
-            dataModel.uploadEvent(widget.event);
-          },
-        ),
-      ])
+      Incrementor(
+        element: _score.autoScore.navigated,
+        onPressed: stateSetter,
+        toggle: true,
+      ),
     ];
   }
 

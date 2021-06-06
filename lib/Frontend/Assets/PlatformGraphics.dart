@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
+import 'package:teamtrack/score.dart';
+import 'package:teamtrack/backend.dart';
 import 'dart:io' show Platform;
 
 void showPlatformDialog(
@@ -219,5 +222,91 @@ class PlatformScaffold extends PlatformWidget<CupertinoPageScaffold, Scaffold> {
         body: null,
         backgroundColor: backgroundColor,
         resizeToAvoidBottomInset: resizeToAvoidBottomInset);
+  }
+}
+
+class Incrementor extends StatefulWidget {
+  Incrementor({Key key, this.element, this.onPressed, this.toggle = false})
+      : super(key: key);
+  final ScoringElement element;
+  final Function onPressed;
+  final bool toggle;
+  @override
+  State<StatefulWidget> createState() => _Incrementor();
+}
+
+class _Incrementor extends State<Incrementor> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 5),
+          child: Row(
+            children: [
+              Text(widget.element.name),
+              Spacer(),
+              if (!widget.toggle)
+                RawMaterialButton(
+                  onPressed: widget.element.count > widget.element.min()
+                      ? () {
+                          setState(() {
+                            HapticFeedback.mediumImpact();
+                            widget.element.count--;
+                          });
+                          widget.onPressed();
+                        }
+                      : null,
+                  elevation: 2.0,
+                  fillColor: Theme.of(context).canvasColor,
+                  splashColor: Colors.red,
+                  child: Icon(Icons.remove_circle_outline_rounded),
+                  shape: CircleBorder(),
+                ),
+              if (!widget.toggle)
+                SizedBox(
+                  width: 20,
+                  child: Text(
+                    widget.element.count.toString(),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              if (!widget.toggle)
+                RawMaterialButton(
+                  onPressed: widget.element.count < widget.element.max()
+                      ? () {
+                          setState(() {
+                            HapticFeedback.mediumImpact();
+                            widget.element.count++;
+                          });
+                          widget.onPressed();
+                        }
+                      : null,
+                  elevation: 2.0,
+                  fillColor: Theme.of(context).canvasColor,
+                  splashColor: Colors.green,
+                  child: Icon(Icons.add_circle_outline_rounded),
+                  shape: CircleBorder(),
+                )
+              else
+                PlatformSwitch(
+                  value: widget.element.asBool(),
+                  onChanged: (val) {
+                    if (val)
+                      widget.element.count = 1;
+                    else
+                      widget.element.count = 0;
+                    widget.onPressed();
+                  },
+                )
+            ],
+          ),
+        ),
+        Divider(
+          height: 3,
+          thickness: 2,
+        ),
+      ],
+    );
   }
 }

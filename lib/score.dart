@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:teamtrack/backend.dart';
 
 class Score {
@@ -62,81 +64,145 @@ extension scoreList on List<Score> {
 }
 
 class TeleScore {
-  int lowGoals = 0;
-  int midGoals = 0;
-  int hiGoals = 0;
+  ScoringElement lowGoals = ScoringElement(name: "Low Goals", value: 2);
+  ScoringElement midGoals = ScoringElement(name: "Middle Goals", value: 4);
+  ScoringElement hiGoals = ScoringElement(name: "High Goals", value: 6);
+
   int total() {
-    return lowGoals * 2 + midGoals * 4 + hiGoals * 6;
+    return lowGoals.scoreValue() + midGoals.scoreValue() + hiGoals.scoreValue();
   }
 
   TeleScore();
   TeleScore.fromJson(Map<String, dynamic> json)
-      : hiGoals = json['HighGoals'],
-        midGoals = json['MiddleGoals'],
-        lowGoals = json['LowGoals'];
+      : hiGoals = ScoringElement(
+            name: 'High Goals', count: json['HighGoals'], value: 6),
+        midGoals = ScoringElement(
+            name: 'Middle Goals', count: json['MiddleGoals'], value: 4),
+        lowGoals = ScoringElement(
+            name: 'Low Goals', count: json['LowGoals'], value: 2);
   Map<String, dynamic> toJson() => {
-        'HighGoals': hiGoals,
-        'MiddleGoals': midGoals,
-        'LowGoals': lowGoals,
+        'HighGoals': hiGoals.count,
+        'MiddleGoals': midGoals.count,
+        'LowGoals': lowGoals.count,
       };
 }
 
 class AutoScore {
-  int wobbleGoals = 0;
-  int lowGoals = 0;
-  int midGoals = 0;
-  int hiGoals = 0;
-  int pwrShots = 0;
-  bool navigated = false;
+  ScoringElement wobbleGoals =
+      ScoringElement(name: 'Wobble Goals', value: 15, max: () => 2);
+  ScoringElement lowGoals = ScoringElement(name: 'Low Goals', value: 3);
+  ScoringElement midGoals = ScoringElement(name: 'Middle Goals', value: 6);
+  ScoringElement hiGoals = ScoringElement(name: 'High Goals', value: 12);
+  ScoringElement pwrShots =
+      ScoringElement(name: 'Power Shots', value: 15, max: () => 3);
+  ScoringElement navigated =
+      ScoringElement(name: 'Navigated', value: 5, max: () => 1);
   int total() {
-    return wobbleGoals * 15 +
-        lowGoals * 3 +
-        midGoals * 6 +
-        hiGoals * 12 +
-        pwrShots * 15 +
-        (navigated ? 5 : 0);
+    return wobbleGoals.scoreValue() +
+        lowGoals.scoreValue() +
+        midGoals.scoreValue() +
+        hiGoals.scoreValue() +
+        pwrShots.scoreValue() +
+        navigated.scoreValue();
   }
 
   AutoScore();
-  AutoScore.fromJson(Map<String, dynamic> json)
-      : hiGoals = json['HighGoals'],
-        midGoals = json['MiddleGoals'],
-        lowGoals = json['LowGoals'],
-        wobbleGoals = json['WobbleGoals'],
-        pwrShots = json['PowerShots'],
-        navigated = json['Navigated'];
+  AutoScore.fromJson(Map<String, dynamic> json) {
+    hiGoals =
+        ScoringElement(name: 'High Goals', count: json['HighGoals'], value: 12);
+    midGoals = ScoringElement(
+        name: 'Middle Goals', count: json['MiddleGoals'], value: 6);
+    lowGoals =
+        ScoringElement(name: 'Low Goals', count: json['LowGoals'], value: 3);
+    wobbleGoals = ScoringElement(
+        name: 'Wobble Goals',
+        count: json['WobbleGoals'],
+        value: 15,
+        max: () => 2);
+    pwrShots = ScoringElement(
+        name: 'Power Shots',
+        count: json['PowerShots'],
+        value: 15,
+        max: () => 3);
+    navigated =
+        ScoringElement(name: 'Navigated', count: json['Navigated'], value: 5);
+  }
   Map<String, dynamic> toJson() => {
-        'HighGoals': hiGoals,
-        'MiddleGoals': midGoals,
-        'LowGoals': lowGoals,
-        'WobbleGoals': wobbleGoals,
-        'PowerShots': pwrShots,
-        'Navigated': navigated,
+        'HighGoals': hiGoals.count,
+        'MiddleGoals': midGoals.count,
+        'LowGoals': lowGoals.count,
+        'WobbleGoals': wobbleGoals.count,
+        'PowerShots': pwrShots.count,
+        'Navigated': navigated.count,
       };
 }
 
 class EndgameScore {
-  var wobbleGoalsInDrop = 0;
-  var wobbleGoalsInStart = 0;
-  var pwrShots = 0;
-  var ringsOnWobble = 0;
+  ScoringElement wobbleGoalsInDrop =
+      ScoringElement(name: 'Wobbles In Drop', value: 20);
+  ScoringElement wobbleGoalsInStart =
+      ScoringElement(name: 'Wobbles In Start', value: 5);
+  ScoringElement pwrShots =
+      ScoringElement(name: 'Power Shots', value: 15, max: () => 3);
+  ScoringElement ringsOnWobble =
+      ScoringElement(name: 'Rings On Wobble', value: 5);
+
   int total() {
-    return wobbleGoalsInDrop * 20 +
-        wobbleGoalsInStart * 5 +
-        ringsOnWobble * 5 +
-        pwrShots * 15;
+    return wobbleGoalsInDrop.scoreValue() +
+        wobbleGoalsInStart.scoreValue() +
+        ringsOnWobble.scoreValue() +
+        pwrShots.scoreValue();
   }
 
-  EndgameScore();
-  EndgameScore.fromJson(Map<String, dynamic> json)
-      : wobbleGoalsInDrop = json['WobblesInDrop'],
-        wobbleGoalsInStart = json['WobblesInStart'],
-        pwrShots = json['PowerShots'],
-        ringsOnWobble = json['RingsOnWobble'];
+  EndgameScore() {
+    maxSet();
+  }
+  void maxSet() {
+    wobbleGoalsInStart.max = () => 2 - wobbleGoalsInDrop.count;
+    wobbleGoalsInDrop.max = () => 2 - wobbleGoalsInStart.count;
+  }
+
+  EndgameScore.fromJson(Map<String, dynamic> json) {
+    wobbleGoalsInDrop = ScoringElement(
+        name: 'Wobbles In Drop',
+        count: json['WobblesInDrop'],
+        value: 20,
+        max: () => 2 - wobbleGoalsInStart.count);
+    wobbleGoalsInStart = ScoringElement(
+        name: 'Wobbles In Start',
+        count: json['WobblesInStart'],
+        value: 5,
+        max: () => 2 - wobbleGoalsInDrop.count);
+    pwrShots = ScoringElement(
+        name: 'Power Shots',
+        count: json['PowerShots'],
+        value: 15,
+        max: () => 3);
+    ringsOnWobble = ScoringElement(
+        name: 'Rings On Wobble', count: json['RingsOnWobble'], value: 5);
+  }
   Map<String, dynamic> toJson() => {
-        'WobblesInDrop': wobbleGoalsInDrop,
-        'WobblesInStart': wobbleGoalsInStart,
-        'PowerShots': pwrShots,
-        'RingsOnWobble': ringsOnWobble
+        'WobblesInDrop': wobbleGoalsInDrop.count,
+        'WobblesInStart': wobbleGoalsInStart.count,
+        'PowerShots': pwrShots.count,
+        'RingsOnWobble': ringsOnWobble.count
       };
+}
+
+class ScoringElement {
+  ScoringElement(
+      {this.name = '', this.count = 0, this.value = 1, this.min, this.max}) {
+    setStuff();
+  }
+  String name;
+  int count;
+  int value;
+  int Function() min = () => 0;
+  int Function() max = () => 9999;
+  int scoreValue() => count * value;
+  bool asBool() => count == 0 ? false : true;
+  void setStuff() {
+    if (min == null) min = () => 0;
+    if (max == null) max = () => 9999;
+  }
 }
