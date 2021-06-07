@@ -2,26 +2,31 @@ import 'dart:math';
 
 import 'package:teamtrack/backend.dart';
 
-class Score {
-  TeleScore teleScore = TeleScore();
-  AutoScore autoScore = AutoScore();
-  EndgameScore endgameScore = EndgameScore();
+class Score extends ScoreDivision {
+  TeleScore teleScore;
+  AutoScore autoScore;
+  EndgameScore endgameScore;
   String id;
   Dice dice;
   Score(String id, Dice dice) {
     this.id = id;
     this.dice = dice;
+    teleScore = TeleScore(dice);
+    autoScore = AutoScore(dice);
+    endgameScore = EndgameScore(dice);
   }
   int total() {
     return teleScore.total() + autoScore.total() + endgameScore.total();
   }
 
-  Score.fromJson(Map<String, dynamic> json)
-      : autoScore = AutoScore.fromJson(json['AutoScore']),
-        teleScore = TeleScore.fromJson(json['TeleScore']),
-        endgameScore = EndgameScore.fromJson(json['EndgameScore']),
-        id = json['id'],
-        dice = getDiceFromString(json['dice']);
+  Dice getDice() => dice;
+  Score.fromJson(Map<String, dynamic> json) {
+    autoScore = AutoScore.fromJson(json['AutoScore'], dice);
+    teleScore = TeleScore.fromJson(json['TeleScore'], dice);
+    endgameScore = EndgameScore.fromJson(json['EndgameScore'], dice);
+    id = json['id'];
+    dice = getDiceFromString(json['dice']);
+  }
   Map<String, dynamic> toJson() => {
         'AutoScore': autoScore.toJson(),
         'TeleScore': teleScore.toJson(),
@@ -63,7 +68,8 @@ extension scoreList on List<Score> {
   }
 }
 
-class TeleScore {
+class TeleScore extends ScoreDivision {
+  Dice dice;
   ScoringElement lowGoals = ScoringElement(name: "Low Goals", value: 2);
   ScoringElement midGoals = ScoringElement(name: "Middle Goals", value: 4);
   ScoringElement hiGoals = ScoringElement(name: "High Goals", value: 6);
@@ -72,8 +78,9 @@ class TeleScore {
     return lowGoals.scoreValue() + midGoals.scoreValue() + hiGoals.scoreValue();
   }
 
-  TeleScore();
-  TeleScore.fromJson(Map<String, dynamic> json)
+  Dice getDice() => dice;
+  TeleScore(this.dice);
+  TeleScore.fromJson(Map<String, dynamic> json, this.dice)
       : hiGoals = ScoringElement(
             name: 'High Goals', count: json['HighGoals'], value: 6),
         midGoals = ScoringElement(
@@ -87,7 +94,8 @@ class TeleScore {
       };
 }
 
-class AutoScore {
+class AutoScore extends ScoreDivision {
+  Dice dice;
   ScoringElement wobbleGoals =
       ScoringElement(name: 'Wobble Goals', value: 15, max: () => 2);
   ScoringElement lowGoals = ScoringElement(name: 'Low Goals', value: 3);
@@ -106,8 +114,9 @@ class AutoScore {
         navigated.scoreValue();
   }
 
-  AutoScore();
-  AutoScore.fromJson(Map<String, dynamic> json) {
+  Dice getDice() => dice;
+  AutoScore(this.dice);
+  AutoScore.fromJson(Map<String, dynamic> json, this.dice) {
     hiGoals =
         ScoringElement(name: 'High Goals', count: json['HighGoals'], value: 12);
     midGoals = ScoringElement(
@@ -137,7 +146,8 @@ class AutoScore {
       };
 }
 
-class EndgameScore {
+class EndgameScore extends ScoreDivision {
+  Dice dice;
   ScoringElement wobbleGoalsInDrop =
       ScoringElement(name: 'Wobbles In Drop', value: 20);
   ScoringElement wobbleGoalsInStart =
@@ -154,7 +164,8 @@ class EndgameScore {
         pwrShots.scoreValue();
   }
 
-  EndgameScore() {
+  Dice getDice() => dice;
+  EndgameScore(this.dice) {
     maxSet();
   }
   void maxSet() {
@@ -162,7 +173,7 @@ class EndgameScore {
     wobbleGoalsInDrop.max = () => 2 - wobbleGoalsInStart.count;
   }
 
-  EndgameScore.fromJson(Map<String, dynamic> json) {
+  EndgameScore.fromJson(Map<String, dynamic> json, this.dice) {
     wobbleGoalsInDrop = ScoringElement(
         name: 'Wobbles In Drop',
         count: json['WobblesInDrop'],
@@ -205,4 +216,9 @@ class ScoringElement {
     if (min == null) min = () => 0;
     if (max == null) max = () => 9999;
   }
+}
+
+abstract class ScoreDivision {
+  int total();
+  Dice getDice();
 }

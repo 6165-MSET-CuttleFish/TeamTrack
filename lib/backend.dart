@@ -246,7 +246,7 @@ class Event {
       if (element.equals(newTeam)) isIn = true;
     });
     if (!isIn) teams.add(newTeam);
-    teams.sortTeams();
+    //teams.sortTeams();
   }
 
   void deleteTeam(Team team) {
@@ -586,13 +586,46 @@ extension TeamsExtension on List<Team> {
           number.replaceAll(new RegExp(r' -,[^\w\s]+'), '').replaceAll(' ', ''),
           name);
       this.add(newTeam);
-      this.sortTeams();
+      //this.sortTeams();
       return newTeam;
     }
   }
 
-  void sortTeams() {
-    this.sort((a, b) => int.parse(a.number).compareTo(int.parse(b.number)));
+  // void sortTeams() {
+  //   this.sort((a, b) => int.parse(a.number).compareTo(int.parse(b.number)));
+  // }
+
+  List<Team> sortedTeams() {
+    List<Team> val = [];
+    for (Team team in this) {
+      val.add(team);
+    }
+    val.sort((a, b) => int.parse(a.number).compareTo(int.parse(b.number)));
+    return val;
+  }
+
+  double maxScoreVar(Dice dice, String string) {
+    if (string == "auto") {
+      return this.maxAutoScore(dice);
+    } else if (string == "tele") {
+      return this.maxTeleScore(dice);
+    } else if (string == "endgame") {
+      return this.maxEndScore(dice);
+    } else {
+      return this.maxScore(dice);
+    }
+  }
+
+  double lowestMadVar(Dice dice, String string) {
+    if (string == "auto") {
+      return this.lowestAutoMadScore(dice);
+    } else if (string == "tele") {
+      return this.lowestTeleMadScore(dice);
+    } else if (string == "endgame") {
+      return this.lowestEndMadScore(dice);
+    } else {
+      return this.lowestMadScore(dice);
+    }
   }
 
   double maxScore(Dice dice) {
@@ -633,6 +666,46 @@ extension TeamsExtension on List<Team> {
   double lowestEndMadScore(Dice dice) {
     if (this.length == 0) return 1;
     return this.map((e) => e.scores.endMADScore(dice)).reduce(min);
+  }
+}
+
+extension ScoreDivExtension on List<ScoreDivision> {
+  List<FlSpot> spots() {
+    final list = this.map((e) => e.total()).toList();
+    List<FlSpot> val = [];
+    for (int i = 0; i < list.length; i++) {
+      val.add(FlSpot(i.toDouble(), list[i].toDouble()));
+    }
+    return val;
+  }
+
+  double maxScore(Dice dice) {
+    final arr = this.diceScores(dice);
+    if (arr.length == 0) return 0;
+    return arr.map((e) => e.total()).reduce(max).toDouble();
+  }
+
+  double minScore(Dice dice) {
+    final arr = this.diceScores(dice);
+    if (arr.length == 0) return 0;
+    return arr.map((e) => e.total()).reduce(min).toDouble();
+  }
+
+  double meanScore(Dice dice) {
+    final arr = this.diceScores(dice);
+    if (arr.length == 0) return 0;
+    return arr.map((e) => e.total()).mean();
+  }
+
+  double madScore(Dice dice) {
+    final arr = this.diceScores(dice);
+    if (arr.length == 0) return 0;
+    return arr.map((e) => e.total()).mad();
+  }
+
+  List<ScoreDivision> diceScores(Dice dice) {
+    return (dice != Dice.none ? this.where((e) => e.getDice() == dice) : this)
+        .toList();
   }
 }
 

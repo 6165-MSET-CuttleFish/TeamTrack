@@ -1,7 +1,5 @@
 import 'dart:io';
 import 'dart:math';
-import 'package:teamtrack/Frontend/Assets/BarGraph.dart';
-import 'package:teamtrack/Frontend/Assets/CardView.dart';
 import 'package:teamtrack/Frontend/Assets/Collapsible.dart';
 import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
 import 'package:teamtrack/Frontend/MatchList.dart';
@@ -495,156 +493,19 @@ class _TeamView extends State<TeamView> {
             child: Text('Target'),
           )),
       Padding(
-        padding: EdgeInsets.all(10),
+        padding: const EdgeInsets.only(top: 20, bottom: 10),
+        child: Text(
+          'General',
+          style: Theme.of(context).textTheme.bodyText1,
+        ),
       ),
-      Text(
-        'General',
-        style: Theme.of(context).textTheme.bodyText1,
+      ScoreCard(
+        team: _team,
+        event: widget.event,
+        type: "general",
+        scoreDivisions: _team.scores,
+        dice: _dice,
       ),
-      Padding(
-        padding: EdgeInsets.all(5),
-      ),
-      CardView(
-          isActive: _team.scores.diceScores(_dice).length >= 1,
-          child: Padding(
-              padding: EdgeInsets.only(left: 5, right: 5),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  BarGraph(
-                    val: _team.scores.meanScore(_dice),
-                    max: widget.event.teams.maxScore(_dice),
-                    title: 'Average',
-                  ),
-                  BarGraph(
-                      val: _team.scores.maxScore(_dice),
-                      max: widget.event.teams.maxScore(_dice),
-                      title: 'Best Score'),
-                  BarGraph(
-                    val: _team.scores.madScore(_dice),
-                    max: widget.event.teams.lowestMadScore(_dice),
-                    inverted: true,
-                    title: 'Deviation',
-                  ),
-                ],
-              )),
-          collapsed: _team.scores.diceScores(_dice).length >= 1
-              ? AspectRatio(
-                  aspectRatio: 2,
-                  child: Container(
-                      decoration: const BoxDecoration(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(18),
-                          ),
-                          color: Color(0xff232d37)),
-                      child: Padding(
-                          padding: const EdgeInsets.only(
-                              right: 50.0, left: 12.0, top: 24, bottom: 12),
-                          child: LineChart(LineChartData(
-                              gridData: FlGridData(
-                                show: true,
-                                drawVerticalLine: true,
-                                getDrawingHorizontalLine: (value) {
-                                  return FlLine(
-                                    color: value % 10 == 0
-                                        ? Color(0xff37434d)
-                                        : Colors.transparent,
-                                    strokeWidth: value % 10 == 0 ? 1 : 0,
-                                  );
-                                },
-                                getDrawingVerticalLine: (value) {
-                                  return FlLine(
-                                    color: const Color(0xff37434d),
-                                    strokeWidth: 1,
-                                  );
-                                },
-                              ),
-                              titlesData: FlTitlesData(
-                                show: true,
-                                bottomTitles: SideTitles(
-                                  showTitles: true,
-                                  reservedSize: 22,
-                                  getTextStyles: (value) => const TextStyle(
-                                      color: Color(0xff68737d), fontSize: 16),
-                                  getTitles: (value) {
-                                    return (value + 1).toInt().toString();
-                                  },
-                                  margin: 8,
-                                ),
-                                leftTitles: SideTitles(
-                                  showTitles: true,
-                                  getTextStyles: (value) => const TextStyle(
-                                    color: Color(0xff67727d),
-                                    fontSize: 15,
-                                  ),
-                                  getTitles: (value) {
-                                    if (value % 30 == 0) {
-                                      return value.toInt().toString();
-                                    }
-                                    return '';
-                                  },
-                                  reservedSize: 28,
-                                  margin: 12,
-                                ),
-                              ),
-                              borderData: FlBorderData(
-                                  show: true,
-                                  border: Border.all(
-                                      color: const Color(0xff37434d),
-                                      width: 1)),
-                              minX: 0,
-                              maxX: _team.scores
-                                      .diceScores(_dice)
-                                      .length
-                                      .toDouble() -
-                                  1,
-                              minY: [
-                                _team.scores.minScore(_dice),
-                                _team.targetScore.total().toDouble()
-                              ].reduce(min),
-                              maxY: [
-                                _team.scores.maxScore(_dice),
-                                _team.targetScore != null
-                                    ? _team.targetScore.total().toDouble()
-                                    : 0.0
-                              ].reduce(max),
-                              lineBarsData: [
-                                LineChartBarData(
-                                    belowBarData: _team.targetScore != null
-                                        ? BarAreaData(
-                                            show: true,
-                                            colors: [
-                                              Colors.lightGreenAccent
-                                                  .withOpacity(0.5)
-                                            ],
-                                            cutOffY: _team.targetScore
-                                                ?.total()
-                                                ?.toDouble(),
-                                            applyCutOffY: true,
-                                          )
-                                        : null,
-                                    aboveBarData: _team.targetScore != null
-                                        ? BarAreaData(
-                                            show: true,
-                                            colors: [
-                                              Colors.redAccent.withOpacity(0.5)
-                                            ],
-                                            cutOffY: _team.targetScore
-                                                ?.total()
-                                                ?.toDouble(),
-                                            applyCutOffY: true,
-                                          )
-                                        : null,
-                                    spots:
-                                        _team.scores.diceScores(_dice).spots(),
-                                    colors: [Colors.orange],
-                                    isCurved: true,
-                                    preventCurveOverShooting: true,
-                                    barWidth: 5,
-                                    shadow: Shadow(
-                                        color: Colors.green, blurRadius: 5)),
-                              ])))))
-              : Text('')),
       Padding(
         padding: EdgeInsets.all(10),
       ),
@@ -655,468 +516,41 @@ class _TeamView extends State<TeamView> {
       Padding(
         padding: EdgeInsets.all(5),
       ),
-      CardView(
-        isActive: _team.scores.diceScores(_dice).length >= 1,
-        child: Padding(
-            padding: EdgeInsets.only(left: 5, right: 5),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                BarGraph(
-                  val: _team.scores.autoMeanScore(_dice),
-                  max: widget.event.teams.maxAutoScore(_dice),
-                  title: 'Average',
-                ),
-                BarGraph(
-                    val: _team.scores.autoMaxScore(_dice),
-                    max: widget.event.teams.maxAutoScore(_dice),
-                    title: 'Best Score'),
-                BarGraph(
-                  val: _team.scores.autoMADScore(_dice),
-                  max: widget.event.teams.lowestAutoMadScore(_dice),
-                  inverted: true,
-                  title: 'Deviation',
-                ),
-              ],
-            )),
-        collapsed: _team.scores.diceScores(_dice).length >= 1
-            ? AspectRatio(
-                aspectRatio: 2,
-                child: Container(
-                    decoration: const BoxDecoration(
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(18),
-                        ),
-                        color: Color(0xff232d37)),
-                    child: Padding(
-                        padding: const EdgeInsets.only(
-                            right: 50.0, left: 12.0, top: 24, bottom: 12),
-                        child: LineChart(LineChartData(
-                            gridData: FlGridData(
-                              show: true,
-                              drawVerticalLine: true,
-                              getDrawingHorizontalLine: (value) {
-                                return FlLine(
-                                  color: value % 10 == 0
-                                      ? Color(0xff37434d)
-                                      : Colors.transparent,
-                                  strokeWidth: value % 10 == 0 ? 1 : 0,
-                                );
-                              },
-                              getDrawingVerticalLine: (value) {
-                                return FlLine(
-                                  color: const Color(0xff37434d),
-                                  strokeWidth: 1,
-                                );
-                              },
-                            ),
-                            titlesData: FlTitlesData(
-                              show: true,
-                              bottomTitles: SideTitles(
-                                showTitles: true,
-                                reservedSize: 22,
-                                getTextStyles: (value) => const TextStyle(
-                                    color: Color(0xff68737d), fontSize: 16),
-                                getTitles: (value) {
-                                  return (value + 1).toInt().toString();
-                                },
-                                margin: 8,
-                              ),
-                              leftTitles: SideTitles(
-                                showTitles: true,
-                                getTextStyles: (value) => const TextStyle(
-                                  color: Color(0xff67727d),
-                                  fontSize: 15,
-                                ),
-                                getTitles: (value) {
-                                  if (value % 30 == 0) {
-                                    return value.toInt().toString();
-                                  }
-                                  return '';
-                                },
-                                reservedSize: 28,
-                                margin: 12,
-                              ),
-                            ),
-                            borderData: FlBorderData(
-                                show: true,
-                                border: Border.all(
-                                    color: const Color(0xff37434d), width: 1)),
-                            minX: 0,
-                            maxX: _team.scores
-                                    .where((e) => _dice != Dice.none
-                                        ? e.dice == _dice
-                                        : true)
-                                    .length
-                                    .toDouble() -
-                                1,
-                            minY: [
-                              _team.scores.autoMinScore(_dice),
-                              _team.targetScore.autoScore.total().toDouble()
-                            ].reduce(min),
-                            maxY: [
-                              _team.scores.autoMaxScore(_dice),
-                              _team.targetScore != null
-                                  ? _team.targetScore.autoScore
-                                      .total()
-                                      .toDouble()
-                                  : 0.0
-                            ].reduce(max),
-                            lineBarsData: [
-                              LineChartBarData(
-                                  belowBarData: _team.targetScore != null
-                                      ? BarAreaData(
-                                          show: true,
-                                          colors: [
-                                            Colors.lightGreenAccent
-                                                .withOpacity(0.5)
-                                          ],
-                                          cutOffY: widget
-                                              .team.targetScore?.autoScore
-                                              ?.total()
-                                              ?.toDouble(),
-                                          applyCutOffY: true,
-                                        )
-                                      : null,
-                                  aboveBarData: _team.targetScore != null
-                                      ? BarAreaData(
-                                          show: true,
-                                          colors: [
-                                            Colors.redAccent.withOpacity(0.5)
-                                          ],
-                                          cutOffY: widget
-                                              .team.targetScore?.autoScore
-                                              ?.total()
-                                              ?.toDouble(),
-                                          applyCutOffY: true,
-                                        )
-                                      : null,
-                                  spots: _team.scores
-                                      .diceScores(_dice)
-                                      .autoSpots(),
-                                  colors: [Colors.orange],
-                                  isCurved: true,
-                                  preventCurveOverShooting: true,
-                                  barWidth: 5,
-                                  shadow: Shadow(
-                                      color: Colors.green, blurRadius: 5)),
-                            ])))))
-            : Text(''),
+      ScoreCard(
+        team: _team,
+        event: widget.event,
+        type: "auto",
+        scoreDivisions: _team.scores.map((e) => e.autoScore).toList(),
+        dice: _dice,
       ),
       Padding(
-        padding: EdgeInsets.all(10),
+        padding: const EdgeInsets.only(top: 20, bottom: 10),
+        child: Text(
+          'Tele-Op',
+          style: Theme.of(context).textTheme.bodyText1,
+        ),
       ),
-      Text(
-        'Tele-Op',
-        style: Theme.of(context).textTheme.bodyText1,
-      ),
-      Padding(
-        padding: EdgeInsets.all(5),
-      ),
-      CardView(
-          isActive: _team.scores.diceScores(_dice).length >= 1,
-          child: Padding(
-              padding: EdgeInsets.only(left: 5, right: 5),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  BarGraph(
-                    val: _team.scores.teleMeanScore(_dice),
-                    max: widget.event.teams.maxTeleScore(_dice),
-                    title: 'Average',
-                  ),
-                  BarGraph(
-                      val: _team.scores.teleMaxScore(_dice),
-                      max: widget.event.teams.maxTeleScore(_dice),
-                      title: 'Best Score'),
-                  BarGraph(
-                    val: _team.scores.teleMADScore(_dice),
-                    max: widget.event.teams.lowestTeleMadScore(_dice),
-                    inverted: true,
-                    title: 'Deviation',
-                  ),
-                ],
-              )),
-          collapsed: _team.scores.diceScores(_dice).length >= 1
-              ? AspectRatio(
-                  aspectRatio: 2,
-                  child: Container(
-                      decoration: const BoxDecoration(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(18),
-                          ),
-                          color: Color(0xff232d37)),
-                      child: Padding(
-                          padding: const EdgeInsets.only(
-                              right: 50.0, left: 12.0, top: 24, bottom: 12),
-                          child: LineChart(LineChartData(
-                              gridData: FlGridData(
-                                show: true,
-                                drawVerticalLine: true,
-                                getDrawingHorizontalLine: (value) {
-                                  return FlLine(
-                                    color: value % 10 == 0
-                                        ? Color(0xff37434d)
-                                        : Colors.transparent,
-                                    strokeWidth: value % 10 == 0 ? 1 : 0,
-                                  );
-                                },
-                                getDrawingVerticalLine: (value) {
-                                  return FlLine(
-                                    color: const Color(0xff37434d),
-                                    strokeWidth: 1,
-                                  );
-                                },
-                              ),
-                              titlesData: FlTitlesData(
-                                show: true,
-                                bottomTitles: SideTitles(
-                                  showTitles: true,
-                                  reservedSize: 22,
-                                  getTextStyles: (value) => const TextStyle(
-                                      color: Color(0xff68737d), fontSize: 16),
-                                  getTitles: (value) {
-                                    return (value + 1).toInt().toString();
-                                  },
-                                  margin: 8,
-                                ),
-                                leftTitles: SideTitles(
-                                  showTitles: true,
-                                  getTextStyles: (value) => const TextStyle(
-                                    color: Color(0xff67727d),
-                                    fontSize: 15,
-                                  ),
-                                  getTitles: (value) {
-                                    if (value % 30 == 0) {
-                                      return value.toInt().toString();
-                                    }
-                                    return '';
-                                  },
-                                  reservedSize: 28,
-                                  margin: 12,
-                                ),
-                              ),
-                              borderData: FlBorderData(
-                                  show: true,
-                                  border: Border.all(
-                                      color: const Color(0xff37434d),
-                                      width: 1)),
-                              minX: 0,
-                              maxX: _team.scores
-                                      .diceScores(_dice)
-                                      .length
-                                      .toDouble() -
-                                  1,
-                              minY: [
-                                _team.scores.teleMinScore(_dice),
-                                _team.targetScore.teleScore.total().toDouble()
-                              ].reduce(min),
-                              maxY: [
-                                _team.scores.teleMaxScore(_dice).toDouble(),
-                                _team.targetScore != null
-                                    ? _team.targetScore.teleScore
-                                        .total()
-                                        .toDouble()
-                                    : 0.0
-                              ].reduce(max),
-                              lineBarsData: [
-                                LineChartBarData(
-                                    belowBarData: _team.targetScore != null
-                                        ? BarAreaData(
-                                            show: true,
-                                            colors: [
-                                              Colors.lightGreenAccent
-                                                  .withOpacity(0.5)
-                                            ],
-                                            cutOffY: widget
-                                                .team.targetScore?.teleScore
-                                                ?.total()
-                                                ?.toDouble(),
-                                            applyCutOffY: true,
-                                          )
-                                        : null,
-                                    aboveBarData: _team.targetScore != null
-                                        ? BarAreaData(
-                                            show: true,
-                                            colors: [
-                                              Colors.redAccent.withOpacity(0.5)
-                                            ],
-                                            cutOffY: widget
-                                                .team.targetScore?.teleScore
-                                                ?.total()
-                                                ?.toDouble(),
-                                            applyCutOffY: true,
-                                          )
-                                        : null,
-                                    spots: _team.scores
-                                        .diceScores(_dice)
-                                        .teleSpots(),
-                                    colors: [Colors.orange],
-                                    isCurved: true,
-                                    preventCurveOverShooting: true,
-                                    barWidth: 5,
-                                    shadow: Shadow(
-                                        color: Colors.green, blurRadius: 5)),
-                              ])))))
-              : Text('')),
-      Padding(
-        padding: EdgeInsets.all(10),
-      ),
-      Text(
-        'Endgame',
-        style: Theme.of(context).textTheme.bodyText1,
+      ScoreCard(
+        team: _team,
+        event: widget.event,
+        type: "tele",
+        scoreDivisions: _team.scores.map((e) => e.teleScore).toList(),
+        dice: _dice,
       ),
       Padding(
-        padding: EdgeInsets.all(5),
+        padding: const EdgeInsets.only(top: 20, bottom: 10),
+        child: Text(
+          'Endgame',
+          style: Theme.of(context).textTheme.bodyText1,
+        ),
       ),
-      CardView(
-          isActive: _team.scores.diceScores(_dice).length >= 1,
-          child: Padding(
-              padding: EdgeInsets.only(left: 5, right: 5),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  BarGraph(
-                    val: _team.scores.endMeanScore(_dice),
-                    max: widget.event.teams.maxEndScore(_dice),
-                    title: 'Average',
-                  ),
-                  BarGraph(
-                      val: _team.scores.endMaxScore(_dice),
-                      max: widget.event.teams.maxEndScore(_dice),
-                      title: 'Best Score'),
-                  BarGraph(
-                    val: _team.scores.endMADScore(_dice),
-                    max: widget.event.teams.lowestEndMadScore(_dice),
-                    inverted: true,
-                    title: 'Deviation',
-                  ),
-                ],
-              )),
-          collapsed: _team.scores.diceScores(_dice).length >= 1
-              ? AspectRatio(
-                  aspectRatio: 2,
-                  child: Container(
-                      decoration: const BoxDecoration(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(18),
-                          ),
-                          color: Color(0xff232d37)),
-                      child: Padding(
-                          padding: const EdgeInsets.only(
-                              right: 50.0, left: 12.0, top: 24, bottom: 12),
-                          child: LineChart(LineChartData(
-                              gridData: FlGridData(
-                                show: true,
-                                drawVerticalLine: true,
-                                getDrawingHorizontalLine: (value) {
-                                  return FlLine(
-                                    color: value % 10 == 0
-                                        ? Color(0xff37434d)
-                                        : Colors.transparent,
-                                    strokeWidth: value % 10 == 0 ? 1 : 0,
-                                  );
-                                },
-                                getDrawingVerticalLine: (value) {
-                                  return FlLine(
-                                    color: const Color(0xff37434d),
-                                    strokeWidth: 1,
-                                  );
-                                },
-                              ),
-                              titlesData: FlTitlesData(
-                                show: true,
-                                bottomTitles: SideTitles(
-                                  showTitles: true,
-                                  reservedSize: 22,
-                                  getTextStyles: (value) => const TextStyle(
-                                      color: Color(0xff68737d), fontSize: 16),
-                                  getTitles: (value) {
-                                    return (value + 1).toInt().toString();
-                                  },
-                                  margin: 8,
-                                ),
-                                leftTitles: SideTitles(
-                                  showTitles: true,
-                                  getTextStyles: (value) => const TextStyle(
-                                    color: Color(0xff67727d),
-                                    fontSize: 15,
-                                  ),
-                                  getTitles: (value) {
-                                    if (value % 30 == 0) {
-                                      return value.toInt().toString();
-                                    }
-                                    return '';
-                                  },
-                                  reservedSize: 28,
-                                  margin: 12,
-                                ),
-                              ),
-                              borderData: FlBorderData(
-                                  show: true,
-                                  border: Border.all(
-                                      color: const Color(0xff37434d),
-                                      width: 1)),
-                              minX: 0,
-                              maxX: _team.scores
-                                      .diceScores(_dice)
-                                      .length
-                                      .toDouble() -
-                                  1,
-                              minY: [
-                                _team.scores.endMinScore(_dice),
-                                _team.targetScore.endgameScore
-                                    .total()
-                                    .toDouble()
-                              ].reduce(min),
-                              maxY: [
-                                _team.scores.endMaxScore(_dice),
-                                _team.targetScore != null
-                                    ? _team.targetScore.endgameScore
-                                        .total()
-                                        .toDouble()
-                                    : 0.0
-                              ].reduce(max),
-                              lineBarsData: [
-                                LineChartBarData(
-                                    belowBarData: _team.targetScore != null
-                                        ? BarAreaData(
-                                            show: true,
-                                            colors: [
-                                              Colors.lightGreenAccent
-                                                  .withOpacity(0.5)
-                                            ],
-                                            cutOffY: _team
-                                                .targetScore?.endgameScore
-                                                ?.total()
-                                                ?.toDouble(),
-                                            applyCutOffY: true,
-                                          )
-                                        : null,
-                                    aboveBarData: _team.targetScore != null
-                                        ? BarAreaData(
-                                            show: true,
-                                            colors: [
-                                              Colors.redAccent.withOpacity(0.5)
-                                            ],
-                                            cutOffY: widget
-                                                .team.targetScore?.endgameScore
-                                                ?.total()
-                                                ?.toDouble(),
-                                            applyCutOffY: true,
-                                          )
-                                        : null,
-                                    spots: _team.scores
-                                        .diceScores(_dice)
-                                        .endSpots(),
-                                    colors: [Colors.orange],
-                                    isCurved: true,
-                                    preventCurveOverShooting: true,
-                                    barWidth: 5,
-                                    shadow: Shadow(
-                                        color: Colors.green, blurRadius: 5)),
-                              ])))))
-              : Text('')),
+      ScoreCard(
+        team: _team,
+        event: widget.event,
+        type: "endgame",
+        scoreDivisions: _team.scores.map((e) => e.endgameScore).toList(),
+        dice: _dice,
+      ),
       Padding(
         padding: EdgeInsets.all(130),
       ),

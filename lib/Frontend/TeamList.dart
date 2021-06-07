@@ -25,7 +25,7 @@ class _TeamList extends State<TeamList> {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      children: widget.event.teams
+      children: widget.event.teams.sortedTeams()
           .map((e) => Slidable(
                 actionPane: slider,
                 secondaryActions: [
