@@ -36,7 +36,7 @@ class _TeamView extends State<TeamView> {
   Widget build(BuildContext context) {
     _team = widget.team;
     return Scaffold(
-      bottomNavigationBar: Platform.isIOS
+      bottomNavigationBar: NewPlatform.isIOS()
           ? SafeArea(
               child: CupertinoSlidingSegmentedControl(
               groupValue: _dice,
@@ -436,30 +436,18 @@ class _TeamView extends State<TeamView> {
           width: MediaQuery.of(context).size.width,
           child: PlatformButton(
             onPressed: () async {
-              if (Platform.isIOS) {
-                await Navigator.push(
-                    context,
-                    CupertinoPageRoute(
-                        builder: (context) => MatchList(
-                              event: widget.event,
-                              team: _team,
-                            )));
-                setState(() {});
-              } else {
-                await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => MatchList(
-                              event: widget.event,
-                              team: _team,
-                            )));
-                setState(() {});
-              }
+              await Navigator.push(
+                  context,
+                  platformPageRoute((context) => MatchList(
+                        event: widget.event,
+                        team: _team,
+                      )));
+              setState(() {});
             },
             color: CupertinoColors.systemGreen,
             child: Text('Matches'),
           )),
-      if (Platform.isIOS) Padding(padding: EdgeInsets.all(5)),
+      if (NewPlatform.isIOS()) Padding(padding: EdgeInsets.all(5)),
       Container(
           width: MediaQuery.of(context).size.width / 2,
           child: PlatformButton(
@@ -467,27 +455,14 @@ class _TeamView extends State<TeamView> {
               if (_team.targetScore == null) {
                 _team.targetScore = Score(Uuid().v4(), Dice.none);
               }
-              if (Platform.isIOS) {
-                await Navigator.push(
-                    context,
-                    CupertinoPageRoute(
-                        builder: (context) => MatchView(
-                              match: Match.defaultMatch(EventType.remote),
-                              team: _team,
-                              event: widget.event,
-                            )));
-                setState(() {});
-              } else {
-                await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => MatchView(
-                              match: Match.defaultMatch(EventType.remote),
-                              team: _team,
-                              event: widget.event,
-                            )));
-                setState(() {});
-              }
+              await Navigator.push(
+                  context,
+                  platformPageRoute((context) => MatchView(
+                        match: Match.defaultMatch(EventType.remote),
+                        event: widget.event,
+                        team: _team,
+                      )));
+              setState(() {});
             },
             color: Colors.indigoAccent,
             child: Text('Target'),

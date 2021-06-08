@@ -28,6 +28,11 @@ class _MatchView extends State<MatchView> {
   Score _score;
   int _view = 0;
   Match _match;
+  final Stream<double> _periodicStream =
+      Stream.periodic(const Duration(milliseconds: 1));
+  double _time = 0;
+  double _previousStreamValue;
+  bool _paused;
   _MatchView(Match match, Team team) {
     if (team != null) {
       _score = team.targetScore;
@@ -45,209 +50,237 @@ class _MatchView extends State<MatchView> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<Database.Event>(
-        stream: DatabaseServices(id: widget.event.id).getEventChanges,
-        builder: (context, eventHandler) {
-          if (eventHandler.hasData &&
-              !eventHandler.hasError &&
-              !dataModel.isProcessing) {
-            widget.event.updateLocal(
-                json.decode(json.encode(eventHandler.data.snapshot.value)));
-            if (widget.team == null) {
-              _match = widget.event.matches
-                  .firstWhere((element) => element.id == _match.id, orElse: () {
-                Navigator.pop(context);
-                return Match.defaultMatch(EventType.remote);
-              });
-            }
-            _selectedTeam = widget.event.teams.firstWhere(
-                (team) => team.number == _selectedTeam.number, orElse: () {
-              Navigator.pop(context);
-              return Team.nullTeam();
-            });
-            if (widget.team != null) {
-              _score = _selectedTeam.targetScore;
-            } else {
-              _score = _selectedTeam.scores.firstWhere(
-                  (element) => element.id == _match.id,
-                  orElse: () => Score(Uuid().v4(), Dice.none));
+    return StreamBuilder(
+        stream: _periodicStream,
+        builder: (context, newTime) {
+          if (newTime.hasData && newTime.data != _previousStreamValue) {
+            _previousStreamValue = newTime.data;
+            if (!_paused) {
+              _time += 1 / 1000;
             }
           }
-          return DefaultTabController(
-            length: 3,
-            child: Scaffold(
-              appBar: AppBar(
-                backgroundColor: _color,
-                title: Text('Match Stats'),
-                elevation: 0.0,
-              ),
-              body: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        _color,
-                        Theme.of(context).canvasColor,
-                        Theme.of(context).canvasColor,
-                        Theme.of(context).canvasColor,
-                        Theme.of(context).canvasColor,
-                        Theme.of(context).canvasColor,
-                        Theme.of(context).canvasColor,
-                      ]),
-                ),
-                child: Center(
-                  child: Column(children: [
-                    if (_match != null && _match.type != EventType.remote)
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Container(
-                            width: 100,
-                            child: Text(_match.redScore(),
-                                style: Theme.of(context).textTheme.headline4),
-                          ),
-                          Container(
-                            child: Text('-',
-                                style: Theme.of(context).textTheme.headline4),
-                          ),
-                          Container(
-                            width: 100,
-                            child: Text(_match.blueScore(),
-                                style: Theme.of(context).textTheme.headline4),
-                          )
-                        ],
-                      ),
-                    Padding(
-                      padding: EdgeInsets.all(10),
+          return StreamBuilder<Database.Event>(
+              stream: DatabaseServices(id: widget.event.id).getEventChanges,
+              builder: (context, eventHandler) {
+                if (eventHandler.hasData &&
+                    !eventHandler.hasError &&
+                    !dataModel.isProcessing) {
+                  widget.event.updateLocal(json
+                      .decode(json.encode(eventHandler.data.snapshot.value)));
+                  if (widget.team == null) {
+                    _match = widget.event.matches.firstWhere(
+                        (element) => element.id == _match.id, orElse: () {
+                      Navigator.pop(context);
+                      return Match.defaultMatch(EventType.remote);
+                    });
+                  }
+                  _selectedTeam = widget.event.teams
+                      .firstWhere((team) => team.number == _selectedTeam.number,
+                          orElse: () {
+                    Navigator.pop(context);
+                    return Team.nullTeam();
+                  });
+                  if (widget.team != null) {
+                    _score = _selectedTeam.targetScore;
+                  } else {
+                    _score = _selectedTeam.scores.firstWhere(
+                        (element) => element.id == _match.id,
+                        orElse: () => Score(Uuid().v4(), Dice.none));
+                  }
+                }
+                return DefaultTabController(
+                  length: 3,
+                  child: Scaffold(
+                    appBar: AppBar(
+                      backgroundColor: _color,
+                      title: Text('Match Stats'),
+                      elevation: 0.0,
+                      actions: [],
                     ),
-                    if (_match != null && _match.type != EventType.remote)
-                      buttonRow(),
-                    Text(_selectedTeam.name + ' : ' + _score.total().toString(),
-                        style: Theme.of(context).textTheme.headline6),
-                    if (widget.team == null)
-                      DropdownButton<Dice>(
-                        value: _match.dice,
-                        icon: Icon(Icons.height_rounded),
-                        iconSize: 24,
-                        elevation: 16,
-                        style: TextStyle(color: Theme.of(context).accentColor),
-                        underline: Container(
-                          height: 0.5,
-                          color: Colors.deepPurpleAccent,
-                        ),
-                        onChanged: (Dice newValue) {
-                          setState(() {
-                            HapticFeedback.mediumImpact();
-                            _match.setDice(newValue);
-                          });
-                          dataModel.saveEvents();
-                          dataModel.uploadEvent(widget.event);
-                        },
-                        items: <Dice>[Dice.one, Dice.two, Dice.three]
-                            .map<DropdownMenuItem<Dice>>((Dice value) {
-                          return DropdownMenuItem<Dice>(
-                            value: value,
-                            child: Text('Stack Height : ' +
-                                value.stackHeight().toString()),
-                          );
-                        }).toList(),
+                    body: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              _color,
+                              Theme.of(context).canvasColor,
+                              Theme.of(context).canvasColor,
+                              Theme.of(context).canvasColor,
+                              Theme.of(context).canvasColor,
+                              Theme.of(context).canvasColor,
+                              Theme.of(context).canvasColor,
+                            ]),
                       ),
-                    Padding(
-                      padding: EdgeInsets.all(25),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          SizedBox(
-                              child: Text(
-                            'Autonomous : ' +
-                                _score.autoScore.total().toString(),
-                            style: Theme.of(context).textTheme.caption,
-                          )),
-                          SizedBox(
-                            child: Text(
-                                'Tele-Op : ' +
-                                    _score.teleScore.total().toString(),
-                                style: Theme.of(context).textTheme.caption),
-                          ),
-                          SizedBox(
-                              child: Text(
-                                  'Endgame : ' +
-                                      _score.endgameScore.total().toString(),
-                                  style: Theme.of(context).textTheme.caption))
-                        ],
-                      ),
-                    ),
-                    Divider(
-                      height: 5,
-                      thickness: 2,
-                    ),
-                    if (Platform.isIOS)
-                      SizedBox(
-                          width: MediaQuery.of(context).size.width,
-                          child: CupertinoSlidingSegmentedControl(
-                            groupValue: _view,
-                            children: <int, Widget>{
-                              0: Text('Autonomous'),
-                              1: Text('Tele-Op'),
-                              2: Text('Endgame')
-                            },
-                            onValueChanged: (int x) {
-                              setState(() {
-                                HapticFeedback.mediumImpact();
-                                _view = x;
-                              });
-                            },
-                          )),
-                    if (Platform.isAndroid)
-                      SizedBox(
-                        height: 50,
-                        child: TabBar(
-                          labelColor: Theme.of(context).accentColor,
-                          unselectedLabelColor: Colors.grey,
-                          labelStyle: TextStyle(fontFamily: '.SF UI Display'),
-                          tabs: [
-                            Tab(
-                              text: 'Autonomous',
+                      child: Center(
+                        child: Column(children: [
+                          if (_match != null && _match.type != EventType.remote)
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Container(
+                                  width: 100,
+                                  child: Text(_match.redScore(),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline4),
+                                ),
+                                Container(
+                                  child: Text('-',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline4),
+                                ),
+                                Container(
+                                  width: 100,
+                                  child: Text(_match.blueScore(),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline4),
+                                )
+                              ],
                             ),
-                            Tab(
-                              text: 'Tele-Op',
+                          Padding(
+                            padding: EdgeInsets.all(10),
+                          ),
+                          if (_match != null && _match.type != EventType.remote)
+                            buttonRow(),
+                          Text(
+                              _selectedTeam.name +
+                                  ' : ' +
+                                  _score.total().toString(),
+                              style: Theme.of(context).textTheme.headline6),
+                          if (widget.team == null)
+                            DropdownButton<Dice>(
+                              value: _match.dice,
+                              icon: Icon(Icons.height_rounded),
+                              iconSize: 24,
+                              elevation: 16,
+                              style: TextStyle(
+                                  color: Theme.of(context).accentColor),
+                              underline: Container(
+                                height: 0.5,
+                                color: Colors.deepPurpleAccent,
+                              ),
+                              onChanged: (Dice newValue) {
+                                setState(() {
+                                  HapticFeedback.mediumImpact();
+                                  _match.setDice(newValue);
+                                });
+                                dataModel.saveEvents();
+                                dataModel.uploadEvent(widget.event);
+                              },
+                              items: <Dice>[Dice.one, Dice.two, Dice.three]
+                                  .map<DropdownMenuItem<Dice>>((Dice value) {
+                                return DropdownMenuItem<Dice>(
+                                  value: value,
+                                  child: Text('Stack Height : ' +
+                                      value.stackHeight().toString()),
+                                );
+                              }).toList(),
                             ),
-                            Tab(
-                              text: 'Endgame',
+                          Padding(
+                            padding: EdgeInsets.all(25),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                SizedBox(
+                                    child: Text(
+                                  'Autonomous : ' +
+                                      _score.autoScore.total().toString(),
+                                  style: Theme.of(context).textTheme.caption,
+                                )),
+                                SizedBox(
+                                  child: Text(
+                                      'Tele-Op : ' +
+                                          _score.teleScore.total().toString(),
+                                      style:
+                                          Theme.of(context).textTheme.caption),
+                                ),
+                                SizedBox(
+                                    child: Text(
+                                        'Endgame : ' +
+                                            _score.endgameScore
+                                                .total()
+                                                .toString(),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .caption))
+                              ],
+                            ),
+                          ),
+                          Divider(
+                            height: 5,
+                            thickness: 2,
+                          ),
+                          if (NewPlatform.isIOS())
+                            SizedBox(
+                                width: MediaQuery.of(context).size.width,
+                                child: CupertinoSlidingSegmentedControl(
+                                  groupValue: _view,
+                                  children: <int, Widget>{
+                                    0: Text('Autonomous'),
+                                    1: Text('Tele-Op'),
+                                    2: Text('Endgame')
+                                  },
+                                  onValueChanged: (int x) {
+                                    setState(() {
+                                      HapticFeedback.mediumImpact();
+                                      _view = x;
+                                    });
+                                  },
+                                )),
+                          if (NewPlatform.isAndroid())
+                            SizedBox(
+                              height: 50,
+                              child: TabBar(
+                                labelColor: Theme.of(context).accentColor,
+                                unselectedLabelColor: Colors.grey,
+                                labelStyle:
+                                    TextStyle(fontFamily: '.SF UI Display'),
+                                tabs: [
+                                  Tab(
+                                    text: 'Autonomous',
+                                  ),
+                                  Tab(
+                                    text: 'Tele-Op',
+                                  ),
+                                  Tab(
+                                    text: 'Endgame',
+                                  )
+                                ],
+                              ),
+                            ),
+                          Divider(
+                            height: 5,
+                            thickness: 2,
+                          ),
+                          if (NewPlatform.isAndroid())
+                            Expanded(
+                              child: TabBarView(
+                                children: [
+                                  ListView(
+                                    children: autoView(),
+                                  ),
+                                  ListView(
+                                    children: teleView(),
+                                  ),
+                                  ListView(
+                                    children: endView(),
+                                  )
+                                ],
+                              ),
+                            ),
+                          if (NewPlatform.isIOS())
+                            Expanded(
+                              child: viewSelect(),
                             )
-                          ],
-                        ),
+                        ]),
                       ),
-                    Divider(
-                      height: 5,
-                      thickness: 2,
                     ),
-                    if (Platform.isAndroid)
-                      Expanded(
-                        child: TabBarView(
-                          children: [
-                            ListView(
-                              children: autoView(),
-                            ),
-                            ListView(
-                              children: teleView(),
-                            ),
-                            ListView(
-                              children: endView(),
-                            )
-                          ],
-                        ),
-                      ),
-                    if (Platform.isIOS)
-                      Expanded(
-                        child: viewSelect(),
-                      )
-                  ]),
-                ),
-              ),
-            ),
-          );
+                  ),
+                );
+              });
         });
   }
 

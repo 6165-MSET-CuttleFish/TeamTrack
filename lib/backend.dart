@@ -151,18 +151,16 @@ class AuthenticationService {
 }
 
 DataModel dataModel;
-DarkThemeProvider themeChangeProvider = new DarkThemeProvider();
-Database.FirebaseDatabase firebaseDatabase = Database.FirebaseDatabase.instance;
-FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+final DarkThemeProvider themeChangeProvider = new DarkThemeProvider();
+final Database.FirebaseDatabase firebaseDatabase =
+    Database.FirebaseDatabase.instance;
+final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 
 class DataModel {
   final List<String> keys = ['UltimateGoal'];
   DataModel() {
     try {
       restoreEvents();
-      //restoreEvents();
-      // events = List<Event>.from(
-      //     jsonDecode[keys[0]].map((model) => Event.fromJson(model)));
     } catch (Exception) {
       print('No events');
     }
@@ -703,10 +701,9 @@ extension ScoreDivExtension on List<ScoreDivision> {
     return arr.map((e) => e.total()).mad();
   }
 
-  List<ScoreDivision> diceScores(Dice dice) {
-    return (dice != Dice.none ? this.where((e) => e.getDice() == dice) : this)
-        .toList();
-  }
+  List<ScoreDivision> diceScores(Dice dice) =>
+      (dice != Dice.none ? this.where((e) => e.getDice() == dice) : this)
+          .toList();
 }
 
 extension ScoresExtension on List<Score> {
@@ -850,10 +847,8 @@ extension ScoresExtension on List<Score> {
     return arr.map((e) => e.endgameScore.total()).mad();
   }
 
-  List<Score> diceScores(Dice dice) {
-    return (dice != Dice.none ? this.where((e) => e.dice == dice) : this)
-        .toList();
-  }
+  List<Score> diceScores(Dice dice) =>
+      (dice != Dice.none ? this.where((e) => e.dice == dice) : this).toList();
 }
 
 bool toggle(bool init) {

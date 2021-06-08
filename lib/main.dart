@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart' as Database;
 import 'package:flutter/services.dart';
+import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
 import 'package:teamtrack/Frontend/EventsList.dart';
 import 'package:teamtrack/Frontend/Login.dart';
 import 'package:teamtrack/backend.dart';
@@ -23,28 +24,29 @@ class TeamTrack extends StatefulWidget {
 
 class _TeamTrack extends State<TeamTrack> {
   final lightTheme = ThemeData(
-    primarySwatch: Colors.deepPurple,
-    splashColor: Platform.isAndroid ? Colors.cyan : Colors.transparent,
-    visualDensity: VisualDensity.adaptivePlatformDensity,
-  );
+      primarySwatch: Colors.deepPurple,
+      splashColor: NewPlatform.isAndroid() ? Colors.cyan : Colors.transparent,
+      visualDensity: VisualDensity.adaptivePlatformDensity,
+    );
 
   final darkTheme = ThemeData(
-    textTheme: TextTheme(bodyText2: TextStyle(color: Colors.white)),
-    backgroundColor: Colors.black,
-    splashColor: Platform.isAndroid ? Colors.deepPurple : Colors.transparent,
-    shadowColor: Colors.white,
-    brightness: Brightness.dark,
-    canvasColor: Colors.black,
-    buttonColor: Colors.grey,
-    accentColor: Colors.cyan,
-    floatingActionButtonTheme: FloatingActionButtonThemeData(
-      focusElevation: 0,
-      backgroundColor: Colors.cyan,
-      elevation: 0,
-    ),
-    primarySwatch: Colors.cyan,
-    visualDensity: VisualDensity.adaptivePlatformDensity,
-  );
+      textTheme: TextTheme(bodyText2: TextStyle(color: Colors.white)),
+      backgroundColor: Colors.black,
+      splashColor: 
+          NewPlatform.isAndroid() ? Colors.deepPurple : Colors.transparent,
+      shadowColor: Colors.white,
+      brightness: Brightness.dark,
+      canvasColor: Colors.black,
+      buttonColor: Colors.grey,
+      accentColor: Colors.cyan,
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        focusElevation: 0,
+        backgroundColor: Colors.cyan,
+        elevation: 0,
+      ),
+      primarySwatch: Colors.cyan,
+      visualDensity: VisualDensity.adaptivePlatformDensity,
+    );
 
   @override
   void initState() {
@@ -82,17 +84,6 @@ class AuthenticationWrapper extends StatelessWidget {
       return LoginView(dataModel: dataModel);
     } else {
       return EventsList(dataModel: dataModel);
-      // return StreamBuilder<Database.Event>(
-      //     stream: firebaseDatabase.reference().child('alpha').onValue,
-      //     builder: (context, snapshot) {
-      //       return Container(
-      //         height: MediaQuery.of(context).size.height,
-      //         width: MediaQuery.of(context).size.width,
-      //         child: Center(
-      //           child: Text(snapshot.data.snapshot.value['number']),
-      //         ),
-      //       );
-      //     });
     }
   }
 }

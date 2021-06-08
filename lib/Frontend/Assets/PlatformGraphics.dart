@@ -11,14 +11,48 @@ import 'dart:math';
 import 'package:fl_chart/fl_chart.dart';
 import 'dart:io' show Platform;
 
+class NewPlatform {
+  static bool isIOS() {
+    try {
+      return Platform.isIOS;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  static bool isAndroid() {
+    try {
+      return Platform.isAndroid;
+    } catch (e) {
+      return true;
+    }
+  }
+
+  static bool isWeb() {
+    try {
+      var temp = Platform.isAndroid;
+    } catch (e) {
+      return true;
+    }
+    return false;
+  }
+}
+
 void showPlatformDialog(
     {BuildContext context, Widget Function(BuildContext) builder}) {
-  if (Platform.isIOS) {
+  if (NewPlatform.isIOS()) {
     showCupertinoDialog(
         context: context, builder: builder, barrierDismissible: false);
   } else {
     showDialog(context: context, builder: builder, barrierDismissible: false);
   }
+}
+
+PageRoute platformPageRoute(Widget Function(BuildContext) builder) {
+  if (NewPlatform.isIOS()) {
+    return CupertinoPageRoute(builder: builder);
+  }
+  return MaterialPageRoute(builder: builder);
 }
 
 abstract class PlatformWidget<C extends Widget, M extends Widget>
@@ -30,7 +64,7 @@ abstract class PlatformWidget<C extends Widget, M extends Widget>
   @override
   Widget build(BuildContext context) {
     try {
-      if (Platform.isIOS) {
+      if (NewPlatform.isIOS()) {
         return buildCupertinoWidget(context);
       } else {
         return buildMaterialWidget(context);
@@ -256,10 +290,7 @@ class _Incrementor extends State<Incrementor> {
                 RawMaterialButton(
                   onPressed: widget.element.count > widget.element.min()
                       ? () {
-                          setState(() {
-                            HapticFeedback.mediumImpact();
-                            widget.element.count--;
-                          });
+                          setState(widget.element.decrement);
                           widget.onPressed();
                         }
                       : null,
@@ -281,10 +312,7 @@ class _Incrementor extends State<Incrementor> {
                 RawMaterialButton(
                   onPressed: widget.element.count < widget.element.max()
                       ? () {
-                          setState(() {
-                            HapticFeedback.mediumImpact();
-                            widget.element.count++;
-                          });
+                          setState(widget.element.increment);
                           widget.onPressed();
                         }
                       : null,
@@ -473,8 +501,7 @@ class ScoreCard extends StatelessWidget {
                                         applyCutOffY: true,
                                       )
                                     : null,
-                                spots:
-                                    scoreDivisions.diceScores(dice).spots(),
+                                spots: scoreDivisions.diceScores(dice).spots(),
                                 colors: [Colors.orange],
                                 isCurved: true,
                                 preventCurveOverShooting: true,

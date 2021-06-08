@@ -1,5 +1,5 @@
 import 'dart:math';
-
+import 'package:flutter/services.dart';
 import 'package:teamtrack/backend.dart';
 
 class Score extends ScoreDivision {
@@ -8,9 +8,7 @@ class Score extends ScoreDivision {
   EndgameScore endgameScore;
   String id;
   Dice dice;
-  Score(String id, Dice dice) {
-    this.id = id;
-    this.dice = dice;
+  Score(this.id, this.dice) {
     teleScore = TeleScore(dice);
     autoScore = AutoScore(dice);
     endgameScore = EndgameScore(dice);
@@ -211,10 +209,26 @@ class ScoringElement {
   int Function() min = () => 0;
   int Function() max = () => 9999;
   int scoreValue() => count * value;
+  int incrementValue = 1;
+  int decrementValue = 1;
   bool asBool() => count == 0 ? false : true;
   void setStuff() {
     if (min == null) min = () => 0;
     if (max == null) max = () => 9999;
+  }
+
+  void increment() {
+    if (count < max()) {
+      HapticFeedback.mediumImpact();
+      count += incrementValue;
+    }
+  }
+
+  void decrement() {
+    if (count > min()) {
+      HapticFeedback.mediumImpact();
+      count -= decrementValue;
+    }
   }
 }
 

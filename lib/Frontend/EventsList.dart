@@ -90,23 +90,12 @@ class _EventsList extends State<EventsList> {
                     ),
                     title: Text(e.name),
                     onTap: () {
-                      if (Platform.isIOS) {
-                        Navigator.push(
-                            context,
-                            CupertinoPageRoute(
-                                builder: (context) => EventView(
-                                      event: e,
-                                      dataModel: dataModel,
-                                    )));
-                      } else {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => EventView(
-                                      event: e,
-                                      dataModel: dataModel,
-                                    )));
-                      }
+                      Navigator.push(
+                          context,
+                          platformPageRoute((context) => EventView(
+                                event: e,
+                                dataModel: dataModel,
+                              )));
                     },
                   )),
               actionPane: slider,
@@ -168,7 +157,9 @@ class _EventsList extends State<EventsList> {
                   iconColor: Theme.of(context).primaryColor,
                   child: ListTile(
                     trailing: Icon(
-                      e.shared ? CupertinoIcons.cloud_fill : CupertinoIcons.lock_shield_fill,
+                      e.shared
+                          ? CupertinoIcons.cloud_fill
+                          : CupertinoIcons.lock_shield_fill,
                       color: Theme.of(context).accentColor,
                     ),
                     leading: Icon(
@@ -177,23 +168,12 @@ class _EventsList extends State<EventsList> {
                     ),
                     title: Text(e.name),
                     onTap: () {
-                      if (Platform.isIOS) {
-                        Navigator.push(
-                            context,
-                            CupertinoPageRoute(
-                                builder: (context) => EventView(
-                                      event: e,
-                                      dataModel: dataModel,
-                                    )));
-                      } else {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => EventView(
-                                      event: e,
-                                      dataModel: dataModel,
-                                    )));
-                      }
+                      Navigator.push(
+                          context,
+                          platformPageRoute((context) => EventView(
+                                event: e,
+                                dataModel: dataModel,
+                              )));
                     },
                   )),
               actionPane: slider,
@@ -260,23 +240,12 @@ class _EventsList extends State<EventsList> {
                     ),
                     title: Text(e.name),
                     onTap: () {
-                      if (Platform.isIOS) {
-                        Navigator.push(
-                            context,
-                            CupertinoPageRoute(
-                                builder: (context) => EventView(
-                                      event: e,
-                                      dataModel: dataModel,
-                                    )));
-                      } else {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => EventView(
-                                      event: e,
-                                      dataModel: dataModel,
-                                    )));
-                      }
+                      Navigator.push(
+                          context,
+                          platformPageRoute((context) => EventView(
+                                event: e,
+                                dataModel: dataModel,
+                              )));
                     },
                   )),
               actionPane: slider,
@@ -374,108 +343,113 @@ class _EventsList extends State<EventsList> {
   }
 
   void _onPressed() {
-    if (Platform.isIOS)
-      showCupertinoModalPopup(
-          context: context,
-          builder: (context) => CupertinoActionSheet(
-                //title: Text('New Event'),
-                message: Text('Select Event Type'),
-                actions: [
-                  CupertinoActionSheetAction(
-                      onPressed: () {
-                        _newType = EventType.local;
-                        setState(() {});
-                        Navigator.pop(context);
-                        _chosen();
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Icon(CupertinoIcons.person_3_fill),
-                          Text('Local Event'),
-                          Text(''),
-                        ],
-                      )),
-                  CupertinoActionSheetAction(
-                      onPressed: () {
-                        _newType = EventType.remote;
-                        setState(() {});
-                        Navigator.pop(context);
-                        _chosen();
-                      },
-                      child: Row(
+    Future materialModal = showModalBottomSheet(
+        context: context,
+        builder: (context) => Container(
+            height: 120,
+            child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Theme.of(context).splashColor,
+                    width: 1.0,
+                  ),
+                  color: Theme.of(context).canvasColor,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ListTileTheme(
+                      iconColor: Theme.of(context).accentColor,
+                      child: ListTile(
+                        onTap: () {
+                          _newType = EventType.local;
+                          setState(() {});
+                          Navigator.pop(context);
+                          _chosen();
+                        },
+                        leading: Icon(CupertinoIcons.person_3_fill),
+                        title: Text('Local Event'),
+                      ),
+                    ),
+                    ListTileTheme(
+                      iconColor: Theme.of(context).accentColor,
+                      child: ListTile(
+                        onTap: () {
+                          _newType = EventType.remote;
+                          setState(() {});
+                          Navigator.pop(context);
+                          _chosen();
+                        },
+                        leading: Icon(
+                            CupertinoIcons.rectangle_stack_person_crop_fill),
+                        title: Text('Remote Event'),
+                      ),
+                    ),
+                    // ListTileTheme(
+                    //   iconColor: Theme.of(context).accentColor,
+                    //   child: ListTile(
+                    //     onTap: () {
+                    //       _newType = EventType.live;
+                    //       setState(() {});
+                    //       Navigator.pop(context);
+                    //       _chosen();
+                    //     },
+                    //     leading: Icon(CupertinoIcons.cloud_fill),
+                    //     title: Text('Live Event'),
+                    //   ),
+                    // )
+                  ],
+                ))));
+    try {
+      if (NewPlatform.isIOS())
+        showCupertinoModalPopup(
+            context: context,
+            builder: (context) => CupertinoActionSheet(
+                  //title: Text('New Event'),
+                  message: Text('Select Event Type'),
+                  actions: [
+                    CupertinoActionSheetAction(
+                        onPressed: () {
+                          _newType = EventType.local;
+                          setState(() {});
+                          Navigator.pop(context);
+                          _chosen();
+                        },
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Icon(CupertinoIcons
-                                .rectangle_stack_person_crop_fill),
-                            Text('Remote Event'),
-                            Text('')
-                          ])),
-                ],
-                cancelButton: CupertinoActionSheetAction(
-                  child: Text('Cancel'),
-                  onPressed: () => {Navigator.pop(context)},
-                  isDefaultAction: true,
-                ),
-              ));
-    else
-      showModalBottomSheet(
-          context: context,
-          builder: (context) => Container(
-              height: 120,
-              child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Theme.of(context).splashColor,
-                      width: 1.0,
-                    ),
-                    color: Theme.of(context).canvasColor,
+                            Icon(CupertinoIcons.person_3_fill),
+                            Text('Local Event'),
+                            Text(''),
+                          ],
+                        )),
+                    CupertinoActionSheetAction(
+                        onPressed: () {
+                          _newType = EventType.remote;
+                          setState(() {});
+                          Navigator.pop(context);
+                          _chosen();
+                        },
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Icon(CupertinoIcons
+                                  .rectangle_stack_person_crop_fill),
+                              Text('Remote Event'),
+                              Text('')
+                            ])),
+                  ],
+                  cancelButton: CupertinoActionSheetAction(
+                    child: Text('Cancel'),
+                    onPressed: () => {Navigator.pop(context)},
+                    isDefaultAction: true,
                   ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      ListTileTheme(
-                        iconColor: Theme.of(context).accentColor,
-                        child: ListTile(
-                          onTap: () {
-                            _newType = EventType.local;
-                            setState(() {});
-                            Navigator.pop(context);
-                            _chosen();
-                          },
-                          leading: Icon(CupertinoIcons.person_3_fill),
-                          title: Text('Local Event'),
-                        ),
-                      ),
-                      ListTileTheme(
-                        iconColor: Theme.of(context).accentColor,
-                        child: ListTile(
-                          onTap: () {
-                            _newType = EventType.remote;
-                            setState(() {});
-                            Navigator.pop(context);
-                            _chosen();
-                          },
-                          leading: Icon(
-                              CupertinoIcons.rectangle_stack_person_crop_fill),
-                          title: Text('Remote Event'),
-                        ),
-                      ),
-                      // ListTileTheme(
-                      //   iconColor: Theme.of(context).accentColor,
-                      //   child: ListTile(
-                      //     onTap: () {
-                      //       _newType = EventType.live;
-                      //       setState(() {});
-                      //       Navigator.pop(context);
-                      //       _chosen();
-                      //     },
-                      //     leading: Icon(CupertinoIcons.cloud_fill),
-                      //     title: Text('Live Event'),
-                      //   ),
-                      // )
-                    ],
-                  ))));
+                ));
+      else
+        materialModal;
+    } catch (e) {
+      materialModal;
+    }
   }
 
   EventType _newType;
