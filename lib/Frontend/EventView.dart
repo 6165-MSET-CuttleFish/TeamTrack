@@ -46,9 +46,18 @@ class _EventView extends State<EventView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: _tab == 0 ? Text('Teams') : Text('Matches'),
-        backgroundColor: Theme.of(context).accentColor,
-      ),
+          title: _tab == 0 ? Text('Teams') : Text('Matches'),
+          backgroundColor: Theme.of(context).accentColor,
+          actions: [
+            IconButton(
+                icon: Icon(Icons.search),
+                onPressed: () {
+                  showSearch(
+                      context: context,
+                      delegate: TeamSearch(
+                          teams: widget.event.teams, event: widget.event));
+                })
+          ]),
       bottomNavigationBar: widget.event.type != EventType.remote
           ? BottomNavigationBar(
               currentIndex: _tab,

@@ -25,7 +25,8 @@ class _TeamList extends State<TeamList> {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      children: widget.event.teams.sortedTeams()
+      children: widget.event.teams
+          .sortedTeams()
           .map((e) => Slidable(
                 actionPane: slider,
                 secondaryActions: [
@@ -88,6 +89,54 @@ class _TeamList extends State<TeamList> {
                     )),
               ))
           .toList(),
+    );
+  }
+}
+
+class TeamSearch extends SearchDelegate<String> {
+  TeamSearch({this.teams, this.event});
+  List<Team> teams;
+  Event event;
+  @override
+  List<Widget> buildActions(BuildContext context) {
+    return [IconButton(icon: Icon(Icons.clear), onPressed: () {})];
+  }
+
+  @override
+  Widget buildLeading(BuildContext context) {
+    return IconButton(
+        icon: AnimatedIcon(
+          icon: AnimatedIcons.menu_arrow,
+          progress: transitionAnimation,
+        ),
+        onPressed: () {
+          close(context, null);
+        });
+  }
+
+  @override
+  Widget buildResults(BuildContext context) => buildSuggestions(context);
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    final suggestionList = query.isNotEmpty
+        ? [
+            ...teams.where((q) => q.number.contains(query)),
+            ...teams.where((q) => q.name.contains(query)),
+          ].toList()
+        : teams;
+    return ListView.builder(
+      itemCount: suggestionList.length,
+      itemBuilder: (context, index) => ListTile(
+          leading: Text(suggestionList[index].number),
+          title: Text(suggestionList[index].name),
+          onTap: () {
+            close(context, null);
+            Navigator.push(
+                context,
+                platformPageRoute((context) =>
+                    TeamView(event: event, team: suggestionList[index])));
+          }),
     );
   }
 }
