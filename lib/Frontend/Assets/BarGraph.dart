@@ -4,7 +4,7 @@ import 'package:flutter/rendering.dart';
 
 class BarGraph extends StatelessWidget {
   BarGraph(
-      {Key key,
+      {Key? key,
       this.max = 2,
       this.val = 9,
       this.inverted = false,

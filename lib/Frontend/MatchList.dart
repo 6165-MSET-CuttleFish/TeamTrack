@@ -9,10 +9,9 @@ import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
 import 'dart:convert';
 
 class MatchList extends StatefulWidget {
-  MatchList({Key key, this.event, this.team, this.dataModel}) : super(key: key);
+  MatchList({Key? key, required this.event, this.team}) : super(key: key);
   final Event event;
-  final Team team;
-  final DataModel dataModel;
+  final Team? team;
   @override
   State<StatefulWidget> createState() => _MatchList();
 }
@@ -26,7 +25,7 @@ class _MatchList extends State<MatchList> {
         builder: (context, eventHandler) {
           if (eventHandler.hasData && !eventHandler.hasError && !dataModel.isProcessing) {
             widget.event.updateLocal(
-                json.decode(json.encode(eventHandler.data.snapshot.value)));
+                json.decode(json.encode(eventHandler.data?.snapshot.value)));
           }
           if (widget.team == null) {
             return _matches();
@@ -63,7 +62,7 @@ class _MatchList extends State<MatchList> {
                                                   widget.event.teams.firstWhere(
                                                       (element) =>
                                                           element.number ==
-                                                          widget.team.number),
+                                                          widget.team!.number),
                                                   Team.nullTeam()),
                                               Alliance(Team.nullTeam(),
                                                   Team.nullTeam()),
@@ -137,14 +136,14 @@ class _MatchList extends State<MatchList> {
                         ),
                         child: ListTile(
                           leading: Column(children: [
-                            Text(e.red.item1.name + ' & ' + e.red.item2.name),
+                            Text(e.red?.item1?.name ?? '?' + ' & ' + (e.red?.item2?.name ?? '?')),
                             Text(
                               'VS',
                               style: TextStyle(
                                   color: Colors.red,
                                   fontWeight: FontWeight.bold),
                             ),
-                            Text(e.blue.item1.name + ' & ' + e.blue.item2.name)
+                            Text(e.blue?.item1?.name ?? '?' + ' & ' + (e.blue?.item2?.name ?? '?'))
                           ]),
                           trailing: Text(e.score()),
                           onTap: () async {
@@ -166,7 +165,7 @@ class _MatchList extends State<MatchList> {
       var matches = widget.event.matches
           .where((e) =>
               e.alliance(widget.event.teams.firstWhere(
-                  (element) => element.number == widget.team.number)) !=
+                  (element) => element.number == widget.team!.number)) !=
               null)
           .toList();
       for (int i = 0; i < matches.length; i++) {
@@ -195,7 +194,7 @@ class _MatchList extends State<MatchList> {
                                 isDestructive: true,
                                 child: Text('Confirm'),
                                 onPressed: () {
-                                  matches[i].red.item1.scores.removeWhere(
+                                  matches[i].red?.item1?.scores.removeWhere(
                                       (f) => f.id == matches[i].id);
                                   widget.event.matches.remove(matches[i]);
                                   setState(() {});
@@ -220,7 +219,7 @@ class _MatchList extends State<MatchList> {
                   leading: Text((i + 1).toString()),
                   title: Text(widget.event.teams
                       .firstWhere(
-                          (element) => element.number == widget.team.number)
+                          (element) => element.number == widget.team?.number)
                       .name),
                   trailing: Text(matches[i].score()),
                   onTap: () async {
@@ -243,12 +242,12 @@ class _MatchList extends State<MatchList> {
 
   List<Widget> _teamSpecMatches() {
     if (widget.event.teams
-            .firstWhere((element) => element.number == widget.team.number) !=
+            .firstWhere((element) => element.number == widget.team?.number) !=
         null) {
       return widget.event.matches
           .where((e) =>
               e.alliance(widget.event.teams.firstWhere(
-                  (element) => element.number == widget.team.number)) !=
+                  (element) => element.number == widget.team!.number)) !=
               null)
           .toList()
           .map((e) => Slidable(
@@ -277,13 +276,13 @@ class _MatchList extends State<MatchList> {
                                   child: Text('Confirm'),
                                   onPressed: () {
                                     setState(() {
-                                      e.red.item1.scores
+                                      e.red?.item1?.scores
                                           .removeWhere((f) => f.id == e.id);
-                                      e.red.item2.scores
+                                      e.red?.item2?.scores
                                           .removeWhere((f) => f.id == e.id);
-                                      e.blue.item1.scores
+                                      e.blue?.item1?.scores
                                           .removeWhere((f) => f.id == e.id);
-                                      e.blue.item2.scores
+                                      e.blue?.item2?.scores
                                           .removeWhere((f) => f.id == e.id);
                                       widget.event.matches.remove(e);
                                     });
@@ -306,13 +305,13 @@ class _MatchList extends State<MatchList> {
                   ),
                   child: ListTile(
                     leading: Column(children: [
-                      Text(e.red.item1.name + ' & ' + e.red.item2.name),
+                      Text(e.red?.item1?.name ?? '?' + ' & ' + (e.red?.item2?.name ?? '?')),
                       Text(
                         'VS',
                         style: TextStyle(
                             color: Colors.red, fontWeight: FontWeight.bold),
                       ),
-                      Text(e.blue.item1.name + ' & ' + e.blue.item2.name)
+                      Text(e.blue?.item1?.name ?? '?' + ' & ' + (e.blue?.item2?.name ?? '?'))
                     ]),
                     trailing: Text(e.score()),
                     onTap: () async {

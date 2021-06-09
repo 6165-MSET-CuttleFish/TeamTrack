@@ -6,9 +6,8 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
 
 class TeamList extends StatefulWidget {
-  TeamList({Key key, this.event, this.dataModel}) : super(key: key);
+  TeamList({Key? key, required this.event}) : super(key: key);
   final Event event;
-  final DataModel dataModel;
   @override
   State<StatefulWidget> createState() => _TeamList();
 }
@@ -93,8 +92,8 @@ class _TeamList extends State<TeamList> {
   }
 }
 
-class TeamSearch extends SearchDelegate<String> {
-  TeamSearch({this.teams, this.event});
+class TeamSearch extends SearchDelegate<String?> {
+  TeamSearch({required this.teams, required this.event});
   List<Team> teams;
   Event event;
   @override

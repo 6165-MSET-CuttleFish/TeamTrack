@@ -2,11 +2,11 @@ import 'package:flutter/services.dart';
 import 'package:teamtrack/backend.dart';
 
 class Score extends ScoreDivision {
-  TeleScore teleScore;
-  AutoScore autoScore;
-  EndgameScore endgameScore;
-  String id;
-  Dice dice;
+  TeleScore teleScore = TeleScore(Dice.none);
+  AutoScore autoScore = AutoScore(Dice.none);
+  EndgameScore endgameScore = EndgameScore(Dice.none);
+  String id = '';
+  Dice dice = Dice.none;
   Score(this.id, this.dice) {
     teleScore = TeleScore(dice);
     autoScore = AutoScore(dice);
@@ -40,7 +40,7 @@ Dice getDiceFromString(String statusAsString) {
       return element;
     }
   }
-  return null;
+  return Dice.none;
 }
 
 EventType getTypeFromString(String statusAsString) {
@@ -49,7 +49,7 @@ EventType getTypeFromString(String statusAsString) {
       return element;
     }
   }
-  return null;
+  return EventType.remote;
 }
 
 extension scoreList on List<Score> {
@@ -73,7 +73,7 @@ class TeleScore extends ScoreDivision {
   ScoringElement hiGoals = ScoringElement(name: "High Goals", value: 6);
   List<ScoringElement> getElements() => [hiGoals, midGoals, lowGoals];
   BoxAndWhisker cycles = BoxAndWhisker();
-  int misses = 0;
+  int? misses = 0;
   Dice getDice() => dice;
   TeleScore(this.dice);
   TeleScore.fromJson(Map<String, dynamic> json, this.dice) {
@@ -203,8 +203,8 @@ class ScoringElement {
   int count;
   int value;
   bool isBool;
-  int Function() min = () => 0;
-  int Function() max = () => 9999;
+  int Function()? min = () => 0;
+  int Function()? max = () => 9999;
   int scoreValue() => count * value;
   int incrementValue = 1;
   int decrementValue = 1;
@@ -215,14 +215,14 @@ class ScoringElement {
   }
 
   void increment() {
-    if (count < max()) {
+    if (count < max!()) {
       HapticFeedback.mediumImpact();
       count += incrementValue;
     }
   }
 
   void decrement() {
-    if (count > min()) {
+    if (count > min!()) {
       HapticFeedback.mediumImpact();
       count -= decrementValue;
     }
@@ -238,12 +238,12 @@ abstract class ScoreDivision {
 }
 
 class BoxAndWhisker {
-  double median;
-  double q1;
-  double q3;
-  double max;
-  double min;
-  List<num> getArray() => [median, q1, q3, max, min];
+  double? median;
+  double? q1;
+  double? q3;
+  double? max;
+  double? min;
+  List<num?> getArray() => [median, q1, q3, max, min];
   BoxAndWhisker(
       {this.max = 0, this.min = 0, this.median = 0, this.q1 = 0, this.q3 = 0});
   Map<String, dynamic> toJson() =>

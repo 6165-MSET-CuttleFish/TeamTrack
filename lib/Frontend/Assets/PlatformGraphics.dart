@@ -39,12 +39,12 @@ class NewPlatform {
 }
 
 void showPlatformDialog(
-    {BuildContext context, Widget Function(BuildContext) builder}) {
+    {BuildContext? context, Widget Function(BuildContext)? builder}) {
   if (NewPlatform.isIOS()) {
     showCupertinoDialog(
-        context: context, builder: builder, barrierDismissible: false);
+        context: context!, builder: builder!, barrierDismissible: false);
   } else {
-    showDialog(context: context, builder: builder, barrierDismissible: false);
+    showDialog(context: context!, builder: builder!, barrierDismissible: false);
   }
 }
 
@@ -57,7 +57,7 @@ PageRoute platformPageRoute(Widget Function(BuildContext) builder) {
 
 abstract class PlatformWidget<C extends Widget, M extends Widget>
     extends StatelessWidget {
-  PlatformWidget({Key key}) : super(key: key);
+  PlatformWidget({Key? key}) : super(key: key);
 
   C buildCupertinoWidget(BuildContext context);
   M buildMaterialWidget(BuildContext context);
@@ -76,7 +76,8 @@ abstract class PlatformWidget<C extends Widget, M extends Widget>
 }
 
 class PlatformSwitch extends PlatformWidget<CupertinoSwitch, Switch> {
-  PlatformSwitch({Key key, this.value, this.onChanged}) : super(key: key);
+  PlatformSwitch({Key? key, required this.value, required this.onChanged})
+      : super(key: key);
   final bool value;
   final ValueChanged<bool> onChanged;
   @override
@@ -100,17 +101,17 @@ class PlatformSwitch extends PlatformWidget<CupertinoSwitch, Switch> {
 }
 
 class PlatformAlert extends PlatformWidget<CupertinoAlertDialog, AlertDialog> {
-  PlatformAlert({Key key, this.title, this.content, this.actions})
+  PlatformAlert({Key? key, this.title, this.content, this.actions})
       : super(key: key);
-  final Widget title;
-  final Widget content;
-  final List<Widget> actions;
+  final Widget? title;
+  final Widget? content;
+  final List<Widget>? actions;
   @override
   CupertinoAlertDialog buildCupertinoWidget(BuildContext context) {
     return CupertinoAlertDialog(
       title: Padding(child: title, padding: EdgeInsets.only(bottom: 10)),
       content: content,
-      actions: actions,
+      actions: actions!,
     );
   }
 
@@ -128,7 +129,7 @@ class PlatformAlert extends PlatformWidget<CupertinoAlertDialog, AlertDialog> {
 class PlatformTextField
     extends PlatformWidget<CupertinoTextField, TextFormField> {
   PlatformTextField(
-      {Key key,
+      {Key? key,
       this.onChanged,
       this.keyboardType,
       this.textCapitalization = TextCapitalization.none,
@@ -136,17 +137,17 @@ class PlatformTextField
       this.obscureText = false,
       this.controller})
       : super(key: key);
-  final ValueChanged<String> onChanged;
-  final TextInputType keyboardType;
+  final ValueChanged<String>? onChanged;
+  final TextInputType? keyboardType;
   final TextCapitalization textCapitalization;
-  final String placeholder;
+  final String? placeholder;
   final bool obscureText;
-  final TextEditingController controller;
+  final TextEditingController? controller;
   @override
   CupertinoTextField buildCupertinoWidget(BuildContext context) {
     return CupertinoTextField(
       controller: controller,
-      style: TextStyle(color: Theme.of(context).textTheme.bodyText2.color),
+      style: TextStyle(color: Theme.of(context).textTheme.bodyText2!.color),
       onChanged: onChanged,
       keyboardType: keyboardType,
       textCapitalization: textCapitalization,
@@ -159,7 +160,7 @@ class PlatformTextField
   TextFormField buildMaterialWidget(BuildContext context) {
     return TextFormField(
       controller: controller,
-      style: TextStyle(color: Theme.of(context).textTheme.bodyText2.color),
+      style: TextStyle(color: Theme.of(context).textTheme.bodyText2!.color),
       onChanged: onChanged,
       keyboardType: keyboardType,
       textCapitalization: textCapitalization,
@@ -172,23 +173,23 @@ class PlatformTextField
 class PlatformDialogAction
     extends PlatformWidget<CupertinoDialogAction, FlatButton> {
   PlatformDialogAction(
-      {Key key,
+      {Key? key,
       this.child,
       this.isDefaultAction = false,
       this.onPressed,
       this.isDestructive = false})
       : super(key: key);
-  final Widget child;
+  final Widget? child;
   final bool isDefaultAction;
-  final Function onPressed;
+  final Function? onPressed;
   final bool isDestructive;
   @override
   CupertinoDialogAction buildCupertinoWidget(BuildContext context) {
     return CupertinoDialogAction(
       //textStyle: TextStyle(color: Theme.of(context).textTheme.bodyText2.color),
       isDefaultAction: isDefaultAction,
-      child: child,
-      onPressed: onPressed,
+      child: child!,
+      onPressed: onPressed as void Function()?,
       isDestructiveAction: isDestructive,
     );
   }
@@ -196,8 +197,8 @@ class PlatformDialogAction
   @override
   FlatButton buildMaterialWidget(BuildContext context) {
     return FlatButton(
-      onPressed: onPressed,
-      child: child,
+      onPressed: onPressed as void Function()?,
+      child: child!,
       textColor: isDestructive ? Colors.red : null,
     );
   }
@@ -205,21 +206,21 @@ class PlatformDialogAction
 
 class PlatformButton extends PlatformWidget<CupertinoButton, MaterialButton> {
   PlatformButton(
-      {Key key,
+      {Key? key,
       this.child,
       this.onPressed,
       this.disabledColor = Colors.transparent,
       this.color})
       : super(key: key);
-  final Widget child;
-  final Function onPressed;
-  final Color color;
+  final Widget? child;
+  final Function? onPressed;
+  final Color? color;
   final Color disabledColor;
   @override
   CupertinoButton buildCupertinoWidget(BuildContext context) {
     return CupertinoButton(
-      child: child,
-      onPressed: onPressed,
+      child: child!,
+      onPressed: onPressed as void Function()?,
       color: color,
       disabledColor: disabledColor,
     );
@@ -230,42 +231,16 @@ class PlatformButton extends PlatformWidget<CupertinoButton, MaterialButton> {
     return MaterialButton(
       elevation: 0,
       child: child,
-      onPressed: onPressed,
+      onPressed: onPressed as void Function()?,
       color: color,
       disabledColor: disabledColor,
     );
   }
 }
 
-class PlatformScaffold extends PlatformWidget<CupertinoPageScaffold, Scaffold> {
-  PlatformScaffold(
-      {Key key,
-      this.child,
-      this.backgroundColor,
-      this.resizeToAvoidBottomInset = true})
-      : super(key: key);
-  final Widget child;
-  final Color backgroundColor;
-  final bool resizeToAvoidBottomInset;
-  @override
-  CupertinoPageScaffold buildCupertinoWidget(BuildContext context) {
-    return CupertinoPageScaffold(
-        child: null,
-        backgroundColor: backgroundColor,
-        resizeToAvoidBottomInset: resizeToAvoidBottomInset);
-  }
-
-  @override
-  Scaffold buildMaterialWidget(BuildContext context) {
-    return Scaffold(
-        body: null,
-        backgroundColor: backgroundColor,
-        resizeToAvoidBottomInset: resizeToAvoidBottomInset);
-  }
-}
-
 class Incrementor extends StatefulWidget {
-  Incrementor({Key key, this.element, this.onPressed}) : super(key: key);
+  Incrementor({Key? key, required this.element, required this.onPressed})
+      : super(key: key);
   final ScoringElement element;
   final Function onPressed;
   @override
@@ -286,7 +261,7 @@ class _Incrementor extends State<Incrementor> {
               Spacer(),
               if (!widget.element.isBool)
                 RawMaterialButton(
-                  onPressed: widget.element.count > widget.element.min()
+                  onPressed: widget.element.count > widget.element.min!()
                       ? () {
                           setState(widget.element.decrement);
                           widget.onPressed();
@@ -308,7 +283,7 @@ class _Incrementor extends State<Incrementor> {
                 ),
               if (!widget.element.isBool)
                 RawMaterialButton(
-                  onPressed: widget.element.count < widget.element.max()
+                  onPressed: widget.element.count < widget.element.max!()
                       ? () {
                           setState(widget.element.increment);
                           widget.onPressed();
@@ -345,19 +320,19 @@ class _Incrementor extends State<Incrementor> {
 
 class ScoreCard extends StatelessWidget {
   ScoreCard(
-      {Key key,
-      this.scoreDivisions,
-      this.dice,
-      this.team,
-      this.event,
-      this.type})
+      {Key? key,
+      required this.scoreDivisions,
+      required this.dice,
+      required this.team,
+      required this.event,
+      required this.type})
       : super(key: key) {
     if (type == "auto") {
-      targetScore = team.targetScore.autoScore;
+      targetScore = team.targetScore!.autoScore;
     } else if (type == "tele") {
-      targetScore = team.targetScore.teleScore;
+      targetScore = team.targetScore!.teleScore;
     } else if (type == "endgame") {
-      targetScore = team.targetScore.endgameScore;
+      targetScore = team.targetScore!.endgameScore;
     } else {
       targetScore = team.targetScore;
     }
@@ -367,33 +342,34 @@ class ScoreCard extends StatelessWidget {
   final Team team;
   final Event event;
   final String type;
-  ScoreDivision targetScore;
+  ScoreDivision? targetScore;
   @override
   Widget build(BuildContext context) {
     return CardView(
       isActive: scoreDivisions.diceScores(dice).length >= 1,
       child: Padding(
-          padding: EdgeInsets.only(left: 5, right: 5),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              BarGraph(
-                val: scoreDivisions.meanScore(dice),
+        padding: EdgeInsets.only(left: 5, right: 5),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            BarGraph(
+              val: scoreDivisions.meanScore(dice),
+              max: event.teams.maxScoreVar(dice, type),
+              title: 'Average',
+            ),
+            BarGraph(
+                val: scoreDivisions.maxScore(dice),
                 max: event.teams.maxScoreVar(dice, type),
-                title: 'Average',
-              ),
-              BarGraph(
-                  val: scoreDivisions.maxScore(dice),
-                  max: event.teams.maxScoreVar(dice, type),
-                  title: 'Best Score'),
-              BarGraph(
-                val: scoreDivisions.madScore(dice),
-                max: event.teams.lowestMadVar(dice, type),
-                inverted: true,
-                title: 'Deviation',
-              ),
-            ],
-          )),
+                title: 'Best Score'),
+            BarGraph(
+              val: scoreDivisions.madScore(dice),
+              max: event.teams.lowestMadVar(dice, type),
+              inverted: true,
+              title: 'Deviation',
+            ),
+          ],
+        ),
+      ),
       collapsed: scoreDivisions.diceScores(dice).length >= 1
           ? AspectRatio(
               aspectRatio: 2,
@@ -468,40 +444,41 @@ class ScoreCard extends StatelessWidget {
                           1,
                       minY: [
                         scoreDivisions.minScore(dice),
-                        targetScore.total().toDouble()
+                        targetScore!.total().toDouble()
                       ].reduce(min),
                       maxY: [
                         scoreDivisions.maxScore(dice),
                         team.targetScore != null
-                            ? targetScore.total().toDouble()
+                            ? targetScore!.total().toDouble()
                             : 0.0
                       ].reduce(max),
                       lineBarsData: [
                         LineChartBarData(
-                            belowBarData: team.targetScore != null
-                                ? BarAreaData(
-                                    show: true,
-                                    colors: [
-                                      Colors.lightGreenAccent.withOpacity(0.5)
-                                    ],
-                                    cutOffY: targetScore?.total()?.toDouble(),
-                                    applyCutOffY: true,
-                                  )
-                                : null,
-                            aboveBarData: team.targetScore != null
-                                ? BarAreaData(
-                                    show: true,
-                                    colors: [Colors.redAccent.withOpacity(0.5)],
-                                    cutOffY: targetScore?.total()?.toDouble(),
-                                    applyCutOffY: true,
-                                  )
-                                : null,
-                            spots: scoreDivisions.diceScores(dice).spots(),
-                            colors: [Colors.orange],
-                            isCurved: true,
-                            preventCurveOverShooting: true,
-                            barWidth: 5,
-                            shadow: Shadow(color: Colors.green, blurRadius: 5)),
+                          belowBarData: team.targetScore != null
+                              ? BarAreaData(
+                                  show: true,
+                                  colors: [
+                                    Colors.lightGreenAccent.withOpacity(0.5)
+                                  ],
+                                  cutOffY: targetScore?.total().toDouble(),
+                                  applyCutOffY: true,
+                                )
+                              : null,
+                          aboveBarData: team.targetScore != null
+                              ? BarAreaData(
+                                  show: true,
+                                  colors: [Colors.redAccent.withOpacity(0.5)],
+                                  cutOffY: targetScore?.total().toDouble(),
+                                  applyCutOffY: true,
+                                )
+                              : null,
+                          spots: scoreDivisions.diceScores(dice).spots(),
+                          colors: [Colors.orange],
+                          isCurved: true,
+                          preventCurveOverShooting: true,
+                          barWidth: 5,
+                          shadow: Shadow(color: Colors.green, blurRadius: 5),
+                        ),
                       ],
                     ),
                   ),

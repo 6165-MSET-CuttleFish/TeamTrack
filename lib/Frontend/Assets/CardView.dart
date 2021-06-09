@@ -7,10 +7,10 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 
 class CardView extends StatefulWidget {
-  CardView({Key key, this.child, this.collapsed, this.isActive = true})
+  CardView({Key? key, this.child, this.collapsed, this.isActive = true})
       : super(key: key);
-  final Widget child;
-  final Widget collapsed;
+  final Widget? child;
+  final Widget? collapsed;
   final bool isActive;
   @override
   State<StatefulWidget> createState() => _CardView();
@@ -97,7 +97,7 @@ class _CardView extends State<CardView> {
                 Padding(
                   padding: EdgeInsets.only(bottom: 50),
                 ),
-                widget.collapsed
+                widget.collapsed!
               ]),
             )
           ]),

@@ -15,7 +15,7 @@ import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 read(String key) async {
   final prefs = await SharedPreferences.getInstance();
-  return json.decode(prefs.getString(key));
+  return json.decode(prefs.getString(key)!);
 }
 
 save(String key, value) async {
@@ -51,10 +51,10 @@ class DarkThemePreference {
 }
 
 class DatabaseServices {
-  String id;
+  String? id;
   DatabaseServices({this.id});
   Stream<Database.Event> get getEventChanges =>
-      firebaseDatabase.reference().child(id).onValue;
+      firebaseDatabase.reference().child(id!).onValue;
 }
 
 DatabaseServices db = DatabaseServices();
@@ -62,8 +62,9 @@ DatabaseServices db = DatabaseServices();
 class AuthenticationService {
   final FirebaseAuth _firebaseAuth;
   AuthenticationService(this._firebaseAuth);
-  Stream<User> get authStateChanges => _firebaseAuth.idTokenChanges();
-  Future<String> signIn({String email, String password}) async {
+  Stream<User?> get authStateChanges => _firebaseAuth.idTokenChanges();
+  Future<String?> signIn(
+      {required String email, required String password}) async {
     try {
       await _firebaseAuth.signInWithEmailAndPassword(
           email: email, password: password);
@@ -73,7 +74,8 @@ class AuthenticationService {
     }
   }
 
-  Future<String> signUp({String email, String password}) async {
+  Future<String?> signUp(
+      {required String email, required String password}) async {
     try {
       await _firebaseAuth.createUserWithEmailAndPassword(
           email: email, password: password);
@@ -89,7 +91,8 @@ class AuthenticationService {
 
   Future<UserCredential> signInWithGoogle() async {
     // Trigger the authentication flow
-    final GoogleSignInAccount googleUser = await GoogleSignIn().signIn();
+    final GoogleSignInAccount googleUser =
+        await (GoogleSignIn().signIn() as FutureOr<GoogleSignInAccount>);
 
     // Obtain the auth details from the request
     final GoogleSignInAuthentication googleAuth =
@@ -149,7 +152,7 @@ class AuthenticationService {
   }
 }
 
-DataModel dataModel;
+DataModel dataModel = DataModel();
 final DarkThemeProvider themeChangeProvider = new DarkThemeProvider();
 final Database.FirebaseDatabase firebaseDatabase =
     Database.FirebaseDatabase.instance;
@@ -202,7 +205,7 @@ class DataModel {
 
   void restoreEvents() async {
     final prefs = await SharedPreferences.getInstance();
-    var x = jsonDecode(prefs.getString(keys[0])) as List;
+    var x = jsonDecode(prefs.getString(keys[0])!) as List;
     var y = x.map((e) => Event.fromJson(e)).toList();
     events = y;
     // organize();
@@ -212,17 +215,17 @@ class DataModel {
   void organize() {
     for (Event event in events) {
       for (Match match in event.matches) {
-        match.red.item1 = event.teams.firstWhere(
-            (e) => e.number == match.red.item1.number,
+        match.red!.item1 = event.teams.firstWhere(
+            (e) => e.number == match.red!.item1!.number,
             orElse: () => Team.nullTeam());
-        match.red.item2 = event.teams.firstWhere(
-            (e) => e.number == match.red.item2.number,
+        match.red!.item2 = event.teams.firstWhere(
+            (e) => e.number == match.red!.item2!.number,
             orElse: () => Team.nullTeam());
-        match.blue.item1 = event.teams.firstWhere(
-            (e) => e.number == match.blue.item1.number,
+        match.blue!.item1 = event.teams.firstWhere(
+            (e) => e.number == match.blue!.item1!.number,
             orElse: () => Team.nullTeam());
-        match.blue.item2 = event.teams.firstWhere(
-            (e) => e.number == match.blue.item2.number,
+        match.blue!.item2 = event.teams.firstWhere(
+            (e) => e.number == match.blue!.item2!.number,
             orElse: () => Team.nullTeam());
       }
     }
@@ -233,10 +236,10 @@ class Event {
   Event({this.name, this.type});
   String id = Uuid().v4();
   bool shared = false;
-  EventType type;
+  EventType? type;
   List<Team> teams = [];
   List<Match> matches = [];
-  String name;
+  String? name;
   void addTeam(Team newTeam) {
     bool isIn = false;
     teams.forEach((element) {
@@ -248,19 +251,19 @@ class Event {
 
   void deleteTeam(Team team) {
     for (Match match in matches) {
-      if (match.red.item1.equals(team)) match.red.item1 = Team.nullTeam();
-      if (match.red.item2.equals(team)) match.red.item2 = Team.nullTeam();
-      if (match.blue.item1.equals(team)) match.blue.item1 = Team.nullTeam();
-      if (match.blue.item2.equals(team)) match.blue.item2 = Team.nullTeam();
+      if (match.red!.item1!.equals(team)) match.red!.item1 = Team.nullTeam();
+      if (match.red!.item2!.equals(team)) match.red!.item2 = Team.nullTeam();
+      if (match.blue!.item1!.equals(team)) match.blue!.item1 = Team.nullTeam();
+      if (match.blue!.item2!.equals(team)) match.blue!.item2 = Team.nullTeam();
     }
     teams.remove(team);
   }
 
   void deleteMatch(Match e) {
-    e.red.item1.scores.removeWhere((f) => f.id == e.id);
-    e.red.item2.scores.removeWhere((f) => f.id == e.id);
-    e.blue.item1.scores.removeWhere((f) => f.id == e.id);
-    e.blue.item2.scores.removeWhere((f) => f.id == e.id);
+    e.red?.item1?.scores.removeWhere((f) => f.id == e.id);
+    e.red?.item2?.scores.removeWhere((f) => f.id == e.id);
+    e.blue?.item1?.scores.removeWhere((f) => f.id == e.id);
+    e.blue?.item2?.scores.removeWhere((f) => f.id == e.id);
     matches.remove(e);
   }
 
@@ -268,7 +271,7 @@ class Event {
     shared = true;
   }
 
-  void updateLocal(Map<String, dynamic> json) {
+  void updateLocal(Map<String, dynamic>? json) {
     if (json != null) {
       name = json['name'];
       try {
@@ -315,42 +318,46 @@ class Event {
 }
 
 class Alliance {
-  Team item1;
-  Team item2;
+  Team? item1;
+  Team? item2;
   Alliance(Team item1, Team item2) {
     this.item1 = item1;
     this.item2 = item2;
   }
-  int allianceTotal(String id) {
+  int allianceTotal(String? id) {
     return 0 +
-        item1?.scores
-            ?.firstWhere((e) => e.id == id,
-                orElse: () => Score(Uuid().v4(), Dice.none))
-            ?.total() +
-        item2?.scores
-            ?.firstWhere((e) => e.id == id,
-                orElse: () => Score(Uuid().v4(), Dice.none))
-            ?.total();
+        (item1?.scores
+                .firstWhere((e) => e.id == id,
+                    orElse: () => Score(Uuid().v4(), Dice.none))
+                .total() ??
+            0) +
+        (item2?.scores
+                .firstWhere(
+                  (e) => e.id == id,
+                  orElse: () => Score(Uuid().v4(), Dice.none),
+                )
+                .total() ??
+            0);
   }
 
-  Alliance.fromJson(Map<String, dynamic> json, List<Team> teamList)
+  Alliance.fromJson(Map<String, dynamic>? json, List<Team> teamList)
       : item1 = teamList.firstWhere(
-            (e) => e.number.trim() == json['team1'].trim(),
+            (e) => e.number.trim() == json?['team1'].trim(),
             orElse: () => Team.nullTeam()),
         item2 = teamList.firstWhere(
-            (e) => e.number.trim() == json['team2'].trim(),
+            (e) => e.number.trim() == json?['team2'].trim(),
             orElse: () => Team.nullTeam());
   Map<String, dynamic> toJson() => {
-        'team1': item1.number,
-        'team2': item2.number,
+        'team1': item1?.number,
+        'team2': item2?.number,
       };
 }
 
 class Team {
-  String name;
-  String number;
-  List<Score> scores;
-  Score targetScore;
+  String name = '';
+  String number = '';
+  List<Score> scores = [];
+  Score? targetScore;
   Team(String number, String name) {
     this.name = name;
     this.number = number;
@@ -380,26 +387,26 @@ class Team {
         'name': name,
         'number': number,
         'scores': scores.map((e) => e.toJson()).toList(),
-        'targetScore': targetScore.toJson()
+        'targetScore': targetScore!.toJson()
       };
 }
 
 class Match {
-  EventType type = EventType.live;
+  EventType? type = EventType.live;
   Dice dice = Dice.one;
-  Alliance red;
-  Alliance blue;
-  String id;
-  Match(Alliance red, Alliance blue, EventType type) {
+  Alliance? red;
+  Alliance? blue;
+  String id = '';
+  Match(Alliance red, Alliance blue, EventType? type) {
     this.type = type;
     this.red = red;
     this.blue = blue;
     id = Uuid().v4();
-    red?.item1?.scores?.addScore(Score(id, dice));
+    red.item1?.scores.addScore(Score(id, dice));
     if (type != EventType.remote) {
-      red?.item2?.scores?.addScore(Score(id, dice));
-      blue?.item1?.scores?.addScore(Score(id, dice));
-      blue?.item2?.scores?.addScore(Score(id, dice));
+      red.item2?.scores.addScore(Score(id, dice));
+      blue.item1?.scores.addScore(Score(id, dice));
+      blue.item2?.scores.addScore(Score(id, dice));
     }
   }
   static Match defaultMatch(EventType type) {
@@ -407,10 +414,10 @@ class Match {
         Alliance(Team('3', 'Charlie'), Team('4', 'Delta')), type);
   }
 
-  Alliance alliance(Team team) {
-    if (red.item1.equals(team) || red.item2.equals(team)) {
+  Alliance? alliance(Team team) {
+    if (red!.item1!.equals(team) || red!.item2!.equals(team)) {
       return red;
-    } else if (blue.item1.equals(team) || blue.item2.equals(team)) {
+    } else if (blue!.item1!.equals(team) || blue!.item2!.equals(team)) {
       return blue;
     } else {
       return null;
@@ -419,19 +426,19 @@ class Match {
 
   void setDice(Dice dice) {
     this.dice = dice;
-    red.item1.scores
+    red?.item1?.scores
         .firstWhere((e) => e.id == id,
             orElse: () => Score(Uuid().v4(), Dice.none))
         .dice = dice;
-    red.item2.scores
+    red?.item2?.scores
         .firstWhere((e) => e.id == id,
             orElse: () => Score(Uuid().v4(), Dice.none))
         .dice = dice;
-    blue.item1.scores
+    blue?.item1?.scores
         .firstWhere((e) => e.id == id,
             orElse: () => Score(Uuid().v4(), Dice.none))
         .dice = dice;
-    blue.item2.scores
+    blue?.item2?.scores
         .firstWhere((e) => e.id == id,
             orElse: () => Score(Uuid().v4(), Dice.none))
         .dice = dice;
@@ -439,37 +446,38 @@ class Match {
 
   String score() {
     if (type == EventType.remote) {
-      return red.item1.scores
-          .firstWhere((e) => e.id == id,
-              orElse: () => Score(Uuid().v4(), Dice.none))
-          .total()
-          .toString();
+      return red?.item1?.scores
+              .firstWhere((e) => e.id == id,
+                  orElse: () => Score(Uuid().v4(), Dice.none))
+              .total()
+              .toString() ??
+          '0';
     }
     return redScore() + " - " + blueScore();
   }
 
   String redScore() {
-    final r0 = red.item1.scores
+    final r0 = red?.item1?.scores
         .firstWhere((e) => e.id == id,
             orElse: () => Score(Uuid().v4(), Dice.none))
         .total();
-    final r1 = red.item2.scores
+    final r1 = red?.item2?.scores
         .firstWhere((e) => e.id == id,
             orElse: () => Score(Uuid().v4(), Dice.none))
         .total();
-    return (r0 + r1).toString();
+    return (r0 ?? 0 + (r1 ?? 0)).toString();
   }
 
   String blueScore() {
-    final b0 = blue.item1.scores
+    final b0 = blue?.item1?.scores
         .firstWhere((e) => e.id == id,
             orElse: () => Score(Uuid().v4(), Dice.none))
         .total();
-    final b1 = blue.item2.scores
+    final b1 = blue?.item2?.scores
         .firstWhere((e) => e.id == id,
             orElse: () => Score(Uuid().v4(), Dice.none))
         .total();
-    return (b0 + b1).toString();
+    return (b0 ?? 0 + (b1 ?? 0)).toString();
   }
 
   Match.fromJson(Map<String, dynamic> json, List<Team> teamList)
@@ -479,8 +487,8 @@ class Match {
         dice = getDiceFromString(json['dice']),
         type = getTypeFromString(json['type']);
   Map<String, dynamic> toJson() => {
-        'red': red.toJson(),
-        'blue': blue.toJson(),
+        'red': red!.toJson(),
+        'blue': blue!.toJson(),
         'type': type.toString(),
         'dice': dice.toString(),
         'id': id.toString()
@@ -564,7 +572,7 @@ extension IterableDoubleExtensions on List<double> {
   }
 }
 
-extension IterableExtensions on Iterable<int> {
+extension IterableExtensions on Iterable<num> {
   List<FlSpot> spots() {
     List<FlSpot> val = [];
     for (int i = 0; i < this.length; i++) {
@@ -591,12 +599,12 @@ extension IterableExtensions on Iterable<int> {
 }
 
 extension MatchExtensions on List<Match> {
-  List<FlSpot> spots(Team team, Dice dice) {
+  List<FlSpot> spots(Team? team, Dice? dice) {
     List<FlSpot> val = [];
     final arr =
         (dice != Dice.none ? this.where((e) => e.dice == dice) : this).toList();
     for (int i = 0; i < arr.length; i++) {
-      final alliance = arr[i].alliance(team);
+      final alliance = arr[i].alliance(team!);
       if (alliance != null) {
         final allianceTotal = alliance.allianceTotal(arr[i].id);
         val.add(FlSpot(i.toDouble(), allianceTotal.toDouble()));
@@ -605,10 +613,10 @@ extension MatchExtensions on List<Match> {
     return val;
   }
 
-  int maxAllianceScore(Team team) {
+  int maxAllianceScore(Team? team) {
     List<int> val = [];
     for (int i = 0; i < this.length; i++) {
-      final alliance = this[i].alliance(team);
+      final alliance = this[i].alliance(team!);
       if (alliance != null) {
         final allianceTotal = alliance.allianceTotal(this[i].id);
         val.add(allianceTotal);
@@ -656,7 +664,7 @@ extension TeamsExtension on List<Team> {
     return val;
   }
 
-  double maxScoreVar(Dice dice, String string) {
+  double maxScoreVar(Dice? dice, String? string) {
     if (string == "auto") {
       return this.maxAutoScore(dice);
     } else if (string == "tele") {
@@ -668,7 +676,7 @@ extension TeamsExtension on List<Team> {
     }
   }
 
-  double lowestMadVar(Dice dice, String string) {
+  double lowestMadVar(Dice? dice, String? string) {
     if (string == "auto") {
       return this.lowestAutoMadScore(dice);
     } else if (string == "tele") {
@@ -680,42 +688,42 @@ extension TeamsExtension on List<Team> {
     }
   }
 
-  double maxScore(Dice dice) {
+  double maxScore(Dice? dice) {
     if (this.length == 0) return 1;
     return this.map((e) => e.scores.maxScore(dice)).reduce(max);
   }
 
-  double lowestMadScore(Dice dice) {
+  double lowestMadScore(Dice? dice) {
     if (this.length == 0) return 1;
     return this.map((e) => e.scores.madScore(dice)).reduce(min);
   }
 
-  double maxAutoScore(Dice dice) {
+  double maxAutoScore(Dice? dice) {
     if (this.length == 0) return 1;
     return this.map((e) => e.scores.autoMaxScore(dice)).reduce(max);
   }
 
-  double lowestAutoMadScore(Dice dice) {
+  double lowestAutoMadScore(Dice? dice) {
     if (this.length == 0) return 1;
     return this.map((e) => e.scores.autoMADScore(dice)).reduce(min);
   }
 
-  double maxTeleScore(Dice dice) {
+  double maxTeleScore(Dice? dice) {
     if (this.length == 0) return 1;
     return this.map((e) => e.scores.teleMaxScore(dice)).reduce(max);
   }
 
-  double lowestTeleMadScore(Dice dice) {
+  double lowestTeleMadScore(Dice? dice) {
     if (this.length == 0) return 1;
     return this.map((e) => e.scores.teleMADScore(dice)).reduce(min);
   }
 
-  double maxEndScore(Dice dice) {
+  double maxEndScore(Dice? dice) {
     if (this.length == 0) return 1;
     return this.map((e) => e.scores.endMaxScore(dice)).reduce(max);
   }
 
-  double lowestEndMadScore(Dice dice) {
+  double lowestEndMadScore(Dice? dice) {
     if (this.length == 0) return 1;
     return this.map((e) => e.scores.endMADScore(dice)).reduce(min);
   }
@@ -797,7 +805,7 @@ extension ScoresExtension on List<Score> {
     return val;
   }
 
-  double maxScore(Dice dice) {
+  double maxScore(Dice? dice) {
     final arr = this.diceScores(dice);
     if (arr.length == 0) return 0;
     return arr.map((e) => e.total()).reduce(max).toDouble();
@@ -815,13 +823,13 @@ extension ScoresExtension on List<Score> {
     return arr.map((e) => e.total()).mean();
   }
 
-  double madScore(Dice dice) {
+  double madScore(Dice? dice) {
     final arr = this.diceScores(dice);
     if (arr.length == 0) return 0;
     return arr.map((e) => e.total()).mad();
   }
 
-  double teleMaxScore(Dice dice) {
+  double teleMaxScore(Dice? dice) {
     final arr = this.diceScores(dice);
     if (arr.length == 0) return 0;
     return arr.map((e) => e.teleScore.total()).reduce(max).toDouble();
@@ -839,13 +847,13 @@ extension ScoresExtension on List<Score> {
     return arr.map((e) => e.teleScore.total()).mean();
   }
 
-  double teleMADScore(Dice dice) {
+  double teleMADScore(Dice? dice) {
     final arr = this.diceScores(dice);
     if (arr.length == 0) return 0;
     return arr.map((e) => e.teleScore.total()).mad();
   }
 
-  double autoMaxScore(Dice dice) {
+  double autoMaxScore(Dice? dice) {
     final arr = this.diceScores(dice);
     if (arr.length == 0)
       return 0;
@@ -869,7 +877,7 @@ extension ScoresExtension on List<Score> {
       return arr.map((e) => e.autoScore.total()).mean();
   }
 
-  double autoMADScore(Dice dice) {
+  double autoMADScore(Dice? dice) {
     final arr = this.diceScores(dice);
     if (arr.length == 0)
       return 0;
@@ -877,7 +885,7 @@ extension ScoresExtension on List<Score> {
       return arr.map((e) => e.autoScore.total()).mad();
   }
 
-  double endMaxScore(Dice dice) {
+  double endMaxScore(Dice? dice) {
     final arr = this.diceScores(dice);
     if (arr.length == 0) return 0;
     return arr.map((e) => e.endgameScore.total()).reduce(max).toDouble();
@@ -895,13 +903,13 @@ extension ScoresExtension on List<Score> {
     return arr.map((e) => e.endgameScore.total()).mean();
   }
 
-  double endMADScore(Dice dice) {
+  double endMADScore(Dice? dice) {
     final arr = this.diceScores(dice);
     if (arr.length == 0) return 0;
     return arr.map((e) => e.endgameScore.total()).mad();
   }
 
-  List<Score> diceScores(Dice dice) =>
+  List<Score> diceScores(Dice? dice) =>
       (dice != Dice.none ? this.where((e) => e.dice == dice) : this).toList();
 }
 

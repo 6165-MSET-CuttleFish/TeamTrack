@@ -8,9 +8,8 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
 
 class EventView extends StatefulWidget {
-  EventView({Key key, this.event, this.dataModel}) : super(key: key);
+  EventView({Key? key, required this.event}) : super(key: key);
   final Event event;
-  final DataModel dataModel;
   @override
   _EventView createState() => _EventView();
 }
@@ -95,8 +94,8 @@ class _EventView extends State<EventView> {
         context, MaterialPageRoute(builder: (context) => _addMatch()));
   }
 
-  String _newName;
-  String _newNumber;
+  String _newName = '';
+  String _newNumber = '';
   void _teamConfig() {
     showPlatformDialog(
         context: context,
@@ -204,10 +203,10 @@ class _EventView extends State<EventView> {
           children: [
             Expanded(
               child: TextFormField(
-                autofillHints: widget.event.teams.map((e) => e.number),
+                autofillHints: widget.event.teams.map(((e) => e.number!) as String Function(Team)),
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(labelText: 'Team number'),
-                validator: (String value) {
+                validator: (String? value) {
                   if (names[i].isEmpty) {
                     return 'Number is required';
                   } else {
@@ -235,13 +234,13 @@ class _EventView extends State<EventView> {
             ),
             Expanded(
                 child: TextFormField(
-                  autofillHints: widget.event.teams.map((e) => e.name),
+                  autofillHints: widget.event.teams.map(((e) => e.name!) as String Function(Team)),
               controller: controllers[i],
               keyboardType: TextInputType.name,
               textCapitalization: TextCapitalization.words,
               decoration: InputDecoration(labelText: 'Name'),
-              validator: (String value) {
-                if (value.isEmpty) {
+              validator: (String? value) {
+                if (value!.isEmpty) {
                   return 'Name is required';
                 } else {
                   return null;
@@ -266,7 +265,7 @@ class _EventView extends State<EventView> {
       color: Colors.green,
       child: Text('Save'),
       onPressed: () {
-        if (_formKey.currentState.validate()) {
+        if (_formKey.currentState?.validate() ?? false) {
           setState(() {
             widget.event.matches.add(Match(
                 Alliance(

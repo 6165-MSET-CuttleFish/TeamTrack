@@ -10,8 +10,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
 
 class EventsList extends StatefulWidget {
-  EventsList({Key key, this.dataModel}) : super(key: key);
-  final DataModel dataModel;
+  EventsList({Key? key, this.dataModel}) : super(key: key);
+  final DataModel? dataModel;
 
   @override
   _EventsList createState() => _EventsList(dataModel: dataModel);
@@ -20,7 +20,7 @@ class EventsList extends StatefulWidget {
 class _EventsList extends State<EventsList> {
   final slider = SlidableStrechActionPane();
   _EventsList({this.dataModel});
-  DataModel dataModel;
+  DataModel? dataModel;
   final secondaryActions = <Widget>[
     IconSlideAction(
       icon: Icons.delete,
@@ -28,7 +28,7 @@ class _EventsList extends State<EventsList> {
     )
   ];
   List<Widget> localEvents() {
-    return dataModel
+    return dataModel!
         .localEvents()
         .map((e) => Slidable(
               actions: [
@@ -60,9 +60,9 @@ class _EventsList extends State<EventsList> {
                                   child: Text('Confirm'),
                                   onPressed: () {
                                     setState(() {
-                                      dataModel.events.remove(e);
+                                      dataModel!.events.remove(e);
                                     });
-                                    dataModel.saveEvents();
+                                    dataModel!.saveEvents();
                                     Navigator.of(context).pop();
                                   },
                                 ),
@@ -84,13 +84,12 @@ class _EventsList extends State<EventsList> {
                       CupertinoIcons.person_3_fill,
                       color: Theme.of(context).accentColor,
                     ),
-                    title: Text(e.name),
+                    title: Text(e.name!),
                     onTap: () {
                       Navigator.push(
                           context,
                           platformPageRoute((context) => EventView(
                                 event: e,
-                                dataModel: dataModel,
                               )));
                     },
                   )),
@@ -100,7 +99,7 @@ class _EventsList extends State<EventsList> {
   }
 
   List<Widget> remoteEvents() {
-    return dataModel
+    return dataModel!
         .remoteEvents()
         .map((e) => Slidable(
               actions: [
@@ -108,7 +107,7 @@ class _EventsList extends State<EventsList> {
                   onTap: () async {
                     e.shared = true;
                     firebaseDatabase.reference().child(e.id).set(e.toJson());
-                    dataModel.saveEvents();
+                    dataModel!.saveEvents();
                   },
                   icon: Icons.share,
                   color: Colors.blue,
@@ -136,9 +135,9 @@ class _EventsList extends State<EventsList> {
                                   child: Text('Confirm'),
                                   onPressed: () {
                                     setState(() {
-                                      dataModel.events.remove(e);
+                                      dataModel!.events.remove(e);
                                     });
-                                    dataModel.saveEvents();
+                                    dataModel!.saveEvents();
                                     Navigator.of(context).pop();
                                   },
                                 ),
@@ -162,13 +161,12 @@ class _EventsList extends State<EventsList> {
                       CupertinoIcons.rectangle_stack_person_crop_fill,
                       color: Theme.of(context).accentColor,
                     ),
-                    title: Text(e.name),
+                    title: Text(e.name!),
                     onTap: () {
                       Navigator.push(
                           context,
                           platformPageRoute((context) => EventView(
                                 event: e,
-                                dataModel: dataModel,
                               )));
                     },
                   )),
@@ -178,7 +176,7 @@ class _EventsList extends State<EventsList> {
   }
 
   List<Widget> liveEvents() {
-    return dataModel
+    return dataModel!
         .liveEvents()
         .map((e) => Slidable(
               actions: [
@@ -210,9 +208,9 @@ class _EventsList extends State<EventsList> {
                                   child: Text('Confirm'),
                                   onPressed: () {
                                     setState(() {
-                                      dataModel.localEvents().remove(e);
+                                      dataModel!.localEvents().remove(e);
                                     });
-                                    dataModel.saveEvents();
+                                    dataModel!.saveEvents();
                                     Navigator.of(context).pop();
                                   },
                                 ),
@@ -234,13 +232,12 @@ class _EventsList extends State<EventsList> {
                       CupertinoIcons.person_3_fill,
                       color: Theme.of(context).accentColor,
                     ),
-                    title: Text(e.name),
+                    title: Text(e.name!),
                     onTap: () {
                       Navigator.push(
                           context,
                           platformPageRoute((context) => EventView(
                                 event: e,
-                                dataModel: dataModel,
                               )));
                     },
                   )),
@@ -254,7 +251,7 @@ class _EventsList extends State<EventsList> {
     prefs.setBool(key, value);
   }
 
-  String _newName;
+  String? _newName;
   @override
   Widget build(BuildContext context) {
     restoreEvents();
@@ -444,7 +441,7 @@ class _EventsList extends State<EventsList> {
         materialModal;
   }
 
-  EventType _newType;
+  EventType? _newType;
   void _chosen() {
     showPlatformDialog(
         context: context,
@@ -472,10 +469,10 @@ class _EventsList extends State<EventsList> {
                   child: Text('Save'),
                   onPressed: () {
                     setState(() {
-                      if (_newName.isNotEmpty)
-                        dataModel.events
+                      if (_newName!.isNotEmpty)
+                        dataModel!.events
                             .add(Event(name: _newName, type: _newType));
-                      dataModel.saveEvents();
+                      dataModel!.saveEvents();
                       _newName = '';
                     });
                     Navigator.of(context).pop();

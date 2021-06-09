@@ -17,7 +17,7 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:syncfusion_flutter_charts/sparkcharts.dart';
 
 class TeamView extends StatefulWidget {
-  TeamView({Key key, this.team, this.event}) : super(key: key);
+  TeamView({Key? key, required this.team, required this.event}) : super(key: key);
   final Team team;
   final Event event;
   @override
@@ -25,15 +25,11 @@ class TeamView extends StatefulWidget {
 }
 
 class _TeamView extends State<TeamView> {
-  _TeamView() {
-    textColor = Colors.white;
-  }
-  Color textColor;
   Dice _dice = Dice.none;
   final Curve finalCurve = Curves.fastLinearToSlowEaseIn;
   final Duration finalDuration = Duration(milliseconds: 800);
   final _selections = [true, true, false, false, false];
-  Team _team;
+  Team _team = Team.nullTeam();
   @override
   Widget build(BuildContext context) {
     _team = widget.team;
@@ -48,9 +44,9 @@ class _TeamView extends State<TeamView> {
                 Dice.three: Text('4'),
                 Dice.none: Text('All Cases')
               },
-              onValueChanged: (Dice newDice) {
+              onValueChanged: (Dice? newDice) {
                 setState(() {
-                  _dice = newDice;
+                  _dice = newDice ?? Dice.none;
                 });
               },
             ))
@@ -126,7 +122,7 @@ class _TeamView extends State<TeamView> {
                 !eventHandler.hasError &&
                 !dataModel.isProcessing) {
               widget.event.updateLocal(
-                  json.decode(json.encode(eventHandler.data.snapshot.value)));
+                  json.decode(json.encode(eventHandler.data!.snapshot.value)));
               _team = widget.event.teams.firstWhere(
                   (element) => element.number == _team.number, orElse: () {
                 Navigator.of(context).pop();
@@ -220,7 +216,7 @@ class _TeamView extends State<TeamView> {
                     maxY: [
                       widget.event.matches.maxAllianceScore(_team).toDouble(),
                       _team.targetScore != null
-                          ? _team.targetScore.total().toDouble()
+                          ? _team.targetScore!.total().toDouble()
                           : 0.0
                     ].reduce(max),
                     lineBarsData: [
@@ -232,7 +228,7 @@ class _TeamView extends State<TeamView> {
                                     Colors.lightGreenAccent.withOpacity(0.2)
                                   ],
                                   cutOffY:
-                                      _team.targetScore?.total()?.toDouble(),
+                                      _team.targetScore?.total().toDouble(),
                                   applyCutOffY: true,
                                 )
                               : null,
@@ -241,7 +237,7 @@ class _TeamView extends State<TeamView> {
                                   show: true,
                                   colors: [Colors.redAccent.withOpacity(0.2)],
                                   cutOffY:
-                                      _team.targetScore?.total()?.toDouble(),
+                                      _team.targetScore?.total().toDouble(),
                                   applyCutOffY: true,
                                 )
                               : null,
@@ -266,7 +262,7 @@ class _TeamView extends State<TeamView> {
                                     Colors.lightGreenAccent.withOpacity(0.2)
                                   ],
                                   cutOffY:
-                                      _team.targetScore?.total()?.toDouble(),
+                                      _team.targetScore?.total().toDouble(),
                                   applyCutOffY: true,
                                 )
                               : null,
@@ -275,7 +271,7 @@ class _TeamView extends State<TeamView> {
                                   show: true,
                                   colors: [Colors.redAccent.withOpacity(0.2)],
                                   cutOffY:
-                                      _team.targetScore?.total()?.toDouble(),
+                                      _team.targetScore?.total().toDouble(),
                                   applyCutOffY: true,
                                 )
                               : null,

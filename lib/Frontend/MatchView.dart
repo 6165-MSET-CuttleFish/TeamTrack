@@ -12,41 +12,42 @@ import 'dart:convert';
 import 'package:uuid/uuid.dart';
 
 class MatchView extends StatefulWidget {
-  MatchView({Key key, @required this.match, this.team, this.event})
+  MatchView({Key? key, this.match, this.team, required this.event})
       : super(key: key);
   @required
-  final Match match;
-  final Team team;
+  final Match? match;
+  final Team? team;
   final Event event;
   @override
   State createState() => _MatchView(match, team);
 }
 
 class _MatchView extends State<MatchView> {
-  Team _selectedTeam;
+  Team _selectedTeam = Team.nullTeam();
   Color _color = CupertinoColors.systemRed;
-  Score _score;
+  Score _score = Score(Uuid().v4(), Dice.none);
   int _view = 0;
-  Match _match;
+  Match? _match; // = Match.defaultMatch(EventType.remote);
   final Stream<int> _periodicStream =
       Stream.periodic(const Duration(milliseconds: 100), (i) => i);
   double _time = 0;
   List<double> lapses = [];
-  int _previousStreamValue = 0;
+  int? _previousStreamValue = 0;
   bool _paused = true;
-  _MatchView(Match match, Team team) {
+  _MatchView(Match? match, Team? team) {
     if (team != null) {
-      _score = team.targetScore;
+      _score = team.targetScore ?? Score(Uuid().v4(), Dice.none);
       _selectedTeam = team;
       _color = CupertinoColors.systemGreen;
     } else {
       _match = match;
-      _selectedTeam = match.red.item1;
+      _selectedTeam = match?.red?.item1 ?? Team.nullTeam();
       _score = _selectedTeam.scores.firstWhere(
-        (element) => element.id == match.id,
-        orElse: () => Score(Uuid().v4(), Dice.none),
-      );
-      if (_match.type == EventType.remote) _color = CupertinoColors.systemGreen;
+            (element) => element.id == match?.id,
+            orElse: () => Score(Uuid().v4(), Dice.none),
+          );
+      if (_match!.type == EventType.remote)
+        _color = CupertinoColors.systemGreen;
     }
   }
 
@@ -60,12 +61,12 @@ class _MatchView extends State<MatchView> {
               !dataModel.isProcessing) {
             widget.event.updateLocal(
               json.decode(
-                json.encode(eventHandler.data.snapshot.value),
+                json.encode(eventHandler.data!.snapshot.value),
               ),
             );
             if (widget.team == null) {
-              _match = widget.event.matches
-                  .firstWhere((element) => element.id == _match.id, orElse: () {
+              _match = widget.event.matches.firstWhere(
+                  (element) => element.id == _match!.id, orElse: () {
                 Navigator.pop(context);
                 return Match.defaultMatch(EventType.remote);
               });
@@ -76,10 +77,11 @@ class _MatchView extends State<MatchView> {
               return Team.nullTeam();
             });
             if (widget.team != null) {
-              _score = _selectedTeam.targetScore;
+              _score =
+                  _selectedTeam.targetScore ?? Score(Uuid().v4(), Dice.none);
             } else {
               _score = _selectedTeam.scores.firstWhere(
-                  (element) => element.id == _match.id,
+                  (element) => element.id == _match!.id,
                   orElse: () => Score(Uuid().v4(), Dice.none));
             }
           }
@@ -133,13 +135,14 @@ class _MatchView extends State<MatchView> {
                       ),
                       child: Center(
                         child: Column(children: [
-                          if (_match != null && _match.type != EventType.remote)
+                          if (_match != null &&
+                              _match!.type != EventType.remote)
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 Container(
                                   width: 100,
-                                  child: Text(_match.redScore(),
+                                  child: Text(_match?.redScore() ?? '0',
                                       style: Theme.of(context)
                                           .textTheme
                                           .headline4),
@@ -152,7 +155,7 @@ class _MatchView extends State<MatchView> {
                                 ),
                                 Container(
                                   width: 100,
-                                  child: Text(_match.blueScore(),
+                                  child: Text(_match?.blueScore() ?? '0',
                                       style: Theme.of(context)
                                           .textTheme
                                           .headline4),
@@ -162,16 +165,15 @@ class _MatchView extends State<MatchView> {
                           Padding(
                             padding: EdgeInsets.all(10),
                           ),
-                          if (_match != null && _match.type != EventType.remote)
+                          if (_match != null &&
+                              _match?.type != EventType.remote)
                             buttonRow(),
                           Text(
-                              _selectedTeam.name +
-                                  ' : ' +
-                                  _score.total().toString(),
+                              _selectedTeam.name,
                               style: Theme.of(context).textTheme.headline6),
                           if (widget.team == null)
                             DropdownButton<Dice>(
-                              value: _match.dice,
+                              value: _match?.dice,
                               icon: Icon(Icons.height_rounded),
                               iconSize: 24,
                               elevation: 16,
@@ -181,10 +183,10 @@ class _MatchView extends State<MatchView> {
                                 height: 0.5,
                                 color: Colors.deepPurpleAccent,
                               ),
-                              onChanged: (Dice newValue) {
+                              onChanged: (newValue) {
                                 setState(() {
                                   HapticFeedback.mediumImpact();
-                                  _match.setDice(newValue);
+                                  _match?.setDice(newValue ?? Dice.one);
                                 });
                                 dataModel.saveEvents();
                                 dataModel.uploadEvent(widget.event);
@@ -242,10 +244,10 @@ class _MatchView extends State<MatchView> {
                                     1: Text('Tele-Op'),
                                     2: Text('Endgame')
                                   },
-                                  onValueChanged: (int x) {
+                                  onValueChanged: (int? x) {
                                     setState(() {
                                       HapticFeedback.mediumImpact();
-                                      _view = x;
+                                      _view = x ?? 0;
                                     });
                                   },
                                 )),
@@ -351,21 +353,22 @@ class _MatchView extends State<MatchView> {
             flex: 1,
             child: PlatformButton(
               child: Text(
-                _match.red.item1.number,
+                _match?.red?.item1?.number ?? '?',
                 style: TextStyle(
-                    color: _selectedTeam == _match.red.item1
+                    color: _selectedTeam == _match?.red?.item1
                         ? Colors.grey
                         : CupertinoColors.systemRed),
               ),
-              onPressed: _selectedTeam == _match.red.item1
+              onPressed: _selectedTeam == _match?.red?.item1
                   ? null
                   : () {
                       setState(() {
-                        _selectedTeam = _match.red.item1;
+                        _selectedTeam = _match?.red?.item1 ?? Team.nullTeam();
                         _color = CupertinoColors.systemRed;
                         _score = _selectedTeam.scores.firstWhere(
-                            (element) => element.id == _match.id,
-                            orElse: () => Score(Uuid().v4(), Dice.none));
+                              (element) => element.id == _match?.id,
+                              orElse: () => Score(Uuid().v4(), Dice.none),
+                            );
                       });
                     },
             )),
@@ -373,22 +376,23 @@ class _MatchView extends State<MatchView> {
             flex: 1,
             child: PlatformButton(
               child: Text(
-                _match.red.item2.number,
+                _match?.red?.item2?.number ?? '?',
                 style: TextStyle(
-                  color: _selectedTeam == _match.red.item2
+                  color: _selectedTeam == _match?.red?.item2
                       ? Colors.grey
                       : CupertinoColors.systemRed,
                 ),
               ),
-              onPressed: _selectedTeam == _match.red.item2
+              onPressed: _selectedTeam == _match?.red?.item2
                   ? null
                   : () {
                       setState(() {
-                        _selectedTeam = _match.red.item2;
+                        _selectedTeam = _match?.red?.item2 ?? Team.nullTeam();
                         _color = CupertinoColors.systemRed;
                         _score = _selectedTeam.scores.firstWhere(
-                            (element) => element.id == _match.id,
-                            orElse: () => Score(Uuid().v4(), Dice.none));
+                              (element) => element.id == _match?.id,
+                              orElse: () => Score(Uuid().v4(), Dice.none),
+                            );
                       });
                     },
             )),
@@ -397,21 +401,22 @@ class _MatchView extends State<MatchView> {
             flex: 1,
             child: PlatformButton(
               child: Text(
-                _match.blue.item1.number,
+                _match?.blue?.item1?.number ?? '?',
                 style: TextStyle(
-                    color: _selectedTeam == _match.blue.item1
+                    color: _selectedTeam == _match?.blue?.item1
                         ? Colors.grey
                         : Colors.blue),
               ),
-              onPressed: _selectedTeam == _match.blue.item1
+              onPressed: _selectedTeam == _match?.blue?.item1
                   ? null
                   : () {
                       setState(() {
-                        _selectedTeam = _match.blue.item1;
+                        _selectedTeam = _match?.blue?.item1 ?? Team.nullTeam();
                         _color = Colors.blue;
                         _score = _selectedTeam.scores.firstWhere(
-                            (element) => element.id == _match.id,
-                            orElse: () => Score(Uuid().v4(), Dice.none));
+                              (element) => element.id == _match?.id,
+                              orElse: () => Score(Uuid().v4(), Dice.none),
+                            );
                       });
                     },
             )),
@@ -419,21 +424,22 @@ class _MatchView extends State<MatchView> {
             flex: 1,
             child: PlatformButton(
               child: Text(
-                _match.blue.item2.number,
+                _match?.blue?.item2?.number ?? '?',
                 style: TextStyle(
-                    color: _selectedTeam == _match.blue.item2
+                    color: _selectedTeam == _match?.blue?.item2
                         ? Colors.grey
                         : Colors.blue),
               ),
-              onPressed: _selectedTeam == _match.blue.item2
+              onPressed: _selectedTeam == _match?.blue?.item2
                   ? null
                   : () {
                       setState(() {
-                        _selectedTeam = _match.blue.item2;
+                        _selectedTeam = _match?.blue?.item2 ?? Team.nullTeam();
                         _color = Colors.blue;
                         _score = _selectedTeam.scores.firstWhere(
-                            (element) => element.id == _match.id,
-                            orElse: () => Score(Uuid().v4(), Dice.none));
+                              (element) => element.id == _match?.id,
+                              orElse: () => Score(Uuid().v4(), Dice.none),
+                            );
                       });
                     },
             ))

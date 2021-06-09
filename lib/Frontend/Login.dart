@@ -6,8 +6,8 @@ import 'package:auth_buttons/auth_buttons.dart';
 import 'package:provider/provider.dart';
 
 class LoginView extends StatefulWidget {
-  LoginView({Key key, this.dataModel}) : super(key: key);
-  final DataModel dataModel;
+  LoginView({Key? key, this.dataModel}) : super(key: key);
+  final DataModel? dataModel;
 
   @override
   _LoginView createState() => _LoginView();
@@ -15,12 +15,10 @@ class LoginView extends StatefulWidget {
 
 class _LoginView extends State<LoginView> {
   PageController _controller = PageController(initialPage: 0);
-  Size size;
-  BuildContext context;
+  late Size size;
   @override
   Widget build(BuildContext context) {
     size = MediaQuery.of(context).size;
-    this.context = context;
     return Scaffold(
         body: Stack(alignment: Alignment.bottomCenter, children: [
       Container(
@@ -81,7 +79,7 @@ class _LoginView extends State<LoginView> {
               child: Text("Sign In"),
               color: Colors.green,
               onPressed: () async {
-                String s = await context.read<AuthenticationService>().signIn(
+                String? s = await context.read<AuthenticationService>().signIn(
                       email: emailController.text.trim(),
                       password: passwordController.text.trim(),
                     );
@@ -93,7 +91,7 @@ class _LoginView extends State<LoginView> {
                       builder: (BuildContext context) => PlatformAlert(
                             title: Text('Error'),
                             content: Text(
-                              s,
+                              s!,
                               style: Theme.of(context).textTheme.bodyText1,
                             ),
                             actions: [
@@ -192,7 +190,7 @@ class _LoginView extends State<LoginView> {
               child: Text("Sign Up"),
               color: Colors.green,
               onPressed: () async {
-                String s = await context.read<AuthenticationService>().signUp(
+                String? s = await context.read<AuthenticationService>().signUp(
                       email: emailController.text.trim(),
                       password: passwordController.text.trim(),
                     );
@@ -210,7 +208,7 @@ class _LoginView extends State<LoginView> {
                       builder: (BuildContext context) => PlatformAlert(
                             title: Text('Error'),
                             content: Text(
-                              s,
+                              s!,
                               style: Theme.of(context).textTheme.bodyText1,
                             ),
                             actions: [

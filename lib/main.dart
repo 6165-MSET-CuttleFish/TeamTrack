@@ -65,7 +65,7 @@ class _TeamTrack extends State<TeamTrack> {
         return themeChangeProvider;
       },
       child: Consumer<DarkThemeProvider>(
-          builder: (BuildContext context, value, Widget child) {
+          builder: (BuildContext context, value, Widget? child) {
         return MaterialApp(
             debugShowCheckedModeBanner: false,
             title: 'TeamTrack',
@@ -115,7 +115,6 @@ class MyApp extends StatelessWidget {
   );
   @override
   Widget build(BuildContext context) {
-    dataModel = DataModel();
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     return MultiProvider(
       providers: [
