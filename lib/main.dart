@@ -80,7 +80,7 @@ class _TeamTrack extends State<TeamTrack> {
 class AuthenticationWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final firebaseUser = context.watch<User>();
+    final firebaseUser = context.watch<User?>();
     if (firebaseUser == null) {
       return LoginView(dataModel: dataModel);
     } else {

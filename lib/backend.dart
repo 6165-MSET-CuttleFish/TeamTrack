@@ -386,7 +386,8 @@ class Team {
   Map<String, dynamic> toJson() => {
         'name': name,
         'number': number,
-        'scores': scores.map((e) => e.toJson()).toList(),
+        'scores':
+            scores.length != 0 ? scores.map((e) => e.toJson()).toList() : null,
         'targetScore': targetScore!.toJson()
       };
 }
@@ -572,7 +573,7 @@ extension IterableDoubleExtensions on List<double> {
   }
 }
 
-extension IterableExtensions on Iterable<num> {
+extension IterableExtensions on Iterable<int> {
   List<FlSpot> spots() {
     List<FlSpot> val = [];
     for (int i = 0; i < this.length; i++) {
@@ -676,7 +677,7 @@ extension TeamsExtension on List<Team> {
     }
   }
 
-  double lowestMadVar(Dice? dice, String? string) {
+  double lowestMadVar(Dice? dice, String string) {
     if (string == "auto") {
       return this.lowestAutoMadScore(dice);
     } else if (string == "tele") {
