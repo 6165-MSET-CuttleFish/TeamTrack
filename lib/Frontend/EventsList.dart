@@ -1,7 +1,3 @@
-import 'dart:io';
-
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:teamtrack/Frontend/Login.dart';
 import 'package:teamtrack/backend.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -400,7 +396,6 @@ class _EventsList extends State<EventsList> {
                     // )
                   ],
                 ))));
-    try {
       if (NewPlatform.isIOS())
         showCupertinoModalPopup(
             context: context,
@@ -447,9 +442,6 @@ class _EventsList extends State<EventsList> {
                 ));
       else
         materialModal;
-    } catch (e) {
-      materialModal;
-    }
   }
 
   EventType _newType;

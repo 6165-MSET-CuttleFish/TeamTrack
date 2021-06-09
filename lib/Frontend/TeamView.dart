@@ -13,6 +13,8 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:uuid/uuid.dart';
 import 'package:firebase_database/firebase_database.dart' as Database;
 import 'dart:convert';
+import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:syncfusion_flutter_charts/sparkcharts.dart';
 
 class TeamView extends StatefulWidget {
   TeamView({Key key, this.team, this.event}) : super(key: key);
@@ -433,40 +435,68 @@ class _TeamView extends State<TeamView> {
         ]),
       ),
       Container(
-          width: MediaQuery.of(context).size.width,
-          child: PlatformButton(
-            onPressed: () async {
-              await Navigator.push(
-                  context,
-                  platformPageRoute((context) => MatchList(
-                        event: widget.event,
-                        team: _team,
-                      )));
-              setState(() {});
-            },
-            color: CupertinoColors.systemGreen,
-            child: Text('Matches'),
-          )),
+        width: MediaQuery.of(context).size.width,
+        child: PlatformButton(
+          onPressed: () async {
+            await Navigator.push(
+                context,
+                platformPageRoute((context) => MatchList(
+                      event: widget.event,
+                      team: _team,
+                    )));
+            setState(() {});
+          },
+          color: CupertinoColors.systemGreen,
+          child: Text('Matches'),
+        ),
+      ),
       if (NewPlatform.isIOS()) Padding(padding: EdgeInsets.all(5)),
       Container(
-          width: MediaQuery.of(context).size.width / 2,
-          child: PlatformButton(
-            onPressed: () async {
-              if (_team.targetScore == null) {
-                _team.targetScore = Score(Uuid().v4(), Dice.none);
-              }
-              await Navigator.push(
-                  context,
-                  platformPageRoute((context) => MatchView(
-                        match: Match.defaultMatch(EventType.remote),
-                        event: widget.event,
-                        team: _team,
-                      )));
-              setState(() {});
-            },
-            color: Colors.indigoAccent,
-            child: Text('Target'),
-          )),
+        width: MediaQuery.of(context).size.width / 2,
+        child: PlatformButton(
+          onPressed: () async {
+            if (_team.targetScore == null) {
+              _team.targetScore = Score(Uuid().v4(), Dice.none);
+            }
+            await Navigator.push(
+              context,
+              platformPageRoute(
+                (context) => MatchView(
+                  match: Match.defaultMatch(EventType.remote),
+                  event: widget.event,
+                  team: _team,
+                ),
+              ),
+            );
+            setState(() {});
+          },
+          color: Colors.indigoAccent,
+          child: Text('Target'),
+        ),
+      ),
+      Container(
+        decoration: BoxDecoration(
+          color: Color(0xff37434d),
+          borderRadius: BorderRadius.all(
+                    Radius.circular(18),
+                  ),
+        ),
+        child: SfCartesianChart(
+          series: <ChartSeries<BoxAndWhisker, double>>[
+            BoxAndWhiskerSeries<BoxAndWhisker, double>(
+              yAxisName: "Time (S)",
+              gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Colors.red, Colors.blue]),
+              dataSource: _team.scores.map((e) => e.teleScore.cycles).toList(),
+              boxPlotMode: BoxPlotMode.exclusive,
+              xValueMapper: (BoxAndWhisker cycles, _) => _.toDouble() + 1,
+              yValueMapper: (BoxAndWhisker cycles, _) => cycles.getArray(),
+            ),
+          ],
+        ),
+      ),
       Padding(
         padding: const EdgeInsets.only(top: 20, bottom: 10),
         child: Text(

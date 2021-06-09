@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_database/firebase_database.dart' as Database;
 import 'package:flutter/services.dart';
 import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
 import 'package:teamtrack/Frontend/EventsList.dart';
@@ -9,7 +8,6 @@ import 'package:teamtrack/backend.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'dart:io' show Platform;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,29 +22,29 @@ class TeamTrack extends StatefulWidget {
 
 class _TeamTrack extends State<TeamTrack> {
   final lightTheme = ThemeData(
-      primarySwatch: Colors.deepPurple,
-      splashColor: NewPlatform.isAndroid() ? Colors.cyan : Colors.transparent,
-      visualDensity: VisualDensity.adaptivePlatformDensity,
-    );
+    primarySwatch: Colors.deepPurple,
+    splashColor: NewPlatform.isAndroid() ? Colors.cyan : Colors.transparent,
+    visualDensity: VisualDensity.adaptivePlatformDensity,
+  );
 
   final darkTheme = ThemeData(
-      textTheme: TextTheme(bodyText2: TextStyle(color: Colors.white)),
-      backgroundColor: Colors.black,
-      splashColor: 
-          NewPlatform.isAndroid() ? Colors.deepPurple : Colors.transparent,
-      shadowColor: Colors.white,
-      brightness: Brightness.dark,
-      canvasColor: Colors.black,
-      buttonColor: Colors.grey,
-      accentColor: Colors.cyan,
-      floatingActionButtonTheme: FloatingActionButtonThemeData(
-        focusElevation: 0,
-        backgroundColor: Colors.cyan,
-        elevation: 0,
-      ),
-      primarySwatch: Colors.cyan,
-      visualDensity: VisualDensity.adaptivePlatformDensity,
-    );
+    textTheme: TextTheme(bodyText2: TextStyle(color: Colors.white)),
+    backgroundColor: Colors.black,
+    splashColor:
+        NewPlatform.isAndroid() ? Colors.deepPurple : Colors.transparent,
+    shadowColor: Colors.white,
+    brightness: Brightness.dark,
+    canvasColor: Colors.black,
+    buttonColor: Colors.grey,
+    accentColor: Colors.cyan,
+    floatingActionButtonTheme: FloatingActionButtonThemeData(
+      focusElevation: 0,
+      backgroundColor: Colors.cyan,
+      elevation: 0,
+    ),
+    primarySwatch: Colors.cyan,
+    visualDensity: VisualDensity.adaptivePlatformDensity,
+  );
 
   @override
   void initState() {
@@ -62,17 +60,20 @@ class _TeamTrack extends State<TeamTrack> {
   @override
   Widget build(BuildContext context) {
     dataModel = DataModel();
-    return ChangeNotifierProvider(create: (_) {
-      return themeChangeProvider;
-    }, child: Consumer<DarkThemeProvider>(
-        builder: (BuildContext context, value, Widget child) {
-      return MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'TeamTrack',
-          theme: themeChangeProvider.darkTheme ? darkTheme : lightTheme,
-          darkTheme: darkTheme,
-          home: AuthenticationWrapper());
-    }));
+    return ChangeNotifierProvider(
+      create: (_) {
+        return themeChangeProvider;
+      },
+      child: Consumer<DarkThemeProvider>(
+          builder: (BuildContext context, value, Widget child) {
+        return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'TeamTrack',
+            theme: themeChangeProvider.darkTheme ? darkTheme : lightTheme,
+            darkTheme: darkTheme,
+            home: AuthenticationWrapper());
+      }),
+    );
   }
 }
 
@@ -86,6 +87,12 @@ class AuthenticationWrapper extends StatelessWidget {
       return EventsList(dataModel: dataModel);
     }
   }
+}
+
+class SalesData {
+  SalesData(this.year, this.number);
+  final double year;
+  final List<int> number;
 }
 
 class MyApp extends StatelessWidget {
@@ -116,6 +123,7 @@ class MyApp extends StatelessWidget {
           create: (_) => AuthenticationService(FirebaseAuth.instance),
         ),
         StreamProvider(
+            initialData: null,
             create: (context) =>
                 context.read<AuthenticationService>().authStateChanges),
       ],

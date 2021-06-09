@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:flutter/services.dart';
 import 'package:teamtrack/backend.dart';
 
@@ -13,17 +12,18 @@ class Score extends ScoreDivision {
     autoScore = AutoScore(dice);
     endgameScore = EndgameScore(dice);
   }
-  int total() {
-    return teleScore.total() + autoScore.total() + endgameScore.total();
-  }
-
+  List<ScoringElement> getElements() => [
+        ...teleScore.getElements(),
+        ...autoScore.getElements(),
+        ...endgameScore.getElements()
+      ];
   Dice getDice() => dice;
   Score.fromJson(Map<String, dynamic> json) {
+    dice = getDiceFromString(json['dice']);
     autoScore = AutoScore.fromJson(json['AutoScore'], dice);
     teleScore = TeleScore.fromJson(json['TeleScore'], dice);
     endgameScore = EndgameScore.fromJson(json['EndgameScore'], dice);
     id = json['id'];
-    dice = getDiceFromString(json['dice']);
   }
   Map<String, dynamic> toJson() => {
         'AutoScore': autoScore.toJson(),
@@ -71,24 +71,27 @@ class TeleScore extends ScoreDivision {
   ScoringElement lowGoals = ScoringElement(name: "Low Goals", value: 2);
   ScoringElement midGoals = ScoringElement(name: "Middle Goals", value: 4);
   ScoringElement hiGoals = ScoringElement(name: "High Goals", value: 6);
-
-  int total() {
-    return lowGoals.scoreValue() + midGoals.scoreValue() + hiGoals.scoreValue();
-  }
-
+  List<ScoringElement> getElements() => [hiGoals, midGoals, lowGoals];
+  BoxAndWhisker cycles = BoxAndWhisker();
+  int misses = 0;
   Dice getDice() => dice;
   TeleScore(this.dice);
-  TeleScore.fromJson(Map<String, dynamic> json, this.dice)
-      : hiGoals = ScoringElement(
-            name: 'High Goals', count: json['HighGoals'], value: 6),
-        midGoals = ScoringElement(
-            name: 'Middle Goals', count: json['MiddleGoals'], value: 4),
-        lowGoals = ScoringElement(
-            name: 'Low Goals', count: json['LowGoals'], value: 2);
+  TeleScore.fromJson(Map<String, dynamic> json, this.dice) {
+    hiGoals =
+        ScoringElement(name: 'High Goals', count: json['HighGoals'], value: 6);
+    midGoals = ScoringElement(
+        name: 'Middle Goals', count: json['MiddleGoals'], value: 4);
+    lowGoals =
+        ScoringElement(name: 'Low Goals', count: json['LowGoals'], value: 2);
+    misses = json['Misses'];
+    cycles = BoxAndWhisker.fromJson(json['CycleMap']);
+  }
   Map<String, dynamic> toJson() => {
         'HighGoals': hiGoals.count,
         'MiddleGoals': midGoals.count,
         'LowGoals': lowGoals.count,
+        'Misses': misses,
+        'CycleMap': cycles.toJson(),
       };
 }
 
@@ -102,16 +105,9 @@ class AutoScore extends ScoreDivision {
   ScoringElement pwrShots =
       ScoringElement(name: 'Power Shots', value: 15, max: () => 3);
   ScoringElement navigated =
-      ScoringElement(name: 'Navigated', value: 5, max: () => 1);
-  int total() {
-    return wobbleGoals.scoreValue() +
-        lowGoals.scoreValue() +
-        midGoals.scoreValue() +
-        hiGoals.scoreValue() +
-        pwrShots.scoreValue() +
-        navigated.scoreValue();
-  }
-
+      ScoringElement(name: 'Navigated', value: 5, max: () => 1, isBool: true);
+  List<ScoringElement> getElements() =>
+      [hiGoals, midGoals, lowGoals, wobbleGoals, pwrShots, navigated];
   Dice getDice() => dice;
   AutoScore(this.dice);
   AutoScore.fromJson(Map<String, dynamic> json, this.dice) {
@@ -131,8 +127,8 @@ class AutoScore extends ScoreDivision {
         count: json['PowerShots'],
         value: 15,
         max: () => 3);
-    navigated =
-        ScoringElement(name: 'Navigated', count: json['Navigated'], value: 5);
+    navigated = ScoringElement(
+        name: 'Navigated', count: json['Navigated'], value: 5, isBool: true);
   }
   Map<String, dynamic> toJson() => {
         'HighGoals': hiGoals.count,
@@ -154,13 +150,8 @@ class EndgameScore extends ScoreDivision {
       ScoringElement(name: 'Power Shots', value: 15, max: () => 3);
   ScoringElement ringsOnWobble =
       ScoringElement(name: 'Rings On Wobble', value: 5);
-
-  int total() {
-    return wobbleGoalsInDrop.scoreValue() +
-        wobbleGoalsInStart.scoreValue() +
-        ringsOnWobble.scoreValue() +
-        pwrShots.scoreValue();
-  }
+  List<ScoringElement> getElements() =>
+      [pwrShots, wobbleGoalsInDrop, wobbleGoalsInStart, ringsOnWobble];
 
   Dice getDice() => dice;
   EndgameScore(this.dice) {
@@ -200,12 +191,18 @@ class EndgameScore extends ScoreDivision {
 
 class ScoringElement {
   ScoringElement(
-      {this.name = '', this.count = 0, this.value = 1, this.min, this.max}) {
+      {this.name = '',
+      this.count = 0,
+      this.value = 1,
+      this.min,
+      this.max,
+      this.isBool = false}) {
     setStuff();
   }
   String name;
   int count;
   int value;
+  bool isBool;
   int Function() min = () => 0;
   int Function() max = () => 9999;
   int scoreValue() => count * value;
@@ -233,6 +230,28 @@ class ScoringElement {
 }
 
 abstract class ScoreDivision {
-  int total();
+  int total() => getElements()
+      .map((e) => e.scoreValue())
+      .reduce((value, element) => value += element);
   Dice getDice();
+  List<ScoringElement> getElements();
+}
+
+class BoxAndWhisker {
+  double median;
+  double q1;
+  double q3;
+  double max;
+  double min;
+  List<num> getArray() => [median, q1, q3, max, min];
+  BoxAndWhisker(
+      {this.max = 0, this.min = 0, this.median = 0, this.q1 = 0, this.q3 = 0});
+  Map<String, dynamic> toJson() =>
+      {'median': median, 'q1': q1, 'q3': q3, 'max': max, 'min': min};
+  BoxAndWhisker.fromJson(Map<String, dynamic> json)
+      : median = json['median'],
+        q1 = json['q1'],
+        q3 = json['q3'],
+        max = json['max'],
+        min = json['min'];
 }

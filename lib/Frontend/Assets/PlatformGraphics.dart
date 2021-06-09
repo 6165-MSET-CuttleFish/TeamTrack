@@ -265,11 +265,9 @@ class PlatformScaffold extends PlatformWidget<CupertinoPageScaffold, Scaffold> {
 }
 
 class Incrementor extends StatefulWidget {
-  Incrementor({Key key, this.element, this.onPressed, this.toggle = false})
-      : super(key: key);
+  Incrementor({Key key, this.element, this.onPressed}) : super(key: key);
   final ScoringElement element;
   final Function onPressed;
-  final bool toggle;
   @override
   State<StatefulWidget> createState() => _Incrementor();
 }
@@ -286,7 +284,7 @@ class _Incrementor extends State<Incrementor> {
             children: [
               Text(widget.element.name),
               Spacer(),
-              if (!widget.toggle)
+              if (!widget.element.isBool)
                 RawMaterialButton(
                   onPressed: widget.element.count > widget.element.min()
                       ? () {
@@ -300,7 +298,7 @@ class _Incrementor extends State<Incrementor> {
                   child: Icon(Icons.remove_circle_outline_rounded),
                   shape: CircleBorder(),
                 ),
-              if (!widget.toggle)
+              if (!widget.element.isBool)
                 SizedBox(
                   width: 20,
                   child: Text(
@@ -308,7 +306,7 @@ class _Incrementor extends State<Incrementor> {
                     textAlign: TextAlign.center,
                   ),
                 ),
-              if (!widget.toggle)
+              if (!widget.element.isBool)
                 RawMaterialButton(
                   onPressed: widget.element.count < widget.element.max()
                       ? () {
@@ -400,115 +398,116 @@ class ScoreCard extends StatelessWidget {
           ? AspectRatio(
               aspectRatio: 2,
               child: Container(
-                  decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(18),
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(18),
+                  ),
+                  color: Color(0xff232d37),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                      right: 50.0, left: 12.0, top: 24, bottom: 12),
+                  child: LineChart(
+                    LineChartData(
+                      gridData: FlGridData(
+                        show: true,
+                        drawVerticalLine: true,
+                        getDrawingHorizontalLine: (value) {
+                          return FlLine(
+                            color: value % 10 == 0
+                                ? Color(0xff37434d)
+                                : Colors.transparent,
+                            strokeWidth: value % 10 == 0 ? 1 : 0,
+                          );
+                        },
+                        getDrawingVerticalLine: (value) {
+                          return FlLine(
+                            color: const Color(0xff37434d),
+                            strokeWidth: 1,
+                          );
+                        },
                       ),
-                      color: Color(0xff232d37)),
-                  child: Padding(
-                      padding: const EdgeInsets.only(
-                          right: 50.0, left: 12.0, top: 24, bottom: 12),
-                      child: LineChart(LineChartData(
-                          gridData: FlGridData(
-                            show: true,
-                            drawVerticalLine: true,
-                            getDrawingHorizontalLine: (value) {
-                              return FlLine(
-                                color: value % 10 == 0
-                                    ? Color(0xff37434d)
-                                    : Colors.transparent,
-                                strokeWidth: value % 10 == 0 ? 1 : 0,
-                              );
-                            },
-                            getDrawingVerticalLine: (value) {
-                              return FlLine(
-                                color: const Color(0xff37434d),
-                                strokeWidth: 1,
-                              );
-                            },
+                      titlesData: FlTitlesData(
+                        show: true,
+                        bottomTitles: SideTitles(
+                          showTitles: true,
+                          reservedSize: 22,
+                          getTextStyles: (value) => const TextStyle(
+                              color: Color(0xff68737d), fontSize: 16),
+                          getTitles: (value) {
+                            return (value + 1).toInt().toString();
+                          },
+                          margin: 8,
+                        ),
+                        leftTitles: SideTitles(
+                          showTitles: true,
+                          getTextStyles: (value) => const TextStyle(
+                            color: Color(0xff67727d),
+                            fontSize: 15,
                           ),
-                          titlesData: FlTitlesData(
-                            show: true,
-                            bottomTitles: SideTitles(
-                              showTitles: true,
-                              reservedSize: 22,
-                              getTextStyles: (value) => const TextStyle(
-                                  color: Color(0xff68737d), fontSize: 16),
-                              getTitles: (value) {
-                                return (value + 1).toInt().toString();
-                              },
-                              margin: 8,
-                            ),
-                            leftTitles: SideTitles(
-                              showTitles: true,
-                              getTextStyles: (value) => const TextStyle(
-                                color: Color(0xff67727d),
-                                fontSize: 15,
-                              ),
-                              getTitles: (value) {
-                                if (value % 30 == 0) {
-                                  return value.toInt().toString();
-                                }
-                                return '';
-                              },
-                              reservedSize: 28,
-                              margin: 12,
-                            ),
-                          ),
-                          borderData: FlBorderData(
-                              show: true,
-                              border: Border.all(
-                                  color: const Color(0xff37434d), width: 1)),
-                          minX: 0,
-                          maxX: team.scores
-                                  .where((e) =>
-                                      dice != Dice.none ? e.dice == dice : true)
-                                  .length
-                                  .toDouble() -
-                              1,
-                          minY: [
-                            scoreDivisions.minScore(dice),
-                            targetScore.total().toDouble()
-                          ].reduce(min),
-                          maxY: [
-                            scoreDivisions.maxScore(dice),
-                            team.targetScore != null
-                                ? targetScore.total().toDouble()
-                                : 0.0
-                          ].reduce(max),
-                          lineBarsData: [
-                            LineChartBarData(
-                                belowBarData: team.targetScore != null
-                                    ? BarAreaData(
-                                        show: true,
-                                        colors: [
-                                          Colors.lightGreenAccent
-                                              .withOpacity(0.5)
-                                        ],
-                                        cutOffY:
-                                            targetScore?.total()?.toDouble(),
-                                        applyCutOffY: true,
-                                      )
-                                    : null,
-                                aboveBarData: team.targetScore != null
-                                    ? BarAreaData(
-                                        show: true,
-                                        colors: [
-                                          Colors.redAccent.withOpacity(0.5)
-                                        ],
-                                        cutOffY:
-                                            targetScore?.total()?.toDouble(),
-                                        applyCutOffY: true,
-                                      )
-                                    : null,
-                                spots: scoreDivisions.diceScores(dice).spots(),
-                                colors: [Colors.orange],
-                                isCurved: true,
-                                preventCurveOverShooting: true,
-                                barWidth: 5,
-                                shadow:
-                                    Shadow(color: Colors.green, blurRadius: 5)),
-                          ])))))
+                          getTitles: (value) {
+                            if (value % 30 == 0) {
+                              return value.toInt().toString();
+                            }
+                            return '';
+                          },
+                          reservedSize: 28,
+                          margin: 12,
+                        ),
+                      ),
+                      borderData: FlBorderData(
+                          show: true,
+                          border: Border.all(
+                              color: const Color(0xff37434d), width: 1)),
+                      minX: 0,
+                      maxX: team.scores
+                              .where((e) =>
+                                  dice != Dice.none ? e.dice == dice : true)
+                              .length
+                              .toDouble() -
+                          1,
+                      minY: [
+                        scoreDivisions.minScore(dice),
+                        targetScore.total().toDouble()
+                      ].reduce(min),
+                      maxY: [
+                        scoreDivisions.maxScore(dice),
+                        team.targetScore != null
+                            ? targetScore.total().toDouble()
+                            : 0.0
+                      ].reduce(max),
+                      lineBarsData: [
+                        LineChartBarData(
+                            belowBarData: team.targetScore != null
+                                ? BarAreaData(
+                                    show: true,
+                                    colors: [
+                                      Colors.lightGreenAccent.withOpacity(0.5)
+                                    ],
+                                    cutOffY: targetScore?.total()?.toDouble(),
+                                    applyCutOffY: true,
+                                  )
+                                : null,
+                            aboveBarData: team.targetScore != null
+                                ? BarAreaData(
+                                    show: true,
+                                    colors: [Colors.redAccent.withOpacity(0.5)],
+                                    cutOffY: targetScore?.total()?.toDouble(),
+                                    applyCutOffY: true,
+                                  )
+                                : null,
+                            spots: scoreDivisions.diceScores(dice).spots(),
+                            colors: [Colors.orange],
+                            isCurved: true,
+                            preventCurveOverShooting: true,
+                            barWidth: 5,
+                            shadow: Shadow(color: Colors.green, blurRadius: 5)),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            )
           : Text(''),
     );
   }

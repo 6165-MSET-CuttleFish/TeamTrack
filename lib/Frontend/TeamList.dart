@@ -99,7 +99,13 @@ class TeamSearch extends SearchDelegate<String> {
   Event event;
   @override
   List<Widget> buildActions(BuildContext context) {
-    return [IconButton(icon: Icon(Icons.clear), onPressed: () {})];
+    return [
+      IconButton(
+          icon: Icon(Icons.clear),
+          onPressed: () {
+            query = '';
+          })
+    ];
   }
 
   @override
@@ -127,16 +133,25 @@ class TeamSearch extends SearchDelegate<String> {
         : teams;
     return ListView.builder(
       itemCount: suggestionList.length,
-      itemBuilder: (context, index) => ListTile(
-          leading: Text(suggestionList[index].number),
-          title: Text(suggestionList[index].name),
-          onTap: () {
-            close(context, null);
-            Navigator.push(
-                context,
-                platformPageRoute((context) =>
-                    TeamView(event: event, team: suggestionList[index])));
-          }),
+      itemBuilder: (context, index) => Container(
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Colors.grey,
+            width: 1,
+          ),
+        ),
+        child: ListTile(
+            leading: Text(suggestionList[index].number,
+                style: Theme.of(context).textTheme.caption),
+            title: Text(suggestionList[index].name),
+            onTap: () {
+              close(context, null);
+              Navigator.push(
+                  context,
+                  platformPageRoute((context) =>
+                      TeamView(event: event, team: suggestionList[index])));
+            }),
+      ),
     );
   }
 }

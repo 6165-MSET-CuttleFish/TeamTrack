@@ -1,7 +1,3 @@
-import 'dart:io';
-
-import 'package:firebase_database/firebase_database.dart' as Database;
-import 'package:provider/provider.dart';
 import 'package:teamtrack/Frontend/MatchList.dart';
 import 'package:teamtrack/Frontend/TeamList.dart';
 import 'package:teamtrack/backend.dart';
@@ -10,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
-import 'dart:convert';
 
 class EventView extends StatefulWidget {
   EventView({Key key, this.event, this.dataModel}) : super(key: key);
@@ -49,14 +44,16 @@ class _EventView extends State<EventView> {
           title: _tab == 0 ? Text('Teams') : Text('Matches'),
           backgroundColor: Theme.of(context).accentColor,
           actions: [
-            IconButton(
-                icon: Icon(Icons.search),
-                onPressed: () {
-                  showSearch(
-                      context: context,
-                      delegate: TeamSearch(
-                          teams: widget.event.teams, event: widget.event));
-                })
+            if (_tab == 0)
+              IconButton(
+                  icon: Icon(Icons.search),
+                  onPressed: () {
+                    showSearch(
+                        context: context,
+                        delegate: TeamSearch(
+                            teams: widget.event.teams.sortedTeams(),
+                            event: widget.event));
+                  }),
           ]),
       bottomNavigationBar: widget.event.type != EventType.remote
           ? BottomNavigationBar(
@@ -94,14 +91,6 @@ class _EventView extends State<EventView> {
   }
 
   void _matchConfig() {
-    // showModalBottomSheet(
-    //     context: context,
-    //     builder: (context) {
-    //       return SafeArea(
-    //           child: Container(
-    //               height: MediaQuery.of(context).size.height * 0.85,
-    //               child: _addMatch()));
-    //     });
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => _addMatch()));
   }
@@ -215,6 +204,7 @@ class _EventView extends State<EventView> {
           children: [
             Expanded(
               child: TextFormField(
+                autofillHints: widget.event.teams.map((e) => e.number),
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(labelText: 'Team number'),
                 validator: (String value) {
@@ -245,6 +235,7 @@ class _EventView extends State<EventView> {
             ),
             Expanded(
                 child: TextFormField(
+                  autofillHints: widget.event.teams.map((e) => e.name),
               controller: controllers[i],
               keyboardType: TextInputType.name,
               textCapitalization: TextCapitalization.words,

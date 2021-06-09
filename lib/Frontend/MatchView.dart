@@ -19,7 +19,7 @@ class MatchView extends StatefulWidget {
   final Team team;
   final Event event;
   @override
-  _MatchView createState() => _MatchView(match, team);
+  State createState() => _MatchView(match, team);
 }
 
 class _MatchView extends State<MatchView> {
@@ -28,11 +28,12 @@ class _MatchView extends State<MatchView> {
   Score _score;
   int _view = 0;
   Match _match;
-  final Stream<double> _periodicStream =
-      Stream.periodic(const Duration(milliseconds: 1));
+  final Stream<int> _periodicStream =
+      Stream.periodic(const Duration(milliseconds: 100), (i) => i);
   double _time = 0;
-  double _previousStreamValue;
-  bool _paused;
+  List<double> lapses = [];
+  int _previousStreamValue = 0;
+  bool _paused = true;
   _MatchView(Match match, Team team) {
     if (team != null) {
       _score = team.targetScore;
@@ -42,50 +43,55 @@ class _MatchView extends State<MatchView> {
       _match = match;
       _selectedTeam = match.red.item1;
       _score = _selectedTeam.scores.firstWhere(
-          (element) => element.id == match.id,
-          orElse: () => Score(Uuid().v4(), Dice.none));
+        (element) => element.id == match.id,
+        orElse: () => Score(Uuid().v4(), Dice.none),
+      );
       if (_match.type == EventType.remote) _color = CupertinoColors.systemGreen;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
-        stream: _periodicStream,
-        builder: (context, newTime) {
-          if (newTime.hasData && newTime.data != _previousStreamValue) {
-            _previousStreamValue = newTime.data;
-            if (!_paused) {
-              _time += 1 / 1000;
+    return StreamBuilder<Database.Event>(
+        stream: DatabaseServices(id: widget.event.id).getEventChanges,
+        builder: (context, eventHandler) {
+          if (eventHandler.hasData &&
+              !eventHandler.hasError &&
+              !dataModel.isProcessing) {
+            widget.event.updateLocal(
+              json.decode(
+                json.encode(eventHandler.data.snapshot.value),
+              ),
+            );
+            if (widget.team == null) {
+              _match = widget.event.matches
+                  .firstWhere((element) => element.id == _match.id, orElse: () {
+                Navigator.pop(context);
+                return Match.defaultMatch(EventType.remote);
+              });
+            }
+            _selectedTeam = widget.event.teams.firstWhere(
+                (team) => team.number == _selectedTeam.number, orElse: () {
+              Navigator.pop(context);
+              return Team.nullTeam();
+            });
+            if (widget.team != null) {
+              _score = _selectedTeam.targetScore;
+            } else {
+              _score = _selectedTeam.scores.firstWhere(
+                  (element) => element.id == _match.id,
+                  orElse: () => Score(Uuid().v4(), Dice.none));
             }
           }
-          return StreamBuilder<Database.Event>(
-              stream: DatabaseServices(id: widget.event.id).getEventChanges,
-              builder: (context, eventHandler) {
-                if (eventHandler.hasData &&
-                    !eventHandler.hasError &&
-                    !dataModel.isProcessing) {
-                  widget.event.updateLocal(json
-                      .decode(json.encode(eventHandler.data.snapshot.value)));
-                  if (widget.team == null) {
-                    _match = widget.event.matches.firstWhere(
-                        (element) => element.id == _match.id, orElse: () {
-                      Navigator.pop(context);
-                      return Match.defaultMatch(EventType.remote);
-                    });
-                  }
-                  _selectedTeam = widget.event.teams
-                      .firstWhere((team) => team.number == _selectedTeam.number,
-                          orElse: () {
-                    Navigator.pop(context);
-                    return Team.nullTeam();
-                  });
-                  if (widget.team != null) {
-                    _score = _selectedTeam.targetScore;
-                  } else {
-                    _score = _selectedTeam.scores.firstWhere(
-                        (element) => element.id == _match.id,
-                        orElse: () => Score(Uuid().v4(), Dice.none));
+          return StreamBuilder<int>(
+              stream: _periodicStream,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  if (snapshot.data != _previousStreamValue) {
+                    _previousStreamValue = snapshot.data;
+                    if (!_paused) {
+                      _time += 1 / 10;
+                    }
                   }
                 }
                 return DefaultTabController(
@@ -95,7 +101,20 @@ class _MatchView extends State<MatchView> {
                       backgroundColor: _color,
                       title: Text('Match Stats'),
                       elevation: 0.0,
-                      actions: [],
+                      actions: [
+                        Text(_time.roundToDouble().toString()),
+                        IconButton(
+                          icon: Icon(_paused ? Icons.play_arrow : Icons.pause),
+                          onPressed: () => setState(() => _paused = !_paused),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.stop),
+                          onPressed: () => setState(() {
+                            _paused = true;
+                            _time = 0;
+                          }),
+                        ),
+                      ],
                     ),
                     body: Container(
                       decoration: BoxDecoration(
@@ -285,9 +304,17 @@ class _MatchView extends State<MatchView> {
   }
 
   void stateSetter() {
-    setState(() {});
     dataModel.saveEvents();
     dataModel.uploadEvent(widget.event);
+  }
+
+  void teleStateSetter() {
+    if (lapses.length == 0)
+      lapses.add(_time);
+    else
+      lapses.add(_time - lapses.reduce((value, element) => value + element));
+    if (lapses.length > 4) _score.teleScore.cycles = lapses.getBoxAndWhisker();
+    stateSetter();
   }
 
   ListView viewSelect() {
@@ -301,73 +328,20 @@ class _MatchView extends State<MatchView> {
     }
   }
 
-  List<Widget> endView() {
-    return [
-      Incrementor(
-        element: _score.endgameScore.pwrShots,
-        onPressed: stateSetter,
-      ),
-      Incrementor(
-        element: _score.endgameScore.wobbleGoalsInDrop,
-        onPressed: stateSetter,
-      ),
-      Incrementor(
-        element: _score.endgameScore.wobbleGoalsInStart,
-        onPressed: stateSetter,
-      ),
-      Incrementor(
-        element: _score.endgameScore.ringsOnWobble,
-        onPressed: stateSetter,
-      ),
-    ];
-  }
+  List<Widget> endView() => _score.endgameScore
+      .getElements()
+      .map((e) => Incrementor(element: e, onPressed: stateSetter))
+      .toList();
 
-  List<Widget> teleView() {
-    return [
-      Incrementor(
-        element: _score.teleScore.hiGoals,
-        onPressed: stateSetter,
-      ),
-      Incrementor(
-        element: _score.teleScore.midGoals,
-        onPressed: stateSetter,
-      ),
-      Incrementor(
-        element: _score.teleScore.lowGoals,
-        onPressed: stateSetter,
-      ),
-    ];
-  }
+  List<Widget> teleView() => _score.teleScore
+      .getElements()
+      .map((e) => Incrementor(element: e, onPressed: teleStateSetter))
+      .toList();
 
-  List<Widget> autoView() {
-    return [
-      Incrementor(
-        element: _score.autoScore.hiGoals,
-        onPressed: stateSetter,
-      ),
-      Incrementor(
-        element: _score.autoScore.midGoals,
-        onPressed: stateSetter,
-      ),
-      Incrementor(
-        element: _score.autoScore.lowGoals,
-        onPressed: stateSetter,
-      ),
-      Incrementor(
-        element: _score.autoScore.wobbleGoals,
-        onPressed: stateSetter,
-      ),
-      Incrementor(
-        element: _score.autoScore.pwrShots,
-        onPressed: stateSetter,
-      ),
-      Incrementor(
-        element: _score.autoScore.navigated,
-        onPressed: stateSetter,
-        toggle: true,
-      ),
-    ];
-  }
+  List<Widget> autoView() => _score.autoScore
+      .getElements()
+      .map((e) => Incrementor(element: e, onPressed: stateSetter))
+      .toList();
 
   Row buttonRow() {
     return Row(

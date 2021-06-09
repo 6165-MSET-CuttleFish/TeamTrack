@@ -246,6 +246,8 @@ class _LineChartSample2State extends State<LineChartSample2> {
           isStrokeCapRound: true,
           dotData: FlDotData(
             show: false,
+            getDotPainter: (spot, percent, barData, index) =>
+            FlDotCirclePainter(radius: 12, color: Colors.deepOrange.withOpacity(0.5))
           ),
           belowBarData: BarAreaData(show: true, colors: [
             ColorTween(begin: gradientColors[0], end: gradientColors[1])

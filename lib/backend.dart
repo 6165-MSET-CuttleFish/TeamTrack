@@ -12,7 +12,6 @@ import 'package:uuid/uuid.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:crypto/crypto.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
-import 'package:github_sign_in/github_sign_in.dart';
 
 read(String key) async {
   final prefs = await SharedPreferences.getInstance();
@@ -506,6 +505,65 @@ extension DiceExtension on Dice {
   }
 }
 
+extension IterableDoubleExtensions on List<double> {
+  double mean() {
+    if (this.length == 0) {
+      return 0;
+    } else {
+      return this.reduce((value, element) => value + element) / this.length;
+    }
+  }
+
+  List<double> sorted() {
+    if (this.length < 4) return [];
+    List<double> val = [];
+    for (double i in this) val.add(i);
+    val.sort((a, b) => a.compareTo(b));
+    return val;
+  }
+
+  double median() {
+    if (this.length < 4) return 0;
+    final val = this.sorted();
+    var index = val.length.toDouble() / 2.0;
+    return _quartile(index);
+  }
+
+  double _quartile(double index) {
+    final val = this.sorted();
+    if (index.toInt() != index)
+      return [val[index.toInt()], val[index.toInt() + 1]].mean();
+    return val[index.toInt()];
+  }
+
+  double q1() {
+    if (this.length < 4) return 0;
+    final val = this.sorted();
+    var index = val.length.toDouble() / 4.0;
+    return _quartile(index);
+  }
+
+  double q3() {
+    if (this.length < 4) return 0;
+    final val = this.sorted();
+    var index = (3 * val.length.toDouble()) / 4.0;
+    return _quartile(index);
+  }
+
+  double maxValue() => this.reduce(max);
+  double minValue() => this.reduce(min);
+
+  BoxAndWhisker getBoxAndWhisker() {
+    return BoxAndWhisker(
+      max: maxValue(),
+      min: minValue(),
+      median: median(),
+      q1: q1(),
+      q3: q3(),
+    );
+  }
+}
+
 extension IterableExtensions on Iterable<int> {
   List<FlSpot> spots() {
     List<FlSpot> val = [];
@@ -519,7 +577,7 @@ extension IterableExtensions on Iterable<int> {
     if (this.length == 0) {
       return 0;
     } else {
-      return this.reduce((value, element) => value += element) / this.length;
+      return this.reduce((value, element) => value + element) / this.length;
     }
   }
 
@@ -588,10 +646,6 @@ extension TeamsExtension on List<Team> {
       return newTeam;
     }
   }
-
-  // void sortTeams() {
-  //   this.sort((a, b) => int.parse(a.number).compareTo(int.parse(b.number)));
-  // }
 
   List<Team> sortedTeams() {
     List<Team> val = [];
