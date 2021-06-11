@@ -249,9 +249,9 @@ class BoxAndWhisker {
   Map<String, dynamic> toJson() =>
       {'median': median, 'q1': q1, 'q3': q3, 'max': max, 'min': min};
   BoxAndWhisker.fromJson(Map<String, dynamic> json)
-      : median = json['median'],
-        q1 = json['q1'],
-        q3 = json['q3'],
-        max = json['max'],
-        min = json['min'];
+      : median = json['median'].toDouble(),
+        q1 = json['q1'].toDouble(),
+        q3 = json['q3'].toDouble(),
+        max = json['max'].toDouble(),
+        min = json['min'].toDouble();
 }

@@ -6,8 +6,7 @@ import 'package:auth_buttons/auth_buttons.dart';
 import 'package:provider/provider.dart';
 
 class LoginView extends StatefulWidget {
-  LoginView({Key? key, this.dataModel}) : super(key: key);
-  final DataModel? dataModel;
+  LoginView({Key? key}) : super(key: key);
 
   @override
   _LoginView createState() => _LoginView();
@@ -20,43 +19,53 @@ class _LoginView extends State<LoginView> {
   Widget build(BuildContext context) {
     size = MediaQuery.of(context).size;
     return Scaffold(
-        body: Stack(alignment: Alignment.bottomCenter, children: [
-      Container(
-        decoration: BoxDecoration(
-            gradient: RadialGradient(colors: [
-          Color.fromRGBO(25, 25, 112, 1),
-          Colors.black,
-        ])),
-      ),
-      Column(children: [
-        Image.asset(
-          "LoadingScreen2.png",
-        ),
-        Spacer(),
-      ]),
-      SafeArea(
-        child: Card(
-          color: Theme.of(context).cardColor.withOpacity(0.7),
-          child: Container(
-            width: size.width - 20,
-            height: 310,
-            child: PageView(
-              controller: _controller,
-              children: <Widget>[signInList(), signInSheet()],
+      body: Stack(
+        alignment: Alignment.bottomCenter,
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              gradient: RadialGradient(
+                colors: [
+                  Color.fromRGBO(25, 25, 112, 1),
+                  Colors.black,
+                ],
+              ),
             ),
           ),
-          semanticContainer: true,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-          elevation: 1,
-          margin: EdgeInsets.all(10),
-        ),
-      )
-    ]));
+          Column(
+            children: [
+              Image.asset(
+                "LoadingScreen2.png",
+              ),
+              Spacer()
+            ],
+          ),
+          SafeArea(
+            child: Card(
+              color: Theme.of(context).cardColor.withOpacity(0.7),
+              child: Container(
+                width: size.width - 20,
+                height: 310,
+                child: PageView(
+                  controller: _controller,
+                  children: <Widget>[signInList(), signInSheet()],
+                ),
+              ),
+              semanticContainer: true,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0)),
+              elevation: 1,
+              margin: EdgeInsets.all(10),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  TextEditingController displayNameController = TextEditingController();
   Widget signInSheet() {
     return Padding(
         padding: EdgeInsets.all(20),
@@ -87,23 +96,24 @@ class _LoginView extends State<LoginView> {
                 passwordController.clear();
                 if (s != "Signed in") {
                   showPlatformDialog(
-                      context: context,
-                      builder: (BuildContext context) => PlatformAlert(
-                            title: Text('Error'),
-                            content: Text(
-                              s!,
-                              style: Theme.of(context).textTheme.bodyText1,
-                            ),
-                            actions: [
-                              PlatformDialogAction(
-                                isDefaultAction: true,
-                                child: Text('Okay'),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                            ],
-                          ));
+                    context: context,
+                    builder: (BuildContext context) => PlatformAlert(
+                      title: Text('Error'),
+                      content: Text(
+                        s!,
+                        style: Theme.of(context).textTheme.bodyText1,
+                      ),
+                      actions: [
+                        PlatformDialogAction(
+                          isDefaultAction: true,
+                          child: Text('Okay'),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      ],
+                    ),
+                  );
                 }
               },
             ),
@@ -118,7 +128,9 @@ class _LoginView extends State<LoginView> {
         PlatformButton(
           onPressed: () {
             showModalBottomSheet(
-                context: context, builder: (context) => signUpSheet());
+                context: context,
+                builder: (context) => signUpSheet(),
+                isScrollControlled: true);
           },
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -170,61 +182,70 @@ class _LoginView extends State<LoginView> {
 
   Widget signUpSheet() {
     return Padding(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          children: [
-            PlatformTextField(
-              controller: emailController,
-              keyboardType: TextInputType.emailAddress,
-              placeholder: "Email",
-            ),
-            Padding(padding: EdgeInsets.all(10)),
-            PlatformTextField(
-              controller: passwordController,
-              keyboardType: TextInputType.visiblePassword,
-              placeholder: "Password",
-              obscureText: true,
-            ),
-            Padding(padding: EdgeInsets.all(5)),
-            PlatformButton(
-              child: Text("Sign Up"),
-              color: Colors.green,
-              onPressed: () async {
-                String? s = await context.read<AuthenticationService>().signUp(
+      padding: EdgeInsets.all(20),
+      child: Column(
+        children: [
+          PlatformTextField(
+            controller: emailController,
+            keyboardType: TextInputType.emailAddress,
+            placeholder: "Email",
+          ),
+          Padding(padding: EdgeInsets.all(10)),
+          PlatformTextField(
+            controller: displayNameController,
+            keyboardType: TextInputType.emailAddress,
+            placeholder: "Display Name",
+          ),
+          Padding(padding: EdgeInsets.all(5)),
+          PlatformTextField(
+            controller: passwordController,
+            keyboardType: TextInputType.visiblePassword,
+            placeholder: "Password",
+            obscureText: true,
+          ),
+          Padding(padding: EdgeInsets.all(5)),
+          PlatformButton(
+            child: Text("Sign Up"),
+            color: Colors.green,
+            onPressed: () async {
+              String? s = await context.read<AuthenticationService>().signUp(
+                  email: emailController.text.trim(),
+                  password: passwordController.text.trim(),
+                  displayName: displayNameController.text.trim());
+              if (s == "Signed up") {
+                emailController.clear();
+                passwordController.clear();
+                displayNameController.clear();
+                Navigator.of(context).pop();
+                await context.read<AuthenticationService>().signIn(
                       email: emailController.text.trim(),
                       password: passwordController.text.trim(),
                     );
-                if (s == "Signed up") {
-                  emailController.clear();
-                  passwordController.clear();
-                  Navigator.of(context).pop();
-                  await context.read<AuthenticationService>().signIn(
-                        email: emailController.text.trim(),
-                        password: passwordController.text.trim(),
-                      );
-                } else {
-                  showPlatformDialog(
-                      context: context,
-                      builder: (BuildContext context) => PlatformAlert(
-                            title: Text('Error'),
-                            content: Text(
-                              s!,
-                              style: Theme.of(context).textTheme.bodyText1,
-                            ),
-                            actions: [
-                              PlatformDialogAction(
-                                isDefaultAction: true,
-                                child: Text('Okay'),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                            ],
-                          ));
-                }
-              },
-            ),
-          ],
-        ));
+              } else {
+                showPlatformDialog(
+                  context: context,
+                  builder: (BuildContext context) => PlatformAlert(
+                    title: Text('Error'),
+                    content: Text(
+                      s!,
+                      style: Theme.of(context).textTheme.bodyText1,
+                    ),
+                    actions: [
+                      PlatformDialogAction(
+                        isDefaultAction: true,
+                        child: Text('Okay'),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              }
+            },
+          ),
+        ],
+      ),
+    );
   }
 }

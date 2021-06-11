@@ -22,11 +22,11 @@ class _TeamList extends State<TeamList> {
     )
   ];
   @override
-  Widget build(BuildContext context) {
-    return ListView(
-      children: widget.event.teams
-          .sortedTeams()
-          .map((e) => Slidable(
+  Widget build(BuildContext context) => ListView(
+        children: widget.event.teams
+            .sortedTeams()
+            .map(
+              (e) => Slidable(
                 actionPane: slider,
                 secondaryActions: [
                   IconSlideAction(
@@ -34,62 +34,66 @@ class _TeamList extends State<TeamList> {
                     color: Colors.red,
                     onTap: () {
                       showPlatformDialog(
-                          context: context,
-                          builder: (BuildContext context) => PlatformAlert(
-                                title: Text('Delete Team'),
-                                content: Text('Are you sure?'),
-                                actions: [
-                                  PlatformDialogAction(
-                                    isDefaultAction: true,
-                                    child: Text('Cancel'),
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                  ),
-                                  PlatformDialogAction(
-                                    isDefaultAction: false,
-                                    isDestructive: true,
-                                    child: Text('Confirm'),
-                                    onPressed: () {
-                                      setState(() {
-                                        widget.event.deleteTeam(e);
-                                      });
-                                      dataModel.saveEvents();
-                                      dataModel.uploadEvent(widget.event);
-                                      Navigator.of(context).pop();
-                                    },
-                                  ),
-                                ],
-                              ));
+                        context: context,
+                        builder: (BuildContext context) => PlatformAlert(
+                          title: Text('Delete Team'),
+                          content: Text('Are you sure?'),
+                          actions: [
+                            PlatformDialogAction(
+                              isDefaultAction: true,
+                              child: Text('Cancel'),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                            PlatformDialogAction(
+                              isDefaultAction: false,
+                              isDestructive: true,
+                              child: Text('Confirm'),
+                              onPressed: () {
+                                setState(() {
+                                  widget.event.deleteTeam(e);
+                                });
+                                dataModel.saveEvents();
+                                dataModel.uploadEvent(widget.event);
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        ),
+                      );
                     },
                   )
                 ],
                 child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Colors.grey,
-                        width: 1,
-                      ),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.grey,
+                      width: 1,
                     ),
-                    child: ListTile(
-                      title: Text(e.name),
-                      leading: Text(e.number,
-                          style: Theme.of(context).textTheme.caption),
-                      onTap: () async {
-                        await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => TeamView(
-                                      team: e,
-                                      event: widget.event,
-                                    )));
-                        setState(() {});
-                      },
-                    )),
-              ))
-          .toList(),
-    );
-  }
+                  ),
+                  child: ListTile(
+                    title: Text(e.name),
+                    leading: Text(e.number,
+                        style: Theme.of(context).textTheme.caption),
+                    onTap: () async {
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => TeamView(
+                            team: e,
+                            event: widget.event,
+                          ),
+                        ),
+                      );
+                      setState(() {});
+                    },
+                  ),
+                ),
+              ),
+            )
+            .toList(),
+      );
 }
 
 class TeamSearch extends SearchDelegate<String?> {
@@ -97,26 +101,21 @@ class TeamSearch extends SearchDelegate<String?> {
   List<Team> teams;
   Event event;
   @override
-  List<Widget> buildActions(BuildContext context) {
-    return [
-      IconButton(
+  List<Widget> buildActions(BuildContext context) => [
+        IconButton(
           icon: Icon(Icons.clear),
-          onPressed: () {
-            query = '';
-          })
-    ];
-  }
-
+          onPressed: () => query = '',
+        )
+      ];
   @override
   Widget buildLeading(BuildContext context) {
     return IconButton(
-        icon: AnimatedIcon(
-          icon: AnimatedIcons.menu_arrow,
-          progress: transitionAnimation,
-        ),
-        onPressed: () {
-          close(context, null);
-        });
+      icon: AnimatedIcon(
+        icon: AnimatedIcons.menu_arrow,
+        progress: transitionAnimation,
+      ),
+      onPressed: () => close(context, null),
+    );
   }
 
   @override

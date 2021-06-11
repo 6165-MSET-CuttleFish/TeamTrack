@@ -82,17 +82,11 @@ class AuthenticationWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     final firebaseUser = context.watch<User?>();
     if (firebaseUser == null) {
-      return LoginView(dataModel: dataModel);
+      return LoginView();
     } else {
-      return EventsList(dataModel: dataModel);
+      return EventsList();
     }
   }
-}
-
-class SalesData {
-  SalesData(this.year, this.number);
-  final double year;
-  final List<int> number;
 }
 
 class MyApp extends StatelessWidget {

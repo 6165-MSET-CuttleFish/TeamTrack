@@ -75,10 +75,13 @@ class AuthenticationService {
   }
 
   Future<String?> signUp(
-      {required String email, required String password}) async {
+      {required String email,
+      required String password,
+      required String displayName}) async {
     try {
       await _firebaseAuth.createUserWithEmailAndPassword(
           email: email, password: password);
+      _firebaseAuth.currentUser?.updateDisplayName(displayName);
       return "Signed up";
     } on FirebaseAuthException catch (e) {
       return e.message;
@@ -185,12 +188,6 @@ class DataModel {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString(keys[0], jsonEncode(coded));
     print(coded);
-    // for (Event event in events) {
-    //   if (event.shared) {
-    //     var ref = firebaseDatabase.reference().child(event.id);
-    //     ref.update(event.toJson());
-    //   }
-    // }
   }
 
   bool isProcessing = false;
@@ -208,7 +205,6 @@ class DataModel {
     var x = jsonDecode(prefs.getString(keys[0])!) as List;
     var y = x.map((e) => Event.fromJson(e)).toList();
     events = y;
-    // organize();
     print('reloaded');
   }
 
@@ -386,9 +382,8 @@ class Team {
   Map<String, dynamic> toJson() => {
         'name': name,
         'number': number,
-        'scores':
-            scores.length != 0 ? scores.map((e) => e.toJson()).toList() : null,
-        'targetScore': targetScore!.toJson()
+        'scores': scores.map((e) => e.toJson()).toList(),
+        'targetScore': targetScore?.toJson()
       };
 }
 
