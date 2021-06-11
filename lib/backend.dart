@@ -442,12 +442,11 @@ class Match {
 
   String score() {
     if (type == EventType.remote) {
-      return red?.item1?.scores
-              .firstWhere((e) => e.id == id,
-                  orElse: () => Score(Uuid().v4(), Dice.none))
-              .total()
-              .toString() ??
-          '0';
+      return red!.item1!.scores
+          .firstWhere((e) => e.id == id,
+              orElse: () => Score(Uuid().v4(), Dice.none))
+          .total()
+          .toString();
     }
     return redScore() + " - " + blueScore();
   }
@@ -461,7 +460,7 @@ class Match {
         .firstWhere((e) => e.id == id,
             orElse: () => Score(Uuid().v4(), Dice.none))
         .total();
-    return (r0 ?? 0 + (r1 ?? 0)).toString();
+    return ((r0 ?? 0) + (r1 ?? 0)).toString();
   }
 
   String blueScore() {
@@ -473,7 +472,7 @@ class Match {
         .firstWhere((e) => e.id == id,
             orElse: () => Score(Uuid().v4(), Dice.none))
         .total();
-    return (b0 ?? 0 + (b1 ?? 0)).toString();
+    return ((b0 ?? 0) + (b1 ?? 0)).toString();
   }
 
   Match.fromJson(Map<String, dynamic> json, List<Team> teamList)

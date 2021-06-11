@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:math';
+import 'package:flutter/services.dart';
 import 'package:teamtrack/Frontend/Assets/Collapsible.dart';
 import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
 import 'package:teamtrack/Frontend/MatchList.dart';
@@ -113,6 +114,7 @@ class _TeamView extends State<TeamView> {
             ),
       appBar: AppBar(
         title: Text(_team.name),
+        foregroundColor: Colors.green,
         backgroundColor: Theme.of(context).accentColor,
       ),
       body: StreamBuilder<Database.Event>(
@@ -122,7 +124,10 @@ class _TeamView extends State<TeamView> {
                 !eventHandler.hasError &&
                 !dataModel.isProcessing) {
               widget.event.updateLocal(
-                  json.decode(json.encode(eventHandler.data!.snapshot.value)));
+                json.decode(
+                  json.encode(eventHandler.data!.snapshot.value),
+                ),
+              );
               _team = widget.event.teams.firstWhere(
                   (element) => element.number == _team.number, orElse: () {
                 Navigator.of(context).pop();

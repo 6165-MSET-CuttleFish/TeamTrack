@@ -43,16 +43,19 @@ class _EventView extends State<EventView> {
           title: _tab == 0 ? Text('Teams') : Text('Matches'),
           backgroundColor: Theme.of(context).accentColor,
           actions: [
-            if (_tab == 0)
-              IconButton(
-                  icon: Icon(Icons.search),
-                  onPressed: () {
-                    showSearch(
-                        context: context,
-                        delegate: TeamSearch(
-                            teams: widget.event.teams.sortedTeams(),
-                            event: widget.event));
-                  }),
+            IconButton(
+                icon: Icon(Icons.search),
+                onPressed: () {
+                  showSearch(
+                      context: context,
+                      delegate: _tab == 0
+                          ? TeamSearch(
+                              teams: widget.event.teams.sortedTeams(),
+                              event: widget.event)
+                          : MatchSearch(
+                              matches: widget.event.matches,
+                              event: widget.event));
+                }),
           ]),
       bottomNavigationBar: widget.event.type != EventType.remote
           ? BottomNavigationBar(
@@ -203,7 +206,7 @@ class _EventView extends State<EventView> {
           children: [
             Expanded(
               child: TextFormField(
-                autofillHints: widget.event.teams.map(((e) => e.number!) as String Function(Team)),
+                autofillHints: widget.event.teams.map((e) => e.number),
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(labelText: 'Team number'),
                 validator: (String? value) {
@@ -234,7 +237,6 @@ class _EventView extends State<EventView> {
             ),
             Expanded(
                 child: TextFormField(
-                  autofillHints: widget.event.teams.map(((e) => e.name!) as String Function(Team)),
               controller: controllers[i],
               keyboardType: TextInputType.name,
               textCapitalization: TextCapitalization.words,

@@ -7,8 +7,6 @@ import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
 import 'package:teamtrack/Frontend/EventView.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:provider/provider.dart';
 
 class EventsList extends StatefulWidget {
   EventsList({Key? key}) : super(key: key);
@@ -24,7 +22,7 @@ class _EventsList extends State<EventsList> {
       color: Colors.red,
     )
   ];
-
+  int _tab = 0;
   @override
   Widget build(BuildContext context) {
     restoreEvents();
@@ -33,20 +31,15 @@ class _EventsList extends State<EventsList> {
       return Scaffold(
         appBar: AppBar(
           backgroundColor: Theme.of(context).accentColor,
-          title: Text('Events'),
+          title: Builder(builder: (_) {
+            switch (_tab) {
+              case 1:
+                return Text("Inbox");
+              default:
+                return Text("Events");
+            }
+          }),
           actions: [
-            RawMaterialButton(
-              shape: CircleBorder(),
-              fillColor: Colors.grey,
-              child: Text(
-                '👀',
-                style: TextStyle(fontSize: 30),
-              ),
-              onPressed: () {
-                launch(
-                    "https://www.youtube.com/playlist?list=PLDxjFQFO9emFugiSoMBMbJpAlyqztXKce");
-              },
-            ),
             Padding(
               padding: EdgeInsets.only(left: 30),
             ),
@@ -54,74 +47,113 @@ class _EventsList extends State<EventsList> {
               icon: themeChange.darkTheme
                   ? Icon(CupertinoIcons.sun_max)
                   : Icon(CupertinoIcons.moon),
-              onPressed: () async {
-                setState(() {
-                  themeChange.darkTheme = !themeChangeProvider.darkTheme;
-                });
+              onPressed: () {
+                setState(() =>
+                    themeChange.darkTheme = !themeChangeProvider.darkTheme);
               },
             )
           ],
         ),
         drawer: Drawer(
-            elevation: 0,
-            child: Container(
-              color: Theme.of(context).cardColor,
+            elevation: 1,
+            child: Material(
               child: ListView(
                 children: [
                   DrawerHeader(
+                    decoration:
+                        BoxDecoration(color: Theme.of(context).accentColor),
                     child: Padding(
                       padding: const EdgeInsets.only(left: 5.0, right: 5.0),
                       child: Row(
                         children: [
-                          if (context.read<User?>()?.photoURL != null)
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(300),
-                              child: Image.network(
-                                context.read<User?>()!.photoURL!,
-                                height: 70,
-                              ),
-                            )
-                          else
-                            Icon(Icons.account_circle, size: 70),
+                          Column(children: [
+                            if (context.read<User?>()?.photoURL != null)
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(300),
+                                child: Image.network(
+                                  context.read<User?>()!.photoURL!,
+                                  height: 70,
+                                ),
+                              )
+                            else
+                              Icon(Icons.account_circle, size: 70),
+                            Text(context.read<User?>()?.displayName ?? "Guest"),
+                            Text(context.read<User?>()?.email ?? ""),
+                          ]),
                           Spacer(),
-                          PlatformButton(
-                              child: Text('Sign Out'),
-                              onPressed: () {
-                                showPlatformDialog(
-                                    context: context,
-                                    builder: (context) => PlatformAlert(
-                                          title: Text('Sign Out'),
-                                          content: Text('Are you sure?'),
-                                          actions: [
-                                            PlatformDialogAction(
-                                                isDefaultAction: true,
-                                                child: Text('Cancel'),
-                                                onPressed: () =>
-                                                    Navigator.of(context)
-                                                        .pop()),
-                                            PlatformDialogAction(
-                                                isDestructive: true,
-                                                child: Text('Sign Out'),
-                                                onPressed: () {
-                                                  Navigator.of(context).pop();
-                                                  context
-                                                      .read<
-                                                          AuthenticationService>()
-                                                      .signOut();
-                                                }),
-                                          ],
-                                        ));
-                              }),
                         ],
                       ),
                     ),
                   ),
-                  Text(context.read<User?>()?.displayName ?? "Guest"),
-                  Text(context.read<User?>()?.email ?? ""),
+                  ListTile(
+                      leading: Icon(Icons.event_note_outlined),
+                      title: Text("Events"),
+                      onTap: () {
+                        setState(() => _tab = 0);
+                        Navigator.of(context).pop();
+                      }),
+                  ListTile(
+                    leading: Icon(Icons.mail_rounded),
+                    title: Text("Inbox"),
+                    onTap: () {
+                      setState(() => _tab = 1);
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.logout),
+                    title: Text('Sign Out'),
+                    onTap: () {
+                      showPlatformDialog(
+                        context: context,
+                        builder: (context) => PlatformAlert(
+                          title: Text('Sign Out'),
+                          content: Text('Are you sure?'),
+                          actions: [
+                            PlatformDialogAction(
+                                isDefaultAction: true,
+                                child: Text('Cancel'),
+                                onPressed: () => Navigator.of(context).pop()),
+                            PlatformDialogAction(
+                                isDestructive: true,
+                                child: Text('Sign Out'),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                  context
+                                      .read<AuthenticationService>()
+                                      .signOut();
+                                }),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
                 ],
               ),
             )),
-        body: SafeArea(
+        body: Builder(builder: (_) => getHome()),
+        floatingActionButton: _tab == 0
+            ? FloatingActionButton(
+                child: Icon(Icons.add),
+                onPressed: _onPressed,
+              )
+            : null,
+      );
+    } else {
+      return Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+  }
+
+  Widget getHome() {
+    switch (_tab) {
+      case 1:
+        return SafeArea(
+          child: ListView(children: []),
+        );
+      default:
+        return SafeArea(
           child: ListView(children: [
             ExpansionTile(
               leading: Icon(CupertinoIcons.person_3),
@@ -140,16 +172,7 @@ class _EventsList extends State<EventsList> {
             //   children: liveEvents(),
             // ),
           ]),
-        ),
-        floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.add),
-          onPressed: _onPressed,
-        ),
-      );
-    } else {
-      return Center(
-        child: CircularProgressIndicator(),
-      );
+        );
     }
   }
 
@@ -158,7 +181,11 @@ class _EventsList extends State<EventsList> {
       .map((e) => Slidable(
             actions: [
               IconSlideAction(
-                onTap: () {},
+                onTap: () async {
+                  e.shared = true;
+                  firebaseDatabase.reference().child(e.id).set(e.toJson());
+                  dataModel.saveEvents();
+                },
                 icon: Icons.share,
                 color: Colors.blue,
               )
@@ -202,7 +229,9 @@ class _EventsList extends State<EventsList> {
                 iconColor: Theme.of(context).primaryColor,
                 child: ListTile(
                   trailing: Icon(
-                    CupertinoIcons.lock_shield_fill,
+                    e.shared
+                        ? CupertinoIcons.cloud_fill
+                        : CupertinoIcons.lock_shield_fill,
                     color: Theme.of(context).accentColor,
                   ),
                   leading: Icon(
@@ -243,32 +272,31 @@ class _EventsList extends State<EventsList> {
               IconSlideAction(
                 onTap: () {
                   showPlatformDialog(
-                      context: context,
-                      builder: (BuildContext context) => PlatformAlert(
-                            title: Text('Delete Event'),
-                            content: Text('Are you sure?'),
-                            actions: [
-                              PlatformDialogAction(
-                                isDefaultAction: true,
-                                child: Text('Cancel'),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                              PlatformDialogAction(
-                                isDefaultAction: false,
-                                isDestructive: true,
-                                child: Text('Confirm'),
-                                onPressed: () {
-                                  setState(() {
-                                    dataModel.events.remove(e);
-                                  });
-                                  dataModel.saveEvents();
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                            ],
-                          ));
+                    context: context,
+                    builder: (BuildContext context) => PlatformAlert(
+                      title: Text('Delete Event'),
+                      content: Text('Are you sure?'),
+                      actions: [
+                        PlatformDialogAction(
+                          isDefaultAction: true,
+                          child: Text('Cancel'),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                        PlatformDialogAction(
+                          isDefaultAction: false,
+                          isDestructive: true,
+                          child: Text('Confirm'),
+                          onPressed: () {
+                            setState(() => dataModel.events.remove(e));
+                            dataModel.saveEvents();
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      ],
+                    ),
+                  );
                 },
                 icon: Icons.delete,
                 color: Colors.red,

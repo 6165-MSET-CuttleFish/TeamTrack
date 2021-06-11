@@ -161,7 +161,10 @@ class _MatchView extends State<MatchView> {
                         ),
                         if (_match != null && _match?.type != EventType.remote)
                           buttonRow(),
-                        Text(_selectedTeam.name,
+                        Text(
+                            _selectedTeam.name +
+                                ' : ' +
+                                _score.total().toString(),
                             style: Theme.of(context).textTheme.headline6),
                         if (widget.team == null)
                           DropdownButton<Dice>(
