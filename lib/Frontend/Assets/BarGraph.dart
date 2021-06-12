@@ -41,7 +41,7 @@ class BarGraph extends StatelessWidget {
               duration: Duration(milliseconds: 600),
               width: 30,
               height: inverted
-                  ? (val != 0 ? max / val : 1) * height
+                  ? (val != 0 ? (max / val).clamp(0, 1) : 1) * height
                   : (max != 0 ? val / max : 0) * height,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(60),

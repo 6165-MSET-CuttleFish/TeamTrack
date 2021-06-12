@@ -508,66 +508,17 @@ extension DiceExtension on Dice {
   }
 }
 
-extension IterableDoubleExtensions on List<double> {
+extension Arithmetic on Iterable<num> {
   double mean() {
     if (this.length == 0) {
       return 0;
     } else {
-      return this.reduce((value, element) => value + element) / this.length;
+      return this.reduce(
+              (value, element) => value.toDouble() + element.toDouble()) /
+          this.length;
     }
   }
 
-  List<double> sorted() {
-    if (this.length < 4) return [];
-    List<double> val = [];
-    for (double i in this) val.add(i);
-    val.sort((a, b) => a.compareTo(b));
-    return val;
-  }
-
-  double median() {
-    if (this.length < 4) return 0;
-    final val = this.sorted();
-    var index = val.length.toDouble() / 2.0;
-    return _quartile(index);
-  }
-
-  double _quartile(double index) {
-    final val = this.sorted();
-    if (index.toInt() != index)
-      return [val[index.toInt()], val[index.toInt() + 1]].mean();
-    return val[index.toInt()];
-  }
-
-  double q1() {
-    if (this.length < 4) return 0;
-    final val = this.sorted();
-    var index = val.length.toDouble() / 4.0;
-    return _quartile(index);
-  }
-
-  double q3() {
-    if (this.length < 4) return 0;
-    final val = this.sorted();
-    var index = (3 * val.length.toDouble()) / 4.0;
-    return _quartile(index);
-  }
-
-  double maxValue() => this.reduce(max);
-  double minValue() => this.reduce(min);
-
-  BoxAndWhisker getBoxAndWhisker() {
-    return BoxAndWhisker(
-      max: maxValue(),
-      min: minValue(),
-      median: median(),
-      q1: q1(),
-      q3: q3(),
-    );
-  }
-}
-
-extension IterableExtensions on Iterable<int> {
   List<FlSpot> spots() {
     List<FlSpot> val = [];
     for (int i = 0; i < this.length; i++) {
@@ -576,21 +527,90 @@ extension IterableExtensions on Iterable<int> {
     return val;
   }
 
-  double mean() {
-    if (this.length == 0) {
-      return 0;
-    } else {
-      return this.reduce((value, element) => value + element) / this.length;
-    }
+  double standardDeviation() {
+    if (this.length == 0) return 0;
+    double mean = this.mean();
+    return sqrt(this
+            .map((e) => pow(e - mean, 2).toDouble())
+            .reduce((value, element) => value + element) /
+        this.length);
   }
 
-  double mad() {
-    if (this.length == 0) {
-      return 0;
+  // double median() {
+  //   if (this.length < 4) return 0;
+  //   final val = this.sorted();
+  //   var index = val.length.toDouble() / 2.0;
+  //   if (index.toInt() != index)
+  //     return [val[index.toInt()], val[index.toInt() + 1]].mean();
+  //   return val[index.toInt()];
+  // }
+/*
+[1, 2, 3, 4, 5, 6, 7]
+[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+*/
+  double median() {
+    if (this.length < 2) return 0;
+    final arr = this.sorted();
+    int index = this.length ~/ 2;
+    if (this.length % 2 == 0) {
+      return [arr[(index - 1).clamp(0, 99999999999)] + arr[index]].mean();
     }
-    final mean = this.mean();
-    return this.map((e) => (e - mean).abs().toInt()).mean();
+    return arr[index];
   }
+
+  // double _quartile(double index) {
+  //   final val = this.sorted();
+  //   if (index.toInt() != index)
+  //     return [val[index.toInt()], val[index.toInt() + 1]].mean();
+  //   return val[index.toInt()];
+  // }
+
+  double q1() {
+    if (this.length < 2) return 0;
+    final arr = this.sorted();
+    if (this.length % 2 == 0) {
+      return arr.sublist(0, (this.length ~/ 2) - 1).median();
+    }
+    return arr.sublist(0, this.length ~/ 2).median();
+  }
+
+  double iqr() => q3() - q1();
+
+  double q3() {
+    if (this.length < 2) return 0;
+    final arr = this.sorted();
+    return arr.sublist(this.length ~/ 2).median();
+  }
+
+  double maxValue() => this.map((e) => e.toDouble()).reduce(max);
+  double minValue() => this.map((e) => e.toDouble()).reduce(min);
+
+  List<double> sorted() {
+    if (this.length < 2) return [];
+    List<double> val = [];
+    for (num i in this) val.add(i.toDouble());
+    val.sort((a, b) => a.compareTo(b));
+    return val;
+  }
+
+  List<double> removeOutliers(bool removeOutliers) => this
+      .map((e) => e.toDouble())
+      .where((e) => removeOutliers ? !e.isOutlier(this) : true)
+      .toList();
+
+  BoxAndWhisker getBoxAndWhisker() => BoxAndWhisker(
+        max: this.maxValue(),
+        min: this.minValue(),
+        median: median(),
+        q1: q1(),
+        q3: q3(),
+      );
+}
+
+extension moreArithmetic on num {
+  bool isOutlier(Iterable<num> list) =>
+      this < list.q1() - 1.5 * list.iqr() ||
+      this > list.q3() + 1.5 * list.iqr();
 }
 
 extension MatchExtensions on List<Match> {
@@ -618,6 +638,13 @@ extension MatchExtensions on List<Match> {
       }
     }
     return val.reduce(max);
+  }
+}
+
+extension SpotExtensions on List<FlSpot> {
+  List<FlSpot> removeOutliers(bool remove) {
+    if (!remove) return this;
+    return this.map((e) => e.y).toList().removeOutliers(remove).spots();
   }
 }
 
@@ -659,103 +686,157 @@ extension TeamsExtension on List<Team> {
     return val;
   }
 
-  double maxScoreVar(Dice? dice, String? string) {
+  double maxScoreVar(Dice? dice, String? string, bool removeOutliers) {
     if (string == "auto") {
-      return this.maxAutoScore(dice);
+      return this.maxAutoScore(dice, removeOutliers);
     } else if (string == "tele") {
-      return this.maxTeleScore(dice);
+      return this.maxTeleScore(dice, removeOutliers);
     } else if (string == "endgame") {
-      return this.maxEndScore(dice);
+      return this.maxEndScore(dice, removeOutliers);
     } else {
-      return this.maxScore(dice);
+      return this.maxScore(dice, removeOutliers);
     }
   }
 
-  double lowestMadVar(Dice? dice, String string) {
+  double lowestStandardDeviationVar(
+      Dice? dice, String string, bool removeOutliers) {
     if (string == "auto") {
-      return this.lowestAutoMadScore(dice);
+      return this.lowestAutoStandardDeviationScore(dice, removeOutliers);
     } else if (string == "tele") {
-      return this.lowestTeleMadScore(dice);
+      return this.lowestTeleStandardDeviationScore(dice, removeOutliers);
     } else if (string == "endgame") {
-      return this.lowestEndMadScore(dice);
+      return this.lowestEndStandardDeviationScore(dice, removeOutliers);
     } else {
-      return this.lowestMadScore(dice);
+      return this.lowestStandardDeviationScore(dice, removeOutliers);
     }
   }
 
-  double maxScore(Dice? dice) {
-    if (this.length == 0) return 1;
-    return this.map((e) => e.scores.maxScore(dice)).reduce(max);
+  double lowestDeviationVar(Dice? dice, String string, bool removeOutliers) {
+    if (string == "auto") {
+      return this.lowestAutoStandardDeviationScore(dice, removeOutliers);
+    } else if (string == "tele") {
+      return this.lowestTeleStandardDeviationScore(dice, removeOutliers);
+    } else if (string == "endgame") {
+      return this.lowestEndStandardDeviationScore(dice, removeOutliers);
+    } else {
+      return this.lowestStandardDeviationScore(dice, removeOutliers);
+    }
   }
 
-  double lowestMadScore(Dice? dice) {
+  double maxScore(Dice? dice, bool removeOutliers) {
     if (this.length == 0) return 1;
-    return this.map((e) => e.scores.madScore(dice)).reduce(min);
+    var x = this
+        .map((e) => e.scores.maxScore(dice))
+        .toList(); //.removeOutliers(removeOutliers);
+    //.reduce(max);
+    return x.reduce(max);
   }
 
-  double maxAutoScore(Dice? dice) {
+  double lowestStandardDeviationScore(Dice? dice, bool removeOutliers) {
     if (this.length == 0) return 1;
-    return this.map((e) => e.scores.autoMaxScore(dice)).reduce(max);
+    return this
+        .map((e) => e.scores.standardDeviationScore(dice))
+        // .removeOutliers(removeOutliers)
+        .reduce(min);
   }
 
-  double lowestAutoMadScore(Dice? dice) {
+  double maxAutoScore(Dice? dice, bool removeOutliers) {
     if (this.length == 0) return 1;
-    return this.map((e) => e.scores.autoMADScore(dice)).reduce(min);
+    return this
+        .map((e) => e.scores.autoMaxScore(dice))
+        //.removeOutliers(removeOutliers)
+        .reduce(max);
   }
 
-  double maxTeleScore(Dice? dice) {
+  double lowestAutoStandardDeviationScore(Dice? dice, bool removeOutliers) {
     if (this.length == 0) return 1;
-    return this.map((e) => e.scores.teleMaxScore(dice)).reduce(max);
+    return this
+        .map((e) => e.scores.autostandardDeviationScore(dice))
+        //.removeOutliers(removeOutliers)
+        .reduce(min);
   }
 
-  double lowestTeleMadScore(Dice? dice) {
+  double maxTeleScore(Dice? dice, bool removeOutliers) {
     if (this.length == 0) return 1;
-    return this.map((e) => e.scores.teleMADScore(dice)).reduce(min);
+    return this
+        .map((e) => e.scores.teleMaxScore(dice))
+        //.removeOutliers(removeOutliers)
+        .reduce(max);
   }
 
-  double maxEndScore(Dice? dice) {
+  double lowestTeleStandardDeviationScore(Dice? dice, bool removeOutliers) {
     if (this.length == 0) return 1;
-    return this.map((e) => e.scores.endMaxScore(dice)).reduce(max);
+    return this
+        .map((e) => e.scores.teleStandardDeviationScore(dice))
+        //.removeOutliers(removeOutliers)
+        .reduce(min);
   }
 
-  double lowestEndMadScore(Dice? dice) {
+  double maxEndScore(Dice? dice, bool removeOutliers) {
     if (this.length == 0) return 1;
-    return this.map((e) => e.scores.endMADScore(dice)).reduce(min);
+    return this
+        .map((e) => e.scores.endMaxScore(dice))
+        //.removeOutliers(removeOutliers)
+        .reduce(max);
+  }
+
+  double lowestEndStandardDeviationScore(Dice? dice, bool removeOutliers) {
+    if (this.length == 0) return 1;
+    return this
+        .map((e) => e.scores.endstandardDeviationScore(dice))
+        //.removeOutliers(removeOutliers)
+        .reduce(min);
   }
 }
 
 extension ScoreDivExtension on List<ScoreDivision> {
-  List<FlSpot> spots() {
-    final list = this.map((e) => e.total()).toList();
-    List<FlSpot> val = [];
-    for (int i = 0; i < list.length; i++) {
-      val.add(FlSpot(i.toDouble(), list[i].toDouble()));
-    }
-    return val;
-  }
+  List<FlSpot> spots() => this.map((e) => e.total()).spots();
 
-  double maxScore(Dice dice) {
+  double maxScore(Dice dice, bool removeOutliers) {
     final arr = this.diceScores(dice);
     if (arr.length == 0) return 0;
-    return arr.map((e) => e.total()).reduce(max).toDouble();
+    return arr
+        .map((e) => e.total().toDouble())
+        .removeOutliers(removeOutliers)
+        .reduce(max)
+        .toDouble();
   }
 
-  double minScore(Dice dice) {
+  double minScore(Dice dice, bool removeOutliers) {
     final arr = this.diceScores(dice);
     if (arr.length == 0) return 0;
-    return arr.map((e) => e.total()).reduce(min).toDouble();
+    return arr
+        .map((e) => e.total().toDouble())
+        .removeOutliers(removeOutliers)
+        .reduce(min)
+        .toDouble();
   }
 
-  double meanScore(Dice dice) {
+  double meanScore(Dice dice, bool removeOutliers) {
     final arr = this.diceScores(dice);
     if (arr.length == 0) return 0;
-    return arr.map((e) => e.total()).mean();
+    return arr
+        .map((e) => e.total().toDouble())
+        .removeOutliers(removeOutliers)
+        .mean();
   }
 
-  double madScore(Dice dice) {
+  double standardDeviationScore(Dice dice, bool removeOutliers) {
     final arr = this.diceScores(dice);
     if (arr.length == 0) return 0;
-    return arr.map((e) => e.total()).mad();
+    return arr
+        .map((e) => e.total().toDouble())
+        .removeOutliers(removeOutliers)
+        .standardDeviation();
+  }
+
+  double devianceScore(Dice dice, bool removeOutliers) {
+    final arr = this.diceScores(dice);
+    if (arr.length == 0) return 0;
+    return arr
+        .map((e) => e.total().toDouble())
+        .removeOutliers(removeOutliers)
+        .standardDeviation();
   }
 
   List<ScoreDivision> diceScores(Dice dice) =>
@@ -818,10 +899,10 @@ extension ScoresExtension on List<Score> {
     return arr.map((e) => e.total()).mean();
   }
 
-  double madScore(Dice? dice) {
+  double standardDeviationScore(Dice? dice) {
     final arr = this.diceScores(dice);
     if (arr.length == 0) return 0;
-    return arr.map((e) => e.total()).mad();
+    return arr.map((e) => e.total().toDouble()).standardDeviation();
   }
 
   double teleMaxScore(Dice? dice) {
@@ -842,10 +923,10 @@ extension ScoresExtension on List<Score> {
     return arr.map((e) => e.teleScore.total()).mean();
   }
 
-  double teleMADScore(Dice? dice) {
+  double teleStandardDeviationScore(Dice? dice) {
     final arr = this.diceScores(dice);
     if (arr.length == 0) return 0;
-    return arr.map((e) => e.teleScore.total()).mad();
+    return arr.map((e) => e.teleScore.total().toDouble()).standardDeviation();
   }
 
   double autoMaxScore(Dice? dice) {
@@ -872,12 +953,12 @@ extension ScoresExtension on List<Score> {
       return arr.map((e) => e.autoScore.total()).mean();
   }
 
-  double autoMADScore(Dice? dice) {
+  double autostandardDeviationScore(Dice? dice) {
     final arr = this.diceScores(dice);
     if (arr.length == 0)
       return 0;
     else
-      return arr.map((e) => e.autoScore.total()).mad();
+      return arr.map((e) => e.autoScore.total().toDouble()).standardDeviation();
   }
 
   double endMaxScore(Dice? dice) {
@@ -895,13 +976,15 @@ extension ScoresExtension on List<Score> {
   double endMeanScore(Dice dice) {
     final arr = this.diceScores(dice);
     if (arr.length == 0) return 0;
-    return arr.map((e) => e.endgameScore.total()).mean();
+    return arr.map((e) => e.endgameScore.total().toDouble()).mean();
   }
 
-  double endMADScore(Dice? dice) {
+  double endstandardDeviationScore(Dice? dice) {
     final arr = this.diceScores(dice);
     if (arr.length == 0) return 0;
-    return arr.map((e) => e.endgameScore.total()).mad();
+    return arr
+        .map((e) => e.endgameScore.total().toDouble())
+        .standardDeviation();
   }
 
   List<Score> diceScores(Dice? dice) =>

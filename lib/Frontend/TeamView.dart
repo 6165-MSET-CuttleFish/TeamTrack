@@ -1,6 +1,4 @@
-import 'dart:io';
 import 'dart:math';
-import 'package:flutter/services.dart';
 import 'package:teamtrack/Frontend/Assets/Collapsible.dart';
 import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
 import 'package:teamtrack/Frontend/MatchList.dart';
@@ -31,6 +29,7 @@ class _TeamView extends State<TeamView> {
   final Duration finalDuration = Duration(milliseconds: 800);
   final _selections = [true, true, false, false, false];
   Team _team = Team.nullTeam();
+  bool removeOutliers = false;
   @override
   Widget build(BuildContext context) {
     _team = widget.team;
@@ -100,7 +99,7 @@ class _TeamView extends State<TeamView> {
                         }
                       : null,
                 ),
-                PlatformButton(
+                MaterialButton(
                   color:
                       _dice == Dice.none ? Theme.of(context).accentColor : null,
                   child: Text('All Cases'),
@@ -116,6 +115,14 @@ class _TeamView extends State<TeamView> {
         title: Text(_team.name),
         foregroundColor: Colors.green,
         backgroundColor: Theme.of(context).accentColor,
+        actions: [
+          Center(child: Text('Refine')),
+          PlatformSwitch(
+            value: removeOutliers,
+            onChanged: (_) => setState(() => removeOutliers = _),
+            highlightColor: Colors.orange,
+          ),
+        ],
       ),
       body: StreamBuilder<Database.Event>(
           stream: DatabaseServices(id: widget.event.id).getEventChanges,
@@ -311,7 +318,10 @@ class _TeamView extends State<TeamView> {
                                             .where((e) => e.dice == _dice)
                                             .toList()
                                             .spots()
-                                        : _team.scores.spots(),
+                                            .removeOutliers(removeOutliers)
+                                        : _team.scores
+                                            .spots()
+                                            .removeOutliers(removeOutliers),
                                     colors: [
                                       Color.fromRGBO(230, 30, 213, 1),
                                     ],
@@ -328,7 +338,10 @@ class _TeamView extends State<TeamView> {
                                             .where((e) => e.dice == _dice)
                                             .toList()
                                             .autoSpots()
-                                        : _team.scores.autoSpots(),
+                                            .removeOutliers(removeOutliers)
+                                        : _team.scores
+                                            .autoSpots()
+                                            .removeOutliers(removeOutliers),
                                     colors: [
                                       Colors.green,
                                     ],
@@ -345,7 +358,10 @@ class _TeamView extends State<TeamView> {
                                             .where((e) => e.dice == _dice)
                                             .toList()
                                             .teleSpots()
-                                        : _team.scores.teleSpots(),
+                                            .removeOutliers(removeOutliers)
+                                        : _team.scores
+                                            .teleSpots()
+                                            .removeOutliers(removeOutliers),
                                     colors: [
                                       Colors.blue,
                                     ],
@@ -362,7 +378,10 @@ class _TeamView extends State<TeamView> {
                                             .where((e) => e.dice == _dice)
                                             .toList()
                                             .endSpots()
-                                        : _team.scores.endSpots(),
+                                            .removeOutliers(removeOutliers)
+                                        : _team.scores
+                                            .endSpots()
+                                            .removeOutliers(removeOutliers),
                                     colors: [
                                       Colors.red,
                                     ],
@@ -562,6 +581,7 @@ class _TeamView extends State<TeamView> {
         type: "general",
         scoreDivisions: _team.scores,
         dice: _dice,
+        removeOutliers: removeOutliers,
       ),
       Padding(
         padding: EdgeInsets.all(10),
@@ -579,6 +599,7 @@ class _TeamView extends State<TeamView> {
         type: "auto",
         scoreDivisions: _team.scores.map((e) => e.autoScore).toList(),
         dice: _dice,
+        removeOutliers: removeOutliers,
       ),
       Padding(
         padding: const EdgeInsets.only(top: 20, bottom: 10),
@@ -593,6 +614,7 @@ class _TeamView extends State<TeamView> {
         type: "tele",
         scoreDivisions: _team.scores.map((e) => e.teleScore).toList(),
         dice: _dice,
+        removeOutliers: removeOutliers,
       ),
       Padding(
         padding: const EdgeInsets.only(top: 20, bottom: 10),
@@ -607,6 +629,7 @@ class _TeamView extends State<TeamView> {
         type: "endgame",
         scoreDivisions: _team.scores.map((e) => e.endgameScore).toList(),
         dice: _dice,
+        removeOutliers: removeOutliers,
       ),
       Padding(
         padding: EdgeInsets.all(130),

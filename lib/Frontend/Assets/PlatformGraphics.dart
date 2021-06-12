@@ -31,6 +31,7 @@ class NewPlatform {
   static bool isWeb() {
     try {
       var temp = Platform.isAndroid;
+      print(temp);
     } catch (e) {
       return true;
     }
@@ -76,16 +77,21 @@ abstract class PlatformWidget<C extends Widget, M extends Widget>
 }
 
 class PlatformSwitch extends PlatformWidget<CupertinoSwitch, Switch> {
-  PlatformSwitch({Key? key, required this.value, required this.onChanged})
+  PlatformSwitch(
+      {Key? key,
+      required this.value,
+      required this.onChanged,
+      this.highlightColor})
       : super(key: key);
   final bool value;
   final ValueChanged<bool> onChanged;
+  final Color? highlightColor;
   @override
   CupertinoSwitch buildCupertinoWidget(BuildContext context) {
     return CupertinoSwitch(
       value: value,
       onChanged: onChanged,
-      activeColor: Theme.of(context).accentColor,
+      activeColor: highlightColor ?? Theme.of(context).accentColor,
     );
   }
 
@@ -95,7 +101,7 @@ class PlatformSwitch extends PlatformWidget<CupertinoSwitch, Switch> {
       value: value,
       onChanged: onChanged,
       activeColor: Colors.white,
-      activeTrackColor: Theme.of(context).accentColor,
+      activeTrackColor: highlightColor ?? Theme.of(context).accentColor,
     );
   }
 }
@@ -171,7 +177,7 @@ class PlatformTextField
 }
 
 class PlatformDialogAction
-    extends PlatformWidget<CupertinoDialogAction, FlatButton> {
+    extends PlatformWidget<CupertinoDialogAction, TextButton> {
   PlatformDialogAction(
       {Key? key,
       this.child,
@@ -181,7 +187,7 @@ class PlatformDialogAction
       : super(key: key);
   final Widget? child;
   final bool isDefaultAction;
-  final Function? onPressed;
+  final void Function()? onPressed;
   final bool isDestructive;
   @override
   CupertinoDialogAction buildCupertinoWidget(BuildContext context) {
@@ -189,51 +195,68 @@ class PlatformDialogAction
       //textStyle: TextStyle(color: Theme.of(context).textTheme.bodyText2.color),
       isDefaultAction: isDefaultAction,
       child: child!,
-      onPressed: onPressed as void Function()?,
+      onPressed: onPressed,
       isDestructiveAction: isDestructive,
     );
   }
 
   @override
-  FlatButton buildMaterialWidget(BuildContext context) {
-    return FlatButton(
-      onPressed: onPressed as void Function()?,
+  TextButton buildMaterialWidget(BuildContext context) {
+    return TextButton(
+      onPressed: onPressed,
       child: child!,
-      textColor: isDestructive ? Colors.red : null,
+      style: ButtonStyle(
+        foregroundColor: MaterialStateProperty.all(
+          isDestructive
+              ? Colors.red
+              : Theme.of(context).textTheme.bodyText2?.color,
+        ),
+      ),
     );
   }
 }
 
-class PlatformButton extends PlatformWidget<CupertinoButton, MaterialButton> {
+class PlatformButton extends PlatformWidget<CupertinoButton, OutlinedButton> {
   PlatformButton(
       {Key? key,
-      this.child,
+      required this.child,
       this.onPressed,
       this.disabledColor = Colors.transparent,
       this.color})
       : super(key: key);
-  final Widget? child;
-  final Function? onPressed;
+  final Widget child;
+  final void Function()? onPressed;
   final Color? color;
   final Color disabledColor;
   @override
   CupertinoButton buildCupertinoWidget(BuildContext context) {
     return CupertinoButton(
-      child: child!,
-      onPressed: onPressed as void Function()?,
+      child: child,
+      onPressed: onPressed,
       color: color,
       disabledColor: disabledColor,
     );
   }
 
   @override
-  MaterialButton buildMaterialWidget(BuildContext context) {
-    return MaterialButton(
-      elevation: 0,
+  OutlinedButton buildMaterialWidget(BuildContext context) {
+    return OutlinedButton(
+      onPressed: onPressed,
       child: child,
-      onPressed: onPressed as void Function()?,
-      color: color,
-      disabledColor: disabledColor,
+      style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.all(color?.withOpacity(0.6)),
+        foregroundColor: MaterialStateProperty.all(
+            Theme.of(context).textTheme.bodyText2?.color),
+        side:
+            MaterialStateProperty.all(BorderSide(color: color ?? Colors.grey)),
+        shape: MaterialStateProperty.all(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(
+              Radius.elliptical(100, 100),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -325,7 +348,8 @@ class ScoreCard extends StatelessWidget {
       required this.dice,
       required this.team,
       required this.event,
-      required this.type})
+      required this.type,
+      required this.removeOutliers})
       : super(key: key) {
     if (type == "auto") {
       targetScore = team.targetScore!.autoScore;
@@ -343,6 +367,7 @@ class ScoreCard extends StatelessWidget {
   final Event event;
   final String type;
   ScoreDivision? targetScore;
+  final bool removeOutliers;
   @override
   Widget build(BuildContext context) {
     return CardView(
@@ -353,24 +378,30 @@ class ScoreCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             BarGraph(
-              val: scoreDivisions.meanScore(dice),
-              max: event.teams.maxScoreVar(dice, type),
+              val: scoreDivisions.meanScore(dice, removeOutliers),
+              max: event.teams.maxScoreVar(dice, type, removeOutliers),
               title: 'Average',
             ),
             BarGraph(
-                val: scoreDivisions.maxScore(dice),
-                max: event.teams.maxScoreVar(dice, type),
+                val: scoreDivisions.maxScore(dice, removeOutliers),
+                max: event.teams.maxScoreVar(dice, type, removeOutliers),
                 title: 'Best Score'),
             BarGraph(
-              val: scoreDivisions.madScore(dice),
-              max: event.teams.lowestMadVar(dice, type),
+              val: scoreDivisions.standardDeviationScore(dice, removeOutliers),
+              max: event.teams
+                  .lowestStandardDeviationVar(dice, type, removeOutliers),
               inverted: true,
               title: 'Deviation',
             ),
           ],
         ),
       ),
-      collapsed: scoreDivisions.diceScores(dice).length >= 1
+      collapsed: scoreDivisions
+                  .diceScores(dice)
+                  .map((e) => e.total())
+                  .removeOutliers(removeOutliers)
+                  .length >=
+              1
           ? AspectRatio(
               aspectRatio: 2,
               child: Container(
@@ -443,11 +474,11 @@ class ScoreCard extends StatelessWidget {
                               .toDouble() -
                           1,
                       minY: [
-                        scoreDivisions.minScore(dice),
+                        scoreDivisions.minScore(dice, removeOutliers),
                         targetScore!.total().toDouble()
                       ].reduce(min),
                       maxY: [
-                        scoreDivisions.maxScore(dice),
+                        scoreDivisions.maxScore(dice, removeOutliers),
                         team.targetScore != null
                             ? targetScore!.total().toDouble()
                             : 0.0
@@ -472,7 +503,10 @@ class ScoreCard extends StatelessWidget {
                                   applyCutOffY: true,
                                 )
                               : null,
-                          spots: scoreDivisions.diceScores(dice).spots(),
+                          spots: scoreDivisions
+                              .diceScores(dice)
+                              .spots()
+                              .removeOutliers(removeOutliers),
                           colors: [Colors.orange],
                           isCurved: true,
                           preventCurveOverShooting: true,

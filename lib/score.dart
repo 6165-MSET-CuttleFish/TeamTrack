@@ -73,7 +73,7 @@ class TeleScore extends ScoreDivision {
   ScoringElement hiGoals = ScoringElement(name: "High Goals", value: 6);
   List<ScoringElement> getElements() => [hiGoals, midGoals, lowGoals];
   BoxAndWhisker cycles = BoxAndWhisker();
-  int? misses = 0;
+  int misses = 0;
   Dice getDice() => dice;
   TeleScore(this.dice);
   TeleScore.fromJson(Map<String, dynamic> json, this.dice) {

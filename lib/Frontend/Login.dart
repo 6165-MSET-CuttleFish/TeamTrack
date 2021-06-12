@@ -68,57 +68,58 @@ class _LoginView extends State<LoginView> {
   TextEditingController displayNameController = TextEditingController();
   Widget signInSheet() {
     return Padding(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          children: [
-            PlatformTextField(
-              controller: emailController,
-              keyboardType: TextInputType.emailAddress,
-              placeholder: "Email",
-            ),
-            Padding(padding: EdgeInsets.all(10)),
-            PlatformTextField(
-              controller: passwordController,
-              keyboardType: TextInputType.visiblePassword,
-              placeholder: "Password",
-              obscureText: true,
-            ),
-            Padding(padding: EdgeInsets.all(5)),
-            PlatformButton(
-              child: Text("Sign In"),
-              color: Colors.green,
-              onPressed: () async {
-                String? s = await context.read<AuthenticationService>().signIn(
-                      email: emailController.text.trim(),
-                      password: passwordController.text.trim(),
-                    );
-                emailController.clear();
-                passwordController.clear();
-                if (s != "Signed in") {
-                  showPlatformDialog(
-                    context: context,
-                    builder: (BuildContext context) => PlatformAlert(
-                      title: Text('Error'),
-                      content: Text(
-                        s!,
-                        style: Theme.of(context).textTheme.bodyText1,
-                      ),
-                      actions: [
-                        PlatformDialogAction(
-                          isDefaultAction: true,
-                          child: Text('Okay'),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                      ],
-                    ),
+      padding: EdgeInsets.all(20),
+      child: Column(
+        children: [
+          PlatformTextField(
+            controller: emailController,
+            keyboardType: TextInputType.emailAddress,
+            placeholder: "Email",
+          ),
+          Padding(padding: EdgeInsets.all(10)),
+          PlatformTextField(
+            controller: passwordController,
+            keyboardType: TextInputType.visiblePassword,
+            placeholder: "Password",
+            obscureText: true,
+          ),
+          Padding(padding: EdgeInsets.all(5)),
+          PlatformButton(
+            child: Text("Sign In"),
+            color: Colors.green,
+            onPressed: () async {
+              String? s = await context.read<AuthenticationService>().signIn(
+                    email: emailController.text.trim(),
+                    password: passwordController.text.trim(),
                   );
-                }
-              },
-            ),
-          ],
-        ));
+              emailController.clear();
+              passwordController.clear();
+              if (s != "Signed in") {
+                showPlatformDialog(
+                  context: context,
+                  builder: (BuildContext context) => PlatformAlert(
+                    title: Text('Error'),
+                    content: Text(
+                      s!,
+                      style: Theme.of(context).textTheme.bodyText1,
+                    ),
+                    actions: [
+                      PlatformDialogAction(
+                        isDefaultAction: true,
+                        child: Text('Okay'),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              }
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   Widget signInList() {
@@ -126,11 +127,13 @@ class _LoginView extends State<LoginView> {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         PlatformButton(
+          color: Theme.of(context).accentColor,
           onPressed: () {
             showModalBottomSheet(
-                context: context,
-                builder: (context) => signUpSheet(),
-                isScrollControlled: true);
+              context: context,
+              builder: (context) => signUpSheet(),
+              isScrollControlled: true,
+            );
           },
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -182,66 +185,82 @@ class _LoginView extends State<LoginView> {
 
   Widget signUpSheet() {
     return Padding(
-      padding: EdgeInsets.all(20),
-      child: Column(
+      padding: EdgeInsets.all(10),
+      child: Stack(
+        alignment: Alignment.topLeft,
         children: [
-          PlatformTextField(
-            controller: emailController,
-            keyboardType: TextInputType.emailAddress,
-            placeholder: "Email",
-          ),
-          Padding(padding: EdgeInsets.all(10)),
-          PlatformTextField(
-            controller: displayNameController,
-            keyboardType: TextInputType.emailAddress,
-            placeholder: "Display Name",
-          ),
-          Padding(padding: EdgeInsets.all(5)),
-          PlatformTextField(
-            controller: passwordController,
-            keyboardType: TextInputType.visiblePassword,
-            placeholder: "Password",
-            obscureText: true,
-          ),
-          Padding(padding: EdgeInsets.all(5)),
-          PlatformButton(
-            child: Text("Sign Up"),
-            color: Colors.green,
-            onPressed: () async {
-              String? s = await context.read<AuthenticationService>().signUp(
-                  email: emailController.text.trim(),
-                  password: passwordController.text.trim(),
-                  displayName: displayNameController.text.trim());
-              if (s == "Signed up") {
-                emailController.clear();
-                passwordController.clear();
-                displayNameController.clear();
-                Navigator.of(context).pop();
-                await context.read<AuthenticationService>().signIn(
-                      email: emailController.text.trim(),
-                      password: passwordController.text.trim(),
-                    );
-              } else {
-                showPlatformDialog(
-                  context: context,
-                  builder: (BuildContext context) => PlatformAlert(
-                    title: Text('Error'),
-                    content: Text(
-                      s!,
-                      style: Theme.of(context).textTheme.bodyText1,
-                    ),
-                    actions: [
-                      PlatformDialogAction(
-                        isDefaultAction: true,
-                        child: Text('Okay'),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
+          Column(
+            children: [
+              Padding(padding: EdgeInsets.all(20)),
+              PlatformTextField(
+                controller: emailController,
+                keyboardType: TextInputType.emailAddress,
+                placeholder: "Email",
+              ),
+              Padding(padding: EdgeInsets.all(5)),
+              PlatformTextField(
+                controller: displayNameController,
+                keyboardType: TextInputType.emailAddress,
+                placeholder: "Display Name",
+              ),
+              Padding(padding: EdgeInsets.all(5)),
+              PlatformTextField(
+                controller: passwordController,
+                keyboardType: TextInputType.visiblePassword,
+                placeholder: "Password",
+                obscureText: true,
+              ),
+              Padding(padding: EdgeInsets.all(5)),
+              PlatformButton(
+                child: Text("Sign Up"),
+                color: Colors.green,
+                onPressed: () async {
+                  String? s = await context
+                      .read<AuthenticationService>()
+                      .signUp(
+                          email: emailController.text.trim(),
+                          password: passwordController.text.trim(),
+                          displayName: displayNameController.text.trim());
+                  if (s == "Signed up") {
+                    emailController.clear();
+                    passwordController.clear();
+                    displayNameController.clear();
+                    Navigator.of(context).pop();
+                    await context.read<AuthenticationService>().signIn(
+                          email: emailController.text.trim(),
+                          password: passwordController.text.trim(),
+                        );
+                  } else {
+                    showPlatformDialog(
+                      context: context,
+                      builder: (BuildContext context) => PlatformAlert(
+                        title: Text('Error'),
+                        content: Text(
+                          s!,
+                          style: Theme.of(context).textTheme.bodyText1,
+                        ),
+                        actions: [
+                          PlatformDialogAction(
+                            isDefaultAction: true,
+                            child: Text('Okay'),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                );
-              }
+                    );
+                  }
+                },
+              ),
+            ],
+          ),
+          RawMaterialButton(
+            shape: CircleBorder(),
+            fillColor: Colors.grey.withOpacity(0.4),
+            child: Icon(Icons.clear),
+            onPressed: () {
+              Navigator.of(context).pop();
             },
           ),
         ],
