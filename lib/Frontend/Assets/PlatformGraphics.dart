@@ -440,7 +440,7 @@ class ScoreCard extends StatelessWidget {
                           showTitles: true,
                           reservedSize: 22,
                           getTextStyles: (value) => const TextStyle(
-                              color: Color(0xff68737d), fontSize: 16),
+                              color: Color(0xff68737d), fontSize: 10),
                           getTitles: (value) {
                             return (value + 1).toInt().toString();
                           },

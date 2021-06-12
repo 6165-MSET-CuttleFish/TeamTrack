@@ -125,23 +125,26 @@ class _TeamView extends State<TeamView> {
         ],
       ),
       body: StreamBuilder<Database.Event>(
-          stream: DatabaseServices(id: widget.event.id).getEventChanges,
-          builder: (context, eventHandler) {
-            if (eventHandler.hasData &&
-                !eventHandler.hasError &&
-                !dataModel.isProcessing) {
-              widget.event.updateLocal(
-                json.decode(
-                  json.encode(eventHandler.data!.snapshot.value),
-                ),
-              );
-              _team = widget.event.teams.firstWhere(
-                  (element) => element.number == _team.number, orElse: () {
+        stream: DatabaseServices(id: widget.event.id).getEventChanges,
+        builder: (context, eventHandler) {
+          if (eventHandler.hasData &&
+              !eventHandler.hasError &&
+              !dataModel.isProcessing) {
+            widget.event.updateLocal(
+              json.decode(
+                json.encode(eventHandler.data!.snapshot.value),
+              ),
+            );
+            _team = widget.event.teams.firstWhere(
+              (element) => element.number == _team.number,
+              orElse: () {
                 Navigator.of(context).pop();
                 return Team.nullTeam();
-              });
-            }
-            return ListView(children: [
+              },
+            );
+          }
+          return ListView(
+            children: [
               Padding(
                 padding: EdgeInsets.only(left: 5, right: 5),
                 child: Column(
@@ -150,8 +153,10 @@ class _TeamView extends State<TeamView> {
                   children: body(),
                 ),
               )
-            ]);
-          }),
+            ],
+          );
+        },
+      ),
     );
   }
 
@@ -201,7 +206,7 @@ class _TeamView extends State<TeamView> {
                                   getTextStyles: (value) => const TextStyle(
                                       color: Color(0xff68737d),
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 16),
+                                      fontSize: 10),
                                   getTitles: (value) {
                                     return (value + 1).toInt().toString();
                                   },
@@ -225,10 +230,10 @@ class _TeamView extends State<TeamView> {
                                 ),
                               ),
                               borderData: FlBorderData(
-                                  show: true,
-                                  border: Border.all(
-                                      color: const Color(0xff37434d),
-                                      width: 1)),
+                                show: true,
+                                border: Border.all(
+                                    color: const Color(0xff37434d), width: 1),
+                              ),
                               minX: 0,
                               maxX: _team.scores
                                       .diceScores(_dice)
@@ -246,91 +251,92 @@ class _TeamView extends State<TeamView> {
                               ].reduce(max),
                               lineBarsData: [
                                 LineChartBarData(
-                                    belowBarData: _team.targetScore != null
-                                        ? BarAreaData(
-                                            show: true,
-                                            colors: [
-                                              Colors.lightGreenAccent
-                                                  .withOpacity(0.2)
-                                            ],
-                                            cutOffY: _team.targetScore
-                                                ?.total()
-                                                .toDouble(),
-                                            applyCutOffY: true,
-                                          )
-                                        : null,
-                                    aboveBarData: _team.targetScore != null
-                                        ? BarAreaData(
-                                            show: true,
-                                            colors: [
-                                              Colors.redAccent.withOpacity(0.2)
-                                            ],
-                                            cutOffY: _team.targetScore
-                                                ?.total()
-                                                .toDouble(),
-                                            applyCutOffY: true,
-                                          )
-                                        : null,
-                                    show: _selections[0] &&
-                                        widget.event.type != EventType.remote,
-                                    spots: widget.event.matches
-                                        .where((e) =>
-                                            e.dice == _dice ||
-                                            _dice == Dice.none)
-                                        .toList()
-                                        .spots(_team, _dice),
-                                    colors: [Color.fromRGBO(255, 166, 0, 1)],
-                                    isCurved: true,
-                                    isStrokeCapRound: true,
-                                    preventCurveOverShooting: true,
-                                    barWidth: 5,
-                                    shadow: Shadow(
-                                        color: Colors.green, blurRadius: 5)),
+                                  belowBarData: _team.targetScore != null
+                                      ? BarAreaData(
+                                          show: true,
+                                          colors: [
+                                            Colors.lightGreenAccent
+                                                .withOpacity(0.2)
+                                          ],
+                                          cutOffY: _team.targetScore
+                                              ?.total()
+                                              .toDouble(),
+                                          applyCutOffY: true,
+                                        )
+                                      : null,
+                                  aboveBarData: _team.targetScore != null
+                                      ? BarAreaData(
+                                          show: true,
+                                          colors: [
+                                            Colors.redAccent.withOpacity(0.2)
+                                          ],
+                                          cutOffY: _team.targetScore
+                                              ?.total()
+                                              .toDouble(),
+                                          applyCutOffY: true,
+                                        )
+                                      : null,
+                                  show: _selections[0] &&
+                                      widget.event.type != EventType.remote,
+                                  spots: widget.event.matches
+                                      .where((e) =>
+                                          e.dice == _dice || _dice == Dice.none)
+                                      .toList()
+                                      .spots(_team, _dice),
+                                  colors: [Color.fromRGBO(255, 166, 0, 1)],
+                                  isCurved: true,
+                                  isStrokeCapRound: true,
+                                  preventCurveOverShooting: true,
+                                  barWidth: 5,
+                                  shadow: Shadow(
+                                      color: Colors.green, blurRadius: 5),
+                                ),
                                 LineChartBarData(
-                                    belowBarData: _team.targetScore != null
-                                        ? BarAreaData(
-                                            show: true,
-                                            colors: [
-                                              Colors.lightGreenAccent
-                                                  .withOpacity(0.2)
-                                            ],
-                                            cutOffY: _team.targetScore
-                                                ?.total()
-                                                .toDouble(),
-                                            applyCutOffY: true,
-                                          )
-                                        : null,
-                                    aboveBarData: _team.targetScore != null
-                                        ? BarAreaData(
-                                            show: true,
-                                            colors: [
-                                              Colors.redAccent.withOpacity(0.2)
-                                            ],
-                                            cutOffY: _team.targetScore
-                                                ?.total()
-                                                .toDouble(),
-                                            applyCutOffY: true,
-                                          )
-                                        : null,
-                                    show: _selections[1],
-                                    spots: _dice != Dice.none
-                                        ? _team.scores
-                                            .where((e) => e.dice == _dice)
-                                            .toList()
-                                            .spots()
-                                            .removeOutliers(removeOutliers)
-                                        : _team.scores
-                                            .spots()
-                                            .removeOutliers(removeOutliers),
-                                    colors: [
-                                      Color.fromRGBO(230, 30, 213, 1),
-                                    ],
-                                    isCurved: true,
-                                    isStrokeCapRound: true,
-                                    preventCurveOverShooting: true,
-                                    barWidth: 5,
-                                    shadow: Shadow(
-                                        color: Colors.green, blurRadius: 5)),
+                                  belowBarData: _team.targetScore != null
+                                      ? BarAreaData(
+                                          show: true,
+                                          colors: [
+                                            Colors.lightGreenAccent
+                                                .withOpacity(0.2)
+                                          ],
+                                          cutOffY: _team.targetScore
+                                              ?.total()
+                                              .toDouble(),
+                                          applyCutOffY: true,
+                                        )
+                                      : null,
+                                  aboveBarData: _team.targetScore != null
+                                      ? BarAreaData(
+                                          show: true,
+                                          colors: [
+                                            Colors.redAccent.withOpacity(0.2)
+                                          ],
+                                          cutOffY: _team.targetScore
+                                              ?.total()
+                                              .toDouble(),
+                                          applyCutOffY: true,
+                                        )
+                                      : null,
+                                  show: _selections[1],
+                                  spots: _dice != Dice.none
+                                      ? _team.scores
+                                          .where((e) => e.dice == _dice)
+                                          .toList()
+                                          .spots()
+                                          .removeOutliers(removeOutliers)
+                                      : _team.scores
+                                          .spots()
+                                          .removeOutliers(removeOutliers),
+                                  colors: [
+                                    Color.fromRGBO(230, 30, 213, 1),
+                                  ],
+                                  isCurved: true,
+                                  isStrokeCapRound: true,
+                                  preventCurveOverShooting: true,
+                                  barWidth: 5,
+                                  shadow: Shadow(
+                                      color: Colors.green, blurRadius: 5),
+                                ),
                                 LineChartBarData(
                                     show: _selections[2],
                                     spots: _dice != Dice.none
@@ -462,9 +468,11 @@ class _TeamView extends State<TeamView> {
                   color: _selections[0] ? Color.fromRGBO(255, 166, 0, 1) : null,
                   splashColor: Color.fromRGBO(255, 166, 0, 1),
                   onPressed: () {
-                    setState(() {
-                      _selections[0] = !_selections[0];
-                    });
+                    setState(
+                      () {
+                        _selections[0] = !_selections[0];
+                      },
+                    );
                   },
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(18.0),
@@ -479,9 +487,11 @@ class _TeamView extends State<TeamView> {
                     side: BorderSide(color: Color.fromRGBO(230, 30, 213, 1))),
                 child: Text('General'),
                 onPressed: () {
-                  setState(() {
-                    _selections[1] = !_selections[1];
-                  });
+                  setState(
+                    () {
+                      _selections[1] = !_selections[1];
+                    },
+                  );
                 },
               ),
               FlatButton(
@@ -492,9 +502,11 @@ class _TeamView extends State<TeamView> {
                     side: BorderSide(color: Colors.green)),
                 child: Text('Autonomous'),
                 onPressed: () {
-                  setState(() {
-                    _selections[2] = !_selections[2];
-                  });
+                  setState(
+                    () {
+                      _selections[2] = !_selections[2];
+                    },
+                  );
                 },
               ),
               FlatButton(
@@ -505,9 +517,11 @@ class _TeamView extends State<TeamView> {
                     side: BorderSide(color: Colors.blue)),
                 child: Text('Tele-Op'),
                 onPressed: () {
-                  setState(() {
-                    _selections[3] = !_selections[3];
-                  });
+                  setState(
+                    () {
+                      _selections[3] = !_selections[3];
+                    },
+                  );
                 },
               ),
               FlatButton(
@@ -518,9 +532,11 @@ class _TeamView extends State<TeamView> {
                     side: BorderSide(color: Colors.red)),
                 child: Text('Endgame'),
                 onPressed: () {
-                  setState(() {
-                    _selections[4] = !_selections[4];
-                  });
+                  setState(
+                    () {
+                      _selections[4] = !_selections[4];
+                    },
+                  );
                 },
               ),
             ],
@@ -533,11 +549,14 @@ class _TeamView extends State<TeamView> {
         child: PlatformButton(
           onPressed: () async {
             await Navigator.push(
-                context,
-                platformPageRoute((context) => MatchList(
-                      event: widget.event,
-                      team: _team,
-                    )));
+              context,
+              platformPageRoute(
+                (context) => MatchList(
+                  event: widget.event,
+                  team: _team,
+                ),
+              ),
+            );
             setState(() {});
           },
           color: CupertinoColors.systemGreen,

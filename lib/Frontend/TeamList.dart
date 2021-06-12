@@ -105,7 +105,7 @@ class TeamSearch extends SearchDelegate<String?> {
         IconButton(
           icon: Icon(Icons.clear),
           onPressed: () => query = '',
-        )
+        ),
       ];
   @override
   Widget buildLeading(BuildContext context) {
