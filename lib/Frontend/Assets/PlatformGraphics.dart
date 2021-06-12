@@ -115,7 +115,10 @@ class PlatformAlert extends PlatformWidget<CupertinoAlertDialog, AlertDialog> {
   @override
   CupertinoAlertDialog buildCupertinoWidget(BuildContext context) {
     return CupertinoAlertDialog(
-      title: Padding(child: title, padding: EdgeInsets.only(bottom: 10)),
+      title: Padding(
+        child: title,
+        padding: EdgeInsets.only(bottom: 10),
+      ),
       content: content,
       actions: actions!,
     );
@@ -244,11 +247,14 @@ class PlatformButton extends PlatformWidget<CupertinoButton, OutlinedButton> {
       onPressed: onPressed,
       child: child,
       style: ButtonStyle(
-        backgroundColor: MaterialStateProperty.all(color?.withOpacity(0.6)),
+        backgroundColor: MaterialStateProperty.all(
+          color?.withOpacity(0.6),
+        ),
         foregroundColor: MaterialStateProperty.all(
             Theme.of(context).textTheme.bodyText2?.color),
-        side:
-            MaterialStateProperty.all(BorderSide(color: color ?? Colors.grey)),
+        side: MaterialStateProperty.all(
+          BorderSide(color: color ?? Colors.grey),
+        ),
         shape: MaterialStateProperty.all(
           RoundedRectangleBorder(
             borderRadius: BorderRadius.all(
@@ -342,15 +348,15 @@ class _Incrementor extends State<Incrementor> {
 }
 
 class ScoreCard extends StatelessWidget {
-  ScoreCard(
-      {Key? key,
-      required this.scoreDivisions,
-      required this.dice,
-      required this.team,
-      required this.event,
-      required this.type,
-      required this.removeOutliers})
-      : super(key: key) {
+  ScoreCard({
+    Key? key,
+    required this.scoreDivisions,
+    required this.dice,
+    required this.team,
+    required this.event,
+    required this.type,
+    required this.removeOutliers,
+  }) : super(key: key) {
     if (type == "auto") {
       targetScore = team.targetScore!.autoScore;
     } else if (type == "tele") {
@@ -463,9 +469,10 @@ class ScoreCard extends StatelessWidget {
                         ),
                       ),
                       borderData: FlBorderData(
-                          show: true,
-                          border: Border.all(
-                              color: const Color(0xff37434d), width: 1)),
+                        show: true,
+                        border: Border.all(
+                            color: const Color(0xff37434d), width: 1),
+                      ),
                       minX: 0,
                       maxX: team.scores
                               .where((e) =>

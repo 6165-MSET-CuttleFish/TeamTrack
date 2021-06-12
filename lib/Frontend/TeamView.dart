@@ -37,19 +37,22 @@ class _TeamView extends State<TeamView> {
       bottomNavigationBar: NewPlatform.isIOS()
           ? SafeArea(
               child: CupertinoSlidingSegmentedControl(
-              groupValue: _dice,
-              children: <Dice, Widget>{
-                Dice.one: Text('0'),
-                Dice.two: Text('1'),
-                Dice.three: Text('4'),
-                Dice.none: Text('All Cases')
-              },
-              onValueChanged: (Dice? newDice) {
-                setState(() {
-                  _dice = newDice ?? Dice.none;
-                });
-              },
-            ))
+                groupValue: _dice,
+                children: <Dice, Widget>{
+                  Dice.one: Text('0'),
+                  Dice.two: Text('1'),
+                  Dice.three: Text('4'),
+                  Dice.none: Text('All Cases')
+                },
+                onValueChanged: (Dice? newDice) {
+                  setState(
+                    () {
+                      _dice = newDice ?? Dice.none;
+                    },
+                  );
+                },
+              ),
+            )
           : ButtonBar(
               alignment: MainAxisAlignment.center,
               children: [
@@ -62,9 +65,11 @@ class _TeamView extends State<TeamView> {
                   child: Text('0'),
                   onPressed: _dice != Dice.one
                       ? () {
-                          setState(() {
-                            _dice = Dice.one;
-                          });
+                          setState(
+                            () {
+                              _dice = Dice.one;
+                            },
+                          );
                         }
                       : null,
                 ),
@@ -77,9 +82,11 @@ class _TeamView extends State<TeamView> {
                   child: Text('1'),
                   onPressed: _dice != Dice.two
                       ? () {
-                          setState(() {
-                            _dice = Dice.two;
-                          });
+                          setState(
+                            () {
+                              _dice = Dice.two;
+                            },
+                          );
                         }
                       : null,
                 ),
@@ -93,9 +100,11 @@ class _TeamView extends State<TeamView> {
                   child: Text('4'),
                   onPressed: _dice != Dice.three
                       ? () {
-                          setState(() {
-                            _dice = Dice.three;
-                          });
+                          setState(
+                            () {
+                              _dice = Dice.three;
+                            },
+                          );
                         }
                       : null,
                 ),
@@ -104,9 +113,11 @@ class _TeamView extends State<TeamView> {
                       _dice == Dice.none ? Theme.of(context).accentColor : null,
                   child: Text('All Cases'),
                   onPressed: () {
-                    setState(() {
-                      _dice = Dice.none;
-                    });
+                    setState(
+                      () {
+                        _dice = Dice.none;
+                      },
+                    );
                   },
                 ),
               ],
@@ -116,7 +127,9 @@ class _TeamView extends State<TeamView> {
         foregroundColor: Colors.green,
         backgroundColor: Theme.of(context).accentColor,
         actions: [
-          Center(child: Text('Refine')),
+          Center(
+            child: Text('Refine'),
+          ),
           PlatformSwitch(
             value: removeOutliers,
             onChanged: (_) => setState(() => removeOutliers = _),
@@ -170,10 +183,11 @@ class _TeamView extends State<TeamView> {
                 aspectRatio: 1.20,
                 child: Container(
                   decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(18),
-                      ),
-                      color: Color(0xff232d37)),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(18),
+                    ),
+                    color: Color(0xff232d37),
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.only(
                         right: 50.0, left: 12.0, top: 24, bottom: 12),
@@ -338,65 +352,68 @@ class _TeamView extends State<TeamView> {
                                       color: Colors.green, blurRadius: 5),
                                 ),
                                 LineChartBarData(
-                                    show: _selections[2],
-                                    spots: _dice != Dice.none
-                                        ? _team.scores
-                                            .where((e) => e.dice == _dice)
-                                            .toList()
-                                            .autoSpots()
-                                            .removeOutliers(removeOutliers)
-                                        : _team.scores
-                                            .autoSpots()
-                                            .removeOutliers(removeOutliers),
-                                    colors: [
-                                      Colors.green,
-                                    ],
-                                    isCurved: true,
-                                    isStrokeCapRound: true,
-                                    preventCurveOverShooting: true,
-                                    barWidth: 5,
-                                    shadow: Shadow(
-                                        color: Colors.green, blurRadius: 5)),
+                                  show: _selections[2],
+                                  spots: _dice != Dice.none
+                                      ? _team.scores
+                                          .where((e) => e.dice == _dice)
+                                          .toList()
+                                          .autoSpots()
+                                          .removeOutliers(removeOutliers)
+                                      : _team.scores
+                                          .autoSpots()
+                                          .removeOutliers(removeOutliers),
+                                  colors: [
+                                    Colors.green,
+                                  ],
+                                  isCurved: true,
+                                  isStrokeCapRound: true,
+                                  preventCurveOverShooting: true,
+                                  barWidth: 5,
+                                  shadow: Shadow(
+                                      color: Colors.green, blurRadius: 5),
+                                ),
                                 LineChartBarData(
-                                    show: _selections[3],
-                                    spots: _dice != Dice.none
-                                        ? _team.scores
-                                            .where((e) => e.dice == _dice)
-                                            .toList()
-                                            .teleSpots()
-                                            .removeOutliers(removeOutliers)
-                                        : _team.scores
-                                            .teleSpots()
-                                            .removeOutliers(removeOutliers),
-                                    colors: [
-                                      Colors.blue,
-                                    ],
-                                    isCurved: true,
-                                    isStrokeCapRound: true,
-                                    preventCurveOverShooting: true,
-                                    barWidth: 5,
-                                    shadow: Shadow(
-                                        color: Colors.green, blurRadius: 5)),
+                                  show: _selections[3],
+                                  spots: _dice != Dice.none
+                                      ? _team.scores
+                                          .where((e) => e.dice == _dice)
+                                          .toList()
+                                          .teleSpots()
+                                          .removeOutliers(removeOutliers)
+                                      : _team.scores
+                                          .teleSpots()
+                                          .removeOutliers(removeOutliers),
+                                  colors: [
+                                    Colors.blue,
+                                  ],
+                                  isCurved: true,
+                                  isStrokeCapRound: true,
+                                  preventCurveOverShooting: true,
+                                  barWidth: 5,
+                                  shadow: Shadow(
+                                      color: Colors.green, blurRadius: 5),
+                                ),
                                 LineChartBarData(
-                                    show: _selections[4],
-                                    spots: _dice != Dice.none
-                                        ? _team.scores
-                                            .where((e) => e.dice == _dice)
-                                            .toList()
-                                            .endSpots()
-                                            .removeOutliers(removeOutliers)
-                                        : _team.scores
-                                            .endSpots()
-                                            .removeOutliers(removeOutliers),
-                                    colors: [
-                                      Colors.red,
-                                    ],
-                                    isCurved: true,
-                                    isStrokeCapRound: true,
-                                    preventCurveOverShooting: true,
-                                    barWidth: 5,
-                                    shadow: Shadow(
-                                        color: Colors.green, blurRadius: 5)),
+                                  show: _selections[4],
+                                  spots: _dice != Dice.none
+                                      ? _team.scores
+                                          .where((e) => e.dice == _dice)
+                                          .toList()
+                                          .endSpots()
+                                          .removeOutliers(removeOutliers)
+                                      : _team.scores
+                                          .endSpots()
+                                          .removeOutliers(removeOutliers),
+                                  colors: [
+                                    Colors.red,
+                                  ],
+                                  isCurved: true,
+                                  isStrokeCapRound: true,
+                                  preventCurveOverShooting: true,
+                                  barWidth: 5,
+                                  shadow: Shadow(
+                                      color: Colors.green, blurRadius: 5),
+                                ),
                               ],
                             ),
                           )
@@ -430,9 +447,11 @@ class _TeamView extends State<TeamView> {
                 height: 90,
                 child: FlatButton(
                   onPressed: () {
-                    setState(() {
-                      _showCycles = !_showCycles;
-                    });
+                    setState(
+                      () {
+                        _showCycles = !_showCycles;
+                      },
+                    );
                   },
                   child: Text(
                     'Show Cycle Times',
@@ -475,16 +494,22 @@ class _TeamView extends State<TeamView> {
                     );
                   },
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18.0),
-                      side: BorderSide(color: Color.fromRGBO(255, 166, 0, 1))),
+                    borderRadius: BorderRadius.circular(18.0),
+                    side: BorderSide(
+                      color: Color.fromRGBO(255, 166, 0, 1),
+                    ),
+                  ),
                   child: Text('Alliance Total'),
                 ),
               FlatButton(
                 color: _selections[1] ? Color.fromRGBO(230, 30, 213, 1) : null,
                 splashColor: Color.fromRGBO(230, 30, 213, 1),
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18.0),
-                    side: BorderSide(color: Color.fromRGBO(230, 30, 213, 1))),
+                  borderRadius: BorderRadius.circular(18.0),
+                  side: BorderSide(
+                    color: Color.fromRGBO(230, 30, 213, 1),
+                  ),
+                ),
                 child: Text('General'),
                 onPressed: () {
                   setState(
@@ -498,8 +523,9 @@ class _TeamView extends State<TeamView> {
                 color: _selections[2] ? Colors.green : null,
                 splashColor: Colors.green,
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18.0),
-                    side: BorderSide(color: Colors.green)),
+                  borderRadius: BorderRadius.circular(18.0),
+                  side: BorderSide(color: Colors.green),
+                ),
                 child: Text('Autonomous'),
                 onPressed: () {
                   setState(
@@ -513,8 +539,9 @@ class _TeamView extends State<TeamView> {
                 color: _selections[3] ? Colors.blue : null,
                 splashColor: Colors.blue,
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18.0),
-                    side: BorderSide(color: Colors.blue)),
+                  borderRadius: BorderRadius.circular(18.0),
+                  side: BorderSide(color: Colors.blue),
+                ),
                 child: Text('Tele-Op'),
                 onPressed: () {
                   setState(
@@ -528,8 +555,9 @@ class _TeamView extends State<TeamView> {
                 color: _selections[4] ? Colors.red : null,
                 splashColor: Colors.red,
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18.0),
-                    side: BorderSide(color: Colors.red)),
+                  borderRadius: BorderRadius.circular(18.0),
+                  side: BorderSide(color: Colors.red),
+                ),
                 child: Text('Endgame'),
                 onPressed: () {
                   setState(
@@ -563,7 +591,10 @@ class _TeamView extends State<TeamView> {
           child: Text('Matches'),
         ),
       ),
-      if (NewPlatform.isIOS()) Padding(padding: EdgeInsets.all(5)),
+      if (NewPlatform.isIOS())
+        Padding(
+          padding: EdgeInsets.all(5),
+        ),
       Container(
         width: MediaQuery.of(context).size.width / 2,
         child: PlatformButton(

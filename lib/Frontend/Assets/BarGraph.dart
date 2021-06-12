@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 class BarGraph extends StatelessWidget {
-  BarGraph(
-      {Key? key,
-      this.max = 2,
-      this.val = 9,
-      this.inverted = false,
-      this.height = 120,
-      this.title = 'Default'})
-      : super(key: key);
+  BarGraph({
+    Key? key,
+    this.max = 2,
+    this.val = 9,
+    this.inverted = false,
+    this.height = 120,
+    this.title = 'Default',
+  }) : super(key: key);
   final String title;
   final double max;
   final double val;

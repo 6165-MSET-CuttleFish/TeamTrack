@@ -31,14 +31,16 @@ class _EventsList extends State<EventsList> {
       return Scaffold(
         appBar: AppBar(
           backgroundColor: Theme.of(context).accentColor,
-          title: Builder(builder: (_) {
-            switch (_tab) {
-              case 1:
-                return Text("Inbox");
-              default:
-                return Text("Events");
-            }
-          }),
+          title: Builder(
+            builder: (_) {
+              switch (_tab) {
+                case 1:
+                  return Text("Inbox");
+                default:
+                  return Text("Events");
+              }
+            },
+          ),
           actions: [
             Padding(
               padding: EdgeInsets.only(left: 30),
@@ -86,12 +88,13 @@ class _EventsList extends State<EventsList> {
                     ),
                   ),
                   ListTile(
-                      leading: Icon(Icons.event_note_outlined),
-                      title: Text("Events"),
-                      onTap: () {
-                        setState(() => _tab = 0);
-                        Navigator.of(context).pop();
-                      }),
+                    leading: Icon(Icons.event_note_outlined),
+                    title: Text("Events"),
+                    onTap: () {
+                      setState(() => _tab = 0);
+                      Navigator.of(context).pop();
+                    },
+                  ),
                   ListTile(
                     leading: Icon(Icons.mail_rounded),
                     title: Text("Inbox"),
@@ -113,16 +116,15 @@ class _EventsList extends State<EventsList> {
                             PlatformDialogAction(
                                 isDefaultAction: true,
                                 child: Text('Cancel'),
-                                onPressed: () => Navigator.of(context).pop()),
+                                onPressed: () => Navigator.of(context).pop(),),
                             PlatformDialogAction(
-                                isDestructive: true,
-                                child: Text('Sign Out'),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                  context
-                                      .read<AuthenticationService>()
-                                      .signOut();
-                                }),
+                              isDestructive: true,
+                              child: Text('Sign Out'),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                                context.read<AuthenticationService>().signOut();
+                              },
+                            ),
                           ],
                         ),
                       );
@@ -130,7 +132,7 @@ class _EventsList extends State<EventsList> {
                   ),
                 ],
               ),
-            )),
+            ),),
         body: Builder(builder: (_) => getHome()),
         floatingActionButton: _tab == 0
             ? FloatingActionButton(
@@ -211,15 +213,17 @@ class _EventsList extends State<EventsList> {
                                 isDestructive: true,
                                 child: Text('Confirm'),
                                 onPressed: () {
-                                  setState(() {
-                                    dataModel.events.remove(e);
-                                  });
+                                  setState(
+                                    () {
+                                      dataModel.events.remove(e);
+                                    },
+                                  );
                                   dataModel.saveEvents();
                                   Navigator.of(context).pop();
                                 },
                               ),
                             ],
-                          ));
+                          ),);
                 },
                 icon: Icons.delete,
                 color: Colors.red,
@@ -249,9 +253,9 @@ class _EventsList extends State<EventsList> {
                       ),
                     );
                   },
-                )),
+                ),),
             actionPane: slider,
-          ))
+          ),)
       .toList();
 
   List<Widget> remoteEvents() => dataModel
@@ -321,11 +325,11 @@ class _EventsList extends State<EventsList> {
                         context,
                         platformPageRoute((context) => EventView(
                               event: e,
-                            )));
+                            ),),);
                   },
-                )),
+                ),),
             actionPane: slider,
-          ))
+          ),)
       .toList();
 
   List<Widget> liveEvents() => dataModel
@@ -359,15 +363,17 @@ class _EventsList extends State<EventsList> {
                                 isDestructive: true,
                                 child: Text('Confirm'),
                                 onPressed: () {
-                                  setState(() {
-                                    dataModel.localEvents().remove(e);
-                                  });
+                                  setState(
+                                    () {
+                                      dataModel.localEvents().remove(e);
+                                    },
+                                  );
                                   dataModel.saveEvents();
                                   Navigator.of(context).pop();
                                 },
                               ),
                             ],
-                          ));
+                          ),);
                 },
                 icon: Icons.delete,
                 color: Colors.red,
@@ -390,11 +396,11 @@ class _EventsList extends State<EventsList> {
                         context,
                         platformPageRoute((context) => EventView(
                               event: e,
-                            )));
+                            ),),);
                   },
-                )),
+                ),),
             actionPane: slider,
-          ))
+          ),)
       .toList();
 
   void saveBool(String key, value) async {
@@ -407,9 +413,11 @@ class _EventsList extends State<EventsList> {
   bool isLoaded = false;
   restoreEvents() async {
     await SharedPreferences.getInstance();
-    setState(() {
-      isLoaded = true;
-    });
+    setState(
+      () {
+        isLoaded = true;
+      },
+    );
   }
 
   void _onPressed() {
@@ -494,7 +502,7 @@ class _EventsList extends State<EventsList> {
                           Text('Local Event'),
                           Text(''),
                         ],
-                      )),
+                      ),),
                   CupertinoActionSheetAction(
                       onPressed: () {
                         _newType = EventType.remote;
@@ -509,14 +517,14 @@ class _EventsList extends State<EventsList> {
                                 .rectangle_stack_person_crop_fill),
                             Text('Remote Event'),
                             Text('')
-                          ])),
+                          ]),),
                 ],
                 cancelButton: CupertinoActionSheetAction(
                   child: Text('Cancel'),
                   onPressed: () => {Navigator.pop(context)},
                   isDefaultAction: true,
                 ),
-              ));
+              ),);
     else
       materialModal;
   }
@@ -552,7 +560,7 @@ class _EventsList extends State<EventsList> {
                     dataModel.events.add(Event(name: _newName, type: _newType));
                   dataModel.saveEvents();
                   _newName = '';
-                });
+                },);
                 Navigator.of(context).pop();
               },
             ),

@@ -28,7 +28,9 @@ class _TeamTrack extends State<TeamTrack> {
   );
 
   final darkTheme = ThemeData(
-    textTheme: TextTheme(bodyText2: TextStyle(color: Colors.white)),
+    textTheme: TextTheme(
+      bodyText2: TextStyle(color: Colors.white),
+    ),
     backgroundColor: Colors.black,
     splashColor:
         NewPlatform.isAndroid() ? Colors.deepPurple : Colors.transparent,
@@ -65,14 +67,15 @@ class _TeamTrack extends State<TeamTrack> {
         return themeChangeProvider;
       },
       child: Consumer<DarkThemeProvider>(
-          builder: (BuildContext context, value, Widget? child) {
-        return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            title: 'TeamTrack',
-            theme: themeChangeProvider.darkTheme ? darkTheme : lightTheme,
-            darkTheme: darkTheme,
-            home: AuthenticationWrapper());
-      }),
+        builder: (BuildContext context, value, Widget? child) {
+          return MaterialApp(
+              debugShowCheckedModeBanner: false,
+              title: 'TeamTrack',
+              theme: themeChangeProvider.darkTheme ? darkTheme : lightTheme,
+              darkTheme: darkTheme,
+              home: AuthenticationWrapper());
+        },
+      ),
     );
   }
 }

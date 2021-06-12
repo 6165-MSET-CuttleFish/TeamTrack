@@ -238,9 +238,11 @@ class Event {
   String? name;
   void addTeam(Team newTeam) {
     bool isIn = false;
-    teams.forEach((element) {
-      if (element.equals(newTeam)) isIn = true;
-    });
+    teams.forEach(
+      (element) {
+        if (element.equals(newTeam)) isIn = true;
+      },
+    );
     if (!isIn) teams.add(newTeam);
     //teams.sortTeams();
   }

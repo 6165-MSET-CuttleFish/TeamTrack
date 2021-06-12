@@ -53,7 +53,8 @@ class _LoginView extends State<LoginView> {
               ),
               semanticContainer: true,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0)),
+                borderRadius: BorderRadius.circular(10.0),
+              ),
               elevation: 1,
               margin: EdgeInsets.all(10),
             ),
@@ -76,14 +77,18 @@ class _LoginView extends State<LoginView> {
             keyboardType: TextInputType.emailAddress,
             placeholder: "Email",
           ),
-          Padding(padding: EdgeInsets.all(10)),
+          Padding(
+            padding: EdgeInsets.all(10),
+          ),
           PlatformTextField(
             controller: passwordController,
             keyboardType: TextInputType.visiblePassword,
             placeholder: "Password",
             obscureText: true,
           ),
-          Padding(padding: EdgeInsets.all(5)),
+          Padding(
+            padding: EdgeInsets.all(5),
+          ),
           PlatformButton(
             child: Text("Sign In"),
             color: Colors.green,
@@ -142,11 +147,12 @@ class _LoginView extends State<LoginView> {
           ),
         ),
         GithubAuthButton(
-            onPressed: () {},
-            style: AuthButtonStyle(
-                iconSize: 20,
-                textStyle: TextStyle(fontSize: 14),
-                width: size.width - 80)),
+          onPressed: () {},
+          style: AuthButtonStyle(
+              iconSize: 20,
+              textStyle: TextStyle(fontSize: 14),
+              width: size.width - 80),
+        ),
         GoogleAuthButton(
           onPressed: () async {
             await context.read<AuthenticationService>().signInWithGoogle();
@@ -169,10 +175,13 @@ class _LoginView extends State<LoginView> {
         ),
         EmailAuthButton(
           onPressed: () {
-            setState(() {
-              _controller.nextPage(
-                  duration: Duration(milliseconds: 500), curve: Curves.linear);
-            });
+            setState(
+              () {
+                _controller.nextPage(
+                    duration: Duration(milliseconds: 500),
+                    curve: Curves.linear);
+              },
+            );
           },
           style: AuthButtonStyle(
               iconSize: 20,
@@ -191,36 +200,44 @@ class _LoginView extends State<LoginView> {
         children: [
           Column(
             children: [
-              Padding(padding: EdgeInsets.all(20)),
+              Padding(
+                padding: EdgeInsets.all(20),
+              ),
               PlatformTextField(
                 controller: emailController,
                 keyboardType: TextInputType.emailAddress,
                 placeholder: "Email",
               ),
-              Padding(padding: EdgeInsets.all(5)),
+              Padding(
+                padding: EdgeInsets.all(5),
+              ),
               PlatformTextField(
                 controller: displayNameController,
                 keyboardType: TextInputType.emailAddress,
                 placeholder: "Display Name",
               ),
-              Padding(padding: EdgeInsets.all(5)),
+              Padding(
+                padding: EdgeInsets.all(5),
+              ),
               PlatformTextField(
                 controller: passwordController,
                 keyboardType: TextInputType.visiblePassword,
                 placeholder: "Password",
                 obscureText: true,
               ),
-              Padding(padding: EdgeInsets.all(5)),
+              Padding(
+                padding: EdgeInsets.all(5),
+              ),
               PlatformButton(
                 child: Text("Sign Up"),
                 color: Colors.green,
                 onPressed: () async {
-                  String? s = await context
-                      .read<AuthenticationService>()
-                      .signUp(
-                          email: emailController.text.trim(),
-                          password: passwordController.text.trim(),
-                          displayName: displayNameController.text.trim());
+                  String? s =
+                      await context.read<AuthenticationService>().signUp(
+                            email: emailController.text.trim(),
+                            password: passwordController.text.trim(),
+                            displayName: displayNameController.text.trim(),
+                          );
                   if (s == "Signed up") {
                     emailController.clear();
                     passwordController.clear();

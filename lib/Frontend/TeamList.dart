@@ -51,9 +51,11 @@ class _TeamList extends State<TeamList> {
                               isDestructive: true,
                               child: Text('Confirm'),
                               onPressed: () {
-                                setState(() {
-                                  widget.event.deleteTeam(e);
-                                });
+                                setState(
+                                  () {
+                                    widget.event.deleteTeam(e);
+                                  },
+                                );
                                 dataModel.saveEvents();
                                 dataModel.uploadEvent(widget.event);
                                 Navigator.of(context).pop();
@@ -125,8 +127,12 @@ class TeamSearch extends SearchDelegate<String?> {
   Widget buildSuggestions(BuildContext context) {
     final suggestionList = query.isNotEmpty
         ? [
-            ...teams.where((q) => q.number.contains(query)),
-            ...teams.where((q) => q.name.contains(query)),
+            ...teams.where(
+              (q) => q.number.contains(query),
+            ),
+            ...teams.where(
+              (q) => q.name.contains(query),
+            ),
           ].toList()
         : teams;
     return ListView.builder(
@@ -139,16 +145,22 @@ class TeamSearch extends SearchDelegate<String?> {
           ),
         ),
         child: ListTile(
-            leading: Text(suggestionList[index].number,
-                style: Theme.of(context).textTheme.caption),
-            title: Text(suggestionList[index].name),
-            onTap: () {
-              close(context, null);
-              Navigator.push(
-                  context,
-                  platformPageRoute((context) =>
-                      TeamView(event: event, team: suggestionList[index])));
-            }),
+          leading: Text(suggestionList[index].number,
+              style: Theme.of(context).textTheme.caption),
+          title: Text(suggestionList[index].name),
+          onTap: () {
+            close(context, null);
+            Navigator.push(
+              context,
+              platformPageRoute(
+                (context) => TeamView(
+                  event: event,
+                  team: suggestionList[index],
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }

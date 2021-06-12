@@ -51,37 +51,43 @@ class _MatchView extends State<MatchView> {
 
   @override
   Widget build(BuildContext context) => StreamBuilder<Database.Event>(
-      stream: DatabaseServices(id: widget.event.id).getEventChanges,
-      builder: (context, eventHandler) {
-        if (eventHandler.hasData &&
-            !eventHandler.hasError &&
-            !dataModel.isProcessing) {
-          widget.event.updateLocal(
-            json.decode(
-              json.encode(eventHandler.data!.snapshot.value),
-            ),
-          );
-          if (widget.team == null) {
-            _match = widget.event.matches
-                .firstWhere((element) => element.id == _match!.id, orElse: () {
-              Navigator.pop(context);
-              return Match.defaultMatch(EventType.remote);
-            });
-          }
-          _selectedTeam = widget.event.teams.firstWhere(
-              (team) => team.number == _selectedTeam.number, orElse: () {
-            Navigator.pop(context);
-            return Team.nullTeam();
-          });
-          if (widget.team != null) {
-            _score = _selectedTeam.targetScore ?? Score(Uuid().v4(), Dice.none);
-          } else {
-            _score = _selectedTeam.scores.firstWhere(
+        stream: DatabaseServices(id: widget.event.id).getEventChanges,
+        builder: (context, eventHandler) {
+          if (eventHandler.hasData &&
+              !eventHandler.hasError &&
+              !dataModel.isProcessing) {
+            widget.event.updateLocal(
+              json.decode(
+                json.encode(eventHandler.data!.snapshot.value),
+              ),
+            );
+            if (widget.team == null) {
+              _match = widget.event.matches.firstWhere(
                 (element) => element.id == _match!.id,
-                orElse: () => Score(Uuid().v4(), Dice.none));
+                orElse: () {
+                  Navigator.pop(context);
+                  return Match.defaultMatch(EventType.remote);
+                },
+              );
+            }
+            _selectedTeam = widget.event.teams.firstWhere(
+              (team) => team.number == _selectedTeam.number,
+              orElse: () {
+                Navigator.pop(context);
+                return Team.nullTeam();
+              },
+            );
+            if (widget.team != null) {
+              _score =
+                  _selectedTeam.targetScore ?? Score(Uuid().v4(), Dice.none);
+            } else {
+              _score = _selectedTeam.scores.firstWhere(
+                (element) => element.id == _match!.id,
+                orElse: () => Score(Uuid().v4(), Dice.none),
+              );
+            }
           }
-        }
-        return StreamBuilder<int>(
+          return StreamBuilder<int>(
             stream: _periodicStream,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
@@ -190,10 +196,12 @@ class _MatchView extends State<MatchView> {
                                 color: Colors.deepPurpleAccent,
                               ),
                               onChanged: (newValue) {
-                                setState(() {
-                                  HapticFeedback.mediumImpact();
-                                  _match?.setDice(newValue ?? Dice.one);
-                                });
+                                setState(
+                                  () {
+                                    HapticFeedback.mediumImpact();
+                                    _match?.setDice(newValue ?? Dice.one);
+                                  },
+                                );
                                 dataModel.saveEvents();
                                 dataModel.uploadEvent(widget.event);
                               },
@@ -202,8 +210,10 @@ class _MatchView extends State<MatchView> {
                                 (Dice value) {
                                   return DropdownMenuItem<Dice>(
                                     value: value,
-                                    child: Text('Stack Height : ' +
-                                        value.stackHeight().toString()),
+                                    child: Text(
+                                      'Stack Height : ' +
+                                          value.stackHeight().toString(),
+                                    ),
                                   );
                                 },
                               ).toList(),
@@ -214,11 +224,12 @@ class _MatchView extends State<MatchView> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 SizedBox(
-                                    child: Text(
-                                  'Autonomous : ' +
-                                      _score.autoScore.total().toString(),
-                                  style: Theme.of(context).textTheme.caption,
-                                )),
+                                  child: Text(
+                                    'Autonomous : ' +
+                                        _score.autoScore.total().toString(),
+                                    style: Theme.of(context).textTheme.caption,
+                                  ),
+                                ),
                                 SizedBox(
                                   child: Text(
                                       'Tele-Op : ' +
@@ -227,14 +238,14 @@ class _MatchView extends State<MatchView> {
                                           Theme.of(context).textTheme.caption),
                                 ),
                                 SizedBox(
-                                    child: Text(
-                                        'Endgame : ' +
-                                            _score.endgameScore
-                                                .total()
-                                                .toString(),
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .caption))
+                                  child: Text(
+                                      'Endgame : ' +
+                                          _score.endgameScore
+                                              .total()
+                                              .toString(),
+                                      style:
+                                          Theme.of(context).textTheme.caption),
+                                )
                               ],
                             ),
                           ),
@@ -253,10 +264,12 @@ class _MatchView extends State<MatchView> {
                                     2: Text('Endgame')
                                   },
                                   onValueChanged: (int? x) {
-                                    setState(() {
-                                      HapticFeedback.mediumImpact();
-                                      _view = x ?? 0;
-                                    });
+                                    setState(
+                                      () {
+                                        HapticFeedback.mediumImpact();
+                                        _view = x ?? 0;
+                                      },
+                                    );
                                   },
                                 )),
                           if (NewPlatform.isAndroid())
@@ -310,8 +323,10 @@ class _MatchView extends State<MatchView> {
                   ),
                 ),
               );
-            });
-      });
+            },
+          );
+        },
+      );
 
   void stateSetter() {
     dataModel.saveEvents();
@@ -322,7 +337,9 @@ class _MatchView extends State<MatchView> {
     if (lapses.length == 0)
       lapses.add(_time);
     else
-      lapses.add(_time - lapses.reduce((value, element) => value + element));
+      lapses.add(
+        _time - lapses.reduce((value, element) => value + element),
+      );
     _score.teleScore.cycles = lapses.getBoxAndWhisker();
     stateSetter();
   }
@@ -330,18 +347,26 @@ class _MatchView extends State<MatchView> {
   ListView viewSelect() {
     switch (_view) {
       case 0:
-        return ListView(children: autoView());
+        return ListView(
+          children: autoView(),
+        );
       case 1:
-        return ListView(children: teleView());
+        return ListView(
+          children: teleView(),
+        );
       default:
-        return ListView(children: endView());
+        return ListView(
+          children: endView(),
+        );
     }
   }
 
   List<Widget> endView() => !_paused
       ? _score.endgameScore
           .getElements()
-          .map((e) => Incrementor(element: e, onPressed: stateSetter))
+          .map(
+            (e) => Incrementor(element: e, onPressed: stateSetter),
+          )
           .toList()
       : [
           Material(
@@ -357,7 +382,9 @@ class _MatchView extends State<MatchView> {
   List<Widget> teleView() => !_paused
       ? _score.teleScore
           .getElements()
-          .map((e) => Incrementor(element: e, onPressed: teleStateSetter))
+          .map(
+            (e) => Incrementor(element: e, onPressed: teleStateSetter),
+          )
           .toList()
       : [
           Material(
@@ -372,7 +399,9 @@ class _MatchView extends State<MatchView> {
 
   List<Widget> autoView() => _score.autoScore
       .getElements()
-      .map((e) => Incrementor(element: e, onPressed: stateSetter))
+      .map(
+        (e) => Incrementor(element: e, onPressed: stateSetter),
+      )
       .toList();
 
   Row buttonRow() {
@@ -380,97 +409,109 @@ class _MatchView extends State<MatchView> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Flexible(
-            flex: 1,
-            child: PlatformButton(
-              child: Text(
-                _match?.red?.item1?.number ?? '?',
-                style: TextStyle(
-                    color: _selectedTeam == _match?.red?.item1
-                        ? Colors.grey
-                        : CupertinoColors.systemRed),
-              ),
-              onPressed: _selectedTeam == _match?.red?.item1
-                  ? null
-                  : () {
-                      setState(() {
+          flex: 1,
+          child: PlatformButton(
+            child: Text(
+              _match?.red?.item1?.number ?? '?',
+              style: TextStyle(
+                  color: _selectedTeam == _match?.red?.item1
+                      ? Colors.grey
+                      : CupertinoColors.systemRed),
+            ),
+            onPressed: _selectedTeam == _match?.red?.item1
+                ? null
+                : () {
+                    setState(
+                      () {
                         _selectedTeam = _match?.red?.item1 ?? Team.nullTeam();
                         _color = CupertinoColors.systemRed;
                         _score = _selectedTeam.scores.firstWhere(
                           (element) => element.id == _match?.id,
                           orElse: () => Score(Uuid().v4(), Dice.none),
                         );
-                      });
-                    },
-            )),
+                      },
+                    );
+                  },
+          ),
+        ),
         Flexible(
-            flex: 1,
-            child: PlatformButton(
-              child: Text(
-                _match?.red?.item2?.number ?? '?',
-                style: TextStyle(
-                  color: _selectedTeam == _match?.red?.item2
-                      ? Colors.grey
-                      : CupertinoColors.systemRed,
-                ),
+          flex: 1,
+          child: PlatformButton(
+            child: Text(
+              _match?.red?.item2?.number ?? '?',
+              style: TextStyle(
+                color: _selectedTeam == _match?.red?.item2
+                    ? Colors.grey
+                    : CupertinoColors.systemRed,
               ),
-              onPressed: _selectedTeam == _match?.red?.item2
-                  ? null
-                  : () {
-                      setState(() {
+            ),
+            onPressed: _selectedTeam == _match?.red?.item2
+                ? null
+                : () {
+                    setState(
+                      () {
                         _selectedTeam = _match?.red?.item2 ?? Team.nullTeam();
                         _color = CupertinoColors.systemRed;
                         _score = _selectedTeam.scores.firstWhere(
                           (element) => element.id == _match?.id,
                           orElse: () => Score(Uuid().v4(), Dice.none),
                         );
-                      });
-                    },
-            )),
+                      },
+                    );
+                  },
+          ),
+        ),
         Spacer(),
         Flexible(
-            flex: 1,
-            child: PlatformButton(
-              child: Text(
-                _match?.blue?.item1?.number ?? '?',
-                style: TextStyle(
-                    color: _selectedTeam == _match?.blue?.item1
-                        ? Colors.grey
-                        : Colors.blue),
-              ),
-              onPressed: _selectedTeam == _match?.blue?.item1
-                  ? null
-                  : () {
-                      setState(() {
+          flex: 1,
+          child: PlatformButton(
+            child: Text(
+              _match?.blue?.item1?.number ?? '?',
+              style: TextStyle(
+                  color: _selectedTeam == _match?.blue?.item1
+                      ? Colors.grey
+                      : Colors.blue),
+            ),
+            onPressed: _selectedTeam == _match?.blue?.item1
+                ? null
+                : () {
+                    setState(
+                      () {
                         _selectedTeam = _match?.blue?.item1 ?? Team.nullTeam();
                         _color = Colors.blue;
                         _score = _selectedTeam.scores.firstWhere(
                           (element) => element.id == _match?.id,
                           orElse: () => Score(Uuid().v4(), Dice.none),
                         );
-                      });
-                    },
-            )),
+                      },
+                    );
+                  },
+          ),
+        ),
         Flexible(
-            flex: 1,
-            child: PlatformButton(
-              child: Text(
-                _match?.blue?.item2?.number ?? '?',
-                style: TextStyle(
-                    color: _selectedTeam == _match?.blue?.item2
-                        ? Colors.grey
-                        : Colors.blue),
-              ),
-              onPressed: _selectedTeam == _match?.blue?.item2
-                  ? null
-                  : () => setState(() {
+          flex: 1,
+          child: PlatformButton(
+            child: Text(
+              _match?.blue?.item2?.number ?? '?',
+              style: TextStyle(
+                  color: _selectedTeam == _match?.blue?.item2
+                      ? Colors.grey
+                      : Colors.blue),
+            ),
+            onPressed: _selectedTeam == _match?.blue?.item2
+                ? null
+                : () => setState(
+                      () {
                         _selectedTeam = _match?.blue?.item2 ?? Team.nullTeam();
                         _color = Colors.blue;
                         _score = _selectedTeam.scores.firstWhere(
                           (element) => element.id == _match?.id,
                           orElse: () => Score(Uuid().v4(), Dice.none),
                         );
-                      }),
-            ))
+                      },
+                    ),
+          ),
+        )
       ],
     );
   }

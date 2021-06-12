@@ -44,26 +44,29 @@ class _EventView extends State<EventView> {
           backgroundColor: Theme.of(context).accentColor,
           actions: [
             IconButton(
-                icon: Icon(Icons.search),
-                onPressed: () {
-                  showSearch(
-                      context: context,
-                      delegate: _tab == 0
-                          ? TeamSearch(
-                              teams: widget.event.teams.sortedTeams(),
-                              event: widget.event)
-                          : MatchSearch(
-                              matches: widget.event.matches,
-                              event: widget.event));
-                }),
+              icon: Icon(Icons.search),
+              onPressed: () {
+                showSearch(
+                  context: context,
+                  delegate: _tab == 0
+                      ? TeamSearch(
+                          teams: widget.event.teams.sortedTeams(),
+                          event: widget.event)
+                      : MatchSearch(
+                          matches: widget.event.matches, event: widget.event),
+                );
+              },
+            ),
           ]),
       bottomNavigationBar: widget.event.type != EventType.remote
           ? BottomNavigationBar(
               currentIndex: _tab,
               onTap: (int index) {
-                setState(() {
-                  _tab = index;
-                });
+                setState(
+                  () {
+                    _tab = index;
+                  },
+                );
               },
               items: [
                 BottomNavigationBarItem(
@@ -94,65 +97,76 @@ class _EventView extends State<EventView> {
 
   void _matchConfig() {
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => _addMatch()));
+      context,
+      MaterialPageRoute(
+        builder: (context) => _addMatch(),
+      ),
+    );
   }
 
   String _newName = '';
   String _newNumber = '';
   void _teamConfig() {
     showPlatformDialog(
-        context: context,
-        builder: (BuildContext context) => PlatformAlert(
-              title: Text('New Team'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  PlatformTextField(
-                    placeholder: 'Team number',
-                    keyboardType: TextInputType.number,
-                    textCapitalization: TextCapitalization.words,
-                    onChanged: (String input) {
-                      _newNumber = input;
-                    },
-                  ),
-                  Padding(padding: EdgeInsets.all(5)),
-                  PlatformTextField(
-                    placeholder: 'Team name',
-                    keyboardType: TextInputType.name,
-                    textCapitalization: TextCapitalization.words,
-                    onChanged: (String input) {
-                      _newName = input;
-                    },
-                  ),
-                ],
-              ),
-              actions: [
-                PlatformDialogAction(
-                  isDefaultAction: true,
-                  child: Text('Cancel'),
-                  onPressed: () {
-                    _newName = '';
-                    _newNumber = '';
-                    Navigator.of(context).pop();
-                  },
-                ),
-                PlatformDialogAction(
-                  isDefaultAction: false,
-                  child: Text('Save'),
-                  onPressed: () {
-                    setState(() {
-                      if (_newNumber.isNotEmpty && _newName.isNotEmpty)
-                        widget.event.addTeam(Team(_newNumber, _newName));
-                      _newName = '';
-                      _newNumber = '';
-                    });
-                    dataModel.saveEvents();
-                    dataModel.uploadEvent(widget.event);
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            ));
+      context: context,
+      builder: (BuildContext context) => PlatformAlert(
+        title: Text('New Team'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            PlatformTextField(
+              placeholder: 'Team number',
+              keyboardType: TextInputType.number,
+              textCapitalization: TextCapitalization.words,
+              onChanged: (String input) {
+                _newNumber = input;
+              },
+            ),
+            Padding(
+              padding: EdgeInsets.all(5),
+            ),
+            PlatformTextField(
+              placeholder: 'Team name',
+              keyboardType: TextInputType.name,
+              textCapitalization: TextCapitalization.words,
+              onChanged: (String input) {
+                _newName = input;
+              },
+            ),
+          ],
+        ),
+        actions: [
+          PlatformDialogAction(
+            isDefaultAction: true,
+            child: Text('Cancel'),
+            onPressed: () {
+              _newName = '';
+              _newNumber = '';
+              Navigator.of(context).pop();
+            },
+          ),
+          PlatformDialogAction(
+            isDefaultAction: false,
+            child: Text('Save'),
+            onPressed: () {
+              setState(
+                () {
+                  if (_newNumber.isNotEmpty && _newName.isNotEmpty)
+                    widget.event.addTeam(
+                      Team(_newNumber, _newName),
+                    );
+                  _newName = '';
+                  _newNumber = '';
+                },
+              );
+              dataModel.saveEvents();
+              dataModel.uploadEvent(widget.event);
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   final List<TextEditingController> controllers = [
@@ -171,7 +185,8 @@ class _EventView extends State<EventView> {
     var list = <Widget>[];
     for (int i = 0; i < 4; i++) {
       if (i == 0) {
-        list.add(Container(
+        list.add(
+          Container(
             decoration: BoxDecoration(
               border: Border.all(
                 color: Colors.transparent,
@@ -184,9 +199,12 @@ class _EventView extends State<EventView> {
             child: Text(
               'Red Alliance',
               style: Theme.of(context).textTheme.headline6,
-            )));
+            ),
+          ),
+        );
       } else if (i == 2) {
-        list.add(Container(
+        list.add(
+          Container(
             decoration: BoxDecoration(
               border: Border.all(
                 color: Colors.transparent,
@@ -199,7 +217,9 @@ class _EventView extends State<EventView> {
             child: Text(
               'Blue Alliance',
               style: Theme.of(context).textTheme.headline6,
-            )));
+            ),
+          ),
+        );
       }
       list.add(
         Row(
@@ -217,94 +237,118 @@ class _EventView extends State<EventView> {
                   }
                 },
                 onChanged: (String val) {
-                  setState(() {
-                    names[i] = val;
-                    controllers[i].value = TextEditingValue(
-                      text: widget.event.teams
-                          .firstWhere((element) =>
-                              element.number ==
-                              val
-                                  .replaceAll(new RegExp(r' ,-.[^\w\s]+'), '')
-                                  .replaceAll(' ', ''))
-                          .name,
-                      selection: TextSelection.fromPosition(
-                        TextPosition(offset: val.length),
-                      ),
-                    );
-                  });
+                  setState(
+                    () {
+                      names[i] = val;
+                      controllers[i].value = TextEditingValue(
+                        text: widget.event.teams
+                            .firstWhere(
+                              (element) =>
+                                  element.number ==
+                                  val
+                                      .replaceAll(
+                                          new RegExp(r' ,-.[^\w\s]+'), '')
+                                      .replaceAll(' ', ''),
+                            )
+                            .name,
+                        selection: TextSelection.fromPosition(
+                          TextPosition(offset: val.length),
+                        ),
+                      );
+                    },
+                  );
                 },
               ),
             ),
             Expanded(
-                child: TextFormField(
-              controller: controllers[i],
-              keyboardType: TextInputType.name,
-              textCapitalization: TextCapitalization.words,
-              decoration: InputDecoration(labelText: 'Name'),
-              validator: (String? value) {
-                if (value!.isEmpty) {
-                  return 'Name is required';
-                } else {
-                  return null;
-                }
-              },
-              onChanged: (String val) {
-                setState(() {
-                  controllers[i].value = TextEditingValue(
-                    text: val,
-                    selection: TextSelection.fromPosition(
-                      TextPosition(offset: val.length),
-                    ),
+              child: TextFormField(
+                controller: controllers[i],
+                keyboardType: TextInputType.name,
+                textCapitalization: TextCapitalization.words,
+                decoration: InputDecoration(labelText: 'Name'),
+                validator: (String? value) {
+                  if (value!.isEmpty) {
+                    return 'Name is required';
+                  } else {
+                    return null;
+                  }
+                },
+                onChanged: (String val) {
+                  setState(
+                    () {
+                      controllers[i].value = TextEditingValue(
+                        text: val,
+                        selection: TextSelection.fromPosition(
+                          TextPosition(offset: val.length),
+                        ),
+                      );
+                    },
                   );
-                });
-              },
-            )),
+                },
+              ),
+            ),
           ],
         ),
       );
     }
-    list.add(PlatformButton(
-      color: Colors.green,
-      child: Text('Save'),
-      onPressed: () {
-        if (_formKey.currentState?.validate() ?? false) {
-          setState(() {
-            widget.event.matches.add(Match(
-                Alliance(
-                    widget.event.teams.findAdd(names[0], controllers[0].text),
-                    widget.event.teams.findAdd(names[1], controllers[1].text)),
-                Alliance(
-                    widget.event.teams.findAdd(names[2], controllers[2].text),
-                    widget.event.teams.findAdd(names[3], controllers[3].text)),
-                widget.event.type));
-          });
-          for (TextEditingController controller in controllers) {
-            controller.text = '';
+    list.add(
+      PlatformButton(
+        color: Colors.green,
+        child: Text('Save'),
+        onPressed: () {
+          if (_formKey.currentState?.validate() ?? false) {
+            setState(
+              () {
+                widget.event.matches.add(
+                  Match(
+                      Alliance(
+                        widget.event.teams
+                            .findAdd(names[0], controllers[0].text),
+                        widget.event.teams
+                            .findAdd(names[1], controllers[1].text),
+                      ),
+                      Alliance(
+                        widget.event.teams
+                            .findAdd(names[2], controllers[2].text),
+                        widget.event.teams
+                            .findAdd(names[3], controllers[3].text),
+                      ),
+                      widget.event.type),
+                );
+              },
+            );
+            for (TextEditingController controller in controllers) {
+              controller.text = '';
+            }
+            dataModel.saveEvents();
+            dataModel.uploadEvent(widget.event);
+            Navigator.pop(context);
           }
-          dataModel.saveEvents();
-          dataModel.uploadEvent(widget.event);
-          Navigator.pop(context);
-        }
-      },
-    ));
+        },
+      ),
+    );
     return list;
   }
 
   Widget _addMatch() {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Add Match'),
-          backgroundColor: Theme.of(context).accentColor,
+      appBar: AppBar(
+        title: Text('Add Match'),
+        backgroundColor: Theme.of(context).accentColor,
+      ),
+      body: SafeArea(
+        child: Center(
+          child: Form(
+            key: _formKey,
+            child: Padding(
+              padding: EdgeInsets.only(left: 5, right: 5),
+              child: ListView(
+                children: _textFields(),
+              ),
+            ),
+          ),
         ),
-        body: SafeArea(
-          child: Center(
-              child: Form(
-                  key: _formKey,
-                  child: Padding(
-                      padding: EdgeInsets.only(left: 5, right: 5),
-                      child: ListView(
-                        children: _textFields(),
-                      )))),
-        ));
+      ),
+    );
   }
 }

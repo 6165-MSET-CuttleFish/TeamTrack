@@ -28,7 +28,7 @@ class _CardView extends State<CardView> {
           if (widget.isActive) {
             setState(() {
               _genBool = toggle(_genBool);
-            });
+            },);
           } else {
             showPlatformDialog(
                 context: context,
@@ -47,23 +47,23 @@ class _CardView extends State<CardView> {
                           },
                         ),
                       ],
-                    ));
+                    ),);
           }
         },
         onTapDown: (TapDownDetails details) {
           setState(() {
             _isPressed = true;
-          });
+          },);
         },
         onTapUp: (TapUpDetails details) {
           setState(() {
             _isPressed = false;
-          });
+          },);
         },
         onTapCancel: () {
           setState(() {
             _isPressed = false;
-          });
+          },);
         },
         child: Container(
           //color: Theme.of(context).canvasColor,
@@ -73,7 +73,7 @@ class _CardView extends State<CardView> {
                 topLeft: Radius.circular(10),
                 topRight: Radius.circular(10),
                 bottomLeft: Radius.circular(10),
-                bottomRight: Radius.circular(10)),
+                bottomRight: Radius.circular(10),),
             boxShadow: [
               BoxShadow(
                 color: Colors.grey.withOpacity(0.8),
