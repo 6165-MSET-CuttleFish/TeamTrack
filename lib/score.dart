@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:teamtrack/backend.dart';
 
@@ -5,6 +8,7 @@ class Score extends ScoreDivision {
   TeleScore teleScore = TeleScore(Dice.none);
   AutoScore autoScore = AutoScore(Dice.none);
   EndgameScore endgameScore = EndgameScore(Dice.none);
+  Timestamp timeStamp = Timestamp.now();
   String id = '';
   Dice dice = Dice.none;
   Score(this.id, this.dice) {
@@ -24,14 +28,22 @@ class Score extends ScoreDivision {
     teleScore = TeleScore.fromJson(json['TeleScore'], dice);
     endgameScore = EndgameScore.fromJson(json['EndgameScore'], dice);
     id = json['id'];
+    // timeStamp = json['timeStamp'];
   }
   Map<String, dynamic> toJson() => {
         'AutoScore': autoScore.toJson(),
         'TeleScore': teleScore.toJson(),
         'EndgameScore': endgameScore.toJson(),
         'id': id.toString(),
-        'dice': dice.toString()
+        'dice': dice.toString(),
       };
+}
+
+dynamic myEncode(dynamic item) {
+  if (item is DateTime) {
+    return item.toIso8601String();
+  }
+  return item;
 }
 
 Dice getDiceFromString(String statusAsString) {

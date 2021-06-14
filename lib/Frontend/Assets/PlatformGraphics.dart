@@ -234,6 +234,7 @@ class PlatformButton extends PlatformWidget<CupertinoButton, OutlinedButton> {
   @override
   CupertinoButton buildCupertinoWidget(BuildContext context) {
     return CupertinoButton(
+      borderRadius: BorderRadius.all(Radius.circular(50)),
       child: child,
       onPressed: onPressed,
       color: color,
@@ -253,7 +254,7 @@ class PlatformButton extends PlatformWidget<CupertinoButton, OutlinedButton> {
         foregroundColor: MaterialStateProperty.all(
             Theme.of(context).textTheme.bodyText2?.color),
         side: MaterialStateProperty.all(
-          BorderSide(color: color ?? Colors.grey),
+          BorderSide(color: color ?? Colors.transparent),
         ),
         shape: MaterialStateProperty.all(
           RoundedRectangleBorder(

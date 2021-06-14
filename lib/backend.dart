@@ -53,8 +53,12 @@ class DarkThemePreference {
 class DatabaseServices {
   String? id;
   DatabaseServices({this.id});
-  Stream<Database.Event> get getEventChanges =>
-      firebaseDatabase.reference().child(id!).onValue;
+  Stream<Database.Event> get getEventChanges => firebaseDatabase
+      .reference()
+      .child('Events')
+      .child('UltimateGoal')
+      .child(id ?? '')
+      .onValue;
 }
 
 DatabaseServices db = DatabaseServices();
@@ -194,7 +198,11 @@ class DataModel {
   void uploadEvent(Event event) async {
     if (event.shared) {
       isProcessing = true;
-      var ref = firebaseDatabase.reference().child(event.id);
+      var ref = firebaseDatabase
+          .reference()
+          .child('Events')
+          .child('UltimateGoal')
+          .child(event.id);
       await ref.update(event.toJson());
       isProcessing = false;
     }
@@ -229,13 +237,13 @@ class DataModel {
 }
 
 class Event {
-  Event({this.name, this.type});
+  Event({required this.name, required this.type});
   String id = Uuid().v4();
   bool shared = false;
-  EventType? type;
+  late EventType type;
   List<Team> teams = [];
   List<Match> matches = [];
-  String? name;
+  late String name;
   void addTeam(Team newTeam) {
     bool isIn = false;
     teams.forEach(
@@ -287,12 +295,6 @@ class Event {
       type = getTypeFromString(json['type']);
       shared = json['shared'] ?? true;
       id = json['id'] ?? Uuid().v4();
-    }
-  }
-
-  Future<void> updateRemote() async {
-    if (id.isNotEmpty) {
-      await firebaseDatabase.reference().child(id).update(toJson());
     }
   }
 

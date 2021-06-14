@@ -25,7 +25,7 @@ class _MatchView extends State<MatchView> {
   Color _color = CupertinoColors.systemRed;
   Score _score = Score(Uuid().v4(), Dice.none);
   int _view = 0;
-  Match? _match; // = Match.defaultMatch(EventType.remote);
+  Match? _match;
   final Stream<int> _periodicStream =
       Stream.periodic(const Duration(milliseconds: 100), (i) => i);
   double _time = 0;
@@ -53,6 +53,7 @@ class _MatchView extends State<MatchView> {
   Widget build(BuildContext context) => StreamBuilder<Database.Event>(
         stream: DatabaseServices(id: widget.event.id).getEventChanges,
         builder: (context, eventHandler) {
+          print('lmfao');
           if (eventHandler.hasData &&
               !eventHandler.hasError &&
               !dataModel.isProcessing) {
@@ -151,6 +152,7 @@ class _MatchView extends State<MatchView> {
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 Container(
+                                  alignment: Alignment.center,
                                   width: 100,
                                   child: Text(_match?.redScore() ?? '0',
                                       style: Theme.of(context)
@@ -164,6 +166,7 @@ class _MatchView extends State<MatchView> {
                                           .headline4),
                                 ),
                                 Container(
+                                  alignment: Alignment.center,
                                   width: 100,
                                   child: Text(_match?.blueScore() ?? '0',
                                       style: Theme.of(context)
@@ -183,6 +186,7 @@ class _MatchView extends State<MatchView> {
                                   ' : ' +
                                   _score.total().toString(),
                               style: Theme.of(context).textTheme.headline6),
+                          Text(_score.timeStamp.toDate().minute.toString()),
                           if (widget.team == null)
                             DropdownButton<Dice>(
                               value: _match?.dice,

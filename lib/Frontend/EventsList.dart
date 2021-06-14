@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:teamtrack/Frontend/Inbox.dart';
 import 'package:teamtrack/backend.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +24,7 @@ class _EventsList extends State<EventsList> {
     )
   ];
   int _tab = 0;
+
   @override
   Widget build(BuildContext context) {
     restoreEvents();
@@ -57,18 +59,21 @@ class _EventsList extends State<EventsList> {
           ],
         ),
         drawer: Drawer(
-            elevation: 1,
-            child: Material(
-              child: ListView(
-                children: [
-                  DrawerHeader(
-                    decoration:
-                        BoxDecoration(color: Theme.of(context).accentColor),
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 5.0, right: 5.0),
-                      child: Row(
-                        children: [
-                          Column(children: [
+          elevation: 1,
+          child: Material(
+            child: ListView(
+              children: [
+                DrawerHeader(
+                  decoration:
+                      BoxDecoration(color: Theme.of(context).accentColor),
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 5.0, right: 5.0),
+                    child: Row(
+                      children: [
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
                             if (context.read<User?>()?.photoURL != null)
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(300),
@@ -81,58 +86,60 @@ class _EventsList extends State<EventsList> {
                               Icon(Icons.account_circle, size: 70),
                             Text(context.read<User?>()?.displayName ?? "Guest"),
                             Text(context.read<User?>()?.email ?? ""),
-                          ]),
-                          Spacer(),
-                        ],
-                      ),
-                    ),
-                  ),
-                  ListTile(
-                    leading: Icon(Icons.event_note_outlined),
-                    title: Text("Events"),
-                    onTap: () {
-                      setState(() => _tab = 0);
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                  ListTile(
-                    leading: Icon(Icons.mail_rounded),
-                    title: Text("Inbox"),
-                    onTap: () {
-                      setState(() => _tab = 1);
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                  ListTile(
-                    leading: Icon(Icons.logout),
-                    title: Text('Sign Out'),
-                    onTap: () {
-                      showPlatformDialog(
-                        context: context,
-                        builder: (context) => PlatformAlert(
-                          title: Text('Sign Out'),
-                          content: Text('Are you sure?'),
-                          actions: [
-                            PlatformDialogAction(
-                                isDefaultAction: true,
-                                child: Text('Cancel'),
-                                onPressed: () => Navigator.of(context).pop(),),
-                            PlatformDialogAction(
-                              isDestructive: true,
-                              child: Text('Sign Out'),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                                context.read<AuthenticationService>().signOut();
-                              },
-                            ),
                           ],
                         ),
-                      );
-                    },
+                      ],
+                    ),
                   ),
-                ],
-              ),
-            ),),
+                ),
+                ListTile(
+                  leading: Icon(Icons.event_note_outlined),
+                  title: Text("Events"),
+                  onTap: () {
+                    setState(() => _tab = 0);
+                    Navigator.of(context).pop();
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.mail_rounded),
+                  title: Text("Inbox"),
+                  onTap: () {
+                    setState(() => _tab = 1);
+                    Navigator.of(context).pop();
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.logout),
+                  title: Text('Sign Out'),
+                  onTap: () {
+                    showPlatformDialog(
+                      context: context,
+                      builder: (context) => PlatformAlert(
+                        title: Text('Sign Out'),
+                        content: Text('Are you sure?'),
+                        actions: [
+                          PlatformDialogAction(
+                            isDefaultAction: true,
+                            child: Text('Cancel'),
+                            onPressed: () => Navigator.of(context).pop(),
+                          ),
+                          PlatformDialogAction(
+                            isDestructive: true,
+                            child: Text('Sign Out'),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              context.read<AuthenticationService>().signOut();
+                            },
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
         body: Builder(builder: (_) => getHome()),
         floatingActionButton: _tab == 0
             ? FloatingActionButton(
@@ -151,9 +158,7 @@ class _EventsList extends State<EventsList> {
   Widget getHome() {
     switch (_tab) {
       case 1:
-        return SafeArea(
-          child: ListView(children: []),
-        );
+        return Inbox(); // @BILL
       default:
         return SafeArea(
           child: ListView(children: [
@@ -180,227 +185,236 @@ class _EventsList extends State<EventsList> {
 
   List<Widget> localEvents() => dataModel
       .localEvents()
-      .map((e) => Slidable(
-            actions: [
-              IconSlideAction(
-                onTap: () async {
-                  e.shared = true;
-                  firebaseDatabase.reference().child(e.id).set(e.toJson());
-                  dataModel.saveEvents();
-                },
-                icon: Icons.share,
-                color: Colors.blue,
-              )
-            ],
-            secondaryActions: [
-              IconSlideAction(
-                onTap: () {
-                  showPlatformDialog(
-                      context: context,
-                      builder: (BuildContext context) => PlatformAlert(
-                            title: Text('Delete Event'),
-                            content: Text('Are you sure?'),
-                            actions: [
-                              PlatformDialogAction(
-                                isDefaultAction: true,
-                                child: Text('Cancel'),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                              PlatformDialogAction(
-                                isDefaultAction: false,
-                                isDestructive: true,
-                                child: Text('Confirm'),
-                                onPressed: () {
-                                  setState(
-                                    () {
-                                      dataModel.events.remove(e);
-                                    },
-                                  );
-                                  dataModel.saveEvents();
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                            ],
-                          ),);
-                },
-                icon: Icons.delete,
-                color: Colors.red,
-              )
-            ],
-            child: ListTileTheme(
-                iconColor: Theme.of(context).primaryColor,
-                child: ListTile(
-                  trailing: Icon(
-                    e.shared
-                        ? CupertinoIcons.cloud_fill
-                        : CupertinoIcons.lock_shield_fill,
-                    color: Theme.of(context).accentColor,
-                  ),
-                  leading: Icon(
-                    CupertinoIcons.person_3_fill,
-                    color: Theme.of(context).accentColor,
-                  ),
-                  title: Text(e.name!),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      platformPageRoute(
-                        (context) => EventView(
-                          event: e,
-                        ),
+      .map(
+        (e) => Slidable(
+          actions: [
+            IconSlideAction(
+              onTap: () => _onShare(e),
+              icon: Icons.share,
+              color: Colors.blue,
+            )
+          ],
+          secondaryActions: [
+            IconSlideAction(
+              onTap: () {
+                showPlatformDialog(
+                  context: context,
+                  builder: (BuildContext context) => PlatformAlert(
+                    title: Text('Delete Event'),
+                    content: Text('Are you sure?'),
+                    actions: [
+                      PlatformDialogAction(
+                        isDefaultAction: true,
+                        child: Text('Cancel'),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
                       ),
-                    );
-                  },
-                ),),
-            actionPane: slider,
-          ),)
+                      PlatformDialogAction(
+                        isDefaultAction: false,
+                        isDestructive: true,
+                        child: Text('Confirm'),
+                        onPressed: () {
+                          setState(
+                            () {
+                              dataModel.events.remove(e);
+                            },
+                          );
+                          dataModel.saveEvents();
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              },
+              icon: Icons.delete,
+              color: Colors.red,
+            )
+          ],
+          child: ListTileTheme(
+            iconColor: Theme.of(context).primaryColor,
+            child: ListTile(
+              trailing: Icon(
+                e.shared
+                    ? CupertinoIcons.cloud_fill
+                    : CupertinoIcons.lock_shield_fill,
+                color: Theme.of(context).accentColor,
+              ),
+              leading: Icon(
+                CupertinoIcons.person_3_fill,
+                color: Theme.of(context).accentColor,
+              ),
+              title: Text(e.name),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  platformPageRoute(
+                    (context) => EventView(
+                      event: e,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          actionPane: slider,
+        ),
+      )
       .toList();
 
   List<Widget> remoteEvents() => dataModel
       .remoteEvents()
-      .map((e) => Slidable(
-            actions: [
-              IconSlideAction(
-                onTap: () async {
-                  e.shared = true;
-                  firebaseDatabase.reference().child(e.id).set(e.toJson());
-                  dataModel.saveEvents();
-                },
-                icon: Icons.share,
-                color: Colors.blue,
-              )
-            ],
-            secondaryActions: [
-              IconSlideAction(
-                onTap: () {
-                  showPlatformDialog(
-                    context: context,
-                    builder: (BuildContext context) => PlatformAlert(
-                      title: Text('Delete Event'),
-                      content: Text('Are you sure?'),
-                      actions: [
-                        PlatformDialogAction(
-                          isDefaultAction: true,
-                          child: Text('Cancel'),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                        PlatformDialogAction(
-                          isDefaultAction: false,
-                          isDestructive: true,
-                          child: Text('Confirm'),
-                          onPressed: () {
-                            setState(() => dataModel.events.remove(e));
-                            dataModel.saveEvents();
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                      ],
+      .map(
+        (e) => Slidable(
+          actions: [
+            IconSlideAction(
+              onTap: () => _onShare(e),
+              icon: Icons.share,
+              color: Colors.blue,
+            )
+          ],
+          secondaryActions: [
+            IconSlideAction(
+              onTap: () {
+                showPlatformDialog(
+                  context: context,
+                  builder: (BuildContext context) => PlatformAlert(
+                    title: Text('Delete Event'),
+                    content: Text('Are you sure?'),
+                    actions: [
+                      PlatformDialogAction(
+                        isDefaultAction: true,
+                        child: Text('Cancel'),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                      PlatformDialogAction(
+                        isDefaultAction: false,
+                        isDestructive: true,
+                        child: Text('Confirm'),
+                        onPressed: () {
+                          setState(() => dataModel.events.remove(e));
+                          dataModel.saveEvents();
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              },
+              icon: Icons.delete,
+              color: Colors.red,
+            )
+          ],
+          child: ListTileTheme(
+            iconColor: Theme.of(context).primaryColor,
+            child: ListTile(
+              trailing: Icon(
+                e.shared
+                    ? CupertinoIcons.cloud_fill
+                    : CupertinoIcons.lock_shield_fill,
+                color: Theme.of(context).accentColor,
+              ),
+              leading: Icon(
+                CupertinoIcons.rectangle_stack_person_crop_fill,
+                color: Theme.of(context).accentColor,
+              ),
+              title: Text(e.name),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  platformPageRoute(
+                    (context) => EventView(
+                      event: e,
                     ),
-                  );
-                },
-                icon: Icons.delete,
-                color: Colors.red,
-              )
-            ],
-            child: ListTileTheme(
-                iconColor: Theme.of(context).primaryColor,
-                child: ListTile(
-                  trailing: Icon(
-                    e.shared
-                        ? CupertinoIcons.cloud_fill
-                        : CupertinoIcons.lock_shield_fill,
-                    color: Theme.of(context).accentColor,
                   ),
-                  leading: Icon(
-                    CupertinoIcons.rectangle_stack_person_crop_fill,
-                    color: Theme.of(context).accentColor,
-                  ),
-                  title: Text(e.name!),
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        platformPageRoute((context) => EventView(
-                              event: e,
-                            ),),);
-                  },
-                ),),
-            actionPane: slider,
-          ),)
+                );
+              },
+            ),
+          ),
+          actionPane: slider,
+        ),
+      )
       .toList();
 
   List<Widget> liveEvents() => dataModel
       .liveEvents()
-      .map((e) => Slidable(
-            actions: [
-              IconSlideAction(
-                onTap: () {},
-                icon: Icons.share,
-                color: Colors.blue,
-              )
-            ],
-            secondaryActions: [
-              IconSlideAction(
-                onTap: () {
-                  showPlatformDialog(
-                      context: context,
-                      builder: (BuildContext context) => PlatformAlert(
-                            title: Text('Delete Event'),
-                            content: Text('Are you sure?'),
-                            actions: [
-                              PlatformDialogAction(
-                                isDefaultAction: true,
-                                child: Text('Cancel'),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                              PlatformDialogAction(
-                                isDefaultAction: false,
-                                isDestructive: true,
-                                child: Text('Confirm'),
-                                onPressed: () {
-                                  setState(
-                                    () {
-                                      dataModel.localEvents().remove(e);
-                                    },
-                                  );
-                                  dataModel.saveEvents();
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                            ],
-                          ),);
-                },
-                icon: Icons.delete,
-                color: Colors.red,
-              )
-            ],
-            child: ListTileTheme(
-                iconColor: Theme.of(context).primaryColor,
-                child: ListTile(
-                  trailing: Icon(
-                    CupertinoIcons.location,
-                    color: Theme.of(context).accentColor,
+      .map(
+        (e) => Slidable(
+          actions: [
+            IconSlideAction(
+              onTap: () {},
+              icon: Icons.share,
+              color: Colors.blue,
+            )
+          ],
+          secondaryActions: [
+            IconSlideAction(
+              onTap: () {
+                showPlatformDialog(
+                  context: context,
+                  builder: (BuildContext context) => PlatformAlert(
+                    title: Text('Delete Event'),
+                    content: Text('Are you sure?'),
+                    actions: [
+                      PlatformDialogAction(
+                        isDefaultAction: true,
+                        child: Text('Cancel'),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                      PlatformDialogAction(
+                        isDefaultAction: false,
+                        isDestructive: true,
+                        child: Text('Confirm'),
+                        onPressed: () {
+                          setState(
+                            () {
+                              dataModel.localEvents().remove(e);
+                            },
+                          );
+                          dataModel.saveEvents();
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
                   ),
-                  leading: Icon(
-                    CupertinoIcons.person_3_fill,
-                    color: Theme.of(context).accentColor,
+                );
+              },
+              icon: Icons.delete,
+              color: Colors.red,
+            )
+          ],
+          child: ListTileTheme(
+            iconColor: Theme.of(context).primaryColor,
+            child: ListTile(
+              trailing: Icon(
+                CupertinoIcons.location,
+                color: Theme.of(context).accentColor,
+              ),
+              leading: Icon(
+                CupertinoIcons.person_3_fill,
+                color: Theme.of(context).accentColor,
+              ),
+              title: Text(e.name),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  platformPageRoute(
+                    (context) => EventView(
+                      event: e,
+                    ),
                   ),
-                  title: Text(e.name!),
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        platformPageRoute((context) => EventView(
-                              event: e,
-                            ),),);
-                  },
-                ),),
-            actionPane: slider,
-          ),)
+                );
+              },
+            ),
+          ),
+          actionPane: slider,
+        ),
+      )
       .toList();
 
   void saveBool(String key, value) async {
@@ -421,112 +435,113 @@ class _EventsList extends State<EventsList> {
   }
 
   void _onPressed() {
-    Future materialModal = showModalBottomSheet(
-      context: context,
-      builder: (context) => Container(
-        height: 120,
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: Theme.of(context).splashColor,
-              width: 1.0,
-            ),
-            color: Theme.of(context).canvasColor,
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              ListTileTheme(
-                iconColor: Theme.of(context).accentColor,
-                child: ListTile(
-                  onTap: () {
-                    _newType = EventType.local;
-                    setState(() {});
-                    Navigator.pop(context);
-                    _chosen();
-                  },
-                  leading: Icon(CupertinoIcons.person_3_fill),
-                  title: Text('Local Event'),
-                ),
-              ),
-              ListTileTheme(
-                iconColor: Theme.of(context).accentColor,
-                child: ListTile(
-                  onTap: () {
-                    _newType = EventType.remote;
-                    setState(() {});
-                    Navigator.pop(context);
-                    _chosen();
-                  },
-                  leading:
-                      Icon(CupertinoIcons.rectangle_stack_person_crop_fill),
-                  title: Text('Remote Event'),
-                ),
-              ),
-              // ListTileTheme(
-              //   iconColor: Theme.of(context).accentColor,
-              //   child: ListTile(
-              //     onTap: () {
-              //       _newType = EventType.live;
-              //       setState(() {});
-              //       Navigator.pop(context);
-              //       _chosen();
-              //     },
-              //     leading: Icon(CupertinoIcons.cloud_fill),
-              //     title: Text('Live Event'),
-              //   ),
-              // )
-            ],
-          ),
-        ),
-      ),
-    );
     if (NewPlatform.isIOS())
       showCupertinoModalPopup(
-          context: context,
-          builder: (context) => CupertinoActionSheet(
-                //title: Text('New Event'),
-                message: Text('Select Event Type'),
-                actions: [
-                  CupertinoActionSheetAction(
-                      onPressed: () {
-                        _newType = EventType.local;
-                        setState(() {});
-                        Navigator.pop(context);
-                        _chosen();
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Icon(CupertinoIcons.person_3_fill),
-                          Text('Local Event'),
-                          Text(''),
-                        ],
-                      ),),
-                  CupertinoActionSheetAction(
-                      onPressed: () {
-                        _newType = EventType.remote;
-                        setState(() {});
-                        Navigator.pop(context);
-                        _chosen();
-                      },
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Icon(CupertinoIcons
-                                .rectangle_stack_person_crop_fill),
-                            Text('Remote Event'),
-                            Text('')
-                          ]),),
+        context: context,
+        builder: (context) => CupertinoActionSheet(
+          //title: Text('New Event'),
+          message: Text('Select Event Type'),
+          actions: [
+            CupertinoActionSheetAction(
+              onPressed: () {
+                _newType = EventType.local;
+                setState(() {});
+                Navigator.pop(context);
+                _chosen();
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Icon(CupertinoIcons.person_3_fill),
+                  Text('Local Event'),
+                  Text(''),
                 ],
-                cancelButton: CupertinoActionSheetAction(
-                  child: Text('Cancel'),
-                  onPressed: () => {Navigator.pop(context)},
-                  isDefaultAction: true,
-                ),
-              ),);
+              ),
+            ),
+            CupertinoActionSheetAction(
+              onPressed: () {
+                _newType = EventType.remote;
+                setState(() {});
+                Navigator.pop(context);
+                _chosen();
+              },
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Icon(CupertinoIcons.rectangle_stack_person_crop_fill),
+                    Text('Remote Event'),
+                    Text('')
+                  ]),
+            ),
+          ],
+          cancelButton: CupertinoActionSheetAction(
+            child: Text('Cancel'),
+            onPressed: () => {Navigator.pop(context)},
+            isDefaultAction: true,
+          ),
+        ),
+      );
     else
-      materialModal;
+      showModalBottomSheet(
+        context: context,
+        builder: (context) => Container(
+          height: 120,
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Theme.of(context).splashColor,
+                width: 1.0,
+              ),
+              color: Theme.of(context).canvasColor,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                ListTileTheme(
+                  iconColor: Theme.of(context).accentColor,
+                  child: ListTile(
+                    onTap: () {
+                      _newType = EventType.local;
+                      setState(() {});
+                      Navigator.pop(context);
+                      _chosen();
+                    },
+                    leading: Icon(CupertinoIcons.person_3_fill),
+                    title: Text('Local Event'),
+                  ),
+                ),
+                ListTileTheme(
+                  iconColor: Theme.of(context).accentColor,
+                  child: ListTile(
+                    onTap: () {
+                      _newType = EventType.remote;
+                      setState(() {});
+                      Navigator.pop(context);
+                      _chosen();
+                    },
+                    leading:
+                        Icon(CupertinoIcons.rectangle_stack_person_crop_fill),
+                    title: Text('Remote Event'),
+                  ),
+                ),
+                // ListTileTheme(
+                //   iconColor: Theme.of(context).accentColor,
+                //   child: ListTile(
+                //     onTap: () {
+                //       _newType = EventType.live;
+                //       setState(() {});
+                //       Navigator.pop(context);
+                //       _chosen();
+                //     },
+                //     leading: Icon(CupertinoIcons.cloud_fill),
+                //     title: Text('Live Event'),
+                //   ),
+                // )
+              ],
+            ),
+          ),
+        ),
+      );
   }
 
   EventType? _newType;
@@ -555,16 +570,66 @@ class _EventsList extends State<EventsList> {
               isDefaultAction: false,
               child: Text('Save'),
               onPressed: () {
-                setState(() {
-                  if (_newName!.isNotEmpty)
-                    dataModel.events.add(Event(name: _newName, type: _newType));
-                  dataModel.saveEvents();
-                  _newName = '';
-                },);
+                setState(
+                  () {
+                    if (_newName!.isNotEmpty)
+                      dataModel.events.add(Event(
+                          name: _newName ?? '',
+                          type: _newType ?? EventType.remote));
+                    dataModel.saveEvents();
+                    _newName = '';
+                  },
+                );
                 Navigator.of(context).pop();
               },
             ),
           ],
         ),
       );
+  TextEditingController _emailController = TextEditingController();
+  void _onShare(Event e) {
+    showPlatformDialog(
+      context: context,
+      builder: (context) => PlatformAlert(
+        title: Text('Share Event'),
+        content: PlatformTextField(
+          placeholder: 'Email',
+          keyboardType: TextInputType.emailAddress,
+          controller: _emailController,
+        ),
+        actions: [
+          PlatformDialogAction(
+            child: Text('Cancel'),
+            isDefaultAction: true,
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          PlatformDialogAction(
+            child: Text('Share'),
+            onPressed: () {
+              firebaseFirestore
+                  .collection('inboxes')
+                  .doc('UltimateGoal')
+                  .collection(_emailController.text.trim())
+                  .add(
+                {
+                  'name': e.name,
+                  'authorEmail': context.read<User?>()?.email,
+                  'authorName': context.read<User?>()?.displayName,
+                  'docID': e.id
+                },
+              );
+              if (!e.shared) {
+                e.shared = true;
+                firebaseDatabase.reference().child(e.id).set(e.toJson());
+                dataModel.saveEvents();
+              }
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
+    );
+  }
 }

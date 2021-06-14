@@ -112,13 +112,9 @@ class _TeamView extends State<TeamView> {
                   color:
                       _dice == Dice.none ? Theme.of(context).accentColor : null,
                   child: Text('All Cases'),
-                  onPressed: () {
-                    setState(
-                      () {
-                        _dice = Dice.none;
-                      },
-                    );
-                  },
+                  onPressed: () => setState(
+                    () => _dice = Dice.none,
+                  ),
                 ),
               ],
             ),
@@ -128,12 +124,13 @@ class _TeamView extends State<TeamView> {
         backgroundColor: Theme.of(context).accentColor,
         actions: [
           Center(
-            child: Text('Refine'),
+            child: Text('Remove Outliers'),
           ),
-          PlatformSwitch(
+          Checkbox(
             value: removeOutliers,
-            onChanged: (_) => setState(() => removeOutliers = _),
-            highlightColor: Colors.orange,
+            onChanged: (_) => setState(() => removeOutliers = _ ?? false),
+            checkColor: Colors.black,
+            fillColor: MaterialStateProperty.all(Colors.yellow),
           ),
         ],
       ),
@@ -472,105 +469,109 @@ class _TeamView extends State<TeamView> {
     return <Widget>[
       Collapsible(
         isCollapsed: _team.scores.diceScores(_dice).length < 2,
-        child: Column(children: [
-          Padding(
-            padding: widget.event.type != EventType.remote
-                ? EdgeInsets.all(40)
-                : EdgeInsets.all(20),
-          ),
-          Wrap(
-            crossAxisAlignment: WrapCrossAlignment.start,
-            spacing: 0,
-            children: [
-              if (widget.event.type != EventType.remote)
+        child: Column(
+          children: [
+            Padding(
+              padding: widget.event.type != EventType.remote
+                  ? EdgeInsets.all(40)
+                  : EdgeInsets.all(20),
+            ),
+            Wrap(
+              crossAxisAlignment: WrapCrossAlignment.start,
+              spacing: 0,
+              children: [
+                if (widget.event.type != EventType.remote)
+                  FlatButton(
+                    color:
+                        _selections[0] ? Color.fromRGBO(255, 166, 0, 1) : null,
+                    splashColor: Color.fromRGBO(255, 166, 0, 1),
+                    onPressed: () {
+                      setState(
+                        () {
+                          _selections[0] = !_selections[0];
+                        },
+                      );
+                    },
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18.0),
+                      side: BorderSide(
+                        color: Color.fromRGBO(255, 166, 0, 1),
+                      ),
+                    ),
+                    child: Text('Alliance Total'),
+                  ),
                 FlatButton(
-                  color: _selections[0] ? Color.fromRGBO(255, 166, 0, 1) : null,
-                  splashColor: Color.fromRGBO(255, 166, 0, 1),
-                  onPressed: () {
-                    setState(
-                      () {
-                        _selections[0] = !_selections[0];
-                      },
-                    );
-                  },
+                  color:
+                      _selections[1] ? Color.fromRGBO(230, 30, 213, 1) : null,
+                  splashColor: Color.fromRGBO(230, 30, 213, 1),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(18.0),
                     side: BorderSide(
-                      color: Color.fromRGBO(255, 166, 0, 1),
+                      color: Color.fromRGBO(230, 30, 213, 1),
                     ),
                   ),
-                  child: Text('Alliance Total'),
+                  child: Text('General'),
+                  onPressed: () {
+                    setState(
+                      () {
+                        _selections[1] = !_selections[1];
+                      },
+                    );
+                  },
                 ),
-              FlatButton(
-                color: _selections[1] ? Color.fromRGBO(230, 30, 213, 1) : null,
-                splashColor: Color.fromRGBO(230, 30, 213, 1),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18.0),
-                  side: BorderSide(
-                    color: Color.fromRGBO(230, 30, 213, 1),
+                FlatButton(
+                  color: _selections[2] ? Colors.green : null,
+                  splashColor: Colors.green,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18.0),
+                    side: BorderSide(color: Colors.green),
                   ),
+                  child: Text('Autonomous'),
+                  onPressed: () {
+                    setState(
+                      () {
+                        _selections[2] = !_selections[2];
+                      },
+                    );
+                  },
                 ),
-                child: Text('General'),
-                onPressed: () {
-                  setState(
-                    () {
-                      _selections[1] = !_selections[1];
-                    },
-                  );
-                },
-              ),
-              FlatButton(
-                color: _selections[2] ? Colors.green : null,
-                splashColor: Colors.green,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18.0),
-                  side: BorderSide(color: Colors.green),
+                FlatButton(
+                  color: _selections[3] ? Colors.blue : null,
+                  splashColor: Colors.blue,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18.0),
+                    side: BorderSide(color: Colors.blue),
+                  ),
+                  child: Text('Tele-Op'),
+                  onPressed: () {
+                    setState(
+                      () {
+                        _selections[3] = !_selections[3];
+                      },
+                    );
+                  },
                 ),
-                child: Text('Autonomous'),
-                onPressed: () {
-                  setState(
-                    () {
-                      _selections[2] = !_selections[2];
-                    },
-                  );
-                },
-              ),
-              FlatButton(
-                color: _selections[3] ? Colors.blue : null,
-                splashColor: Colors.blue,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18.0),
-                  side: BorderSide(color: Colors.blue),
+                FlatButton(
+                  color: _selections[4] ? Colors.red : null,
+                  splashColor: Colors.red,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18.0),
+                    side: BorderSide(color: Colors.red),
+                  ),
+                  child: Text('Endgame'),
+                  onPressed: () {
+                    setState(
+                      () {
+                        _selections[4] = !_selections[4];
+                      },
+                    );
+                  },
                 ),
-                child: Text('Tele-Op'),
-                onPressed: () {
-                  setState(
-                    () {
-                      _selections[3] = !_selections[3];
-                    },
-                  );
-                },
-              ),
-              FlatButton(
-                color: _selections[4] ? Colors.red : null,
-                splashColor: Colors.red,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18.0),
-                  side: BorderSide(color: Colors.red),
-                ),
-                child: Text('Endgame'),
-                onPressed: () {
-                  setState(
-                    () {
-                      _selections[4] = !_selections[4];
-                    },
-                  );
-                },
-              ),
-            ],
-          ),
-          _lineChart(),
-        ]),
+              ],
+            ),
+            _lineChart(),
+          ],
+        ),
       ),
       Container(
         width: MediaQuery.of(context).size.width,
