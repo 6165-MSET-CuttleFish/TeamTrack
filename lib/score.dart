@@ -8,6 +8,7 @@ class Score extends ScoreDivision {
   TeleScore teleScore = TeleScore(Dice.none);
   AutoScore autoScore = AutoScore(Dice.none);
   EndgameScore endgameScore = EndgameScore(Dice.none);
+  Penalty penalties = Penalty(Dice.none, false);
   Timestamp timeStamp = Timestamp.now();
   String id = '';
   Dice dice = Dice.none;
@@ -19,7 +20,8 @@ class Score extends ScoreDivision {
   List<ScoringElement> getElements() => [
         ...teleScore.getElements(),
         ...autoScore.getElements(),
-        ...endgameScore.getElements()
+        ...endgameScore.getElements(),
+        ...penalties.getElements()
       ];
   Dice getDice() => dice;
   Score.fromJson(Map<String, dynamic> json) {
@@ -28,7 +30,11 @@ class Score extends ScoreDivision {
     teleScore = TeleScore.fromJson(json['TeleScore'], dice);
     endgameScore = EndgameScore.fromJson(json['EndgameScore'], dice);
     id = json['id'];
-    // timeStamp = json['timeStamp'];
+    try {
+      timeStamp = Timestamp(json['seconds'], json['nanoSeconds']);
+    } catch (e) {
+      timeStamp = Timestamp.now();
+    }
   }
   Map<String, dynamic> toJson() => {
         'AutoScore': autoScore.toJson(),
@@ -36,14 +42,9 @@ class Score extends ScoreDivision {
         'EndgameScore': endgameScore.toJson(),
         'id': id.toString(),
         'dice': dice.toString(),
+        'seconds': timeStamp.seconds,
+        'nanoSeconds': timeStamp.nanoseconds,
       };
-}
-
-dynamic myEncode(dynamic item) {
-  if (item is DateTime) {
-    return item.toIso8601String();
-  }
-  return item;
 }
 
 Dice getDiceFromString(String statusAsString) {
@@ -76,35 +77,6 @@ extension scoreList on List<Score> {
       this.add(value);
     }
   }
-}
-
-class TeleScore extends ScoreDivision {
-  Dice dice;
-  ScoringElement lowGoals = ScoringElement(name: "Low Goals", value: 2);
-  ScoringElement midGoals = ScoringElement(name: "Middle Goals", value: 4);
-  ScoringElement hiGoals = ScoringElement(name: "High Goals", value: 6);
-  List<ScoringElement> getElements() => [hiGoals, midGoals, lowGoals];
-  BoxAndWhisker cycles = BoxAndWhisker();
-  int misses = 0;
-  Dice getDice() => dice;
-  TeleScore(this.dice);
-  TeleScore.fromJson(Map<String, dynamic> json, this.dice) {
-    hiGoals =
-        ScoringElement(name: 'High Goals', count: json['HighGoals'], value: 6);
-    midGoals = ScoringElement(
-        name: 'Middle Goals', count: json['MiddleGoals'], value: 4);
-    lowGoals =
-        ScoringElement(name: 'Low Goals', count: json['LowGoals'], value: 2);
-    misses = json['Misses'];
-    cycles = BoxAndWhisker.fromJson(json['CycleMap']);
-  }
-  Map<String, dynamic> toJson() => {
-        'HighGoals': hiGoals.count,
-        'MiddleGoals': midGoals.count,
-        'LowGoals': lowGoals.count,
-        'Misses': misses,
-        'CycleMap': cycles.toJson(),
-      };
 }
 
 class AutoScore extends ScoreDivision {
@@ -152,6 +124,35 @@ class AutoScore extends ScoreDivision {
       };
 }
 
+class TeleScore extends ScoreDivision {
+  Dice dice;
+  ScoringElement lowGoals = ScoringElement(name: "Low Goals", value: 2);
+  ScoringElement midGoals = ScoringElement(name: "Middle Goals", value: 4);
+  ScoringElement hiGoals = ScoringElement(name: "High Goals", value: 6);
+  List<ScoringElement> getElements() => [hiGoals, midGoals, lowGoals];
+  BoxAndWhisker cycles = BoxAndWhisker();
+  int misses = 0;
+  Dice getDice() => dice;
+  TeleScore(this.dice);
+  TeleScore.fromJson(Map<String, dynamic> json, this.dice) {
+    hiGoals =
+        ScoringElement(name: 'High Goals', count: json['HighGoals'], value: 6);
+    midGoals = ScoringElement(
+        name: 'Middle Goals', count: json['MiddleGoals'], value: 4);
+    lowGoals =
+        ScoringElement(name: 'Low Goals', count: json['LowGoals'], value: 2);
+    misses = json['Misses'];
+    cycles = BoxAndWhisker.fromJson(json['CycleMap']);
+  }
+  Map<String, dynamic> toJson() => {
+        'HighGoals': hiGoals.count,
+        'MiddleGoals': midGoals.count,
+        'LowGoals': lowGoals.count,
+        'Misses': misses,
+        'CycleMap': cycles.toJson(),
+      };
+}
+
 class EndgameScore extends ScoreDivision {
   Dice dice;
   ScoringElement wobbleGoalsInDrop =
@@ -176,28 +177,67 @@ class EndgameScore extends ScoreDivision {
 
   EndgameScore.fromJson(Map<String, dynamic> json, this.dice) {
     wobbleGoalsInDrop = ScoringElement(
-        name: 'Wobbles In Drop',
-        count: json['WobblesInDrop'],
-        value: 20,
-        max: () => 2 - wobbleGoalsInStart.count);
+      name: 'Wobbles In Drop',
+      count: json['WobblesInDrop'],
+      value: 20,
+      max: () => 2 - wobbleGoalsInStart.count,
+    );
     wobbleGoalsInStart = ScoringElement(
-        name: 'Wobbles In Start',
-        count: json['WobblesInStart'],
-        value: 5,
-        max: () => 2 - wobbleGoalsInDrop.count);
+      name: 'Wobbles In Start',
+      count: json['WobblesInStart'],
+      value: 5,
+      max: () => 2 - wobbleGoalsInDrop.count,
+    );
     pwrShots = ScoringElement(
-        name: 'Power Shots',
-        count: json['PowerShots'],
-        value: 15,
-        max: () => 3);
+      name: 'Power Shots',
+      count: json['PowerShots'],
+      value: 15,
+      max: () => 3,
+    );
     ringsOnWobble = ScoringElement(
-        name: 'Rings On Wobble', count: json['RingsOnWobble'], value: 5);
+      name: 'Rings On Wobble',
+      count: json['RingsOnWobble'],
+      value: 5,
+    );
   }
   Map<String, dynamic> toJson() => {
         'WobblesInDrop': wobbleGoalsInDrop.count,
         'WobblesInStart': wobbleGoalsInStart.count,
         'PowerShots': pwrShots.count,
         'RingsOnWobble': ringsOnWobble.count
+      };
+}
+
+class Penalty extends ScoreDivision {
+  ScoringElement majorPenalty =
+      ScoringElement(name: 'Major Penalty', value: -30);
+  ScoringElement minorPenalty =
+      ScoringElement(name: 'Minor Penalty', value: -10);
+  Dice dice;
+  bool show;
+  Penalty(this.dice, this.show);
+
+  @override
+  Dice getDice() => dice;
+
+  @override
+  List<ScoringElement> getElements() => show ? [majorPenalty, minorPenalty] : [];
+
+  Penalty.fromJson(Map<String, dynamic> json, this.dice)
+      : majorPenalty = ScoringElement(
+          name: 'Major Penalty',
+          value: -30,
+          count: json['major'],
+        ),
+        minorPenalty = ScoringElement(
+          name: 'Minor Penalty',
+          value: -10,
+          count: json['minor'],
+        ),
+        show = false;
+  Map<String, dynamic> toJson() => {
+        'major': majorPenalty.count,
+        'minor': minorPenalty.count,
       };
 }
 
@@ -215,16 +255,19 @@ class ScoringElement {
   int count;
   int value;
   bool isBool;
-  int Function()? min = () => 0;
-  int Function()? max = () => 9999;
-  int scoreValue() => count * value;
+  late int Function()? min = () => 0;
+  late int Function()? max = () => 9999;
   int incrementValue = 1;
   int decrementValue = 1;
+
   bool asBool() => count == 0 ? false : true;
+
   void setStuff() {
     if (min == null) min = () => 0;
     if (max == null) max = () => 9999;
   }
+
+  int scoreValue() => count * value;
 
   void increment() {
     if (count < max!()) {

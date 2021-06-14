@@ -610,7 +610,7 @@ class _EventsList extends State<EventsList> {
             onPressed: () {
               firebaseFirestore
                   .collection('inboxes')
-                  .doc('UltimateGoal')
+                  .doc(Statics.gameName)
                   .collection(_emailController.text.trim())
                   .add(
                 {

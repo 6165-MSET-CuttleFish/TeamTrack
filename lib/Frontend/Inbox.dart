@@ -15,12 +15,11 @@ class Inbox extends StatefulWidget {
 class _InboxState extends State<Inbox> {
   QuerySnapshot<Map<String, dynamic>>? query;
   bool isLoaded = false;
-  final docRef = firebaseFirestore.collection('inboxes').doc('UltimateGoal');
+  final docRef = firebaseFirestore.collection('inboxes').doc(Statics.gameName);
   @override
   Widget build(BuildContext context) {
     if (!isLoaded) getList();
     if (isLoaded) {
-      //for (var i in snapshot.data!.docs) print(i['name']);
       return ListView(
         children: query?.docs
                 .map(
@@ -74,10 +73,6 @@ class _InboxState extends State<Inbox> {
                 .toList() ??
             [Text('')],
       );
-      // return ListView(
-      //     children: snapshot.data!.docs
-      //         .map((e) =>
-      //             Text(json.decode(json.encode(snapshot.data))['name']))
     }
     return CircularProgressIndicator();
   }

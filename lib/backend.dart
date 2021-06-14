@@ -23,6 +23,10 @@ save(String key, value) async {
   prefs.setString(key, json.encode(value));
 }
 
+class Statics {
+  static final String gameName = 'UltimateGoal';
+}
+
 class DarkThemeProvider with ChangeNotifier {
   DarkThemePreference darkThemePreference = DarkThemePreference();
   bool _darkTheme = false;
@@ -56,7 +60,7 @@ class DatabaseServices {
   Stream<Database.Event> get getEventChanges => firebaseDatabase
       .reference()
       .child('Events')
-      .child('UltimateGoal')
+      .child(Statics.gameName)
       .child(id ?? '')
       .onValue;
 }
@@ -166,7 +170,7 @@ final Database.FirebaseDatabase firebaseDatabase =
 final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 
 class DataModel {
-  final List<String> keys = ['UltimateGoal'];
+  final List<String> keys = [Statics.gameName];
   DataModel() {
     try {
       restoreEvents();
@@ -201,7 +205,7 @@ class DataModel {
       var ref = firebaseDatabase
           .reference()
           .child('Events')
-          .child('UltimateGoal')
+          .child(Statics.gameName)
           .child(event.id);
       await ref.update(event.toJson());
       isProcessing = false;
@@ -244,6 +248,7 @@ class Event {
   List<Team> teams = [];
   List<Match> matches = [];
   late String name;
+  Timestamp timeStamp = Timestamp.now();
   void addTeam(Team newTeam) {
     bool isIn = false;
     teams.forEach(
@@ -306,6 +311,11 @@ class Event {
     type = getTypeFromString(json['type']);
     shared = json['shared'] ?? false;
     id = json['id'] ?? Uuid().v4();
+    try {
+      timeStamp = Timestamp(json['seconds'], json['nanoSeconds']);
+    } catch (e) {
+      timeStamp = Timestamp.now();
+    }
   }
   Map<String, dynamic> toJson() => {
         'name': name,
@@ -314,6 +324,8 @@ class Event {
         'type': type.toString(),
         'shared': shared,
         'id': id,
+        'seconds': timeStamp.seconds,
+        'nanoSeconds': timeStamp.nanoseconds,
       };
 }
 

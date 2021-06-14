@@ -53,7 +53,6 @@ class _MatchView extends State<MatchView> {
   Widget build(BuildContext context) => StreamBuilder<Database.Event>(
         stream: DatabaseServices(id: widget.event.id).getEventChanges,
         builder: (context, eventHandler) {
-          print('lmfao');
           if (eventHandler.hasData &&
               !eventHandler.hasError &&
               !dataModel.isProcessing) {
@@ -186,7 +185,6 @@ class _MatchView extends State<MatchView> {
                                   ' : ' +
                                   _score.total().toString(),
                               style: Theme.of(context).textTheme.headline6),
-                          Text(_score.timeStamp.toDate().minute.toString()),
                           if (widget.team == null)
                             DropdownButton<Dice>(
                               value: _match?.dice,
@@ -222,6 +220,27 @@ class _MatchView extends State<MatchView> {
                                 },
                               ).toList(),
                             ),
+                          ExpansionTile(
+                            leading: Checkbox(
+                              checkColor: Colors.black,
+                              fillColor: MaterialStateProperty.all(Colors.red),
+                              value: _score.penalties.show,
+                              onChanged: (_) =>
+                                  _score.penalties.show = _ ?? false,
+                            ),
+                            title: Text(
+                              'Penalties',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            children: [
+                              Incrementor(
+                                  element: _score.penalties.majorPenalty,
+                                  onPressed: stateSetter),
+                              Incrementor(
+                                  element: _score.penalties.minorPenalty,
+                                  onPressed: stateSetter),
+                            ],
+                          ),
                           Padding(
                             padding: EdgeInsets.all(25),
                             child: Row(
@@ -252,10 +271,6 @@ class _MatchView extends State<MatchView> {
                                 )
                               ],
                             ),
-                          ),
-                          Divider(
-                            height: 5,
-                            thickness: 2,
                           ),
                           if (NewPlatform.isIOS())
                             SizedBox(

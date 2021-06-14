@@ -269,16 +269,22 @@ class PlatformButton extends PlatformWidget<CupertinoButton, OutlinedButton> {
 }
 
 class Incrementor extends StatefulWidget {
-  Incrementor({Key? key, required this.element, required this.onPressed})
+  Incrementor(
+      {Key? key,
+      required this.element,
+      required this.onPressed,
+      this.onIncrement,
+      this.onDecrement})
       : super(key: key);
   final ScoringElement element;
-  final Function onPressed;
+  final void Function() onPressed;
+  final void Function()? onIncrement;
+  final void Function()? onDecrement;
   @override
   State<StatefulWidget> createState() => _Incrementor();
 }
 
 class _Incrementor extends State<Incrementor> {
-  _Incrementor();
   @override
   Widget build(BuildContext context) {
     return Column(
