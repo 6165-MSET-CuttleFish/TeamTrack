@@ -623,7 +623,7 @@ class _EventsList extends State<EventsList> {
               );
               if (!e.shared) {
                 e.shared = true;
-                firebaseDatabase.reference().child(e.id).set(e.toJson());
+                firebaseDatabase.reference()..child("Events").child(Statics.gameName).child(e.id).set(e.toJson());
                 dataModel.saveEvents();
               }
               Navigator.of(context).pop();
