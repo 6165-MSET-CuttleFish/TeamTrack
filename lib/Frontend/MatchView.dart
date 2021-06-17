@@ -85,6 +85,9 @@ class _MatchView extends State<MatchView> {
                 (element) => element.id == _match!.id,
                 orElse: () => Score(Uuid().v4(), Dice.none),
               );
+              for (var element in _score.teleScore.getElements()) {
+                element.incrementValue = incrementValue.count;
+              }
             }
           }
           return StreamBuilder<int>(
@@ -352,15 +355,15 @@ class _MatchView extends State<MatchView> {
     dataModel.uploadEvent(widget.event);
   }
 
-  void teleStateSetter() {
+  void onIncrement() {
     if (lapses.length == 0)
       lapses.add(_time);
     else
       lapses.add(
         _time - lapses.reduce((value, element) => value + element),
       );
-    _score.teleScore.cycles = lapses.getBoxAndWhisker();
-    stateSetter();
+    _score.teleScore.cycles = lapses; //.getBoxAndWhisker();
+    //stateSetter();
   }
 
   ListView viewSelect() {
@@ -397,14 +400,88 @@ class _MatchView extends State<MatchView> {
             ),
           ),
         ];
-
+  ScoringElement incrementValue = ScoringElement(
+    name: 'Increment Value',
+    min: () => 1,
+    count: 1,
+  );
   List<Widget> teleView() => !_paused
-      ? _score.teleScore
-          .getElements()
-          .map(
-            (e) => Incrementor(element: e, onPressed: teleStateSetter),
-          )
-          .toList()
+      ? [
+          Incrementor(
+            backgroundColor: Colors.blue.withOpacity(0.3),
+            element: incrementValue,
+            onPressed: () => setState(
+              () {
+                for (var element in _score.teleScore.getElements()) {
+                  element.incrementValue = incrementValue.count;
+                }
+              },
+            ),
+          ),
+          Container(
+            color: Colors.red.withOpacity(0.3),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 5),
+                  child: Row(
+                    children: [
+                      Text('Misses'),
+                      Spacer(),
+                      RawMaterialButton(
+                        onPressed: _score.teleScore.misses > 0
+                            ? () {
+                                _score.teleScore.misses++;
+                                stateSetter();
+                              }
+                            : null,
+                        elevation: 2.0,
+                        fillColor: Theme.of(context).canvasColor,
+                        splashColor: Colors.red,
+                        child: Icon(Icons.remove_circle_outline_rounded),
+                        shape: CircleBorder(),
+                      ),
+                      SizedBox(
+                        width: 20,
+                        child: Text(
+                          _score.teleScore.misses.toString(),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      RawMaterialButton(
+                        onPressed: () {
+                          _score.teleScore.misses++;
+                          stateSetter();
+                        },
+                        elevation: 2.0,
+                        fillColor: Theme.of(context).canvasColor,
+                        splashColor: Colors.green,
+                        child: Icon(Icons.add_circle_outline_rounded),
+                        shape: CircleBorder(),
+                      )
+                    ],
+                  ),
+                ),
+                Divider(
+                  height: 3,
+                  thickness: 2,
+                ),
+              ],
+            ),
+          ),
+          Padding(padding: EdgeInsets.all(5)),
+          ..._score.teleScore
+              .getElements()
+              .map(
+                (e) => Incrementor(
+                  element: e,
+                  onPressed: stateSetter,
+                  onIncrement: onIncrement,
+                  onDecrement: () => _score.teleScore.misses++,
+                ),
+              )
+              .toList()
+        ]
       : [
           Material(
             child: IconButton(
@@ -448,6 +525,8 @@ class _MatchView extends State<MatchView> {
                           (element) => element.id == _match?.id,
                           orElse: () => Score(Uuid().v4(), Dice.none),
                         );
+                        incrementValue.count =
+                            _score.teleScore.getElements()[0].incrementValue;
                       },
                     );
                   },

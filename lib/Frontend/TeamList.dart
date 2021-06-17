@@ -4,6 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
+import 'package:firebase_database/firebase_database.dart' as Database;
+import 'dart:convert';
 
 class TeamList extends StatefulWidget {
   TeamList({Key? key, required this.event}) : super(key: key);
@@ -22,79 +24,93 @@ class _TeamList extends State<TeamList> {
     )
   ];
   @override
-  Widget build(BuildContext context) => ListView(
-        children: widget.event.teams
-            .sortedTeams()
-            .map(
-              (e) => Slidable(
-                actionPane: slider,
-                secondaryActions: [
-                  IconSlideAction(
-                    icon: Icons.delete,
-                    color: Colors.red,
-                    onTap: () {
-                      showPlatformDialog(
-                        context: context,
-                        builder: (BuildContext context) => PlatformAlert(
-                          title: Text('Delete Team'),
-                          content: Text('Are you sure?'),
-                          actions: [
-                            PlatformDialogAction(
-                              isDefaultAction: true,
-                              child: Text('Cancel'),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                            PlatformDialogAction(
-                              isDefaultAction: false,
-                              isDestructive: true,
-                              child: Text('Confirm'),
-                              onPressed: () {
-                                setState(
-                                  () {
-                                    widget.event.deleteTeam(e);
+  Widget build(BuildContext context) => StreamBuilder<Database.Event>(
+        stream: DatabaseServices(id: widget.event.id).getEventChanges,
+        builder: (context, eventHandler) {
+          if (eventHandler.hasData &&
+              !eventHandler.hasError &&
+              !dataModel.isProcessing) {
+            widget.event.updateLocal(
+              json.decode(
+                json.encode(eventHandler.data?.snapshot.value),
+              ),
+            );
+          }
+          return ListView(
+            children: widget.event.teams
+                .sortedTeams()
+                .map(
+                  (e) => Slidable(
+                    actionPane: slider,
+                    secondaryActions: [
+                      IconSlideAction(
+                        icon: Icons.delete,
+                        color: Colors.red,
+                        onTap: () {
+                          showPlatformDialog(
+                            context: context,
+                            builder: (BuildContext context) => PlatformAlert(
+                              title: Text('Delete Team'),
+                              content: Text('Are you sure?'),
+                              actions: [
+                                PlatformDialogAction(
+                                  isDefaultAction: true,
+                                  child: Text('Cancel'),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
                                   },
-                                );
-                                dataModel.saveEvents();
-                                dataModel.uploadEvent(widget.event);
-                                Navigator.of(context).pop();
-                              },
+                                ),
+                                PlatformDialogAction(
+                                  isDefaultAction: false,
+                                  isDestructive: true,
+                                  child: Text('Confirm'),
+                                  onPressed: () {
+                                    setState(
+                                      () {
+                                        widget.event.deleteTeam(e);
+                                      },
+                                    );
+                                    dataModel.saveEvents();
+                                    dataModel.uploadEvent(widget.event);
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
                             ),
-                          ],
+                          );
+                        },
+                      )
+                    ],
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.grey,
+                          width: 1,
                         ),
-                      );
-                    },
-                  )
-                ],
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.grey,
-                      width: 1,
+                      ),
+                      child: ListTile(
+                        title: Text(e.name),
+                        leading: Text(e.number,
+                            style: Theme.of(context).textTheme.caption),
+                        onTap: () async {
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TeamView(
+                                team: e,
+                                event: widget.event,
+                              ),
+                            ),
+                          );
+                          setState(() {});
+                        },
+                      ),
                     ),
                   ),
-                  child: ListTile(
-                    title: Text(e.name),
-                    leading: Text(e.number,
-                        style: Theme.of(context).textTheme.caption),
-                    onTap: () async {
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => TeamView(
-                            team: e,
-                            event: widget.event,
-                          ),
-                        ),
-                      );
-                      setState(() {});
-                    },
-                  ),
-                ),
-              ),
-            )
-            .toList(),
+                )
+                .toList(),
+          );
+        },
       );
 }
 

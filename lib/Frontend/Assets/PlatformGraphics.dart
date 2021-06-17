@@ -268,18 +268,31 @@ class PlatformButton extends PlatformWidget<CupertinoButton, OutlinedButton> {
   }
 }
 
+class PlatformProgressIndicator extends PlatformWidget<
+    CupertinoActivityIndicator, CircularProgressIndicator> {
+  @override
+  CupertinoActivityIndicator buildCupertinoWidget(BuildContext context) =>
+      CupertinoActivityIndicator();
+
+  @override
+  CircularProgressIndicator buildMaterialWidget(BuildContext context) =>
+      CircularProgressIndicator();
+}
+
 class Incrementor extends StatefulWidget {
   Incrementor(
       {Key? key,
       required this.element,
       required this.onPressed,
       this.onIncrement,
-      this.onDecrement})
+      this.onDecrement,
+      this.backgroundColor})
       : super(key: key);
   final ScoringElement element;
   final void Function() onPressed;
   final void Function()? onIncrement;
   final void Function()? onDecrement;
+  final Color? backgroundColor;
   @override
   State<StatefulWidget> createState() => _Incrementor();
 }
@@ -287,69 +300,76 @@ class Incrementor extends StatefulWidget {
 class _Incrementor extends State<Incrementor> {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 5),
-          child: Row(
-            children: [
-              Text(widget.element.name),
-              Spacer(),
-              if (!widget.element.isBool)
-                RawMaterialButton(
-                  onPressed: widget.element.count > widget.element.min!()
-                      ? () {
-                          setState(widget.element.decrement);
-                          widget.onPressed();
-                        }
-                      : null,
-                  elevation: 2.0,
-                  fillColor: Theme.of(context).canvasColor,
-                  splashColor: Colors.red,
-                  child: Icon(Icons.remove_circle_outline_rounded),
-                  shape: CircleBorder(),
-                ),
-              if (!widget.element.isBool)
-                SizedBox(
-                  width: 20,
-                  child: Text(
-                    widget.element.count.toString(),
-                    textAlign: TextAlign.center,
+    return Container(
+      color: widget.backgroundColor,
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 5),
+            child: Row(
+              children: [
+                Text(widget.element.name),
+                Spacer(),
+                if (!widget.element.isBool)
+                  RawMaterialButton(
+                    onPressed: widget.element.count > widget.element.min!()
+                        ? () {
+                            setState(widget.element.decrement);
+                            if (widget.onDecrement != null)
+                              widget.onDecrement!();
+                            widget.onPressed();
+                          }
+                        : null,
+                    elevation: 2.0,
+                    fillColor: Theme.of(context).canvasColor,
+                    splashColor: Colors.red,
+                    child: Icon(Icons.remove_circle_outline_rounded),
+                    shape: CircleBorder(),
                   ),
-                ),
-              if (!widget.element.isBool)
-                RawMaterialButton(
-                  onPressed: widget.element.count < widget.element.max!()
-                      ? () {
-                          setState(widget.element.increment);
-                          widget.onPressed();
-                        }
-                      : null,
-                  elevation: 2.0,
-                  fillColor: Theme.of(context).canvasColor,
-                  splashColor: Colors.green,
-                  child: Icon(Icons.add_circle_outline_rounded),
-                  shape: CircleBorder(),
-                )
-              else
-                PlatformSwitch(
-                  value: widget.element.asBool(),
-                  onChanged: (val) {
-                    if (val)
-                      widget.element.count = 1;
-                    else
-                      widget.element.count = 0;
-                    widget.onPressed();
-                  },
-                )
-            ],
+                if (!widget.element.isBool)
+                  SizedBox(
+                    width: 20,
+                    child: Text(
+                      widget.element.count.toString(),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                if (!widget.element.isBool)
+                  RawMaterialButton(
+                    onPressed: widget.element.count < widget.element.max!()
+                        ? () {
+                            setState(widget.element.increment);
+                            if (widget.onIncrement != null)
+                              widget.onIncrement!();
+                            widget.onPressed();
+                          }
+                        : null,
+                    elevation: 2.0,
+                    fillColor: Theme.of(context).canvasColor,
+                    splashColor: Colors.green,
+                    child: Icon(Icons.add_circle_outline_rounded),
+                    shape: CircleBorder(),
+                  )
+                else
+                  PlatformSwitch(
+                    value: widget.element.asBool(),
+                    onChanged: (val) {
+                      if (val)
+                        widget.element.count = 1;
+                      else
+                        widget.element.count = 0;
+                      widget.onPressed();
+                    },
+                  )
+              ],
+            ),
           ),
-        ),
-        Divider(
-          height: 3,
-          thickness: 2,
-        ),
-      ],
+          Divider(
+            height: 3,
+            thickness: 2,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -361,24 +381,29 @@ class ScoreCard extends StatelessWidget {
     required this.dice,
     required this.team,
     required this.event,
-    required this.type,
+    this.type,
     required this.removeOutliers,
   }) : super(key: key) {
-    if (type == "auto") {
-      targetScore = team.targetScore!.autoScore;
-    } else if (type == "tele") {
-      targetScore = team.targetScore!.teleScore;
-    } else if (type == "endgame") {
-      targetScore = team.targetScore!.endgameScore;
-    } else {
-      targetScore = team.targetScore;
+    switch (type) {
+      case OpModeType.auto:
+        targetScore = team.targetScore!.autoScore;
+        break;
+      case OpModeType.tele:
+        targetScore = team.targetScore!.teleScore;
+        break;
+      case OpModeType.endgame:
+        targetScore = team.targetScore!.endgameScore;
+        break;
+      default:
+        targetScore = team.targetScore;
+        break;
     }
   }
   final List<ScoreDivision> scoreDivisions;
   final Dice dice;
   final Team team;
   final Event event;
-  final String type;
+  final OpModeType? type;
   ScoreDivision? targetScore;
   final bool removeOutliers;
   @override
@@ -392,17 +417,17 @@ class ScoreCard extends StatelessWidget {
           children: [
             BarGraph(
               val: scoreDivisions.meanScore(dice, removeOutliers),
-              max: event.teams.maxScoreVar(dice, type, removeOutliers),
+              max: event.teams.maxScore(dice, removeOutliers, type),
               title: 'Average',
             ),
             BarGraph(
                 val: scoreDivisions.maxScore(dice, removeOutliers),
-                max: event.teams.maxScoreVar(dice, type, removeOutliers),
+                max: event.teams.maxScore(dice, removeOutliers, type),
                 title: 'Best Score'),
             BarGraph(
               val: scoreDivisions.standardDeviationScore(dice, removeOutliers),
               max: event.teams
-                  .lowestStandardDeviationVar(dice, type, removeOutliers),
+                  .lowestStandardDeviationScore(dice, removeOutliers, type),
               inverted: true,
               title: 'Deviation',
             ),

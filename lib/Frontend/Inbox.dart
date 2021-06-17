@@ -4,10 +4,11 @@ import 'package:teamtrack/backend.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:teamtrack/score.dart';
+import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
 
 class Inbox extends StatefulWidget {
   const Inbox({Key? key}) : super(key: key);
-
   @override
   _InboxState createState() => _InboxState();
 }
@@ -31,8 +32,23 @@ class _InboxState extends State<Inbox> {
                       ),
                     ),
                     child: ListTile(
-                      leading: Text(
-                        e['authorName'],
+                      leading: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(right: 5),
+                            child: Icon(
+                              getTypeFromString(e['type']) == EventType.remote
+                                  ? CupertinoIcons
+                                      .rectangle_stack_person_crop_fill
+                                  : CupertinoIcons.person_3_fill,
+                              color: Theme.of(context).accentColor,
+                            ),
+                          ),
+                          Text(
+                            e['authorName'],
+                          ),
+                        ],
                       ),
                       title: Column(
                         children: [
@@ -50,12 +66,32 @@ class _InboxState extends State<Inbox> {
                               Icons.thumb_up_alt,
                               color: Colors.green,
                             ),
-                            onPressed: () {
+                            onPressed: () async {
+                              firebaseFirestore
+                                  .collection('users')
+                                  .doc(context.read<User?>()?.email)
+                                  .collection(Statics.gameName)
+                                  .add(
+                                {
+                                  'id': e['id'],
+                                  'name': e['name'],
+                                  'type': e['type'],
+                                },
+                              );
+                              var event = Event(
+                                  name: e['name'],
+                                  type: getTypeFromString(e['type']));
+                              event.id = e['id'];
+                              event.shared = true;
+                              dataModel.events.add(event);
+                              dataModel.saveEvents();
                               docRef
                                   .collection(
                                       context.read<User?>()?.email ?? '')
                                   .doc(e.id)
                                   .delete();
+                              getList();
+                              setState(() {});
                             },
                           ),
                           IconButton(
@@ -63,7 +99,15 @@ class _InboxState extends State<Inbox> {
                               Icons.thumb_down_alt,
                               color: Colors.red,
                             ),
-                            onPressed: () {},
+                            onPressed: () {
+                              docRef
+                                  .collection(
+                                      context.read<User?>()?.email ?? '')
+                                  .doc(e.id)
+                                  .delete();
+                              getList();
+                              setState(() {});
+                            },
                           ),
                         ],
                       ),
@@ -74,7 +118,7 @@ class _InboxState extends State<Inbox> {
             [Text('')],
       );
     }
-    return CircularProgressIndicator();
+    return PlatformProgressIndicator();
   }
 
   void getList() async {

@@ -24,16 +24,14 @@ class _EventView extends State<EventView> {
       onTap: () {},
     )
   ];
-  List<Widget> materialTabs() {
-    return <Widget>[
-      TeamList(
-        event: widget.event,
-      ),
-      MatchList(
-        event: widget.event,
-      )
-    ];
-  }
+  List<Widget> materialTabs() => [
+        TeamList(
+          event: widget.event,
+        ),
+        MatchList(
+          event: widget.event,
+        ),
+      ];
 
   int _tab = 0;
   @override
@@ -44,16 +42,21 @@ class _EventView extends State<EventView> {
           backgroundColor: Theme.of(context).accentColor,
           actions: [
             IconButton(
-              icon: Icon(Icons.search),
+              icon: Icon(
+                Icons.search,
+              ),
               onPressed: () {
                 showSearch(
                   context: context,
                   delegate: _tab == 0
                       ? TeamSearch(
                           teams: widget.event.teams.sortedTeams(),
-                          event: widget.event)
+                          event: widget.event,
+                        )
                       : MatchSearch(
-                          matches: widget.event.matches, event: widget.event),
+                          matches: widget.event.matches,
+                          event: widget.event,
+                        ),
                 );
               },
             ),
@@ -61,7 +64,7 @@ class _EventView extends State<EventView> {
       bottomNavigationBar: widget.event.type != EventType.remote
           ? BottomNavigationBar(
               currentIndex: _tab,
-              onTap: (int index) {
+              onTap: (index) {
                 setState(
                   () {
                     _tab = index;
@@ -85,11 +88,10 @@ class _EventView extends State<EventView> {
         tooltip: _tab == 0 ? 'Add Team' : 'Add Match',
         child: Icon(Icons.add),
         onPressed: () async {
-          if (_tab == 0) {
+          if (_tab == 0)
             _teamConfig();
-          } else {
+          else
             _matchConfig();
-          }
         },
       ),
     );
@@ -173,7 +175,7 @@ class _EventView extends State<EventView> {
     TextEditingController(),
     TextEditingController(),
     TextEditingController(),
-    TextEditingController()
+    TextEditingController(),
   ];
   final names = ['', '', '', ''];
   String r0 = '';
@@ -247,8 +249,13 @@ class _EventView extends State<EventView> {
                                   element.number ==
                                   val
                                       .replaceAll(
-                                          new RegExp(r' ,-.[^\w\s]+'), '')
-                                      .replaceAll(' ', ''),
+                                        RegExp(r' ,-.[^\w\s]+'),
+                                        '',
+                                      )
+                                      .replaceAll(
+                                        ' ',
+                                        '',
+                                      ),
                             )
                             .name,
                         selection: TextSelection.fromPosition(

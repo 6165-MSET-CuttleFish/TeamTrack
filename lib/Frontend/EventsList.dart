@@ -150,7 +150,7 @@ class _EventsList extends State<EventsList> {
       );
     } else {
       return Center(
-        child: CircularProgressIndicator(),
+        child: PlatformProgressIndicator(),
       );
     }
   }
@@ -617,7 +617,8 @@ class _EventsList extends State<EventsList> {
                   'name': e.name,
                   'authorEmail': context.read<User?>()?.email,
                   'authorName': context.read<User?>()?.displayName,
-                  'docID': e.id
+                  'id': e.id,
+                  'type': e.type.toString(),
                 },
               );
               if (!e.shared) {

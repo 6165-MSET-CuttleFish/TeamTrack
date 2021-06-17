@@ -231,9 +231,8 @@ class _TeamView extends State<TeamView> {
                                     fontSize: 15,
                                   ),
                                   getTitles: (value) {
-                                    if (value % 50 == 0) {
+                                    if (value % 50 == 0)
                                       return value.toInt().toString();
-                                    }
                                     return '';
                                   },
                                   reservedSize: 28,
@@ -333,10 +332,10 @@ class _TeamView extends State<TeamView> {
                                       ? _team.scores
                                           .where((e) => e.dice == _dice)
                                           .toList()
-                                          .spots()
+                                          .spots(null)
                                           .removeOutliers(removeOutliers)
                                       : _team.scores
-                                          .spots()
+                                          .spots(null)
                                           .removeOutliers(removeOutliers),
                                   colors: [
                                     Color.fromRGBO(230, 30, 213, 1),
@@ -354,10 +353,10 @@ class _TeamView extends State<TeamView> {
                                       ? _team.scores
                                           .where((e) => e.dice == _dice)
                                           .toList()
-                                          .autoSpots()
+                                          .spots(OpModeType.auto)
                                           .removeOutliers(removeOutliers)
                                       : _team.scores
-                                          .autoSpots()
+                                          .spots(OpModeType.auto)
                                           .removeOutliers(removeOutliers),
                                   colors: [
                                     Colors.green,
@@ -375,10 +374,10 @@ class _TeamView extends State<TeamView> {
                                       ? _team.scores
                                           .where((e) => e.dice == _dice)
                                           .toList()
-                                          .teleSpots()
+                                          .spots(OpModeType.tele)
                                           .removeOutliers(removeOutliers)
                                       : _team.scores
-                                          .teleSpots()
+                                          .spots(OpModeType.tele)
                                           .removeOutliers(removeOutliers),
                                   colors: [
                                     Colors.blue,
@@ -396,10 +395,10 @@ class _TeamView extends State<TeamView> {
                                       ? _team.scores
                                           .where((e) => e.dice == _dice)
                                           .toList()
-                                          .endSpots()
+                                          .spots(OpModeType.endgame)
                                           .removeOutliers(removeOutliers)
                                       : _team.scores
-                                          .endSpots()
+                                          .spots(OpModeType.endgame)
                                           .removeOutliers(removeOutliers),
                                   colors: [
                                     Colors.red,
@@ -415,8 +414,8 @@ class _TeamView extends State<TeamView> {
                             ),
                           )
                         : SfCartesianChart(
-                            series: <ChartSeries<BoxAndWhisker, double>>[
-                              BoxAndWhiskerSeries<BoxAndWhisker, double>(
+                            series: <ChartSeries<List<double>, int>>[
+                              BoxAndWhiskerSeries<List<double>, int>(
                                 gradient: LinearGradient(
                                     begin: Alignment.topCenter,
                                     end: Alignment.bottomCenter,
@@ -429,10 +428,9 @@ class _TeamView extends State<TeamView> {
                                     .map((e) => e.teleScore.cycles)
                                     .toList(),
                                 boxPlotMode: BoxPlotMode.exclusive,
-                                xValueMapper: (BoxAndWhisker cycles, _) =>
-                                    _.toDouble() + 1,
-                                yValueMapper: (BoxAndWhisker cycles, _) =>
-                                    cycles.getArray(),
+                                xValueMapper: (cycles, _) => _ + 1,
+                                yValueMapper: (cycles, _) =>
+                                    cycles.length != 0 ? cycles : [0, 0, 0, 0],
                               ),
                             ],
                           ),
@@ -440,23 +438,39 @@ class _TeamView extends State<TeamView> {
                 ),
               ),
               SizedBox(
-                width: 60,
+                width: 45,
                 height: 90,
-                child: FlatButton(
-                  onPressed: () {
-                    setState(
-                      () {
-                        _showCycles = !_showCycles;
-                      },
-                    );
-                  },
+                child: OutlinedButton(
+                  onPressed: () => setState(
+                    () => _showCycles = !_showCycles,
+                  ),
                   child: Text(
                     'Show Cycle Times',
                     style: TextStyle(
-                        fontSize: 10,
-                        color: _showCycles
-                            ? Colors.white.withOpacity(0.5)
-                            : Colors.white),
+                      fontSize: 10,
+                      color: _showCycles
+                          ? Colors.white.withOpacity(0.5)
+                          : Colors.white,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(
+                      _showCycles
+                          ? Colors.grey.withOpacity(0.3)
+                          : Colors.cyan.withOpacity(0.3),
+                    ),
+                    shape: MaterialStateProperty.all(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(20),
+                        ),
+                      ),
+                    ),
+                    alignment: Alignment.center,
+                    padding: MaterialStateProperty.all(
+                      EdgeInsets.all(0),
+                    ),
                   ),
                 ),
               ),
@@ -629,25 +643,21 @@ class _TeamView extends State<TeamView> {
       ScoreCard(
         team: _team,
         event: widget.event,
-        type: "general",
         scoreDivisions: _team.scores,
         dice: _dice,
         removeOutliers: removeOutliers,
       ),
       Padding(
-        padding: EdgeInsets.all(10),
-      ),
-      Text(
-        'Autonomous',
-        style: Theme.of(context).textTheme.bodyText1,
-      ),
-      Padding(
-        padding: EdgeInsets.all(5),
+        padding: const EdgeInsets.only(top: 20, bottom: 10),
+        child: Text(
+          'Autonomous',
+          style: Theme.of(context).textTheme.bodyText1,
+        ),
       ),
       ScoreCard(
         team: _team,
         event: widget.event,
-        type: "auto",
+        type: OpModeType.auto,
         scoreDivisions: _team.scores.map((e) => e.autoScore).toList(),
         dice: _dice,
         removeOutliers: removeOutliers,
@@ -662,7 +672,7 @@ class _TeamView extends State<TeamView> {
       ScoreCard(
         team: _team,
         event: widget.event,
-        type: "tele",
+        type: OpModeType.tele,
         scoreDivisions: _team.scores.map((e) => e.teleScore).toList(),
         dice: _dice,
         removeOutliers: removeOutliers,
@@ -677,7 +687,7 @@ class _TeamView extends State<TeamView> {
       ScoreCard(
         team: _team,
         event: widget.event,
-        type: "endgame",
+        type: OpModeType.endgame,
         scoreDivisions: _team.scores.map((e) => e.endgameScore).toList(),
         dice: _dice,
         removeOutliers: removeOutliers,

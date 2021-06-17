@@ -142,7 +142,7 @@ class _MatchList extends State<MatchList> {
                             ),
                           );
                         },
-                      )
+                      ),
                     ],
                     child: Container(
                       decoration: BoxDecoration(
