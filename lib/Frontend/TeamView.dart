@@ -266,9 +266,7 @@ class _TeamView extends State<TeamView> {
                               widget.event.matches
                                   .maxAllianceScore(_team)
                                   .toDouble(),
-                              _team.targetScore != null
-                                  ? _team.targetScore!.total().toDouble()
-                                  : 0.0
+                              _team.targetScore?.total().toDouble() ?? 0.0
                             ].reduce(max),
                             lineBarsData: [
                               LineChartBarData(
@@ -303,7 +301,7 @@ class _TeamView extends State<TeamView> {
                                     .where((e) =>
                                         e.dice == _dice || _dice == Dice.none)
                                     .toList()
-                                    .spots(_team, _dice),
+                                    .spots(_team, _dice, showPenalties),
                                 colors: [
                                   Color.fromRGBO(255, 166, 0, 1),
                                 ],

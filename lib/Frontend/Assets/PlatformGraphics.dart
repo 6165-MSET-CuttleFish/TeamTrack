@@ -387,13 +387,13 @@ class ScoreCard extends StatelessWidget {
   }) : super(key: key) {
     switch (type) {
       case OpModeType.auto:
-        targetScore = team.targetScore!.autoScore;
+        targetScore = team.targetScore?.autoScore;
         break;
       case OpModeType.tele:
-        targetScore = team.targetScore!.teleScore;
+        targetScore = team.targetScore?.teleScore;
         break;
       case OpModeType.endgame:
-        targetScore = team.targetScore!.endgameScore;
+        targetScore = team.targetScore?.endgameScore;
         break;
       default:
         targetScore = team.targetScore;
@@ -515,13 +515,11 @@ class ScoreCard extends StatelessWidget {
                           1,
                       minY: [
                         scoreDivisions.minScore(dice, removeOutliers),
-                        targetScore!.total().toDouble()
+                        targetScore?.total().toDouble() ?? 0.0
                       ].reduce(min),
                       maxY: [
                         scoreDivisions.maxScore(dice, removeOutliers),
-                        team.targetScore != null
-                            ? targetScore!.total().toDouble()
-                            : 0.0
+                        targetScore?.total().toDouble() ?? 0.0
                       ].reduce(max),
                       lineBarsData: [
                         LineChartBarData(

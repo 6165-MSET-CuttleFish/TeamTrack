@@ -18,10 +18,11 @@ class Score extends ScoreDivision {
     endgameScore = EndgameScore(dice);
     penalties = Penalty(dice);
   }
-  List<ScoringElement> getElements({bool? includePenalties}) => [
+  List<ScoringElement> getElements({bool? showPenalties}) => [
         ...teleScore.getElements(),
         ...autoScore.getElements(),
         ...endgameScore.getElements(),
+        ...((showPenalties ?? false) ? penalties.getElements() : [])
       ];
   ScoreDivision getScoreDivision(OpModeType? type) {
     switch (type) {
@@ -97,7 +98,7 @@ class AutoScore extends ScoreDivision {
       ScoringElement(name: 'Power Shots', value: 15, max: () => 3);
   ScoringElement navigated =
       ScoringElement(name: 'Navigated', value: 5, max: () => 1, isBool: true);
-  List<ScoringElement> getElements({bool? includePenalties}) =>
+  List<ScoringElement> getElements() =>
       [hiGoals, midGoals, lowGoals, wobbleGoals, pwrShots, navigated];
   Dice getDice() => dice;
   AutoScore(this.dice);
@@ -136,7 +137,7 @@ class TeleScore extends ScoreDivision {
   ScoringElement lowGoals = ScoringElement(name: "Low Goals", value: 2);
   ScoringElement midGoals = ScoringElement(name: "Middle Goals", value: 4);
   ScoringElement hiGoals = ScoringElement(name: "High Goals", value: 6);
-  List<ScoringElement> getElements({bool? includePenalties}) =>
+  List<ScoringElement> getElements() =>
       [hiGoals, midGoals, lowGoals];
   List<double> cycles = [];
   int misses = 0;
@@ -179,7 +180,7 @@ class EndgameScore extends ScoreDivision {
       ScoringElement(name: 'Power Shots', value: 15, max: () => 3);
   ScoringElement ringsOnWobble =
       ScoringElement(name: 'Rings On Wobble', value: 5);
-  List<ScoringElement> getElements({bool? includePenalties}) =>
+  List<ScoringElement> getElements() =>
       [pwrShots, wobbleGoalsInDrop, wobbleGoalsInStart, ringsOnWobble];
 
   Dice getDice() => dice;
@@ -237,7 +238,7 @@ class Penalty extends ScoreDivision {
   Dice getDice() => dice;
 
   @override
-  List<ScoringElement> getElements({bool? includePenalties}) =>
+  List<ScoringElement> getElements() =>
       [majorPenalty, minorPenalty];
 
   Penalty.fromJson(Map<String, dynamic> json, this.dice)
@@ -308,5 +309,5 @@ abstract class ScoreDivision {
       .reduce((value, element) => value += element)
       .clamp(0, 999999999999999999);
   Dice getDice();
-  List<ScoringElement> getElements({bool? includePenalties});
+  List<ScoringElement> getElements();
 }

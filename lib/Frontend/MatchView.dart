@@ -243,26 +243,10 @@ class _MatchView extends State<MatchView> {
                                 Incrementor(
                                   element: _score.penalties.majorPenalty,
                                   onPressed: stateSetter,
-                                  onDecrement: getPenaltyAlliance()!
-                                      .penalties
-                                      .majorPenalty
-                                      .decrement,
-                                  onIncrement: getPenaltyAlliance()!
-                                      .penalties
-                                      .majorPenalty
-                                      .increment,
                                 ),
                                 Incrementor(
                                   element: _score.penalties.minorPenalty,
                                   onPressed: stateSetter,
-                                  onIncrement: getPenaltyAlliance()!
-                                      .penalties
-                                      .majorPenalty
-                                      .increment,
-                                  onDecrement: getPenaltyAlliance()!
-                                      .penalties
-                                      .majorPenalty
-                                      .decrement,
                                 ),
                               ],
                             ),

@@ -345,37 +345,63 @@ class Event {
 class Alliance {
   Team? team1;
   Team? team2;
-  late Penalty penalties;
   EventType eventType;
-  Alliance(this.team1, this.team2, this.eventType) {
-    penalties = Penalty(Dice.none);
+  Alliance? opposingAlliance;
+  String? id;
+  Alliance(this.team1, this.team2, this.eventType);
+  int getPenalty() {
+    if (eventType == EventType.remote)
+      return team1?.scores
+              .firstWhere((element) => element.id == id,
+                  orElse: () => Score('', Dice.none))
+              .penalties
+              .total() ??
+          0;
+    return opposingAlliance?.penaltyTotal() ?? 0;
   }
-  int allianceTotal(String? id, bool showPenalties) =>
-      ((team1?.scores
+
+  int penaltyTotal() =>
+      (team1?.scores
               .firstWhere(
-                (e) => e.id == id,
-                orElse: () => Score(
-                  Uuid().v4(),
-                  Dice.none,
-                ),
+                (element) => element.id == id,
+                orElse: () => Score('', Dice.none),
               )
+              .penalties
               .total() ??
           0) +
       (team2?.scores
               .firstWhere(
-                (e) => e.id == id,
-                orElse: () => Score(
-                  Uuid().v4(),
-                  Dice.none,
-                ),
+                (element) => element.id == id,
+                orElse: () => Score('', Dice.none),
               )
+              .penalties
               .total() ??
-          0) +
-      (showPenalties
-          ? (eventType == EventType.remote
-              ? -penalties.total()
-              : penalties.total())
-          : 0)).clamp(0, 999999999999999999);
+          0);
+
+  int allianceTotal(String? id, bool showPenalties) => ((team1?.scores
+                  .firstWhere(
+                    (e) => e.id == id,
+                    orElse: () => Score(
+                      Uuid().v4(),
+                      Dice.none,
+                    ),
+                  )
+                  .total() ??
+              0) +
+          (team2?.scores
+                  .firstWhere(
+                    (e) => e.id == id,
+                    orElse: () => Score(
+                      Uuid().v4(),
+                      Dice.none,
+                    ),
+                  )
+                  .total() ??
+              0) +
+          (showPenalties
+              ? (eventType == EventType.remote ? -getPenalty() : getPenalty())
+              : 0))
+      .clamp(0, 999999999999999999);
 
   Alliance.fromJson(
     Map<String, dynamic> json,
@@ -388,15 +414,10 @@ class Alliance {
         team2 = teamList.firstWhere(
           (e) => e.number.trim() == json['team2']?.trim(),
           orElse: () => Team.nullTeam(),
-        ),
-        penalties = Penalty.fromJson(
-          json['Penalty'],
-          Dice.none,
         );
   Map<String, dynamic> toJson() => {
         'team1': team1?.number,
         'team2': team2?.number,
-        'Penalty': penalties.toJson(),
       };
 }
 
@@ -409,17 +430,9 @@ class Team {
     this.name = name;
     this.number = number;
     scores = [];
-    targetScore = Score(
-      Uuid().v4(),
-      Dice.none,
-    );
   }
   static Team nullTeam() {
     return Team("?", "?");
-  }
-
-  bool equals(Team other) {
-    return this.number == other.number;
   }
 
   Team.fromJson(Map<String, dynamic> json, EventType eventType) {
@@ -431,7 +444,8 @@ class Team {
     } catch (e) {
       scores = [];
     }
-    targetScore = Score.fromJson(json['targetScore'], eventType);
+    if (json['targetScore'] != null)
+      targetScore = Score.fromJson(json['targetScore'], eventType);
   }
   Map<String, dynamic> toJson() => {
         'name': name,
@@ -447,35 +461,36 @@ class Match {
   Alliance? red;
   Alliance? blue;
   String id = '';
-  Match(Alliance red, Alliance blue, EventType type) {
-    this.type = type;
-    this.red = red;
-    this.blue = blue;
+  Match(this.red, this.blue, this.type) {
     id = Uuid().v4();
-    red.team1?.scores.addScore(Score(
+    red?.team1?.scores.addScore(Score(
       id,
       dice,
     ));
     if (type != EventType.remote) {
-      red.team2?.scores.addScore(
+      red?.team2?.scores.addScore(
         Score(
           id,
           dice,
         ),
       );
-      blue.team1?.scores.addScore(
+      blue?.team1?.scores.addScore(
         Score(
           id,
           dice,
         ),
       );
-      blue.team2?.scores.addScore(
+      blue?.team2?.scores.addScore(
         Score(
           id,
           dice,
         ),
       );
     }
+    red?.opposingAlliance = blue;
+    blue?.opposingAlliance = red;
+    red?.id = id;
+    blue?.id = id;
   }
   static Match defaultMatch(EventType type) {
     return Match(Alliance(Team('1', 'Alpha'), Team('2', 'Beta'), type),
@@ -531,18 +546,35 @@ class Match {
     return redScore() + " - " + blueScore();
   }
 
-  String redScore() => (red?.allianceTotal(id, true) ?? 0).toString();
+  String redScore() =>
+      (red?.allianceTotal(id, dataModel.showPenalties) ?? 0).toString();
 
-  String blueScore() => (blue?.allianceTotal(id, true) ?? 0).toString();
+  String blueScore() =>
+      (blue?.allianceTotal(id, dataModel.showPenalties) ?? 0).toString();
 
-  Match.fromJson(Map<String, dynamic> json, List<Team> teamList)
-      : red = Alliance.fromJson(
-            json['red'], teamList, getTypeFromString(json['type'])),
-        blue = Alliance.fromJson(
-            json['blue'], teamList, getTypeFromString(json['type'])),
-        id = json['id'],
-        dice = getDiceFromString(json['dice']),
-        type = getTypeFromString(json['type']);
+  Match.fromJson(Map<String, dynamic> json, List<Team> teamList) {
+    red = Alliance.fromJson(
+      json['red'],
+      teamList,
+      getTypeFromString(
+        json['type'],
+      ),
+    );
+    blue = Alliance.fromJson(
+      json['blue'],
+      teamList,
+      getTypeFromString(
+        json['type'],
+      ),
+    );
+    id = json['id'];
+    dice = getDiceFromString(json['dice']);
+    type = getTypeFromString(json['type']);
+    red?.opposingAlliance = blue;
+    blue?.opposingAlliance = red;
+    red?.id = id;
+    blue?.id = id;
+  }
   Map<String, dynamic> toJson() => {
         'red': red!.toJson(),
         'blue': blue!.toJson(),
@@ -664,14 +696,14 @@ extension ExTeam on Team? {
 }
 
 extension MatchExtensions on List<Match> {
-  List<FlSpot> spots(Team team, Dice dice) {
+  List<FlSpot> spots(Team team, Dice dice, bool showPenalties) {
     List<FlSpot> val = [];
     final arr =
         (dice != Dice.none ? this.where((e) => e.dice == dice) : this).toList();
     for (int i = 0; i < arr.length; i++) {
       final alliance = arr[i].alliance(team);
       if (alliance != null) {
-        final allianceTotal = alliance.allianceTotal(arr[i].id, true);
+        final allianceTotal = alliance.allianceTotal(arr[i].id, showPenalties);
         val.add(FlSpot(i.toDouble(), allianceTotal.toDouble()));
       }
     }
