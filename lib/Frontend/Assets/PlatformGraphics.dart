@@ -384,6 +384,7 @@ class ScoreCard extends StatelessWidget {
     required this.event,
     this.type,
     required this.removeOutliers,
+    this.matches,
   }) : super(key: key) {
     switch (type) {
       case OpModeType.auto:
@@ -407,6 +408,7 @@ class ScoreCard extends StatelessWidget {
   final OpModeType? type;
   ScoreDivision? targetScore;
   final bool removeOutliers;
+  final List<Match>? matches;
   @override
   Widget build(BuildContext context) {
     return CardView(
@@ -506,22 +508,56 @@ class ScoreCard extends StatelessWidget {
                         border: Border.all(
                             color: const Color(0xff37434d), width: 1),
                       ),
-                      minX: 0,
-                      maxX: team.scores
-                              .where((e) =>
-                                  dice != Dice.none ? e.dice == dice : true)
-                              .length
-                              .toDouble() -
-                          1,
-                      minY: [
-                        scoreDivisions.minScore(dice, removeOutliers),
-                        targetScore?.total().toDouble() ?? 0.0
-                      ].reduce(min),
-                      maxY: [
-                        scoreDivisions.maxScore(dice, removeOutliers),
-                        targetScore?.total().toDouble() ?? 0.0
-                      ].reduce(max),
+                      
+                      // minX: 0,
+                      // maxX: team.scores
+                      //         .where((e) =>
+                      //             dice != Dice.none ? e.dice == dice : true)
+                      //         .length
+                      //         .toDouble() -
+                      //     1,
+                      // minY: [
+                      //   scoreDivisions.minScore(dice, removeOutliers),
+                      //   targetScore?.total().toDouble() ?? 0.0
+                      // ].reduce(min),
+                      // maxY: [
+                      //   scoreDivisions.maxScore(dice, removeOutliers),
+                      //   targetScore?.total().toDouble() ?? 0.0
+                      // ].reduce(max),
                       lineBarsData: [
+                        if (matches != null)
+                          LineChartBarData(
+                            belowBarData: team.targetScore != null
+                                ? BarAreaData(
+                                    show: true,
+                                    colors: [
+                                      Colors.lightGreenAccent.withOpacity(0.5)
+                                    ],
+                                    cutOffY: targetScore?.total().toDouble(),
+                                    applyCutOffY: true,
+                                  )
+                                : null,
+                            aboveBarData: team.targetScore != null
+                                ? BarAreaData(
+                                    show: true,
+                                    colors: [Colors.redAccent.withOpacity(0.5)],
+                                    cutOffY: targetScore?.total().toDouble(),
+                                    applyCutOffY: true,
+                                  )
+                                : null,
+                            spots: matches!
+                                .where(
+                                    (e) => e.dice == dice || dice == Dice.none)
+                                .toList()
+                                .spots(team, dice, false, type: type)
+                                .removeOutliers(removeOutliers),
+                            colors: [
+                              Color.fromRGBO(255, 166, 0, 1),
+                            ],
+                            isCurved: true,
+                            preventCurveOverShooting: true,
+                            barWidth: 5,
+                          ),
                         LineChartBarData(
                           belowBarData: team.targetScore != null
                               ? BarAreaData(
@@ -545,11 +581,10 @@ class ScoreCard extends StatelessWidget {
                               .diceScores(dice)
                               .spots()
                               .removeOutliers(removeOutliers),
-                          colors: [Colors.orange],
+                          colors: [type.getColor()],
                           isCurved: true,
                           preventCurveOverShooting: true,
                           barWidth: 5,
-                          shadow: Shadow(color: Colors.green, blurRadius: 5),
                         ),
                       ],
                     ),

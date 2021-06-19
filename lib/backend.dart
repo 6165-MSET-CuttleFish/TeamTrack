@@ -11,6 +11,7 @@ import 'score.dart';
 import 'package:uuid/uuid.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:crypto/crypto.dart';
+import 'package:flutter/material.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 read(String key) async {
@@ -378,30 +379,35 @@ class Alliance {
               .total() ??
           0);
 
-  int allianceTotal(String? id, bool showPenalties) => ((team1?.scores
-                  .firstWhere(
-                    (e) => e.id == id,
-                    orElse: () => Score(
-                      Uuid().v4(),
-                      Dice.none,
-                    ),
-                  )
-                  .total() ??
-              0) +
-          (team2?.scores
-                  .firstWhere(
-                    (e) => e.id == id,
-                    orElse: () => Score(
-                      Uuid().v4(),
-                      Dice.none,
-                    ),
-                  )
-                  .total() ??
-              0) +
-          (showPenalties
-              ? (eventType == EventType.remote ? -getPenalty() : getPenalty())
-              : 0))
-      .clamp(0, 999999999999999999);
+  int allianceTotal(String? id, bool showPenalties, {OpModeType? type}) =>
+      ((team1?.scores
+                      .firstWhere(
+                        (e) => e.id == id,
+                        orElse: () => Score(
+                          Uuid().v4(),
+                          Dice.none,
+                        ),
+                      )
+                      .getScoreDivision(type)
+                      .total() ??
+                  0) +
+              (team2?.scores
+                      .firstWhere(
+                        (e) => e.id == id,
+                        orElse: () => Score(
+                          Uuid().v4(),
+                          Dice.none,
+                        ),
+                      )
+                      .getScoreDivision(type)
+                      .total() ??
+                  0) +
+              (showPenalties
+                  ? (eventType == EventType.remote
+                      ? -getPenalty()
+                      : getPenalty())
+                  : 0))
+          .clamp(0, 999999999999999999);
 
   Alliance.fromJson(
     Map<String, dynamic> json,
@@ -696,14 +702,14 @@ extension ExTeam on Team? {
 }
 
 extension MatchExtensions on List<Match> {
-  List<FlSpot> spots(Team team, Dice dice, bool showPenalties) {
+  List<FlSpot> spots(Team team, Dice dice, bool showPenalties, {OpModeType? type}) {
     List<FlSpot> val = [];
     final arr =
         (dice != Dice.none ? this.where((e) => e.dice == dice) : this).toList();
     for (int i = 0; i < arr.length; i++) {
       final alliance = arr[i].alliance(team);
       if (alliance != null) {
-        final allianceTotal = alliance.allianceTotal(arr[i].id, showPenalties);
+        final allianceTotal = alliance.allianceTotal(arr[i].id, showPenalties, type: type);
         val.add(FlSpot(i.toDouble(), allianceTotal.toDouble()));
       }
     }
@@ -729,6 +735,17 @@ extension SpotExtensions on List<FlSpot> {
   List<FlSpot> removeOutliers(bool remove) {
     if (!remove) return this;
     return this.map((e) => e.y).toList().removeOutliers(remove).spots();
+  }
+}
+
+extension colorExt on OpModeType? {
+  Color getColor() {
+    switch (this) {
+      case OpModeType.auto: return Colors.green;
+      case OpModeType.tele: return Colors.blue;
+      case OpModeType.endgame: return Colors.red;
+      default: return Color.fromRGBO(230, 30, 213, 1);
+    }
   }
 }
 

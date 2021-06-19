@@ -33,6 +33,7 @@ class _MatchView extends State<MatchView> {
   List<double> lapses = [];
   int? _previousStreamValue = 0;
   bool _paused = true;
+  bool _allowView = false;
   _MatchView(Match? match, Team? team) {
     _selectedAlliance = match?.red;
     if (team != null) {
@@ -179,9 +180,6 @@ class _MatchView extends State<MatchView> {
                                 )
                               ],
                             ),
-                          Padding(
-                            padding: EdgeInsets.all(10),
-                          ),
                           if (_match != null &&
                               _match?.type != EventType.remote)
                             buttonRow(),
@@ -200,7 +198,7 @@ class _MatchView extends State<MatchView> {
                                   color: Theme.of(context).accentColor),
                               underline: Container(
                                 height: 0.5,
-                                color: Colors.deepPurpleAccent,
+                                color: Colors.deepPurple,
                               ),
                               onChanged: (newValue) {
                                 setState(
@@ -251,7 +249,8 @@ class _MatchView extends State<MatchView> {
                               ],
                             ),
                           Padding(
-                            padding: EdgeInsets.all(25),
+                            padding: EdgeInsets.only(
+                                left: 25, right: 25, bottom: 10, top: 10),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -395,7 +394,7 @@ class _MatchView extends State<MatchView> {
     }
   }
 
-  List<Widget> endView() => !_paused
+  List<Widget> endView() => !_paused || _allowView
       ? _score.endgameScore
           .getElements()
           .map(
@@ -411,13 +410,21 @@ class _MatchView extends State<MatchView> {
               },
             ),
           ),
+          Material(
+            child: IconButton(
+              icon: Icon(Icons.visibility),
+              onPressed: () {
+                _allowView = true;
+              },
+            ),
+          ),
         ];
   ScoringElement incrementValue = ScoringElement(
     name: 'Increment Value',
     min: () => 1,
     count: 1,
   );
-  List<Widget> teleView() => !_paused
+  List<Widget> teleView() => !_paused || _allowView
       ? [
           Incrementor(
             backgroundColor: Colors.blue.withOpacity(0.3),
@@ -500,6 +507,14 @@ class _MatchView extends State<MatchView> {
               icon: Icon(Icons.play_arrow),
               onPressed: () {
                 _paused = false;
+              },
+            ),
+          ),
+          Material(
+            child: IconButton(
+              icon: Icon(Icons.visibility),
+              onPressed: () {
+                _allowView = true;
               },
             ),
           ),

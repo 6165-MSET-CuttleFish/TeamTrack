@@ -301,7 +301,8 @@ class _TeamView extends State<TeamView> {
                                     .where((e) =>
                                         e.dice == _dice || _dice == Dice.none)
                                     .toList()
-                                    .spots(_team, _dice, showPenalties),
+                                    .spots(_team, _dice, showPenalties)
+                                    .removeOutliers(removeOutliers),
                                 colors: [
                                   Color.fromRGBO(255, 166, 0, 1),
                                 ],
@@ -309,10 +310,6 @@ class _TeamView extends State<TeamView> {
                                 isStrokeCapRound: true,
                                 preventCurveOverShooting: true,
                                 barWidth: 5,
-                                shadow: Shadow(
-                                  color: Colors.green,
-                                  blurRadius: 5,
-                                ),
                               ),
                               LineChartBarData(
                                 belowBarData: _team.targetScore != null
@@ -357,10 +354,6 @@ class _TeamView extends State<TeamView> {
                                 isStrokeCapRound: true,
                                 preventCurveOverShooting: true,
                                 barWidth: 5,
-                                shadow: Shadow(
-                                  color: Colors.green,
-                                  blurRadius: 5,
-                                ),
                               ),
                               LineChartBarData(
                                 show: _selections[2],
@@ -380,10 +373,6 @@ class _TeamView extends State<TeamView> {
                                 isStrokeCapRound: true,
                                 preventCurveOverShooting: true,
                                 barWidth: 5,
-                                shadow: Shadow(
-                                  color: Colors.green,
-                                  blurRadius: 5,
-                                ),
                               ),
                               LineChartBarData(
                                 show: _selections[3],
@@ -403,10 +392,6 @@ class _TeamView extends State<TeamView> {
                                 isStrokeCapRound: true,
                                 preventCurveOverShooting: true,
                                 barWidth: 5,
-                                shadow: Shadow(
-                                  color: Colors.green,
-                                  blurRadius: 5,
-                                ),
                               ),
                               LineChartBarData(
                                 show: _selections[4],
@@ -426,10 +411,6 @@ class _TeamView extends State<TeamView> {
                                 isStrokeCapRound: true,
                                 preventCurveOverShooting: true,
                                 barWidth: 5,
-                                shadow: Shadow(
-                                  color: Colors.green,
-                                  blurRadius: 5,
-                                ),
                               ),
                             ],
                           ),
@@ -687,6 +668,7 @@ class _TeamView extends State<TeamView> {
         scoreDivisions: _team.scores,
         dice: _dice,
         removeOutliers: removeOutliers,
+        matches: widget.event.type == EventType.remote ? null : widget.event.matches,
       ),
       Padding(
         padding: const EdgeInsets.only(top: 20, bottom: 10),
@@ -702,6 +684,7 @@ class _TeamView extends State<TeamView> {
         scoreDivisions: _team.scores.map((e) => e.autoScore).toList(),
         dice: _dice,
         removeOutliers: removeOutliers,
+        matches: widget.event.type == EventType.remote ? null : widget.event.matches,
       ),
       Padding(
         padding: const EdgeInsets.only(top: 20, bottom: 10),
@@ -717,6 +700,7 @@ class _TeamView extends State<TeamView> {
         scoreDivisions: _team.scores.map((e) => e.teleScore).toList(),
         dice: _dice,
         removeOutliers: removeOutliers,
+        matches: widget.event.type == EventType.remote ? null : widget.event.matches,
       ),
       Padding(
         padding: const EdgeInsets.only(top: 20, bottom: 10),
@@ -732,6 +716,7 @@ class _TeamView extends State<TeamView> {
         scoreDivisions: _team.scores.map((e) => e.endgameScore).toList(),
         dice: _dice,
         removeOutliers: removeOutliers,
+        matches: widget.event.type == EventType.remote ? null : widget.event.matches,
       ),
       Padding(
         padding: EdgeInsets.all(130),
