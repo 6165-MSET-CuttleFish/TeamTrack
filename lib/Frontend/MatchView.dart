@@ -22,6 +22,7 @@ class MatchView extends StatefulWidget {
 
 class _MatchView extends State<MatchView> {
   Team _selectedTeam = Team.nullTeam();
+  Alliance? _selectedAlliance;
   Color _color = CupertinoColors.systemRed;
   Score _score = Score(Uuid().v4(), Dice.none);
   int _view = 0;
@@ -33,13 +34,14 @@ class _MatchView extends State<MatchView> {
   int? _previousStreamValue = 0;
   bool _paused = true;
   _MatchView(Match? match, Team? team) {
+    _selectedAlliance = match?.red;
     if (team != null) {
       _score = team.targetScore ?? Score(Uuid().v4(), Dice.none);
       _selectedTeam = team;
       _color = CupertinoColors.systemGreen;
     } else {
       _match = match;
-      _selectedTeam = match?.red?.item1 ?? Team.nullTeam();
+      _selectedTeam = match?.red?.team1 ?? Team.nullTeam();
       _score = _selectedTeam.scores.firstWhere(
         (element) => element.id == match?.id,
         orElse: () => Score(Uuid().v4(), Dice.none),
@@ -107,7 +109,7 @@ class _MatchView extends State<MatchView> {
                   appBar: AppBar(
                     backgroundColor: _color,
                     title: Text('Match Stats'),
-                    elevation: 0.0,
+                    elevation: 0,
                     actions: [
                       Center(
                         child: Text(
@@ -223,27 +225,47 @@ class _MatchView extends State<MatchView> {
                                 },
                               ).toList(),
                             ),
-                          ExpansionTile(
-                            leading: Checkbox(
-                              checkColor: Colors.black,
-                              fillColor: MaterialStateProperty.all(Colors.red),
-                              value: _score.penalties.show,
-                              onChanged: (_) =>
-                                  _score.penalties.show = _ ?? false,
-                            ),
-                            title: Text(
-                              'Penalties',
-                              style: TextStyle(fontSize: 16),
-                            ),
-                            children: [
-                              Incrementor(
+                          if (getPenaltyAlliance() != null)
+                            ExpansionTile(
+                              leading: Checkbox(
+                                checkColor: Colors.black,
+                                fillColor:
+                                    MaterialStateProperty.all(Colors.red),
+                                value: dataModel.showPenalties,
+                                onChanged: (_) =>
+                                    dataModel.showPenalties = _ ?? false,
+                              ),
+                              title: Text(
+                                'Penalties',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                              children: [
+                                Incrementor(
                                   element: _score.penalties.majorPenalty,
-                                  onPressed: stateSetter),
-                              Incrementor(
+                                  onPressed: stateSetter,
+                                  onDecrement: getPenaltyAlliance()!
+                                      .penalties
+                                      .majorPenalty
+                                      .decrement,
+                                  onIncrement: getPenaltyAlliance()!
+                                      .penalties
+                                      .majorPenalty
+                                      .increment,
+                                ),
+                                Incrementor(
                                   element: _score.penalties.minorPenalty,
-                                  onPressed: stateSetter),
-                            ],
-                          ),
+                                  onPressed: stateSetter,
+                                  onIncrement: getPenaltyAlliance()!
+                                      .penalties
+                                      .majorPenalty
+                                      .increment,
+                                  onDecrement: getPenaltyAlliance()!
+                                      .penalties
+                                      .majorPenalty
+                                      .decrement,
+                                ),
+                              ],
+                            ),
                           Padding(
                             padding: EdgeInsets.all(25),
                             child: Row(
@@ -355,15 +377,21 @@ class _MatchView extends State<MatchView> {
     dataModel.uploadEvent(widget.event);
   }
 
+  Alliance? getPenaltyAlliance() {
+    if (_match?.type == EventType.remote) return _selectedAlliance;
+    if (_selectedAlliance == _match?.red) return _match?.blue;
+    if (_selectedAlliance == _match?.blue) return _match?.red;
+  }
+
   void onIncrement() {
     if (lapses.length == 0)
-      lapses.add(_time);
+      lapses.add(_time.toPrecision(3));
     else
       lapses.add(
-        _time - lapses.reduce((value, element) => value + element),
+        _time.toPrecision(3) -
+            lapses.reduce((value, element) => value + element),
       );
-    _score.teleScore.cycles = lapses; //.getBoxAndWhisker();
-    //stateSetter();
+    _score.teleScore.cycles = lapses;
   }
 
   ListView viewSelect() {
@@ -508,51 +536,57 @@ class _MatchView extends State<MatchView> {
           flex: 1,
           child: PlatformButton(
             child: Text(
-              _match?.red?.item1?.number ?? '?',
+              _match?.red?.team1?.number ?? '?',
               style: TextStyle(
-                  color: _selectedTeam == _match?.red?.item1
+                  color: _selectedTeam == _match?.red?.team1
                       ? Colors.grey
                       : CupertinoColors.systemRed),
             ),
-            onPressed: _selectedTeam == _match?.red?.item1
+            onPressed: _selectedTeam == _match?.red?.team1
                 ? null
-                : () {
-                    setState(
+                : () => setState(
                       () {
-                        _selectedTeam = _match?.red?.item1 ?? Team.nullTeam();
+                        _selectedTeam = _match?.red?.team1 ?? Team.nullTeam();
+                        _selectedAlliance = _match?.red;
                         _color = CupertinoColors.systemRed;
                         _score = _selectedTeam.scores.firstWhere(
                           (element) => element.id == _match?.id,
-                          orElse: () => Score(Uuid().v4(), Dice.none),
+                          orElse: () => Score(
+                            Uuid().v4(),
+                            Dice.none,
+                          ),
                         );
                         incrementValue.count =
                             _score.teleScore.getElements()[0].incrementValue;
                       },
-                    );
-                  },
+                    ),
           ),
         ),
         Flexible(
           flex: 1,
           child: PlatformButton(
             child: Text(
-              _match?.red?.item2?.number ?? '?',
+              _match?.red?.team2?.number ?? '?',
               style: TextStyle(
-                color: _selectedTeam == _match?.red?.item2
+                color: _selectedTeam == _match?.red?.team2
                     ? Colors.grey
                     : CupertinoColors.systemRed,
               ),
             ),
-            onPressed: _selectedTeam == _match?.red?.item2
+            onPressed: _selectedTeam == _match?.red?.team2
                 ? null
                 : () {
                     setState(
                       () {
-                        _selectedTeam = _match?.red?.item2 ?? Team.nullTeam();
+                        _selectedTeam = _match?.red?.team2 ?? Team.nullTeam();
+                        _selectedAlliance = _match?.red;
                         _color = CupertinoColors.systemRed;
                         _score = _selectedTeam.scores.firstWhere(
                           (element) => element.id == _match?.id,
-                          orElse: () => Score(Uuid().v4(), Dice.none),
+                          orElse: () => Score(
+                            Uuid().v4(),
+                            Dice.none,
+                          ),
                         );
                       },
                     );
@@ -564,22 +598,26 @@ class _MatchView extends State<MatchView> {
           flex: 1,
           child: PlatformButton(
             child: Text(
-              _match?.blue?.item1?.number ?? '?',
+              _match?.blue?.team1?.number ?? '?',
               style: TextStyle(
-                  color: _selectedTeam == _match?.blue?.item1
+                  color: _selectedTeam == _match?.blue?.team1
                       ? Colors.grey
                       : Colors.blue),
             ),
-            onPressed: _selectedTeam == _match?.blue?.item1
+            onPressed: _selectedTeam == _match?.blue?.team1
                 ? null
                 : () {
                     setState(
                       () {
-                        _selectedTeam = _match?.blue?.item1 ?? Team.nullTeam();
+                        _selectedTeam = _match?.blue?.team1 ?? Team.nullTeam();
+                        _selectedAlliance = _match?.blue;
                         _color = Colors.blue;
                         _score = _selectedTeam.scores.firstWhere(
                           (element) => element.id == _match?.id,
-                          orElse: () => Score(Uuid().v4(), Dice.none),
+                          orElse: () => Score(
+                            Uuid().v4(),
+                            Dice.none,
+                          ),
                         );
                       },
                     );
@@ -590,21 +628,25 @@ class _MatchView extends State<MatchView> {
           flex: 1,
           child: PlatformButton(
             child: Text(
-              _match?.blue?.item2?.number ?? '?',
+              _match?.blue?.team2?.number ?? '?',
               style: TextStyle(
-                  color: _selectedTeam == _match?.blue?.item2
+                  color: _selectedTeam == _match?.blue?.team2
                       ? Colors.grey
                       : Colors.blue),
             ),
-            onPressed: _selectedTeam == _match?.blue?.item2
+            onPressed: _selectedTeam == _match?.blue?.team2
                 ? null
                 : () => setState(
                       () {
-                        _selectedTeam = _match?.blue?.item2 ?? Team.nullTeam();
+                        _selectedTeam = _match?.blue?.team2 ?? Team.nullTeam();
+                        _selectedAlliance = _match?.blue;
                         _color = Colors.blue;
                         _score = _selectedTeam.scores.firstWhere(
                           (element) => element.id == _match?.id,
-                          orElse: () => Score(Uuid().v4(), Dice.none),
+                          orElse: () => Score(
+                            Uuid().v4(),
+                            Dice.none,
+                          ),
                         );
                       },
                     ),

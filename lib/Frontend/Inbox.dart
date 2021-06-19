@@ -46,7 +46,7 @@ class _InboxState extends State<Inbox> {
                             ),
                           ),
                           Text(
-                            e['authorName'],
+                            e['authorName'] ?? "Guest",
                           ),
                         ],
                       ),

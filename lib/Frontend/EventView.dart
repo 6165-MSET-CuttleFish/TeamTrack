@@ -313,12 +313,14 @@ class _EventView extends State<EventView> {
                             .findAdd(names[0], controllers[0].text),
                         widget.event.teams
                             .findAdd(names[1], controllers[1].text),
+                        widget.event.type,
                       ),
                       Alliance(
                         widget.event.teams
                             .findAdd(names[2], controllers[2].text),
                         widget.event.teams
                             .findAdd(names[3], controllers[3].text),
+                        widget.event.type,
                       ),
                       widget.event.type),
                 );

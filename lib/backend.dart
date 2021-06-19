@@ -171,6 +171,7 @@ final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 
 class DataModel {
   final List<String> keys = [Statics.gameName];
+  bool showPenalties = false;
   DataModel() {
     try {
       restoreEvents();
@@ -223,17 +224,17 @@ class DataModel {
   void organize() {
     for (Event event in events) {
       for (Match match in event.matches) {
-        match.red!.item1 = event.teams.firstWhere(
-            (e) => e.number == match.red!.item1!.number,
+        match.red!.team1 = event.teams.firstWhere(
+            (e) => e.number == match.red!.team1!.number,
             orElse: () => Team.nullTeam());
-        match.red!.item2 = event.teams.firstWhere(
-            (e) => e.number == match.red!.item2!.number,
+        match.red!.team2 = event.teams.firstWhere(
+            (e) => e.number == match.red!.team2!.number,
             orElse: () => Team.nullTeam());
-        match.blue!.item1 = event.teams.firstWhere(
-            (e) => e.number == match.blue!.item1!.number,
+        match.blue!.team1 = event.teams.firstWhere(
+            (e) => e.number == match.blue!.team1!.number,
             orElse: () => Team.nullTeam());
-        match.blue!.item2 = event.teams.firstWhere(
-            (e) => e.number == match.blue!.item2!.number,
+        match.blue!.team2 = event.teams.firstWhere(
+            (e) => e.number == match.blue!.team2!.number,
             orElse: () => Team.nullTeam());
       }
     }
@@ -244,7 +245,7 @@ class Event {
   Event({required this.name, required this.type});
   String id = Uuid().v4();
   bool shared = false;
-  late EventType type;
+  EventType type = EventType.remote;
   List<Team> teams = [];
   List<Match> matches = [];
   late String name;
@@ -261,19 +262,19 @@ class Event {
 
   void deleteTeam(Team team) {
     for (Match match in matches) {
-      if (match.red!.item1!.equals(team)) match.red!.item1 = Team.nullTeam();
-      if (match.red!.item2!.equals(team)) match.red!.item2 = Team.nullTeam();
-      if (match.blue!.item1!.equals(team)) match.blue!.item1 = Team.nullTeam();
-      if (match.blue!.item2!.equals(team)) match.blue!.item2 = Team.nullTeam();
+      if (match.red!.team1!.equals(team)) match.red!.team1 = null;
+      if (match.red!.team2!.equals(team)) match.red!.team2 = null;
+      if (match.blue!.team1!.equals(team)) match.blue!.team1 = null;
+      if (match.blue!.team2!.equals(team)) match.blue!.team2 = null;
     }
     teams.remove(team);
   }
 
   void deleteMatch(Match e) {
-    e.red?.item1?.scores.removeWhere((f) => f.id == e.id);
-    e.red?.item2?.scores.removeWhere((f) => f.id == e.id);
-    e.blue?.item1?.scores.removeWhere((f) => f.id == e.id);
-    e.blue?.item2?.scores.removeWhere((f) => f.id == e.id);
+    e.red?.team1?.scores.removeWhere((f) => f.id == e.id);
+    e.red?.team2?.scores.removeWhere((f) => f.id == e.id);
+    e.blue?.team1?.scores.removeWhere((f) => f.id == e.id);
+    e.blue?.team2?.scores.removeWhere((f) => f.id == e.id);
     matches.remove(e);
   }
 
@@ -283,10 +284,11 @@ class Event {
 
   void updateLocal(Map<String, dynamic>? json) {
     if (json != null) {
+      type = getTypeFromString(json['type']);
       name = json['name'];
       try {
-        teams =
-            List<Team>.from(json['teams'].map((model) => Team.fromJson(model)));
+        teams = List<Team>.from(
+            json['teams'].map((model) => Team.fromJson(model, type)));
       } catch (e) {
         teams = [];
       }
@@ -296,18 +298,30 @@ class Event {
       } catch (e) {
         matches = [];
       }
-      type = getTypeFromString(json['type']);
       shared = json['shared'] ?? true;
       id = json['id'] ?? Uuid().v4();
     }
   }
 
   Event.fromJson(Map<String, dynamic> json) {
-    name = json['name'];
-    teams = List<Team>.from(json['teams'].map((model) => Team.fromJson(model)));
-    matches = List<Match>.from(
-        json['matches'].map((model) => Match.fromJson(model, teams)));
     type = getTypeFromString(json['type']);
+    name = json['name'];
+    teams = List<Team>.from(
+      json['teams'].map(
+        (model) => Team.fromJson(
+          model,
+          type,
+        ),
+      ),
+    );
+    matches = List<Match>.from(
+      json['matches'].map(
+        (model) => Match.fromJson(
+          model,
+          teams,
+        ),
+      ),
+    );
     shared = json['shared'] ?? false;
     id = json['id'] ?? Uuid().v4();
     try {
@@ -329,38 +343,60 @@ class Event {
 }
 
 class Alliance {
-  Team? item1;
-  Team? item2;
-  Alliance(Team item1, Team item2) {
-    this.item1 = item1;
-    this.item2 = item2;
+  Team? team1;
+  Team? team2;
+  late Penalty penalties;
+  EventType eventType;
+  Alliance(this.team1, this.team2, this.eventType) {
+    penalties = Penalty(Dice.none);
   }
-  int allianceTotal(String? id) {
-    return 0 +
-        (item1?.scores
-                .firstWhere((e) => e.id == id,
-                    orElse: () => Score(Uuid().v4(), Dice.none))
-                .total() ??
-            0) +
-        (item2?.scores
-                .firstWhere(
-                  (e) => e.id == id,
-                  orElse: () => Score(Uuid().v4(), Dice.none),
-                )
-                .total() ??
-            0);
-  }
+  int allianceTotal(String? id, bool showPenalties) =>
+      ((team1?.scores
+              .firstWhere(
+                (e) => e.id == id,
+                orElse: () => Score(
+                  Uuid().v4(),
+                  Dice.none,
+                ),
+              )
+              .total() ??
+          0) +
+      (team2?.scores
+              .firstWhere(
+                (e) => e.id == id,
+                orElse: () => Score(
+                  Uuid().v4(),
+                  Dice.none,
+                ),
+              )
+              .total() ??
+          0) +
+      (showPenalties
+          ? (eventType == EventType.remote
+              ? -penalties.total()
+              : penalties.total())
+          : 0)).clamp(0, 999999999999999999);
 
-  Alliance.fromJson(Map<String, dynamic>? json, List<Team> teamList)
-      : item1 = teamList.firstWhere(
-            (e) => e.number.trim() == json?['team1'].trim(),
-            orElse: () => Team.nullTeam()),
-        item2 = teamList.firstWhere(
-            (e) => e.number.trim() == json?['team2'].trim(),
-            orElse: () => Team.nullTeam());
+  Alliance.fromJson(
+    Map<String, dynamic> json,
+    List<Team> teamList,
+    this.eventType,
+  )   : team1 = teamList.firstWhere(
+          (e) => e.number.trim() == json['team1']?.trim(),
+          orElse: () => Team.nullTeam(),
+        ),
+        team2 = teamList.firstWhere(
+          (e) => e.number.trim() == json['team2']?.trim(),
+          orElse: () => Team.nullTeam(),
+        ),
+        penalties = Penalty.fromJson(
+          json['Penalty'],
+          Dice.none,
+        );
   Map<String, dynamic> toJson() => {
-        'team1': item1?.number,
-        'team2': item2?.number,
+        'team1': team1?.number,
+        'team2': team2?.number,
+        'Penalty': penalties.toJson(),
       };
 }
 
@@ -373,7 +409,10 @@ class Team {
     this.name = name;
     this.number = number;
     scores = [];
-    targetScore = Score(Uuid().v4(), Dice.none);
+    targetScore = Score(
+      Uuid().v4(),
+      Dice.none,
+    );
   }
   static Team nullTeam() {
     return Team("?", "?");
@@ -383,16 +422,16 @@ class Team {
     return this.number == other.number;
   }
 
-  Team.fromJson(Map<String, dynamic> json) {
+  Team.fromJson(Map<String, dynamic> json, EventType eventType) {
     number = json['number'];
     name = json['name'];
     try {
       scores = List<Score>.from(
-          json['scores'].map((model) => Score.fromJson(model)));
+          json['scores'].map((model) => Score.fromJson(model, eventType)));
     } catch (e) {
       scores = [];
     }
-    targetScore = Score.fromJson(json['targetScore']);
+    targetScore = Score.fromJson(json['targetScore'], eventType);
   }
   Map<String, dynamic> toJson() => {
         'name': name,
@@ -403,32 +442,50 @@ class Team {
 }
 
 class Match {
-  EventType? type = EventType.live;
+  EventType type = EventType.live;
   Dice dice = Dice.one;
   Alliance? red;
   Alliance? blue;
   String id = '';
-  Match(Alliance red, Alliance blue, EventType? type) {
+  Match(Alliance red, Alliance blue, EventType type) {
     this.type = type;
     this.red = red;
     this.blue = blue;
     id = Uuid().v4();
-    red.item1?.scores.addScore(Score(id, dice));
+    red.team1?.scores.addScore(Score(
+      id,
+      dice,
+    ));
     if (type != EventType.remote) {
-      red.item2?.scores.addScore(Score(id, dice));
-      blue.item1?.scores.addScore(Score(id, dice));
-      blue.item2?.scores.addScore(Score(id, dice));
+      red.team2?.scores.addScore(
+        Score(
+          id,
+          dice,
+        ),
+      );
+      blue.team1?.scores.addScore(
+        Score(
+          id,
+          dice,
+        ),
+      );
+      blue.team2?.scores.addScore(
+        Score(
+          id,
+          dice,
+        ),
+      );
     }
   }
   static Match defaultMatch(EventType type) {
-    return Match(Alliance(Team('1', 'Alpha'), Team('2', 'Beta')),
-        Alliance(Team('3', 'Charlie'), Team('4', 'Delta')), type);
+    return Match(Alliance(Team('1', 'Alpha'), Team('2', 'Beta'), type),
+        Alliance(Team('3', 'Charlie'), Team('4', 'Delta'), type), type);
   }
 
   Alliance? alliance(Team team) {
-    if (red!.item1!.equals(team) || red!.item2!.equals(team)) {
+    if (red!.team1!.equals(team) || red!.team2!.equals(team)) {
       return red;
-    } else if (blue!.item1!.equals(team) || blue!.item2!.equals(team)) {
+    } else if (blue!.team1.equals(team) || blue!.team2!.equals(team)) {
       return blue;
     } else {
       return null;
@@ -437,62 +494,52 @@ class Match {
 
   void setDice(Dice dice) {
     this.dice = dice;
-    red?.item1?.scores
+    red?.team1?.scores
         .firstWhere((e) => e.id == id,
-            orElse: () => Score(Uuid().v4(), Dice.none))
+            orElse: () => Score(
+                  Uuid().v4(),
+                  Dice.none,
+                ))
         .dice = dice;
-    red?.item2?.scores
+    red?.team2?.scores
         .firstWhere((e) => e.id == id,
-            orElse: () => Score(Uuid().v4(), Dice.none))
+            orElse: () => Score(
+                  Uuid().v4(),
+                  Dice.none,
+                ))
         .dice = dice;
-    blue?.item1?.scores
+    blue?.team1?.scores
         .firstWhere((e) => e.id == id,
-            orElse: () => Score(Uuid().v4(), Dice.none))
+            orElse: () => Score(
+                  Uuid().v4(),
+                  Dice.none,
+                ))
         .dice = dice;
-    blue?.item2?.scores
+    blue?.team2?.scores
         .firstWhere((e) => e.id == id,
-            orElse: () => Score(Uuid().v4(), Dice.none))
+            orElse: () => Score(
+                  Uuid().v4(),
+                  Dice.none,
+                ))
         .dice = dice;
   }
 
   String score() {
     if (type == EventType.remote) {
-      return red!.item1!.scores
-          .firstWhere((e) => e.id == id,
-              orElse: () => Score(Uuid().v4(), Dice.none))
-          .total()
-          .toString();
+      return redScore();
     }
     return redScore() + " - " + blueScore();
   }
 
-  String redScore() {
-    final r0 = red?.item1?.scores
-        .firstWhere((e) => e.id == id,
-            orElse: () => Score(Uuid().v4(), Dice.none))
-        .total();
-    final r1 = red?.item2?.scores
-        .firstWhere((e) => e.id == id,
-            orElse: () => Score(Uuid().v4(), Dice.none))
-        .total();
-    return ((r0 ?? 0) + (r1 ?? 0)).toString();
-  }
+  String redScore() => (red?.allianceTotal(id, true) ?? 0).toString();
 
-  String blueScore() {
-    final b0 = blue?.item1?.scores
-        .firstWhere((e) => e.id == id,
-            orElse: () => Score(Uuid().v4(), Dice.none))
-        .total();
-    final b1 = blue?.item2?.scores
-        .firstWhere((e) => e.id == id,
-            orElse: () => Score(Uuid().v4(), Dice.none))
-        .total();
-    return ((b0 ?? 0) + (b1 ?? 0)).toString();
-  }
+  String blueScore() => (blue?.allianceTotal(id, true) ?? 0).toString();
 
   Match.fromJson(Map<String, dynamic> json, List<Team> teamList)
-      : red = Alliance.fromJson(json['red'], teamList),
-        blue = Alliance.fromJson(json['blue'], teamList),
+      : red = Alliance.fromJson(
+            json['red'], teamList, getTypeFromString(json['type'])),
+        blue = Alliance.fromJson(
+            json['blue'], teamList, getTypeFromString(json['type'])),
         id = json['id'],
         dice = getDiceFromString(json['dice']),
         type = getTypeFromString(json['type']);
@@ -553,7 +600,7 @@ extension Arithmetic on Iterable<num> {
     final arr = this.sorted();
     int index = this.length ~/ 2;
     if (this.length % 2 == 0)
-      return [arr[(index - 1).clamp(0, 99999999999)] + arr[index]].mean();
+      return [arr[(index - 1).clamp(0, 999999999999999999)], arr[index]].mean();
     return arr[index];
   }
 
@@ -608,28 +655,38 @@ extension moreArithmetic on num {
       this > list.q3() + 1.5 * list.iqr();
 }
 
+extension Ex on double {
+  double toPrecision(int n) => double.parse(toStringAsFixed(n));
+}
+
+extension ExTeam on Team? {
+  bool equals(Team? other) => this?.number == other?.number;
+}
+
 extension MatchExtensions on List<Match> {
-  List<FlSpot> spots(Team? team, Dice? dice) {
+  List<FlSpot> spots(Team team, Dice dice) {
     List<FlSpot> val = [];
     final arr =
         (dice != Dice.none ? this.where((e) => e.dice == dice) : this).toList();
     for (int i = 0; i < arr.length; i++) {
-      final alliance = arr[i].alliance(team!);
+      final alliance = arr[i].alliance(team);
       if (alliance != null) {
-        final allianceTotal = alliance.allianceTotal(arr[i].id);
+        final allianceTotal = alliance.allianceTotal(arr[i].id, true);
         val.add(FlSpot(i.toDouble(), allianceTotal.toDouble()));
       }
     }
     return val;
   }
 
-  int maxAllianceScore(Team? team) {
+  int maxAllianceScore(Team team) {
     List<int> val = [];
     for (int i = 0; i < this.length; i++) {
-      final alliance = this[i].alliance(team!);
+      final alliance = this[i].alliance(team);
       if (alliance != null) {
-        final allianceTotal = alliance.allianceTotal(this[i].id);
+        final allianceTotal = alliance.allianceTotal(this[i].id, false);
         val.add(allianceTotal);
+        final allianceTotal2 = alliance.allianceTotal(this[i].id, true);
+        val.add(allianceTotal2);
       }
     }
     return val.reduce(max);

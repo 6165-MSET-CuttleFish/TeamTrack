@@ -30,6 +30,11 @@ class _TeamView extends State<TeamView> {
   final _selections = [true, true, false, false, false];
   Team _team = Team.nullTeam();
   bool removeOutliers = false;
+  final endgameColor = Colors.red;
+  final teleColor = Colors.blue;
+  final autoColor = Colors.green;
+  final generalColor = Color.fromRGBO(230, 30, 213, 1);
+  var showPenalties = false;
   @override
   Widget build(BuildContext context) {
     _team = widget.team;
@@ -120,7 +125,6 @@ class _TeamView extends State<TeamView> {
             ),
       appBar: AppBar(
         title: Text(_team.name),
-        foregroundColor: Colors.green,
         backgroundColor: Theme.of(context).accentColor,
         actions: [
           Center(
@@ -132,6 +136,14 @@ class _TeamView extends State<TeamView> {
             checkColor: Colors.black,
             fillColor: MaterialStateProperty.all(Colors.yellow),
           ),
+          Checkbox(
+            value: showPenalties,
+            onChanged: (_) {
+              setState(() => showPenalties = _ ?? false);
+            },
+            checkColor: Colors.black,
+            fillColor: MaterialStateProperty.all(Colors.pink[50]),
+          )
         ],
       ),
       body: StreamBuilder<Database.Event>(
@@ -171,313 +183,341 @@ class _TeamView extends State<TeamView> {
   }
 
   bool _showCycles = false;
-  Widget _lineChart() {
-    return _team.scores.diceScores(_dice).length >= 2
-        ? Stack(
-            alignment: Alignment.topRight,
-            children: [
-              AspectRatio(
-                aspectRatio: 1.20,
-                child: Container(
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(18),
-                    ),
-                    color: Color(0xff232d37),
+  Widget _lineChart() => _team.scores.diceScores(_dice).length >= 2
+      ? Stack(
+          alignment: Alignment.topRight,
+          children: [
+            AspectRatio(
+              aspectRatio: 1.20,
+              child: Container(
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(18),
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                        right: 50.0, left: 12.0, top: 24, bottom: 12),
-                    child: !_showCycles
-                        ? LineChart(
-                            LineChartData(
-                              gridData: FlGridData(
-                                show: true,
-                                drawVerticalLine: true,
-                                getDrawingHorizontalLine: (value) {
-                                  return FlLine(
-                                    color: value % 10 == 0
-                                        ? Color(0xff37434d)
-                                        : Colors.transparent,
-                                    strokeWidth: value % 10 == 0 ? 1 : 0,
-                                  );
-                                },
-                                getDrawingVerticalLine: (value) {
-                                  return FlLine(
-                                    color: const Color(0xff37434d),
-                                    strokeWidth: 1,
-                                  );
-                                },
-                              ),
-                              titlesData: FlTitlesData(
-                                show: true,
-                                bottomTitles: SideTitles(
-                                  showTitles: true,
-                                  reservedSize: 22,
-                                  getTextStyles: (value) => const TextStyle(
-                                      color: Color(0xff68737d),
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 10),
-                                  getTitles: (value) {
-                                    return (value + 1).toInt().toString();
-                                  },
-                                  margin: 8,
-                                ),
-                                leftTitles: SideTitles(
-                                  showTitles: true,
-                                  getTextStyles: (value) => const TextStyle(
-                                    color: Color(0xff67727d),
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                  ),
-                                  getTitles: (value) {
-                                    if (value % 50 == 0)
-                                      return value.toInt().toString();
-                                    return '';
-                                  },
-                                  reservedSize: 28,
-                                  margin: 12,
-                                ),
-                              ),
-                              borderData: FlBorderData(
-                                show: true,
-                                border: Border.all(
-                                    color: const Color(0xff37434d), width: 1),
-                              ),
-                              minX: 0,
-                              maxX: _team.scores
-                                      .diceScores(_dice)
-                                      .length
-                                      .toDouble() -
-                                  1,
-                              minY: 0,
-                              maxY: [
-                                widget.event.matches
-                                    .maxAllianceScore(_team)
-                                    .toDouble(),
-                                _team.targetScore != null
-                                    ? _team.targetScore!.total().toDouble()
-                                    : 0.0
-                              ].reduce(max),
-                              lineBarsData: [
-                                LineChartBarData(
-                                  belowBarData: _team.targetScore != null
-                                      ? BarAreaData(
-                                          show: true,
-                                          colors: [
-                                            Colors.lightGreenAccent
-                                                .withOpacity(0.2)
-                                          ],
-                                          cutOffY: _team.targetScore
-                                              ?.total()
-                                              .toDouble(),
-                                          applyCutOffY: true,
-                                        )
-                                      : null,
-                                  aboveBarData: _team.targetScore != null
-                                      ? BarAreaData(
-                                          show: true,
-                                          colors: [
-                                            Colors.redAccent.withOpacity(0.2)
-                                          ],
-                                          cutOffY: _team.targetScore
-                                              ?.total()
-                                              .toDouble(),
-                                          applyCutOffY: true,
-                                        )
-                                      : null,
-                                  show: _selections[0] &&
-                                      widget.event.type != EventType.remote,
-                                  spots: widget.event.matches
-                                      .where((e) =>
-                                          e.dice == _dice || _dice == Dice.none)
-                                      .toList()
-                                      .spots(_team, _dice),
-                                  colors: [Color.fromRGBO(255, 166, 0, 1)],
-                                  isCurved: true,
-                                  isStrokeCapRound: true,
-                                  preventCurveOverShooting: true,
-                                  barWidth: 5,
-                                  shadow: Shadow(
-                                      color: Colors.green, blurRadius: 5),
-                                ),
-                                LineChartBarData(
-                                  belowBarData: _team.targetScore != null
-                                      ? BarAreaData(
-                                          show: true,
-                                          colors: [
-                                            Colors.lightGreenAccent
-                                                .withOpacity(0.2)
-                                          ],
-                                          cutOffY: _team.targetScore
-                                              ?.total()
-                                              .toDouble(),
-                                          applyCutOffY: true,
-                                        )
-                                      : null,
-                                  aboveBarData: _team.targetScore != null
-                                      ? BarAreaData(
-                                          show: true,
-                                          colors: [
-                                            Colors.redAccent.withOpacity(0.2)
-                                          ],
-                                          cutOffY: _team.targetScore
-                                              ?.total()
-                                              .toDouble(),
-                                          applyCutOffY: true,
-                                        )
-                                      : null,
-                                  show: _selections[1],
-                                  spots: _dice != Dice.none
-                                      ? _team.scores
-                                          .where((e) => e.dice == _dice)
-                                          .toList()
-                                          .spots(null)
-                                          .removeOutliers(removeOutliers)
-                                      : _team.scores
-                                          .spots(null)
-                                          .removeOutliers(removeOutliers),
-                                  colors: [
-                                    Color.fromRGBO(230, 30, 213, 1),
-                                  ],
-                                  isCurved: true,
-                                  isStrokeCapRound: true,
-                                  preventCurveOverShooting: true,
-                                  barWidth: 5,
-                                  shadow: Shadow(
-                                      color: Colors.green, blurRadius: 5),
-                                ),
-                                LineChartBarData(
-                                  show: _selections[2],
-                                  spots: _dice != Dice.none
-                                      ? _team.scores
-                                          .where((e) => e.dice == _dice)
-                                          .toList()
-                                          .spots(OpModeType.auto)
-                                          .removeOutliers(removeOutliers)
-                                      : _team.scores
-                                          .spots(OpModeType.auto)
-                                          .removeOutliers(removeOutliers),
-                                  colors: [
-                                    Colors.green,
-                                  ],
-                                  isCurved: true,
-                                  isStrokeCapRound: true,
-                                  preventCurveOverShooting: true,
-                                  barWidth: 5,
-                                  shadow: Shadow(
-                                      color: Colors.green, blurRadius: 5),
-                                ),
-                                LineChartBarData(
-                                  show: _selections[3],
-                                  spots: _dice != Dice.none
-                                      ? _team.scores
-                                          .where((e) => e.dice == _dice)
-                                          .toList()
-                                          .spots(OpModeType.tele)
-                                          .removeOutliers(removeOutliers)
-                                      : _team.scores
-                                          .spots(OpModeType.tele)
-                                          .removeOutliers(removeOutliers),
-                                  colors: [
-                                    Colors.blue,
-                                  ],
-                                  isCurved: true,
-                                  isStrokeCapRound: true,
-                                  preventCurveOverShooting: true,
-                                  barWidth: 5,
-                                  shadow: Shadow(
-                                      color: Colors.green, blurRadius: 5),
-                                ),
-                                LineChartBarData(
-                                  show: _selections[4],
-                                  spots: _dice != Dice.none
-                                      ? _team.scores
-                                          .where((e) => e.dice == _dice)
-                                          .toList()
-                                          .spots(OpModeType.endgame)
-                                          .removeOutliers(removeOutliers)
-                                      : _team.scores
-                                          .spots(OpModeType.endgame)
-                                          .removeOutliers(removeOutliers),
-                                  colors: [
-                                    Colors.red,
-                                  ],
-                                  isCurved: true,
-                                  isStrokeCapRound: true,
-                                  preventCurveOverShooting: true,
-                                  barWidth: 5,
-                                  shadow: Shadow(
-                                      color: Colors.green, blurRadius: 5),
-                                ),
-                              ],
+                  color: Color(0xff232d37),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                      right: 50.0, left: 12.0, top: 24, bottom: 12),
+                  child: !_showCycles
+                      ? LineChart(
+                          LineChartData(
+                            gridData: FlGridData(
+                              show: true,
+                              drawVerticalLine: true,
+                              getDrawingHorizontalLine: (value) {
+                                return FlLine(
+                                  color: value % 10 == 0
+                                      ? Color(0xff37434d)
+                                      : Colors.transparent,
+                                  strokeWidth: value % 10 == 0 ? 1 : 0,
+                                );
+                              },
+                              getDrawingVerticalLine: (value) {
+                                return FlLine(
+                                  color: const Color(0xff37434d),
+                                  strokeWidth: 1,
+                                );
+                              },
                             ),
-                          )
-                        : SfCartesianChart(
-                            series: <ChartSeries<List<double>, int>>[
-                              BoxAndWhiskerSeries<List<double>, int>(
-                                gradient: LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    colors: [
-                                      Theme.of(context).accentColor,
-                                      Theme.of(context).splashColor
-                                    ]),
-                                dataSource: _team.scores
+                            titlesData: FlTitlesData(
+                              show: true,
+                              bottomTitles: SideTitles(
+                                showTitles: true,
+                                reservedSize: 22,
+                                getTextStyles: (value) => const TextStyle(
+                                    color: Color(0xff68737d),
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 10),
+                                getTitles: (value) {
+                                  return (value + 1).toInt().toString();
+                                },
+                                margin: 8,
+                              ),
+                              leftTitles: SideTitles(
+                                showTitles: true,
+                                getTextStyles: (value) => const TextStyle(
+                                  color: Color(0xff67727d),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                ),
+                                getTitles: (value) {
+                                  if (value % 50 == 0)
+                                    return value.toInt().toString();
+                                  return '';
+                                },
+                                reservedSize: 28,
+                                margin: 12,
+                              ),
+                            ),
+                            borderData: FlBorderData(
+                              show: true,
+                              border: Border.all(
+                                  color: const Color(0xff37434d), width: 1),
+                            ),
+                            minX: 0,
+                            maxX: _team.scores
                                     .diceScores(_dice)
-                                    .map((e) => e.teleScore.cycles)
-                                    .toList(),
-                                boxPlotMode: BoxPlotMode.exclusive,
-                                xValueMapper: (cycles, _) => _ + 1,
-                                yValueMapper: (cycles, _) =>
-                                    cycles.length != 0 ? cycles : [0, 0, 0, 0],
+                                    .length
+                                    .toDouble() -
+                                1,
+                            minY: 0,
+                            maxY: [
+                              widget.event.matches
+                                  .maxAllianceScore(_team)
+                                  .toDouble(),
+                              _team.targetScore != null
+                                  ? _team.targetScore!.total().toDouble()
+                                  : 0.0
+                            ].reduce(max),
+                            lineBarsData: [
+                              LineChartBarData(
+                                belowBarData: _team.targetScore != null
+                                    ? BarAreaData(
+                                        show: true,
+                                        colors: [
+                                          Colors.lightGreenAccent
+                                              .withOpacity(0.2)
+                                        ],
+                                        cutOffY: _team.targetScore
+                                            ?.total()
+                                            .toDouble(),
+                                        applyCutOffY: true,
+                                      )
+                                    : null,
+                                aboveBarData: _team.targetScore != null
+                                    ? BarAreaData(
+                                        show: true,
+                                        colors: [
+                                          Colors.redAccent.withOpacity(0.2)
+                                        ],
+                                        cutOffY: _team.targetScore
+                                            ?.total()
+                                            .toDouble(),
+                                        applyCutOffY: true,
+                                      )
+                                    : null,
+                                show: _selections[0] &&
+                                    widget.event.type != EventType.remote,
+                                spots: widget.event.matches
+                                    .where((e) =>
+                                        e.dice == _dice || _dice == Dice.none)
+                                    .toList()
+                                    .spots(_team, _dice),
+                                colors: [
+                                  Color.fromRGBO(255, 166, 0, 1),
+                                ],
+                                isCurved: true,
+                                isStrokeCapRound: true,
+                                preventCurveOverShooting: true,
+                                barWidth: 5,
+                                shadow: Shadow(
+                                  color: Colors.green,
+                                  blurRadius: 5,
+                                ),
+                              ),
+                              LineChartBarData(
+                                belowBarData: _team.targetScore != null
+                                    ? BarAreaData(
+                                        show: true,
+                                        colors: [
+                                          Colors.lightGreenAccent
+                                              .withOpacity(0.2)
+                                        ],
+                                        cutOffY: _team.targetScore
+                                            ?.total()
+                                            .toDouble(),
+                                        applyCutOffY: true,
+                                      )
+                                    : null,
+                                aboveBarData: _team.targetScore != null
+                                    ? BarAreaData(
+                                        show: true,
+                                        colors: [
+                                          Colors.redAccent.withOpacity(0.2)
+                                        ],
+                                        cutOffY: _team.targetScore
+                                            ?.total()
+                                            .toDouble(),
+                                        applyCutOffY: true,
+                                      )
+                                    : null,
+                                show: _selections[1],
+                                spots: _dice != Dice.none
+                                    ? _team.scores
+                                        .where((e) => e.dice == _dice)
+                                        .toList()
+                                        .spots(null)
+                                        .removeOutliers(removeOutliers)
+                                    : _team.scores
+                                        .spots(null)
+                                        .removeOutliers(removeOutliers),
+                                colors: [
+                                  generalColor,
+                                ],
+                                isCurved: true,
+                                isStrokeCapRound: true,
+                                preventCurveOverShooting: true,
+                                barWidth: 5,
+                                shadow: Shadow(
+                                  color: Colors.green,
+                                  blurRadius: 5,
+                                ),
+                              ),
+                              LineChartBarData(
+                                show: _selections[2],
+                                spots: _dice != Dice.none
+                                    ? _team.scores
+                                        .where((e) => e.dice == _dice)
+                                        .toList()
+                                        .spots(OpModeType.auto)
+                                        .removeOutliers(removeOutliers)
+                                    : _team.scores
+                                        .spots(OpModeType.auto)
+                                        .removeOutliers(removeOutliers),
+                                colors: [
+                                  autoColor,
+                                ],
+                                isCurved: true,
+                                isStrokeCapRound: true,
+                                preventCurveOverShooting: true,
+                                barWidth: 5,
+                                shadow: Shadow(
+                                  color: Colors.green,
+                                  blurRadius: 5,
+                                ),
+                              ),
+                              LineChartBarData(
+                                show: _selections[3],
+                                spots: _dice != Dice.none
+                                    ? _team.scores
+                                        .where((e) => e.dice == _dice)
+                                        .toList()
+                                        .spots(OpModeType.tele)
+                                        .removeOutliers(removeOutliers)
+                                    : _team.scores
+                                        .spots(OpModeType.tele)
+                                        .removeOutliers(removeOutliers),
+                                colors: [
+                                  teleColor,
+                                ],
+                                isCurved: true,
+                                isStrokeCapRound: true,
+                                preventCurveOverShooting: true,
+                                barWidth: 5,
+                                shadow: Shadow(
+                                  color: Colors.green,
+                                  blurRadius: 5,
+                                ),
+                              ),
+                              LineChartBarData(
+                                show: _selections[4],
+                                spots: _dice != Dice.none
+                                    ? _team.scores
+                                        .where((e) => e.dice == _dice)
+                                        .toList()
+                                        .spots(OpModeType.endgame)
+                                        .removeOutliers(removeOutliers)
+                                    : _team.scores
+                                        .spots(OpModeType.endgame)
+                                        .removeOutliers(removeOutliers),
+                                colors: [
+                                  endgameColor,
+                                ],
+                                isCurved: true,
+                                isStrokeCapRound: true,
+                                preventCurveOverShooting: true,
+                                barWidth: 5,
+                                shadow: Shadow(
+                                  color: Colors.green,
+                                  blurRadius: 5,
+                                ),
                               ),
                             ],
                           ),
-                  ),
+                        )
+                      : SfCartesianChart(
+                          title: ChartTitle(
+                              text: 'Cycle Times and Misses',
+                              borderWidth: 2,
+                              // Aligns the chart title to left
+                              alignment: ChartAlignment.near,
+                              textStyle: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                              )),
+                          series: <ChartSeries>[
+                            BoxAndWhiskerSeries<List<double>, int>(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Theme.of(context).accentColor,
+                                  Theme.of(context).splashColor
+                                ],
+                              ),
+                              dataSource: _team.scores
+                                  .diceScores(_dice)
+                                  .map((e) => e.teleScore.cycles)
+                                  .toList(),
+                              boxPlotMode: BoxPlotMode.exclusive,
+                              xValueMapper: (List<double> cycles, _) => _ + 1,
+                              yValueMapper: (List<double> cycles, _) =>
+                                  cycles.length != 0 ? cycles : [0, 0, 0, 0],
+                            ),
+                            ScatterSeries<int, int>(
+                              dataSource: _team.scores
+                                  .diceScores(_dice)
+                                  .map((e) => e.teleScore.misses)
+                                  .toList(),
+                              xValueMapper: (int misses, _) => _ + 1,
+                              yValueMapper: (int misses, _) => misses,
+                            ),
+                          ],
+                        ),
                 ),
               ),
-              SizedBox(
-                width: 45,
-                height: 90,
-                child: OutlinedButton(
-                  onPressed: () => setState(
-                    () => _showCycles = !_showCycles,
+            ),
+            SizedBox(
+              width: 45,
+              height: 90,
+              child: OutlinedButton(
+                onPressed: () => setState(
+                  () => _showCycles = !_showCycles,
+                ),
+                child: Text(
+                  'Show Cycle Times',
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: _showCycles
+                        ? Colors.white.withOpacity(0.5)
+                        : Colors.white,
                   ),
-                  child: Text(
-                    'Show Cycle Times',
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: _showCycles
-                          ? Colors.white.withOpacity(0.5)
-                          : Colors.white,
-                    ),
-                    textAlign: TextAlign.center,
+                  textAlign: TextAlign.center,
+                ),
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(
+                    _showCycles
+                        ? Colors.grey.withOpacity(0.3)
+                        : Colors.cyan.withOpacity(0.3),
                   ),
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(
-                      _showCycles
-                          ? Colors.grey.withOpacity(0.3)
-                          : Colors.cyan.withOpacity(0.3),
-                    ),
-                    shape: MaterialStateProperty.all(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(20),
-                        ),
+                  shape: MaterialStateProperty.all(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(20),
                       ),
                     ),
-                    alignment: Alignment.center,
-                    padding: MaterialStateProperty.all(
-                      EdgeInsets.all(0),
-                    ),
+                  ),
+                  alignment: Alignment.center,
+                  padding: MaterialStateProperty.all(
+                    EdgeInsets.all(0),
                   ),
                 ),
               ),
-            ],
-          )
-        : Text('');
-  }
+            ),
+          ],
+        )
+      : Text('');
 
   List<Widget> body() {
     return <Widget>[
@@ -491,7 +531,8 @@ class _TeamView extends State<TeamView> {
                   : EdgeInsets.all(20),
             ),
             Wrap(
-              crossAxisAlignment: WrapCrossAlignment.start,
+              alignment: WrapAlignment.center,
+              crossAxisAlignment: WrapCrossAlignment.center,
               spacing: 0,
               children: [
                 if (widget.event.type != EventType.remote)
@@ -515,13 +556,12 @@ class _TeamView extends State<TeamView> {
                     child: Text('Alliance Total'),
                   ),
                 FlatButton(
-                  color:
-                      _selections[1] ? Color.fromRGBO(230, 30, 213, 1) : null,
-                  splashColor: Color.fromRGBO(230, 30, 213, 1),
+                  color: _selections[1] ? generalColor : null,
+                  splashColor: generalColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(18.0),
                     side: BorderSide(
-                      color: Color.fromRGBO(230, 30, 213, 1),
+                      color: generalColor,
                     ),
                   ),
                   child: Text('General'),
@@ -534,11 +574,11 @@ class _TeamView extends State<TeamView> {
                   },
                 ),
                 FlatButton(
-                  color: _selections[2] ? Colors.green : null,
-                  splashColor: Colors.green,
+                  color: _selections[2] ? autoColor : null,
+                  splashColor: autoColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(18.0),
-                    side: BorderSide(color: Colors.green),
+                    side: BorderSide(color: autoColor),
                   ),
                   child: Text('Autonomous'),
                   onPressed: () {
@@ -550,11 +590,11 @@ class _TeamView extends State<TeamView> {
                   },
                 ),
                 FlatButton(
-                  color: _selections[3] ? Colors.blue : null,
-                  splashColor: Colors.blue,
+                  color: _selections[3] ? teleColor : null,
+                  splashColor: teleColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(18.0),
-                    side: BorderSide(color: Colors.blue),
+                    side: BorderSide(color: teleColor),
                   ),
                   child: Text('Tele-Op'),
                   onPressed: () {
@@ -566,11 +606,11 @@ class _TeamView extends State<TeamView> {
                   },
                 ),
                 FlatButton(
-                  color: _selections[4] ? Colors.red : null,
-                  splashColor: Colors.red,
+                  color: _selections[4] ? endgameColor : null,
+                  splashColor: endgameColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(18.0),
-                    side: BorderSide(color: Colors.red),
+                    side: BorderSide(color: endgameColor),
                   ),
                   child: Text('Endgame'),
                   onPressed: () {
@@ -615,7 +655,10 @@ class _TeamView extends State<TeamView> {
         child: PlatformButton(
           onPressed: () async {
             if (_team.targetScore == null) {
-              _team.targetScore = Score(Uuid().v4(), Dice.none);
+              _team.targetScore = Score(
+                Uuid().v4(),
+                Dice.none,
+              );
             }
             await Navigator.push(
               context,

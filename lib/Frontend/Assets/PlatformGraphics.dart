@@ -39,8 +39,10 @@ class NewPlatform {
   }
 }
 
-void showPlatformDialog(
-    {BuildContext? context, Widget Function(BuildContext)? builder}) {
+void showPlatformDialog({
+  BuildContext? context,
+  Widget Function(BuildContext)? builder,
+}) {
   if (NewPlatform.isIOS()) {
     showCupertinoDialog(
         context: context!, builder: builder!, barrierDismissible: false);
@@ -195,7 +197,6 @@ class PlatformDialogAction
   @override
   CupertinoDialogAction buildCupertinoWidget(BuildContext context) {
     return CupertinoDialogAction(
-      //textStyle: TextStyle(color: Theme.of(context).textTheme.bodyText2.color),
       isDefaultAction: isDefaultAction,
       child: child!,
       onPressed: onPressed,

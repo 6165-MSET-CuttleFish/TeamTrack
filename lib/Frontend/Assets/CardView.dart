@@ -26,54 +26,51 @@ class _CardView extends State<CardView> {
         onTap: () {
           HapticFeedback.mediumImpact();
           if (widget.isActive) {
-            setState(() {
-              _genBool = toggle(_genBool);
-            },);
+            setState(
+              () {
+                _genBool = toggle(_genBool);
+              },
+            );
           } else {
             showPlatformDialog(
-                context: context,
-                builder: (BuildContext context) => PlatformAlert(
-                      title: Text('Not Enough Data'),
-                      content: Text(
-                        'Add more scores',
-                        style: Theme.of(context).textTheme.bodyText1,
-                      ),
-                      actions: [
-                        PlatformDialogAction(
-                          isDefaultAction: true,
-                          child: Text('Okay'),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                      ],
-                    ),);
+              context: context,
+              builder: (BuildContext context) => PlatformAlert(
+                title: Text('Not Enough Data'),
+                content: Text(
+                  'Add more scores',
+                  style: Theme.of(context).textTheme.bodyText1,
+                ),
+                actions: [
+                  PlatformDialogAction(
+                    isDefaultAction: true,
+                    child: Text('Okay'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
+            );
           }
         },
-        onTapDown: (TapDownDetails details) {
-          setState(() {
-            _isPressed = true;
-          },);
-        },
-        onTapUp: (TapUpDetails details) {
-          setState(() {
-            _isPressed = false;
-          },);
-        },
-        onTapCancel: () {
-          setState(() {
-            _isPressed = false;
-          },);
-        },
+        onTapDown: (TapDownDetails details) => setState(
+          () => _isPressed = true,
+        ),
+        onTapUp: (TapUpDetails details) => setState(
+          () => _isPressed = false,
+        ),
+        onTapCancel: () => setState(
+          () => _isPressed = false,
+        ),
         child: Container(
-          //color: Theme.of(context).canvasColor,
           decoration: BoxDecoration(
             color: Theme.of(context).canvasColor,
             borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(10),
-                topRight: Radius.circular(10),
-                bottomLeft: Radius.circular(10),
-                bottomRight: Radius.circular(10),),
+              topLeft: Radius.circular(10),
+              topRight: Radius.circular(10),
+              bottomLeft: Radius.circular(10),
+              bottomRight: Radius.circular(10),
+            ),
             boxShadow: [
               BoxShadow(
                 color: Colors.grey.withOpacity(0.8),
@@ -82,8 +79,6 @@ class _CardView extends State<CardView> {
               ),
             ],
           ),
-          // shape: RoundedRectangleBorder(
-          //     borderRadius: BorderRadius.all(Radius.circular(15))),
           child: Column(children: [
             AnimatedContainer(
                 curve: Curves.fastLinearToSlowEaseIn,

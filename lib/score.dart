@@ -8,7 +8,7 @@ class Score extends ScoreDivision {
   TeleScore teleScore = TeleScore(Dice.none);
   AutoScore autoScore = AutoScore(Dice.none);
   EndgameScore endgameScore = EndgameScore(Dice.none);
-  Penalty penalties = Penalty(Dice.none, false);
+  Penalty penalties = Penalty(Dice.none);
   Timestamp timeStamp = Timestamp.now();
   String id = '';
   Dice dice = Dice.none;
@@ -16,12 +16,12 @@ class Score extends ScoreDivision {
     teleScore = TeleScore(dice);
     autoScore = AutoScore(dice);
     endgameScore = EndgameScore(dice);
+    penalties = Penalty(dice);
   }
-  List<ScoringElement> getElements() => [
+  List<ScoringElement> getElements({bool? includePenalties}) => [
         ...teleScore.getElements(),
         ...autoScore.getElements(),
         ...endgameScore.getElements(),
-        ...penalties.getElements()
       ];
   ScoreDivision getScoreDivision(OpModeType? type) {
     switch (type) {
@@ -37,11 +37,12 @@ class Score extends ScoreDivision {
   }
 
   Dice getDice() => dice;
-  Score.fromJson(Map<String, dynamic> json) {
+  Score.fromJson(Map<String, dynamic> json, eventType) {
     dice = getDiceFromString(json['dice']);
     autoScore = AutoScore.fromJson(json['AutoScore'], dice);
     teleScore = TeleScore.fromJson(json['TeleScore'], dice);
     endgameScore = EndgameScore.fromJson(json['EndgameScore'], dice);
+    penalties = Penalty.fromJson(json['Penalty'], dice);
     id = json['id'];
     try {
       timeStamp = Timestamp(json['seconds'], json['nanoSeconds']);
@@ -53,6 +54,7 @@ class Score extends ScoreDivision {
         'AutoScore': autoScore.toJson(),
         'TeleScore': teleScore.toJson(),
         'EndgameScore': endgameScore.toJson(),
+        'Penalty': penalties.toJson(),
         'id': id.toString(),
         'dice': dice.toString(),
         'seconds': timeStamp.seconds,
@@ -95,7 +97,7 @@ class AutoScore extends ScoreDivision {
       ScoringElement(name: 'Power Shots', value: 15, max: () => 3);
   ScoringElement navigated =
       ScoringElement(name: 'Navigated', value: 5, max: () => 1, isBool: true);
-  List<ScoringElement> getElements() =>
+  List<ScoringElement> getElements({bool? includePenalties}) =>
       [hiGoals, midGoals, lowGoals, wobbleGoals, pwrShots, navigated];
   Dice getDice() => dice;
   AutoScore(this.dice);
@@ -134,7 +136,8 @@ class TeleScore extends ScoreDivision {
   ScoringElement lowGoals = ScoringElement(name: "Low Goals", value: 2);
   ScoringElement midGoals = ScoringElement(name: "Middle Goals", value: 4);
   ScoringElement hiGoals = ScoringElement(name: "High Goals", value: 6);
-  List<ScoringElement> getElements() => [hiGoals, midGoals, lowGoals];
+  List<ScoringElement> getElements({bool? includePenalties}) =>
+      [hiGoals, midGoals, lowGoals];
   List<double> cycles = [];
   int misses = 0;
   Dice getDice() => dice;
@@ -176,7 +179,7 @@ class EndgameScore extends ScoreDivision {
       ScoringElement(name: 'Power Shots', value: 15, max: () => 3);
   ScoringElement ringsOnWobble =
       ScoringElement(name: 'Rings On Wobble', value: 5);
-  List<ScoringElement> getElements() =>
+  List<ScoringElement> getElements({bool? includePenalties}) =>
       [pwrShots, wobbleGoalsInDrop, wobbleGoalsInStart, ringsOnWobble];
 
   Dice getDice() => dice;
@@ -222,33 +225,32 @@ class EndgameScore extends ScoreDivision {
 }
 
 class Penalty extends ScoreDivision {
-  ScoringElement majorPenalty =
-      ScoringElement(name: 'Major Penalty', value: -30);
-  ScoringElement minorPenalty =
-      ScoringElement(name: 'Minor Penalty', value: -10);
+  late ScoringElement majorPenalty;
+  late ScoringElement minorPenalty;
   Dice dice;
-  bool show;
-  Penalty(this.dice, this.show);
+  Penalty(this.dice) {
+    majorPenalty = ScoringElement(name: 'Major Penalty', value: 30);
+    minorPenalty = ScoringElement(name: 'Minor Penalty', value: 10);
+  }
 
   @override
   Dice getDice() => dice;
 
   @override
-  List<ScoringElement> getElements() =>
-      show ? [majorPenalty, minorPenalty] : [];
+  List<ScoringElement> getElements({bool? includePenalties}) =>
+      [majorPenalty, minorPenalty];
 
   Penalty.fromJson(Map<String, dynamic> json, this.dice)
       : majorPenalty = ScoringElement(
           name: 'Major Penalty',
-          value: -30,
+          value: 30,
           count: json['major'],
         ),
         minorPenalty = ScoringElement(
           name: 'Minor Penalty',
-          value: -10,
+          value: 10,
           count: json['minor'],
-        ),
-        show = false;
+        );
   Map<String, dynamic> toJson() => {
         'major': majorPenalty.count,
         'minor': minorPenalty.count,
@@ -270,7 +272,7 @@ class ScoringElement {
   int value;
   bool isBool;
   late int Function()? min = () => 0;
-  late int Function()? max = () => 9999;
+  late int Function()? max = () => 999999999999999999;
   int incrementValue = 1;
   int decrementValue = 1;
 
@@ -278,7 +280,7 @@ class ScoringElement {
 
   void setStuff() {
     if (min == null) min = () => 0;
-    if (max == null) max = () => 9999;
+    if (max == null) max = () => 999999999999999999;
   }
 
   int scoreValue() => count * value;
@@ -303,7 +305,8 @@ class ScoringElement {
 abstract class ScoreDivision {
   int total() => getElements()
       .map((e) => e.scoreValue())
-      .reduce((value, element) => value += element);
+      .reduce((value, element) => value += element)
+      .clamp(0, 999999999999999999);
   Dice getDice();
-  List<ScoringElement> getElements();
+  List<ScoringElement> getElements({bool? includePenalties});
 }

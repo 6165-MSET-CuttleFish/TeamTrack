@@ -70,11 +70,13 @@ class _MatchList extends State<MatchList> {
                                               (element) =>
                                                   element.number ==
                                                   widget.team!.number),
-                                          Team.nullTeam(),
+                                          null,
+                                          widget.event.type,
                                         ),
                                         Alliance(
-                                          Team.nullTeam(),
-                                          Team.nullTeam(),
+                                          null,
+                                          null,
+                                          widget.event.type,
                                         ),
                                         EventType.remote),
                                   );
@@ -154,9 +156,9 @@ class _MatchList extends State<MatchList> {
                       child: ListTile(
                         leading: Column(children: [
                           Text(
-                            (e.red?.item1?.name ?? '?') +
+                            (e.red?.team1?.name ?? '?') +
                                 ' & ' +
-                                (e.red?.item2?.name ?? '?'),
+                                (e.red?.team2?.name ?? '?'),
                           ),
                           Text(
                             'VS',
@@ -164,9 +166,9 @@ class _MatchList extends State<MatchList> {
                                 color: Colors.red, fontWeight: FontWeight.bold),
                           ),
                           Text(
-                            (e.blue?.item1?.name ?? '?') +
+                            (e.blue?.team1?.name ?? '?') +
                                 ' & ' +
-                                (e.blue?.item2?.name ?? '?'),
+                                (e.blue?.team2?.name ?? '?'),
                           )
                         ]),
                         trailing: Text(
@@ -230,7 +232,7 @@ class _MatchList extends State<MatchList> {
                           onPressed: () {
                             matches[i]
                                 .red
-                                ?.item1
+                                ?.team1
                                 ?.scores
                                 .removeWhere((f) => f.id == matches[i].id);
                             widget.event.matches.remove(matches[i]);
@@ -323,13 +325,13 @@ class _MatchList extends State<MatchList> {
                         onPressed: () {
                           setState(
                             () {
-                              e.red?.item1?.scores
+                              e.red?.team1?.scores
                                   .removeWhere((f) => f.id == e.id);
-                              e.red?.item2?.scores
+                              e.red?.team2?.scores
                                   .removeWhere((f) => f.id == e.id);
-                              e.blue?.item1?.scores
+                              e.blue?.team1?.scores
                                   .removeWhere((f) => f.id == e.id);
-                              e.blue?.item2?.scores
+                              e.blue?.team2?.scores
                                   .removeWhere((f) => f.id == e.id);
                               widget.event.matches.remove(e);
                             },
@@ -355,9 +357,9 @@ class _MatchList extends State<MatchList> {
             child: ListTile(
               leading: Column(children: [
                 Text(
-                  (e.red?.item1?.name ?? '?') +
+                  (e.red?.team1?.name ?? '?') +
                       ' & ' +
-                      (e.red?.item2?.name ?? '?'),
+                      (e.red?.team2?.name ?? '?'),
                 ),
                 Text(
                   'VS',
@@ -365,9 +367,9 @@ class _MatchList extends State<MatchList> {
                       TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  (e.blue?.item1?.name ?? '?') +
+                  (e.blue?.team1?.name ?? '?') +
                       ' & ' +
-                      (e.blue?.item2?.name ?? '?'),
+                      (e.blue?.team2?.name ?? '?'),
                 )
               ]),
               trailing: Text(
@@ -422,10 +424,10 @@ class MatchSearch extends SearchDelegate<String?> {
     final suggestionList = matches
         .where(
           (m) =>
-              (m.red?.item1?.number.contains(query) ?? false) ||
-              (m.red?.item2?.number.contains(query) ?? false) ||
-              (m.blue?.item1?.number.contains(query) ?? false) ||
-              (m.blue?.item2?.number.contains(query) ?? false),
+              (m.red?.team1?.number.contains(query) ?? false) ||
+              (m.red?.team2?.number.contains(query) ?? false) ||
+              (m.blue?.team1?.number.contains(query) ?? false) ||
+              (m.blue?.team2?.number.contains(query) ?? false),
         )
         .toList();
     return ListView.builder(
@@ -440,18 +442,18 @@ class MatchSearch extends SearchDelegate<String?> {
         child: ListTile(
           leading: Column(children: [
             Text(
-              (suggestionList[index].red?.item1?.name ?? '?') +
+              (suggestionList[index].red?.team1?.name ?? '?') +
                   ' & ' +
-                  (suggestionList[index].red?.item2?.name ?? '?'),
+                  (suggestionList[index].red?.team2?.name ?? '?'),
             ),
             Text(
               'VS',
               style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
             ),
             Text(
-              (suggestionList[index].blue?.item1?.name ?? '?') +
+              (suggestionList[index].blue?.team1?.name ?? '?') +
                   ' & ' +
-                  (suggestionList[index].blue?.item2?.name ?? '?'),
+                  (suggestionList[index].blue?.team2?.name ?? '?'),
             )
           ]),
           trailing: Text(
