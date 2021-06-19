@@ -154,7 +154,7 @@ class _TeamView extends State<TeamView> {
               !dataModel.isProcessing) {
             widget.event.updateLocal(
               json.decode(
-                json.encode(eventHandler.data!.snapshot.value),
+                json.encode(eventHandler.data?.snapshot.value),
               ),
             );
             _team = widget.event.teams.firstWhere(

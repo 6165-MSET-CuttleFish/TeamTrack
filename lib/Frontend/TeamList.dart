@@ -65,14 +65,30 @@ class _TeamList extends State<TeamList> {
                                   isDestructive: true,
                                   child: Text('Confirm'),
                                   onPressed: () {
+                                    String? s;
                                     setState(
-                                      () {
-                                        widget.event.deleteTeam(e);
-                                      },
+                                      () => s = widget.event.deleteTeam(e),
                                     );
                                     dataModel.saveEvents();
                                     dataModel.uploadEvent(widget.event);
                                     Navigator.of(context).pop();
+                                    if (s != null)
+                                      showPlatformDialog(
+                                        context: context,
+                                        builder: (context) => PlatformAlert(
+                                          title: Text('Error'),
+                                          content: Text(
+                                              'Team is currently being used in matches'),
+                                          actions: [
+                                            PlatformDialogAction(
+                                              child: Text('Okay'),
+                                              isDefaultAction: true,
+                                              onPressed: () =>
+                                                  Navigator.of(context).pop(),
+                                            )
+                                          ],
+                                        ),
+                                      );
                                   },
                                 ),
                               ],

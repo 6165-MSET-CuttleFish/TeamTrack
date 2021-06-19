@@ -216,29 +216,10 @@ class DataModel {
 
   void restoreEvents() async {
     final prefs = await SharedPreferences.getInstance();
-    var x = jsonDecode(prefs.getString(keys[0])!) as List;
+    var x = jsonDecode(prefs.getString(keys[0]) ?? '') as List;
     var y = x.map((e) => Event.fromJson(e)).toList();
     events = y;
     print('reloaded');
-  }
-
-  void organize() {
-    for (Event event in events) {
-      for (Match match in event.matches) {
-        match.red!.team1 = event.teams.firstWhere(
-            (e) => e.number == match.red!.team1!.number,
-            orElse: () => Team.nullTeam());
-        match.red!.team2 = event.teams.firstWhere(
-            (e) => e.number == match.red!.team2!.number,
-            orElse: () => Team.nullTeam());
-        match.blue!.team1 = event.teams.firstWhere(
-            (e) => e.number == match.blue!.team1!.number,
-            orElse: () => Team.nullTeam());
-        match.blue!.team2 = event.teams.firstWhere(
-            (e) => e.number == match.blue!.team2!.number,
-            orElse: () => Team.nullTeam());
-      }
-    }
   }
 }
 
@@ -261,12 +242,17 @@ class Event {
     if (!isIn) teams.add(newTeam);
   }
 
-  void deleteTeam(Team team) {
+  String? deleteTeam(Team team) {
+    String? potential;
     for (Match match in matches) {
-      if (match.red!.team1!.equals(team)) match.red!.team1 = null;
-      if (match.red!.team2!.equals(team)) match.red!.team2 = null;
-      if (match.blue!.team1!.equals(team)) match.blue!.team1 = null;
-      if (match.blue!.team2!.equals(team)) match.blue!.team2 = null;
+      if ((match.red?.hasTeam(team) ?? false) ||
+          (match.blue?.hasTeam(team) ?? false)) {
+        if (type == EventType.remote)
+          match.red?.team1 == null;
+        else {
+          return 'some';
+        }
+      }
     }
     teams.remove(team);
   }
@@ -277,10 +263,6 @@ class Event {
     e.blue?.team1?.scores.removeWhere((f) => f.id == e.id);
     e.blue?.team2?.scores.removeWhere((f) => f.id == e.id);
     matches.remove(e);
-  }
-
-  void share() {
-    shared = true;
   }
 
   void updateLocal(Map<String, dynamic>? json) {
@@ -361,6 +343,9 @@ class Alliance {
     return opposingAlliance?.penaltyTotal() ?? 0;
   }
 
+  bool hasTeam(Team team) =>
+      (team1 != null && team1!.equals(team)) ||
+      (team2 != null && team2!.equals(team));
   int penaltyTotal() =>
       (team1?.scores
               .firstWhere(
@@ -379,7 +364,7 @@ class Alliance {
               .total() ??
           0);
 
-  int allianceTotal(String? id, bool showPenalties, {OpModeType? type}) =>
+  int allianceTotal(String? id, bool? showPenalties, {OpModeType? type}) =>
       ((team1?.scores
                       .firstWhere(
                         (e) => e.id == id,
@@ -402,7 +387,7 @@ class Alliance {
                       .getScoreDivision(type)
                       .total() ??
                   0) +
-              (showPenalties
+              ((showPenalties ?? false)
                   ? (eventType == EventType.remote
                       ? -getPenalty()
                       : getPenalty())
@@ -545,18 +530,18 @@ class Match {
         .dice = dice;
   }
 
-  String score() {
+  String score({bool? showPenalties}) {
     if (type == EventType.remote) {
-      return redScore();
+      return redScore(showPenalties: showPenalties);
     }
-    return redScore() + " - " + blueScore();
+    return redScore(showPenalties: showPenalties) + " - " + blueScore(showPenalties: showPenalties);
   }
 
-  String redScore() =>
-      (red?.allianceTotal(id, dataModel.showPenalties) ?? 0).toString();
+  String redScore({bool? showPenalties}) =>
+      (red?.allianceTotal(id, showPenalties) ?? 0).toString();
 
-  String blueScore() =>
-      (blue?.allianceTotal(id, dataModel.showPenalties) ?? 0).toString();
+  String blueScore({bool? showPenalties}) =>
+      (blue?.allianceTotal(id, showPenalties) ?? 0).toString();
 
   Match.fromJson(Map<String, dynamic> json, List<Team> teamList) {
     red = Alliance.fromJson(
@@ -702,14 +687,16 @@ extension ExTeam on Team? {
 }
 
 extension MatchExtensions on List<Match> {
-  List<FlSpot> spots(Team team, Dice dice, bool showPenalties, {OpModeType? type}) {
+  List<FlSpot> spots(Team team, Dice dice, bool showPenalties,
+      {OpModeType? type}) {
     List<FlSpot> val = [];
     final arr =
         (dice != Dice.none ? this.where((e) => e.dice == dice) : this).toList();
     for (int i = 0; i < arr.length; i++) {
       final alliance = arr[i].alliance(team);
       if (alliance != null) {
-        final allianceTotal = alliance.allianceTotal(arr[i].id, showPenalties, type: type);
+        final allianceTotal =
+            alliance.allianceTotal(arr[i].id, showPenalties, type: type);
         val.add(FlSpot(i.toDouble(), allianceTotal.toDouble()));
       }
     }
@@ -741,10 +728,14 @@ extension SpotExtensions on List<FlSpot> {
 extension colorExt on OpModeType? {
   Color getColor() {
     switch (this) {
-      case OpModeType.auto: return Colors.green;
-      case OpModeType.tele: return Colors.blue;
-      case OpModeType.endgame: return Colors.red;
-      default: return Color.fromRGBO(230, 30, 213, 1);
+      case OpModeType.auto:
+        return Colors.green;
+      case OpModeType.tele:
+        return Colors.blue;
+      case OpModeType.endgame:
+        return Colors.red;
+      default:
+        return Color.fromRGBO(230, 30, 213, 1);
     }
   }
 }

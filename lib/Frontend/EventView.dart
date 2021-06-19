@@ -274,11 +274,10 @@ class _EventView extends State<EventView> {
                 textCapitalization: TextCapitalization.words,
                 decoration: InputDecoration(labelText: 'Name'),
                 validator: (String? value) {
-                  if (value!.isEmpty) {
+                  if (value?.isEmpty ?? false)
                     return 'Name is required';
-                  } else {
+                  else 
                     return null;
-                  }
                 },
                 onChanged: (String val) {
                   setState(

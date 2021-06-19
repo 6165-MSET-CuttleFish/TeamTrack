@@ -105,7 +105,7 @@ class _LoginView extends State<LoginView> {
                   builder: (BuildContext context) => PlatformAlert(
                     title: Text('Error'),
                     content: Text(
-                      s!,
+                      s ?? 'Something went wrong',
                       style: Theme.of(context).textTheme.bodyText1,
                     ),
                     actions: [
@@ -253,7 +253,7 @@ class _LoginView extends State<LoginView> {
                       builder: (BuildContext context) => PlatformAlert(
                         title: Text('Error'),
                         content: Text(
-                          s!,
+                          s ?? 'Something went wrong',
                           style: Theme.of(context).textTheme.bodyText1,
                         ),
                         actions: [

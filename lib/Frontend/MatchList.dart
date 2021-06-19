@@ -172,7 +172,7 @@ class _MatchList extends State<MatchList> {
                           )
                         ]),
                         trailing: Text(
-                          e.score(),
+                          e.score(showPenalties: true),
                         ),
                         onTap: () async {
                           await Navigator.push(
@@ -264,7 +264,7 @@ class _MatchList extends State<MatchList> {
                         (element) => element.number == widget.team?.number)
                     .name),
                 trailing: Text(
-                  matches[i].score(),
+                  matches[i].score(showPenalties: true),
                 ),
                 onTap: () async {
                   await Navigator.push(
@@ -373,7 +373,7 @@ class _MatchList extends State<MatchList> {
                 )
               ]),
               trailing: Text(
-                e.score(),
+                e.score(showPenalties: true),
               ),
               onTap: () async {
                 await Navigator.push(
@@ -457,7 +457,7 @@ class MatchSearch extends SearchDelegate<String?> {
             )
           ]),
           trailing: Text(
-            suggestionList[index].score(),
+            suggestionList[index].score(showPenalties: true),
           ),
           onTap: () {
             close(context, null);

@@ -47,7 +47,7 @@ class CollapsibleState extends State<Collapsible>
     _sizeAnimation = _sizeTween.animate(curve);
 
     /// Sanity check.
-    if (!widget.isCollapsed!) {
+    if (widget.isCollapsed != null && !widget.isCollapsed!) {
       _controller.forward(from: 1.0);
     }
   }
@@ -57,7 +57,7 @@ class CollapsibleState extends State<Collapsible>
   void didUpdateWidget(covariant Collapsible oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.isCollapsed != widget.isCollapsed) {
-      if (widget.isCollapsed!) {
+      if (widget.isCollapsed != null && widget.isCollapsed!) {
         _controller.reverse();
       } else {
         _controller.forward();

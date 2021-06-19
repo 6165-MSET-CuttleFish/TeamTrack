@@ -6,8 +6,6 @@ import 'package:teamtrack/score.dart';
 import 'package:teamtrack/backend.dart';
 import 'package:teamtrack/Frontend/Assets/BarGraph.dart';
 import 'package:teamtrack/Frontend/Assets/CardView.dart';
-import 'dart:math';
-
 import 'package:fl_chart/fl_chart.dart';
 import 'dart:io' show Platform;
 
@@ -40,14 +38,14 @@ class NewPlatform {
 }
 
 void showPlatformDialog({
-  BuildContext? context,
-  Widget Function(BuildContext)? builder,
+  required BuildContext context,
+  required Widget Function(BuildContext) builder,
 }) {
   if (NewPlatform.isIOS()) {
     showCupertinoDialog(
-        context: context!, builder: builder!, barrierDismissible: false);
+        context: context, builder: builder, barrierDismissible: false);
   } else {
-    showDialog(context: context!, builder: builder!, barrierDismissible: false);
+    showDialog(context: context, builder: builder, barrierDismissible: false);
   }
 }
 

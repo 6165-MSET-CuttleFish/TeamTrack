@@ -151,8 +151,7 @@ class _MatchView extends State<MatchView> {
                     child: Center(
                       child: Column(
                         children: [
-                          if (_match != null &&
-                              _match!.type != EventType.remote)
+                          if (_match?.type != EventType.remote)
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
@@ -180,8 +179,7 @@ class _MatchView extends State<MatchView> {
                                 )
                               ],
                             ),
-                          if (_match != null &&
-                              _match?.type != EventType.remote)
+                          if (_match?.type != EventType.remote)
                             buttonRow(),
                           Text(
                               _selectedTeam.name +
