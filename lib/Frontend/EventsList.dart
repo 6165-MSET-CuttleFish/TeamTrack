@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:teamtrack/Frontend/Inbox.dart';
 import 'package:teamtrack/backend.dart';
@@ -30,6 +31,10 @@ class _EventsList extends State<EventsList> {
     restoreEvents();
     final themeChange = Provider.of<DarkThemeProvider>(context);
     if (isLoaded) {
+      for (var event in dataModel.events.where((e) => !e.shared)) {
+        event.authorEmail = context.read<User?>()?.email;
+        event.authorName = context.read<User?>()?.displayName;
+      }
       return Scaffold(
         appBar: AppBar(
           backgroundColor: Theme.of(context).accentColor,
@@ -615,15 +620,24 @@ class _EventsList extends State<EventsList> {
                   .add(
                 {
                   'name': e.name,
-                  'authorEmail': context.read<User?>()?.email,
-                  'authorName': context.read<User?>()?.displayName,
+                  'senderEmail': context.read<User?>()?.email,
+                  'senderName': context.read<User?>()?.displayName,
+                  'sendDate': Timestamp.now(),
+                  'authorName': e.authorName,
+                  'authorEmail': e.authorEmail,
+                  'creationDate': e.timeStamp,
                   'id': e.id,
                   'type': e.type.toString(),
                 },
               );
               if (!e.shared) {
                 e.shared = true;
-                firebaseDatabase.reference()..child("Events").child(Statics.gameName).child(e.id).set(e.toJson());
+                firebaseDatabase
+                    .reference()
+                    .child("Events")
+                    .child(Statics.gameName)
+                    .child(e.id)
+                    .set(e.toJson());
                 dataModel.saveEvents();
               }
               Navigator.of(context).pop();

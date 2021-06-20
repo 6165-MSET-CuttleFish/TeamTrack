@@ -250,7 +250,7 @@ class _LoginView extends State<LoginView> {
                   } else {
                     showPlatformDialog(
                       context: context,
-                      builder: (BuildContext context) => PlatformAlert(
+                      builder: (context) => PlatformAlert(
                         title: Text('Error'),
                         content: Text(
                           s ?? 'Something went wrong',

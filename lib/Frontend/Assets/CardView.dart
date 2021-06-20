@@ -28,7 +28,7 @@ class _CardView extends State<CardView> {
           if (widget.isActive) {
             setState(
               () {
-                _genBool = toggle(_genBool);
+                _genBool = !_genBool;
               },
             );
           } else {

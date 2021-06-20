@@ -60,21 +60,18 @@ class _TeamTrack extends State<TeamTrack> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    dataModel = DataModel();
-    return ChangeNotifierProvider(
-      create: (_) => themeChangeProvider,
-      child: Consumer<DarkThemeProvider>(
-        builder: (BuildContext context, value, Widget? child) => MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'TeamTrack',
-          theme: themeChangeProvider.darkTheme ? darkTheme : lightTheme,
-          darkTheme: darkTheme,
-          home: AuthenticationWrapper(),
+  Widget build(context) => ChangeNotifierProvider(
+        create: (_) => themeChangeProvider,
+        child: Consumer<DarkThemeProvider>(
+          builder: (BuildContext context, value, Widget? child) => MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'TeamTrack',
+            theme: themeChangeProvider.darkTheme ? darkTheme : lightTheme,
+            darkTheme: darkTheme,
+            home: AuthenticationWrapper(),
+          ),
         ),
-      ),
-    );
-  }
+      );
 }
 
 class AuthenticationWrapper extends StatelessWidget {

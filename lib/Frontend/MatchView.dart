@@ -27,6 +27,7 @@ class _MatchView extends State<MatchView> {
   Score _score = Score(Uuid().v4(), Dice.none);
   int _view = 0;
   Match? _match;
+  bool _showPenalties = false;
   final Stream<int> _periodicStream =
       Stream.periodic(const Duration(milliseconds: 100), (i) => i);
   double _time = 0;
@@ -47,7 +48,7 @@ class _MatchView extends State<MatchView> {
         (element) => element.id == match?.id,
         orElse: () => Score(Uuid().v4(), Dice.none),
       );
-      if (_match!.type == EventType.remote)
+      if (_match?.type == EventType.remote)
         _color = CupertinoColors.systemGreen;
     }
   }
@@ -61,31 +62,33 @@ class _MatchView extends State<MatchView> {
               !dataModel.isProcessing) {
             widget.event.updateLocal(
               json.decode(
-                json.encode(eventHandler.data!.snapshot.value),
+                json.encode(eventHandler.data?.snapshot.value),
               ),
             );
             if (widget.team == null) {
               _match = widget.event.matches.firstWhere(
-                (element) => element.id == _match!.id,
+                (element) => element.id == _match?.id,
                 orElse: () {
-                  Navigator.pop(context);
+                  //Navigator.pop(context);
                   return Match.defaultMatch(EventType.remote);
                 },
               );
             }
             _selectedTeam = widget.event.teams.firstWhere(
               (team) => team.number == _selectedTeam.number,
-              orElse: () {
-                Navigator.pop(context);
-                return Team.nullTeam();
-              },
+              orElse: () => Team.nullTeam(),
             );
+            _selectedAlliance = _match?.red;
+            if (_color == CupertinoColors.systemRed)
+              _selectedAlliance = _match?.red;
+            else if (_color == CupertinoColors.systemBlue)
+              _selectedAlliance = _match?.blue;
             if (widget.team != null) {
               _score =
                   _selectedTeam.targetScore ?? Score(Uuid().v4(), Dice.none);
             } else {
               _score = _selectedTeam.scores.firstWhere(
-                (element) => element.id == _match!.id,
+                (element) => element.id == _match?.id,
                 orElse: () => Score(Uuid().v4(), Dice.none),
               );
               for (var element in _score.teleScore.getElements()) {
@@ -151,14 +154,18 @@ class _MatchView extends State<MatchView> {
                     child: Center(
                       child: Column(
                         children: [
-                          if (_match?.type != EventType.remote)
+                          if (_match?.type != EventType.remote &&
+                              widget.team == null)
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 Container(
                                   alignment: Alignment.center,
                                   width: 100,
-                                  child: Text(_match?.redScore() ?? '0',
+                                  child: Text(
+                                      _match?.redScore(
+                                              showPenalties: _showPenalties) ??
+                                          '0',
                                       style: Theme.of(context)
                                           .textTheme
                                           .headline4),
@@ -172,19 +179,29 @@ class _MatchView extends State<MatchView> {
                                 Container(
                                   alignment: Alignment.center,
                                   width: 100,
-                                  child: Text(_match?.blueScore() ?? '0',
+                                  child: Text(
+                                      _match?.blueScore(
+                                              showPenalties: _showPenalties) ??
+                                          '0',
                                       style: Theme.of(context)
                                           .textTheme
                                           .headline4),
-                                )
+                                ),
                               ],
                             ),
-                          if (_match?.type != EventType.remote)
+                          if (_match?.type != EventType.remote &&
+                              _match != null)
                             buttonRow(),
                           Text(
                               _selectedTeam.name +
                                   ' : ' +
-                                  _score.total().toString(),
+                                  _score
+                                      .total(
+                                          showPenalties: widget.event.type ==
+                                                  EventType.remote
+                                              ? _showPenalties
+                                              : false)
+                                      .toString(),
                               style: Theme.of(context).textTheme.headline6),
                           if (widget.team == null)
                             DropdownButton<Dice>(
@@ -227,9 +244,8 @@ class _MatchView extends State<MatchView> {
                                 checkColor: Colors.black,
                                 fillColor:
                                     MaterialStateProperty.all(Colors.red),
-                                value: dataModel.showPenalties,
-                                onChanged: (_) =>
-                                    dataModel.showPenalties = _ ?? false,
+                                value: _showPenalties,
+                                onChanged: (_) => _showPenalties = _ ?? false,
                               ),
                               title: Text(
                                 'Penalties',

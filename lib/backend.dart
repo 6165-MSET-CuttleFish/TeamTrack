@@ -66,8 +66,6 @@ class DatabaseServices {
       .onValue;
 }
 
-DatabaseServices db = DatabaseServices();
-
 class AuthenticationService {
   final FirebaseAuth _firebaseAuth;
   AuthenticationService(this._firebaseAuth);
@@ -172,7 +170,6 @@ final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 
 class DataModel {
   final List<String> keys = [Statics.gameName];
-  bool showPenalties = false;
   DataModel() {
     try {
       restoreEvents();
@@ -226,6 +223,8 @@ class DataModel {
 class Event {
   Event({required this.name, required this.type});
   String id = Uuid().v4();
+  String? authorName;
+  String? authorEmail;
   bool shared = false;
   EventType type = EventType.remote;
   List<Team> teams = [];
@@ -243,15 +242,13 @@ class Event {
   }
 
   String? deleteTeam(Team team) {
-    String? potential;
     for (Match match in matches) {
       if ((match.red?.hasTeam(team) ?? false) ||
           (match.blue?.hasTeam(team) ?? false)) {
         if (type == EventType.remote)
           match.red?.team1 == null;
-        else {
+        else
           return 'some';
-        }
       }
     }
     teams.remove(team);
@@ -283,6 +280,8 @@ class Event {
       }
       shared = json['shared'] ?? true;
       id = json['id'] ?? Uuid().v4();
+      authorEmail = json['authorEmail'];
+      authorName = json['authorName'];
     }
   }
 
@@ -312,6 +311,8 @@ class Event {
     } catch (e) {
       timeStamp = Timestamp.now();
     }
+    authorEmail = json['authorEmail'];
+    authorName = json['authorName'];
   }
   Map<String, dynamic> toJson() => {
         'name': name,
@@ -320,6 +321,8 @@ class Event {
         'type': type.toString(),
         'shared': shared,
         'id': id,
+        'authorName': authorName,
+        'authorEmail': authorEmail,
         'seconds': timeStamp.seconds,
         'nanoSeconds': timeStamp.nanoseconds,
       };
@@ -389,8 +392,8 @@ class Alliance {
                   0) +
               ((showPenalties ?? false)
                   ? (eventType == EventType.remote
-                      ? -getPenalty()
-                      : getPenalty())
+                      ? getPenalty()
+                      : -getPenalty())
                   : 0))
           .clamp(0, 999999999999999999);
 
@@ -534,7 +537,9 @@ class Match {
     if (type == EventType.remote) {
       return redScore(showPenalties: showPenalties);
     }
-    return redScore(showPenalties: showPenalties) + " - " + blueScore(showPenalties: showPenalties);
+    return redScore(showPenalties: showPenalties) +
+        " - " +
+        blueScore(showPenalties: showPenalties);
   }
 
   String redScore({bool? showPenalties}) =>
@@ -544,20 +549,28 @@ class Match {
       (blue?.allianceTotal(id, showPenalties) ?? 0).toString();
 
   Match.fromJson(Map<String, dynamic> json, List<Team> teamList) {
-    red = Alliance.fromJson(
-      json['red'],
-      teamList,
-      getTypeFromString(
-        json['type'],
-      ),
-    );
-    blue = Alliance.fromJson(
-      json['blue'],
-      teamList,
-      getTypeFromString(
-        json['type'],
-      ),
-    );
+    try {
+      red = Alliance.fromJson(
+        json['red'],
+        teamList,
+        getTypeFromString(
+          json['type'],
+        ),
+      );
+    } catch (e) {
+      red = null;
+    }
+    try {
+      blue = Alliance.fromJson(
+        json['blue'],
+        teamList,
+        getTypeFromString(
+          json['type'],
+        ),
+      );
+    } catch (e) {
+      blue = null;
+    }
     id = json['id'];
     dice = getDiceFromString(json['dice']);
     type = getTypeFromString(json['type']);
@@ -567,8 +580,8 @@ class Match {
     blue?.id = id;
   }
   Map<String, dynamic> toJson() => {
-        'red': red!.toJson(),
-        'blue': blue!.toJson(),
+        'red': red?.toJson(),
+        'blue': blue?.toJson(),
         'type': type.toString(),
         'dice': dice.toString(),
         'id': id.toString()
@@ -662,14 +675,6 @@ extension Arithmetic on Iterable<num> {
         .where((e) => removeOutliers ? !e.isOutlier(this) : true)
         .toList();
   }
-
-  // BoxAndWhisker getBoxAndWhisker() => BoxAndWhisker(
-  //       max: this.maxValue(),
-  //       min: this.minValue(),
-  //       median: median(),
-  //       q1: q1(),
-  //       q3: q3(),
-  //     );
 }
 
 extension moreArithmetic on num {
@@ -845,8 +850,11 @@ extension ScoreDivExtension on List<ScoreDivision> {
 }
 
 extension ScoresExtension on List<Score> {
-  List<FlSpot> spots(OpModeType? type) {
-    final list = this.map((e) => e.getScoreDivision(type).total()).toList();
+  List<FlSpot> spots(OpModeType? type, {bool? showPenalties}) {
+    final list = this
+        .map(
+            (e) => e.getScoreDivision(type).total(showPenalties: showPenalties))
+        .toList();
     List<FlSpot> val = [];
     for (int i = 0; i < list.length; i++) {
       val.add(FlSpot(i.toDouble(), list[i].toDouble()));
@@ -897,8 +905,4 @@ extension ScoresExtension on List<Score> {
 
   List<Score> diceScores(Dice? dice) =>
       (dice != Dice.none ? this.where((e) => e.dice == dice) : this).toList();
-}
-
-bool toggle(bool init) {
-  return !init;
 }

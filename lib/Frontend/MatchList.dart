@@ -214,7 +214,7 @@ class _MatchList extends State<MatchList> {
                 onTap: () {
                   showPlatformDialog(
                     context: context,
-                    builder: (BuildContext context) => PlatformAlert(
+                    builder: (context) => PlatformAlert(
                       title: Text('Delete Match'),
                       content: Text('Are you sure?'),
                       actions: [
@@ -307,7 +307,7 @@ class _MatchList extends State<MatchList> {
               onTap: () {
                 showPlatformDialog(
                   context: context,
-                  builder: (BuildContext context) => PlatformAlert(
+                  builder: (context) => PlatformAlert(
                     title: Text('Delete Match'),
                     content: Text('Are you sure?'),
                     actions: [
@@ -406,7 +406,7 @@ class MatchSearch extends SearchDelegate<String?> {
         )
       ];
   @override
-  Widget buildLeading(BuildContext context) {
+  Widget buildLeading(context) {
     return IconButton(
       icon: AnimatedIcon(
         icon: AnimatedIcons.menu_arrow,
@@ -417,17 +417,21 @@ class MatchSearch extends SearchDelegate<String?> {
   }
 
   @override
-  Widget buildResults(BuildContext context) => buildSuggestions(context);
+  Widget buildResults(context) => buildSuggestions(context);
 
   @override
-  Widget buildSuggestions(BuildContext context) {
+  Widget buildSuggestions(context) {
     final suggestionList = matches
         .where(
           (m) =>
               (m.red?.team1?.number.contains(query) ?? false) ||
               (m.red?.team2?.number.contains(query) ?? false) ||
               (m.blue?.team1?.number.contains(query) ?? false) ||
-              (m.blue?.team2?.number.contains(query) ?? false),
+              (m.blue?.team2?.number.contains(query) ?? false) ||
+              (m.red?.team1?.name.contains(query) ?? false) ||
+              (m.red?.team2?.name.contains(query) ?? false) ||
+              (m.blue?.team1?.name.contains(query) ?? false) ||
+              (m.blue?.team2?.name.contains(query) ?? false),
         )
         .toList();
     return ListView.builder(

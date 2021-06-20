@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:teamtrack/backend.dart';
@@ -24,6 +23,11 @@ class Score extends ScoreDivision {
         ...endgameScore.getElements(),
         ...((showPenalties ?? false) ? penalties.getElements() : [])
       ];
+  @override
+  int total({bool? showPenalties}) => getElements(showPenalties: showPenalties)
+      .map((e) => e.scoreValue())
+      .reduce((value, element) => value += element)
+      .clamp(0, 999999999999999999);
   ScoreDivision getScoreDivision(OpModeType? type) {
     switch (type) {
       case OpModeType.auto:
@@ -137,8 +141,7 @@ class TeleScore extends ScoreDivision {
   ScoringElement lowGoals = ScoringElement(name: "Low Goals", value: 2);
   ScoringElement midGoals = ScoringElement(name: "Middle Goals", value: 4);
   ScoringElement hiGoals = ScoringElement(name: "High Goals", value: 6);
-  List<ScoringElement> getElements() =>
-      [hiGoals, midGoals, lowGoals];
+  List<ScoringElement> getElements() => [hiGoals, midGoals, lowGoals];
   List<double> cycles = [];
   int misses = 0;
   Dice getDice() => dice;
@@ -230,26 +233,30 @@ class Penalty extends ScoreDivision {
   late ScoringElement minorPenalty;
   Dice dice;
   Penalty(this.dice) {
-    majorPenalty = ScoringElement(name: 'Major Penalty', value: 30);
-    minorPenalty = ScoringElement(name: 'Minor Penalty', value: 10);
+    majorPenalty = ScoringElement(name: 'Major Penalty', value: -30);
+    minorPenalty = ScoringElement(name: 'Minor Penalty', value: -10);
   }
 
   @override
   Dice getDice() => dice;
 
   @override
-  List<ScoringElement> getElements() =>
-      [majorPenalty, minorPenalty];
+  List<ScoringElement> getElements() => [majorPenalty, minorPenalty];
+
+  @override
+  int total({bool? showPenalties}) => getElements()
+      .map((e) => e.scoreValue())
+      .reduce((value, element) => value += element);
 
   Penalty.fromJson(Map<String, dynamic> json, this.dice)
       : majorPenalty = ScoringElement(
           name: 'Major Penalty',
-          value: 30,
+          value: -30,
           count: json['major'],
         ),
         minorPenalty = ScoringElement(
           name: 'Minor Penalty',
-          value: 10,
+          value: -10,
           count: json['minor'],
         );
   Map<String, dynamic> toJson() => {
@@ -304,7 +311,7 @@ class ScoringElement {
 }
 
 abstract class ScoreDivision {
-  int total() => getElements()
+  int total({bool? showPenalties}) => getElements()
       .map((e) => e.scoreValue())
       .reduce((value, element) => value += element)
       .clamp(0, 999999999999999999);

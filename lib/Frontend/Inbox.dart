@@ -46,7 +46,7 @@ class _InboxState extends State<Inbox> {
                             ),
                           ),
                           Text(
-                            e['authorName'] ?? "Guest",
+                            e['senderName'] ?? "Guest",
                           ),
                         ],
                       ),
@@ -55,7 +55,7 @@ class _InboxState extends State<Inbox> {
                           Text(
                             e['name'],
                           ),
-                          Text(e['authorEmail'])
+                          Text(e['senderEmail'])
                         ],
                       ),
                       trailing: Row(
