@@ -43,9 +43,9 @@ class _MatchView extends State<MatchView> {
       _score = team.targetScore ?? Score(Uuid().v4(), Dice.none);
       _selectedTeam = team;
       _color = CupertinoColors.systemGreen;
-      int teamIndex = widget.event.teams.indexOf(_selectedTeam);
+      int teamIndex = event.teams.indexOf(_selectedTeam);
       if (teamIndex >= 0 && _selectedTeam.targetScore != null)
-        ref = widget.event.getRef()?.child('teams/$teamIndex/targetScore');
+        ref = event.getRef()?.child('teams/$teamIndex/targetScore');
       else
         ref = null;
     } else {
@@ -57,11 +57,10 @@ class _MatchView extends State<MatchView> {
       );
       if (_match?.type == EventType.remote)
         _color = CupertinoColors.systemGreen;
-      int teamIndex = widget.event.teams.indexOf(_selectedTeam);
+      int teamIndex = event.teams.indexOf(_selectedTeam);
       int scoreIndex = _selectedTeam.scores.indexOf(_score);
       if (teamIndex >= 0 && scoreIndex >= 0)
-        ref =
-            widget.event.getRef()?.child('teams/$teamIndex/scores/$scoreIndex');
+        ref = event.getRef()?.child('teams/$teamIndex/scores/$scoreIndex');
       else
         ref = null;
     }
@@ -419,6 +418,7 @@ class _MatchView extends State<MatchView> {
             lapses.reduce((value, element) => value + element),
       );
     _score.teleScore.cycles = lapses;
+    dataModel.uploadEvent(widget.event);
   }
 
   ListView viewSelect() {
