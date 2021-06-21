@@ -64,6 +64,11 @@ class DatabaseServices {
       .child(Statics.gameName)
       .child(id ?? '')
       .onValue;
+  Database.DatabaseReference getRef() => firebaseDatabase
+      .reference()
+      .child('Events')
+      .child(Statics.gameName)
+      .child(id ?? '');
 }
 
 class AuthenticationService {
@@ -285,6 +290,11 @@ class Event {
     }
   }
 
+  Database.DatabaseReference? getRef() {
+    if (!shared) return null;
+    return firebaseDatabase.reference().child('Events/UltimateGoal').child(id);
+  }
+
   Event.fromJson(Map<String, dynamic> json) {
     type = getTypeFromString(json['type']);
     name = json['name'];
@@ -419,6 +429,7 @@ class Team {
   String name = '';
   String number = '';
   List<Score> scores = [];
+  List<Change> changes = [];
   Score? targetScore;
   Team(String number, String name) {
     this.name = name;
@@ -429,23 +440,45 @@ class Team {
     return Team("?", "?");
   }
 
+  void deleteChange(Change change) {
+    changes.remove(change);
+  }
+
+  void addChange(Change change) {
+    changes.add(change);
+    changes.sort((a, b) => a.startDate.compareTo(b.startDate));
+  }
+
   Team.fromJson(Map<String, dynamic> json, EventType eventType) {
     number = json['number'];
     name = json['name'];
     try {
       scores = List<Score>.from(
-          json['scores'].map((model) => Score.fromJson(model, eventType)));
+        json['scores'].map(
+          (model) => Score.fromJson(model, eventType),
+        ),
+      );
     } catch (e) {
       scores = [];
     }
     if (json['targetScore'] != null)
       targetScore = Score.fromJson(json['targetScore'], eventType);
+    try {
+      changes = List<Change>.from(
+        json['changes'].map(
+          (model) => Change.fromJson(model),
+        ),
+      );
+    } catch (e) {
+      changes = [];
+    }
   }
   Map<String, dynamic> toJson() => {
         'name': name,
         'number': number,
         'scores': scores.map((e) => e.toJson()).toList(),
-        'targetScore': targetScore?.toJson()
+        'targetScore': targetScore?.toJson(),
+        'changes': changes.map((e) => e.toJson()).toList(),
       };
 }
 

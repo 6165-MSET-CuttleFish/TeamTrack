@@ -1,11 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:teamtrack/backend.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:teamtrack/score.dart';
 import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class Inbox extends StatefulWidget {
   const Inbox({Key? key}) : super(key: key);
@@ -118,11 +120,16 @@ class _InboxState extends State<Inbox> {
             [Text('')],
       );
     }
+
     return PlatformProgressIndicator();
   }
 
   void getList() async {
-    query = await docRef.collection(context.read<User?>()?.email ?? '').get();
+    query = await docRef
+        .collection(context.read<User?>()?.email ?? '')
+        .orderBy("sendDate", descending: true)
+        .limit(10)
+        .get();
     isLoaded = true;
   }
 }

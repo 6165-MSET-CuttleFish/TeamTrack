@@ -1,3 +1,5 @@
+import 'dart:math';
+import 'package:firebase_database/firebase_database.dart' as Db;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -278,20 +280,49 @@ class PlatformProgressIndicator extends PlatformWidget<
       CircularProgressIndicator();
 }
 
-class Incrementor extends StatefulWidget {
-  Incrementor(
+class PlatformDatePicker
+    extends PlatformWidget<CupertinoDatePicker, CalendarDatePicker> {
+  PlatformDatePicker(
       {Key? key,
-      required this.element,
-      required this.onPressed,
-      this.onIncrement,
-      this.onDecrement,
-      this.backgroundColor})
+      required this.minimumDate,
+      required this.maximumDate,
+      required this.onDateChanged})
       : super(key: key);
+  final DateTime maximumDate, minimumDate;
+  final void Function(DateTime) onDateChanged;
+  @override
+  CupertinoDatePicker buildCupertinoWidget(BuildContext context) =>
+      CupertinoDatePicker(
+        onDateTimeChanged: onDateChanged,
+        minimumDate: minimumDate,
+        maximumDate: maximumDate,
+      );
+
+  @override
+  CalendarDatePicker buildMaterialWidget(BuildContext context) =>
+      CalendarDatePicker(
+          initialDate: maximumDate,
+          firstDate: minimumDate,
+          lastDate: maximumDate,
+          onDateChanged: onDateChanged);
+}
+
+class Incrementor extends StatefulWidget {
+  Incrementor({
+    Key? key,
+    required this.element,
+    required this.onPressed,
+    this.onIncrement,
+    this.onDecrement,
+    this.backgroundColor,
+    required this.ref,
+  }) : super(key: key);
   final ScoringElement element;
   final void Function() onPressed;
   final void Function()? onIncrement;
   final void Function()? onDecrement;
   final Color? backgroundColor;
+  final Db.DatabaseReference? ref;
   @override
   State<StatefulWidget> createState() => _Incrementor();
 }
@@ -317,6 +348,11 @@ class _Incrementor extends State<Incrementor> {
                             if (widget.onDecrement != null)
                               widget.onDecrement!();
                             widget.onPressed();
+                            widget.ref?.runTransaction((transaction) async {
+                              transaction.value = (transaction.value ?? 0) -
+                                  widget.element.decrementValue;
+                              return transaction;
+                            });
                           }
                         : null,
                     elevation: 2.0,
@@ -341,6 +377,11 @@ class _Incrementor extends State<Incrementor> {
                             if (widget.onIncrement != null)
                               widget.onIncrement!();
                             widget.onPressed();
+                            widget.ref?.runTransaction((transaction) async {
+                              transaction.value = (transaction.value ?? 0) +
+                                  widget.element.incrementValue;
+                              return transaction;
+                            });
                           }
                         : null,
                     elevation: 2.0,
@@ -506,7 +547,7 @@ class ScoreCard extends StatelessWidget {
                         border: Border.all(
                             color: const Color(0xff37434d), width: 1),
                       ),
-                      
+
                       // minX: 0,
                       // maxX: team.scores
                       //         .where((e) =>
@@ -514,10 +555,10 @@ class ScoreCard extends StatelessWidget {
                       //         .length
                       //         .toDouble() -
                       //     1,
-                      // minY: [
-                      //   scoreDivisions.minScore(dice, removeOutliers),
-                      //   targetScore?.total().toDouble() ?? 0.0
-                      // ].reduce(min),
+                      minY: [
+                        scoreDivisions.minScore(dice, removeOutliers),
+                        targetScore?.total().toDouble() ?? 0.0
+                      ].reduce(min),
                       // maxY: [
                       //   scoreDivisions.maxScore(dice, removeOutliers),
                       //   targetScore?.total().toDouble() ?? 0.0

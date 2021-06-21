@@ -15,7 +15,6 @@ class EventsList extends StatefulWidget {
   @override
   _EventsList createState() => _EventsList();
 }
-
 class _EventsList extends State<EventsList> {
   final slider = SlidableStrechActionPane();
   final secondaryActions = <Widget>[
@@ -489,62 +488,54 @@ class _EventsList extends State<EventsList> {
     else
       showModalBottomSheet(
         context: context,
-        builder: (context) => Container(
-          height: 120,
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Theme.of(context).splashColor,
-                width: 1.0,
+        builder: (context) => Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Theme.of(context).splashColor,
+                  width: 1,
+                ),
               ),
-              color: Theme.of(context).canvasColor,
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                ListTileTheme(
-                  iconColor: Theme.of(context).accentColor,
-                  child: ListTile(
-                    onTap: () {
-                      _newType = EventType.local;
-                      setState(() {});
-                      Navigator.pop(context);
-                      _chosen();
-                    },
-                    leading: Icon(CupertinoIcons.person_3_fill),
-                    title: Text('Local Event'),
-                  ),
+              child: ListTileTheme(
+                iconColor: Theme.of(context).accentColor,
+                child: ListTile(
+                  onTap: () {
+                    _newType = EventType.local;
+                    setState(() {});
+                    Navigator.pop(context);
+                    _chosen();
+                  },
+                  leading: Icon(CupertinoIcons.person_3_fill),
+                  title: Text('Local Event'),
                 ),
-                ListTileTheme(
-                  iconColor: Theme.of(context).accentColor,
-                  child: ListTile(
-                    onTap: () {
-                      _newType = EventType.remote;
-                      setState(() {});
-                      Navigator.pop(context);
-                      _chosen();
-                    },
-                    leading:
-                        Icon(CupertinoIcons.rectangle_stack_person_crop_fill),
-                    title: Text('Remote Event'),
-                  ),
-                ),
-                // ListTileTheme(
-                //   iconColor: Theme.of(context).accentColor,
-                //   child: ListTile(
-                //     onTap: () {
-                //       _newType = EventType.live;
-                //       setState(() {});
-                //       Navigator.pop(context);
-                //       _chosen();
-                //     },
-                //     leading: Icon(CupertinoIcons.cloud_fill),
-                //     title: Text('Live Event'),
-                //   ),
-                // )
-              ],
+              ),
             ),
-          ),
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Theme.of(context).splashColor,
+                  width: 1,
+                ),
+              ),
+              child: ListTileTheme(
+                iconColor: Theme.of(context).accentColor,
+                child: ListTile(
+                  onTap: () {
+                    _newType = EventType.remote;
+                    setState(() {});
+                    Navigator.pop(context);
+                    _chosen();
+                  },
+                  leading:
+                      Icon(CupertinoIcons.rectangle_stack_person_crop_fill),
+                  title: Text('Remote Event'),
+                ),
+              ),
+            ),
+          ],
         ),
       );
   }
