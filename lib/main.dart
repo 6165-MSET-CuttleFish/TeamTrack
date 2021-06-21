@@ -8,6 +8,8 @@ import 'package:teamtrack/backend.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,6 +23,7 @@ class TeamTrack extends StatefulWidget {
 }
 
 class _TeamTrack extends State<TeamTrack> {
+
   final lightTheme = ThemeData(
     primarySwatch: Colors.deepPurple,
     splashColor: NewPlatform.isAndroid() ? Colors.cyan : Colors.transparent,
@@ -52,6 +55,30 @@ class _TeamTrack extends State<TeamTrack> {
   void initState() {
     super.initState();
     getCurrentAppTheme();
+    fcm();
+  }
+
+  void fcm() async {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    NotificationSettings settings = await messaging.requestPermission(
+        alert: true,
+        announcement: false,
+        badge: true,
+        carPlay: false,
+        criticalAlert: false,
+        provisional: false,
+        sound: true
+    );
+    print('User granted permission: ${settings.authorizationStatus}');
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print('Got a message whilst in the foreground!');
+      print('Message data: ${message.data}');
+
+      if (message.notification != null) {
+        print('Message also contained a notification: ${message.notification}');
+      }
+    });
   }
 
   void getCurrentAppTheme() async {
