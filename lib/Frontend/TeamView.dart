@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:teamtrack/Frontend/Assets/Collapsible.dart';
 import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
+import 'package:teamtrack/Frontend/ChangeList.dart';
 import 'package:teamtrack/Frontend/MatchList.dart';
 import 'package:teamtrack/Frontend/MatchView.dart';
 import 'package:teamtrack/backend.dart';
@@ -25,8 +26,6 @@ class TeamView extends StatefulWidget {
 
 class _TeamView extends State<TeamView> {
   Dice _dice = Dice.none;
-  final Curve finalCurve = Curves.fastLinearToSlowEaseIn;
-  final Duration finalDuration = Duration(milliseconds: 800);
   final _selections = [true, true, false, false, false];
   Team _team = Team.nullTeam();
   bool removeOutliers = false;
@@ -34,7 +33,8 @@ class _TeamView extends State<TeamView> {
   final teleColor = Colors.blue;
   final autoColor = Colors.green;
   final generalColor = Color.fromRGBO(230, 30, 213, 1);
-  var showPenalties = false;
+  bool showPenalties = false;
+  bool _showCycles = false;
   @override
   Widget build(BuildContext context) {
     _team = widget.team;
@@ -127,23 +127,57 @@ class _TeamView extends State<TeamView> {
         title: Text(_team.name),
         backgroundColor: Theme.of(context).accentColor,
         actions: [
-          Center(
-            child: Text('Remove Outliers'),
+          IconButton(
+            icon: Icon(Icons.settings),
+            onPressed: () => showModalBottomSheet(
+              context: context,
+              builder: (context) => Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CheckboxListTile(
+                    value: removeOutliers,
+                    onChanged: (_) => setState(
+                      () {
+                        removeOutliers = _ ?? false;
+                        Navigator.pop(context);
+                      },
+                    ),
+                    checkColor: Colors.black,
+                    tileColor: Colors.green,
+                    title: Text('Remove Outliers'),
+                    subtitle: Icon(CupertinoIcons.arrow_branch),
+                  ),
+                  CheckboxListTile(
+                    value: showPenalties,
+                    onChanged: (_) {
+                      setState(
+                        () {
+                          showPenalties = _ ?? false;
+                          Navigator.pop(context);
+                        },
+                      );
+                    },
+                    checkColor: Colors.black,
+                    tileColor: Colors.red,
+                    title: Text('Include Penalties'),
+                    subtitle: Icon(Icons.score_rounded),
+                  ),
+                ],
+              ),
+            ),
           ),
-          Checkbox(
-            value: removeOutliers,
-            onChanged: (_) => setState(() => removeOutliers = _ ?? false),
-            checkColor: Colors.black,
-            fillColor: MaterialStateProperty.all(Colors.yellow),
+          IconButton(
+            icon: Icon(Icons.list),
+            tooltip: 'Changelist',
+            onPressed: () => Navigator.of(context).push(
+              platformPageRoute(
+                (context) => ChangeList(
+                  team: _team,
+                  event: widget.event,
+                ),
+              ),
+            ),
           ),
-          Checkbox(
-            value: showPenalties,
-            onChanged: (_) {
-              setState(() => showPenalties = _ ?? false);
-            },
-            checkColor: Colors.black,
-            fillColor: MaterialStateProperty.all(Colors.pink[50]),
-          )
         ],
       ),
       body: StreamBuilder<Database.Event>(
@@ -182,7 +216,6 @@ class _TeamView extends State<TeamView> {
     );
   }
 
-  bool _showCycles = false;
   Widget _lineChart() => _team.scores.diceScores(_dice).length >= 2
       ? Stack(
           alignment: Alignment.topRight,

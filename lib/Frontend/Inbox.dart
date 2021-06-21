@@ -122,7 +122,11 @@ class _InboxState extends State<Inbox> {
   }
 
   void getList() async {
-    query = await docRef.collection(context.read<User?>()?.email ?? '').get();
+    query = await docRef
+        .collection(context.read<User?>()?.email ?? '')
+        .orderBy("sendDate", descending: true)
+        .limit(10)
+        .get();
     isLoaded = true;
   }
 }
