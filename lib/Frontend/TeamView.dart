@@ -471,7 +471,7 @@ class _TeamView extends State<TeamView> {
                             ScatterSeries<int, int>(
                               dataSource: _team.scores
                                   .diceScores(_dice)
-                                  .map((e) => e.teleScore.misses)
+                                  .map((e) => e.teleScore.misses.count)
                                   .toList(),
                               xValueMapper: (int misses, _) => _ + 1,
                               yValueMapper: (int misses, _) => misses,

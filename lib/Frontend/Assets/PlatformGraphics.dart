@@ -349,8 +349,9 @@ class _Incrementor extends State<Incrementor> {
                               widget.onDecrement!();
                             widget.onPressed();
                             widget.ref?.runTransaction((transaction) async {
-                              transaction.value = (transaction.value ?? 0) -
-                                  widget.element.decrementValue;
+                              if (transaction.value > widget.element.min!())
+                                transaction.value = (transaction.value ?? 0) -
+                                    widget.element.decrementValue;
                               return transaction;
                             });
                           }
@@ -378,8 +379,9 @@ class _Incrementor extends State<Incrementor> {
                               widget.onIncrement!();
                             widget.onPressed();
                             widget.ref?.runTransaction((transaction) async {
-                              transaction.value = (transaction.value ?? 0) +
-                                  widget.element.incrementValue;
+                              if (transaction.value < widget.element.max!())
+                                transaction.value = (transaction.value ?? 0) +
+                                    widget.element.incrementValue;
                               return transaction;
                             });
                           }

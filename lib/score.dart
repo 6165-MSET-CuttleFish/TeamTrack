@@ -4,18 +4,19 @@ import 'package:flutter/services.dart';
 import 'package:teamtrack/backend.dart';
 
 class Score extends ScoreDivision {
-  TeleScore teleScore = TeleScore(Dice.none);
-  AutoScore autoScore = AutoScore(Dice.none);
-  EndgameScore endgameScore = EndgameScore(Dice.none);
-  Penalty penalties = Penalty(Dice.none);
+  TeleScore teleScore = TeleScore();
+  AutoScore autoScore = AutoScore();
+  EndgameScore endgameScore = EndgameScore();
+  Penalty penalties = Penalty();
   Timestamp timeStamp = Timestamp.now();
   String id = '';
-  Dice dice = Dice.none;
+  late Dice dice;
   Score(this.id, this.dice) {
-    teleScore = TeleScore(dice);
-    autoScore = AutoScore(dice);
-    endgameScore = EndgameScore(dice);
-    penalties = Penalty(dice);
+    teleScore = TeleScore();
+    autoScore = AutoScore();
+    endgameScore = EndgameScore();
+    penalties = Penalty();
+    setDice(dice);
   }
   List<ScoringElement> getElements({bool? showPenalties}) => [
         ...teleScore.getElements(),
@@ -41,19 +42,22 @@ class Score extends ScoreDivision {
     }
   }
 
+  @override
   Dice getDice() => dice;
+  void setDice(Dice value) {
+    autoScore.dice = value;
+    teleScore.dice = value;
+    endgameScore.dice = value;
+    penalties.dice = value;
+  }
+
   Score.fromJson(Map<String, dynamic> json, eventType) {
     dice = getDiceFromString(json['dice']);
-    autoScore = AutoScore.fromJson(json['AutoScore'], dice);
-    teleScore = TeleScore.fromJson(json['TeleScore'], dice);
-    endgameScore = EndgameScore.fromJson(json['EndgameScore'], dice);
-    penalties = Penalty.fromJson(json['Penalty'], dice);
+    autoScore = AutoScore.fromJson(json['AutoScore']);
+    teleScore = TeleScore.fromJson(json['TeleScore']);
+    endgameScore = EndgameScore.fromJson(json['EndgameScore']);
+    penalties = Penalty.fromJson(json['Penalty']);
     id = json['id'];
-    try {
-      timeStamp = Timestamp(json['seconds'], json['nanoSeconds']);
-    } catch (e) {
-      timeStamp = Timestamp.now();
-    }
   }
   Map<String, dynamic> toJson() => {
         'AutoScore': autoScore.toJson(),
@@ -61,9 +65,6 @@ class Score extends ScoreDivision {
         'EndgameScore': endgameScore.toJson(),
         'Penalty': penalties.toJson(),
         'id': id.toString(),
-        'dice': dice.toString(),
-        'seconds': timeStamp.seconds,
-        'nanoSeconds': timeStamp.nanoseconds,
       };
 }
 
@@ -92,7 +93,7 @@ extension scoreList on List<Score> {
 }
 
 class AutoScore extends ScoreDivision {
-  Dice dice;
+  late Dice dice;
   ScoringElement wobbleGoals = ScoringElement(
       name: 'Wobble Goals', value: 15, max: () => 2, key: "WobbleGoals");
   ScoringElement lowGoals =
@@ -112,8 +113,8 @@ class AutoScore extends ScoreDivision {
   List<ScoringElement> getElements() =>
       [hiGoals, midGoals, lowGoals, wobbleGoals, pwrShots, navigated];
   Dice getDice() => dice;
-  AutoScore(this.dice);
-  AutoScore.fromJson(Map<String, dynamic> json, this.dice) {
+  AutoScore();
+  AutoScore.fromJson(Map<String, dynamic> json) {
     hiGoals = ScoringElement(
         name: 'High Goals',
         count: json['HighGoals'],
@@ -162,7 +163,7 @@ class AutoScore extends ScoreDivision {
 }
 
 class TeleScore extends ScoreDivision {
-  Dice dice;
+  late Dice dice;
   ScoringElement lowGoals =
       ScoringElement(name: "Low Goals", value: 2, key: 'LowGoals');
   ScoringElement midGoals =
@@ -171,10 +172,11 @@ class TeleScore extends ScoreDivision {
       ScoringElement(name: "High Goals", value: 6, key: 'HighGoals');
   List<ScoringElement> getElements() => [hiGoals, midGoals, lowGoals];
   List<double> cycles = [];
-  int misses = 0;
+  ScoringElement misses =
+      ScoringElement(name: "Misses", value: 1, key: 'Misses');
   Dice getDice() => dice;
-  TeleScore(this.dice);
-  TeleScore.fromJson(Map<String, dynamic> map, this.dice) {
+  TeleScore();
+  TeleScore.fromJson(Map<String, dynamic> map) {
     hiGoals = ScoringElement(
         name: 'High Goals',
         count: map['HighGoals'],
@@ -190,7 +192,8 @@ class TeleScore extends ScoreDivision {
     try {
       misses = map['Misses'];
     } catch (e) {
-      misses = 0;
+      misses = ScoringElement(
+          name: "Misses", value: 1, key: 'Misses', count: map['Misses']);
     }
     try {
       cycles = List<double>.from(json.decode(map['Cycles'].toString()));
@@ -208,7 +211,7 @@ class TeleScore extends ScoreDivision {
 }
 
 class EndgameScore extends ScoreDivision {
-  Dice dice;
+  late Dice dice;
   ScoringElement wobbleGoalsInDrop =
       ScoringElement(name: 'Wobbles In Drop', value: 20, key: 'WobblesInDrop');
   ScoringElement wobbleGoalsInStart =
@@ -221,7 +224,7 @@ class EndgameScore extends ScoreDivision {
       [pwrShots, wobbleGoalsInDrop, wobbleGoalsInStart, ringsOnWobble];
 
   Dice getDice() => dice;
-  EndgameScore(this.dice) {
+  EndgameScore() {
     maxSet();
   }
   void maxSet() {
@@ -229,7 +232,7 @@ class EndgameScore extends ScoreDivision {
     wobbleGoalsInDrop.max = () => 2 - wobbleGoalsInStart.count;
   }
 
-  EndgameScore.fromJson(Map<String, dynamic> json, this.dice) {
+  EndgameScore.fromJson(Map<String, dynamic> json) {
     wobbleGoalsInDrop = ScoringElement(
       name: 'Wobbles In Drop',
       count: json['WobblesInDrop'],
@@ -268,8 +271,8 @@ class EndgameScore extends ScoreDivision {
 class Penalty extends ScoreDivision {
   late ScoringElement majorPenalty;
   late ScoringElement minorPenalty;
-  Dice dice;
-  Penalty(this.dice) {
+  late Dice dice;
+  Penalty() {
     majorPenalty =
         ScoringElement(name: 'Major Penalty', value: -30, key: 'major');
     minorPenalty =
@@ -287,7 +290,7 @@ class Penalty extends ScoreDivision {
       .map((e) => e.scoreValue())
       .reduce((value, element) => value + element);
 
-  Penalty.fromJson(Map<String, dynamic> json, this.dice)
+  Penalty.fromJson(Map<String, dynamic> json)
       : majorPenalty = ScoringElement(
           name: 'Major Penalty',
           value: -30,

@@ -15,6 +15,7 @@ class EventsList extends StatefulWidget {
   @override
   _EventsList createState() => _EventsList();
 }
+
 class _EventsList extends State<EventsList> {
   final slider = SlidableStrechActionPane();
   final secondaryActions = <Widget>[
@@ -162,27 +163,25 @@ class _EventsList extends State<EventsList> {
   Widget getHome() {
     switch (_tab) {
       case 1:
-        return Inbox(); // @BILL
+        return Inbox();
       default:
         return SafeArea(
-          child: ListView(children: [
-            ExpansionTile(
-              leading: Icon(CupertinoIcons.person_3),
-              initiallyExpanded: true,
-              title: Text('Local Events'),
-              children: localEvents(),
-            ),
-            ExpansionTile(
-              leading: Icon(CupertinoIcons.rectangle_stack_person_crop),
-              initiallyExpanded: true,
-              title: Text('Remote Events'),
-              children: remoteEvents(),
-            ),
-            // ExpansionTile(
-            //   title: Text('Live Events'),
-            //   children: liveEvents(),
-            // ),
-          ]),
+          child: ListView(
+            children: [
+              ExpansionTile(
+                leading: Icon(CupertinoIcons.person_3),
+                initiallyExpanded: true,
+                title: Text('Local Events'),
+                children: localEvents(),
+              ),
+              ExpansionTile(
+                leading: Icon(CupertinoIcons.rectangle_stack_person_crop),
+                initiallyExpanded: true,
+                title: Text('Remote Events'),
+                children: remoteEvents(),
+              ),
+            ],
+          ),
         );
     }
   }

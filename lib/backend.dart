@@ -323,6 +323,9 @@ class Event {
     }
     authorEmail = json['authorEmail'];
     authorName = json['authorName'];
+    for (var match in matches) {
+      match.setDice(match.dice);
+    }
   }
   Map<String, dynamic> toJson() => {
         'name': name,

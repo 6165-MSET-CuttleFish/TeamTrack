@@ -36,9 +36,10 @@ class _MatchView extends State<MatchView> {
   int? _previousStreamValue = 0;
   bool _paused = true;
   bool _allowView = false;
-  late Database.DatabaseReference? ref;
-  _MatchView(Match? match, Team? team, Event event) {
-    _selectedAlliance = match?.red;
+  Database.DatabaseReference? ref;
+  Database.DatabaseReference? matchRef;
+  _MatchView(this._match, Team? team, Event event) {
+    _selectedAlliance = _match?.red;
     if (team != null) {
       _score = team.targetScore ?? Score(Uuid().v4(), Dice.none);
       _selectedTeam = team;
@@ -49,10 +50,13 @@ class _MatchView extends State<MatchView> {
       else
         ref = null;
     } else {
-      _match = match;
-      _selectedTeam = match?.red?.team1 ?? Team.nullTeam();
+      _selectedTeam = _match?.red?.team1 ?? Team.nullTeam();
+      int matchIndex =
+          event.matches.indexOf(_match ?? Match.defaultMatch(EventType.local));
+      if (matchIndex >= 0)
+        matchRef = event.getRef()?.child('matches/$matchIndex');
       _score = _selectedTeam.scores.firstWhere(
-        (element) => element.id == match?.id,
+        (element) => element.id == _match?.id,
         orElse: () => Score(Uuid().v4(), Dice.none),
       );
       if (_match?.type == EventType.remote)
@@ -82,10 +86,13 @@ class _MatchView extends State<MatchView> {
               _match = widget.event.matches.firstWhere(
                 (element) => element.id == _match?.id,
                 orElse: () {
-                  //Navigator.pop(context);
                   return Match.defaultMatch(EventType.remote);
                 },
               );
+              int matchIndex = widget.event.matches
+                  .indexOf(_match ?? Match.defaultMatch(EventType.local));
+              if (matchIndex >= 0)
+                matchRef = widget.event.getRef()?.child('matches/$matchIndex');
             }
             _selectedTeam = widget.event.teams.firstWhere(
               (team) => team.number == _selectedTeam.number,
@@ -250,8 +257,11 @@ class _MatchView extends State<MatchView> {
                                     _match?.setDice(newValue ?? Dice.one);
                                   },
                                 );
+                                matchRef?.runTransaction((mutableData) async {
+                                  mutableData.value = newValue.toString();
+                                  return mutableData;
+                                });
                                 dataModel.saveEvents();
-                                dataModel.uploadEvent(widget.event);
                               },
                               items: [Dice.one, Dice.two, Dice.three]
                                   .map<DropdownMenuItem<Dice>>(
@@ -418,6 +428,10 @@ class _MatchView extends State<MatchView> {
             lapses.reduce((value, element) => value + element),
       );
     _score.teleScore.cycles = lapses;
+    ref?.child('TeleScore/Cycles').runTransaction((mutableData) async {
+      mutableData.value = _score.teleScore.cycles;
+      return mutableData;
+    });
     dataModel.uploadEvent(widget.event);
   }
 
@@ -469,6 +483,17 @@ class _MatchView extends State<MatchView> {
         ];
   ScoringElement incrementValue = ScoringElement(
       name: 'Increment Value', min: () => 1, count: 1, key: null);
+  void increaseMisses() {
+    _score.teleScore.misses.count++;
+    ref
+        ?.child('TeleScore')
+        .child(_score.teleScore.misses.key ?? '')
+        .runTransaction((mutableData) async {
+      mutableData.value = (mutableData.value ?? 0) + 1;
+      return mutableData;
+    });
+  }
+
   List<Widget> teleView() => !_paused || _allowView
       ? [
           Incrementor(
@@ -476,63 +501,23 @@ class _MatchView extends State<MatchView> {
             element: incrementValue,
             onPressed: () => setState(
               () {
+                for (var element in _score.teleScore.getElements())
+                  element.incrementValue = incrementValue.count;
+              },
+            ),
+            ref: null,
+          ),
+          Incrementor(
+            backgroundColor: Colors.red.withOpacity(0.3),
+            element: _score.teleScore.misses,
+            onPressed: () => setState(
+              () {
                 for (var element in _score.teleScore.getElements()) {
                   element.incrementValue = incrementValue.count;
                 }
               },
             ),
-            ref: ref?.child('AutoScore').child('e.ke'),
-          ),
-          Container(
-            color: Colors.red.withOpacity(0.3),
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 5),
-                  child: Row(
-                    children: [
-                      Text('Misses'),
-                      Spacer(),
-                      RawMaterialButton(
-                        onPressed: _score.teleScore.misses > 0
-                            ? () {
-                                _score.teleScore.misses--;
-                                stateSetter();
-                              }
-                            : null,
-                        elevation: 2.0,
-                        fillColor: Theme.of(context).canvasColor,
-                        splashColor: Colors.red,
-                        child: Icon(Icons.remove_circle_outline_rounded),
-                        shape: CircleBorder(),
-                      ),
-                      SizedBox(
-                        width: 20,
-                        child: Text(
-                          _score.teleScore.misses.toString(),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      RawMaterialButton(
-                        onPressed: () {
-                          _score.teleScore.misses++;
-                          stateSetter();
-                        },
-                        elevation: 2.0,
-                        fillColor: Theme.of(context).canvasColor,
-                        splashColor: Colors.green,
-                        child: Icon(Icons.add_circle_outline_rounded),
-                        shape: CircleBorder(),
-                      )
-                    ],
-                  ),
-                ),
-                Divider(
-                  height: 3,
-                  thickness: 2,
-                ),
-              ],
-            ),
+            ref: ref?.child('TeleScore').child('Misses'),
           ),
           Padding(padding: EdgeInsets.all(5)),
           ..._score.teleScore
@@ -542,7 +527,7 @@ class _MatchView extends State<MatchView> {
                   element: e,
                   onPressed: stateSetter,
                   onIncrement: onIncrement,
-                  onDecrement: () => _score.teleScore.misses++,
+                  onDecrement: increaseMisses,
                   ref: ref?.child('TeleScore').child(e.key ?? ''),
                 ),
               )
