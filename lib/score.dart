@@ -52,7 +52,6 @@ class Score extends ScoreDivision {
   }
 
   Score.fromJson(Map<String, dynamic> json, eventType) {
-    dice = getDiceFromString(json['dice']);
     autoScore = AutoScore.fromJson(json['AutoScore']);
     teleScore = TeleScore.fromJson(json['TeleScore']);
     endgameScore = EndgameScore.fromJson(json['EndgameScore']);
@@ -196,7 +195,7 @@ class TeleScore extends ScoreDivision {
           name: "Misses", value: 1, key: 'Misses', count: map['Misses']);
     }
     try {
-      cycles = List<double>.from(json.decode(map['Cycles'].toString()));
+      cycles = List<double>.from(json.decode(map['Cycles']));
     } catch (e) {
       cycles = [];
     }
@@ -205,7 +204,7 @@ class TeleScore extends ScoreDivision {
         'HighGoals': hiGoals.count,
         'MiddleGoals': midGoals.count,
         'LowGoals': lowGoals.count,
-        'Misses': misses,
+        'Misses': misses.count,
         'Cycles': json.encode(cycles),
       };
 }

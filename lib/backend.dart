@@ -279,7 +279,14 @@ class Event {
       }
       try {
         matches = List<Match>.from(
-            json['matches'].map((model) => Match.fromJson(model, teams)));
+          json['matches'].map(
+            (model) => Match.fromJson(
+              model,
+              teams,
+              getTypeFromString(json['type']),
+            ),
+          ),
+        );
       } catch (e) {
         matches = [];
       }
@@ -287,6 +294,9 @@ class Event {
       id = json['id'] ?? Uuid().v4();
       authorEmail = json['authorEmail'];
       authorName = json['authorName'];
+      for (var match in matches) {
+        match.setDice(match.dice);
+      }
     }
   }
 
@@ -311,6 +321,7 @@ class Event {
         (model) => Match.fromJson(
           model,
           teams,
+          getTypeFromString(json['type']),
         ),
       ),
     );
@@ -584,14 +595,12 @@ class Match {
   String blueScore({bool? showPenalties}) =>
       (blue?.allianceTotal(id, showPenalties) ?? 0).toString();
 
-  Match.fromJson(Map<String, dynamic> json, List<Team> teamList) {
+  Match.fromJson(Map<String, dynamic> json, List<Team> teamList, this.type) {
     try {
       red = Alliance.fromJson(
         json['red'],
         teamList,
-        getTypeFromString(
-          json['type'],
-        ),
+        type,
       );
     } catch (e) {
       red = null;
@@ -600,16 +609,13 @@ class Match {
       blue = Alliance.fromJson(
         json['blue'],
         teamList,
-        getTypeFromString(
-          json['type'],
-        ),
+        type,
       );
     } catch (e) {
       blue = null;
     }
     id = json['id'];
     dice = getDiceFromString(json['dice']);
-    type = getTypeFromString(json['type']);
     red?.opposingAlliance = blue;
     blue?.opposingAlliance = red;
     red?.id = id;

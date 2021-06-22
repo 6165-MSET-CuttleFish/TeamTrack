@@ -257,7 +257,9 @@ class _MatchView extends State<MatchView> {
                                     _match?.setDice(newValue ?? Dice.one);
                                   },
                                 );
-                                matchRef?.runTransaction((mutableData) async {
+                                matchRef
+                                    ?.child('dice')
+                                    .runTransaction((mutableData) async {
                                   mutableData.value = newValue.toString();
                                   return mutableData;
                                 });
@@ -432,7 +434,6 @@ class _MatchView extends State<MatchView> {
       mutableData.value = _score.teleScore.cycles;
       return mutableData;
     });
-    dataModel.uploadEvent(widget.event);
   }
 
   ListView viewSelect() {
