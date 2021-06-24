@@ -57,19 +57,17 @@ class PushNotifications{
             ));
       }
     });
-
-    void showNotification(){
-      flutterLocalNotificationsPlugin.show(
-          0,
-          "aaagaawaga",
-          "speech inconprehensible?",
-          NotificationDetails(
-              android: AndroidNotificationDetails(channel.id, channel.name, channel.description,
-                importance: Importance.high,
-                color: Colors.blue,
-                playSound: true,)));
-    }
-
+  }
+  void showNotification() async{
+    await flutterLocalNotificationsPlugin.show(
+        0,
+        "aaagaawaga",
+        "speech inconprehensible?",
+        NotificationDetails(
+            android: AndroidNotificationDetails(channel.id, channel.name, channel.description,
+              importance: Importance.high,
+              color: Colors.blue,
+              playSound: true,)));
   }
 
   Future<String> getToken() async {

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:teamtrack/PushNotifications.dart';
 import 'package:teamtrack/backend.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +9,9 @@ import 'package:provider/provider.dart';
 import 'package:teamtrack/score.dart';
 import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+final DocumentReference docRef = firebaseFirestore.collection('inboxes').doc(Statics.gameName);
+
 
 class Inbox extends StatefulWidget {
   const Inbox({Key? key}) : super(key: key);
@@ -18,7 +22,11 @@ class Inbox extends StatefulWidget {
 class _InboxState extends State<Inbox> {
   QuerySnapshot<Map<String, dynamic>>? query;
   bool isLoaded = false;
-  final docRef = firebaseFirestore.collection('inboxes').doc(Statics.gameName);
+
+  void docListener(){
+
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!isLoaded) getList();
@@ -132,4 +140,9 @@ class _InboxState extends State<Inbox> {
         .get();
     isLoaded = true;
   }
+
+  void sendNotif() async{
+
+  }
+
 }
