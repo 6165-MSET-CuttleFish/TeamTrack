@@ -802,12 +802,14 @@ extension MatchExtensions on List<Match> {
     List<FlSpot> val = [];
     final arr =
         (dice != Dice.none ? this.where((e) => e.dice == dice) : this).toList();
-    for (int i = 0; i < arr.length; i++) {
-      final alliance = arr[i].alliance(team);
+    int i = 0;
+    for (var match in arr) {
+      final alliance = match.alliance(team);
       if (alliance != null) {
         final allianceTotal =
-            alliance.allianceTotal(arr[i].id, showPenalties, type: type);
+            alliance.allianceTotal(match.id, showPenalties, type: type);
         val.add(FlSpot(i.toDouble(), allianceTotal.toDouble()));
+        i++;
       }
     }
     return val;
