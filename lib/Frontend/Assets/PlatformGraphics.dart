@@ -401,6 +401,11 @@ class _Incrementor extends State<Incrementor> {
                       else
                         widget.element.count = 0;
                       widget.onPressed();
+                      widget.ref?.runTransaction((transaction) async {
+                        if (transaction.value < widget.element.max!())
+                          transaction.value = val ? 1 : 0;
+                        return transaction;
+                      });
                     },
                   )
               ],
