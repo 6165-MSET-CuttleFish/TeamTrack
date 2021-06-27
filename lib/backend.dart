@@ -203,18 +203,6 @@ class DataModel {
   }
 
   bool isProcessing = false;
-  void uploadEvent(Event event) async {
-    if (event.shared) {
-      isProcessing = true;
-      var ref = firebaseDatabase
-          .reference()
-          .child('Events')
-          .child(Statics.gameName)
-          .child(event.id);
-      await ref.update(event.toJson());
-      isProcessing = false;
-    }
-  }
 
   void restoreEvents() async {
     final prefs = await SharedPreferences.getInstance();
@@ -243,28 +231,85 @@ class Event {
         if (element.equals(newTeam)) isIn = true;
       },
     );
-    if (!isIn) teams.add(newTeam);
+    if (!isIn) {
+      teams.add(newTeam);
+      getRef()?.child('teams').runTransaction((mutableData) async {
+        mutableData.value = [...(mutableData.value ?? []), newTeam.toJson()];
+        return mutableData;
+      });
+    }
+  }
+
+  void addMatch(Match e) {
+    if (shared) matches.add(e);
+    getRef()?.runTransaction((mutableData) async {
+      mutableData.value['matches'] = [
+        ...mutableData.value['matches'] ?? [],
+        e.toJson()
+      ];
+      for (var team in e.getTeams()) {
+        var teamIndex = (mutableData.value['teams'] as List)
+            .indexWhere((element) => element['number'] == team?.number);
+        if (teamIndex >= 0)
+          mutableData.value['teams'][teamIndex]['scores'] = [
+            ...mutableData.value['teams'][teamIndex]['scores'] ?? [],
+            Score(e.id, Dice.none).toJson()
+          ];
+      }
+      return mutableData;
+    });
   }
 
   String? deleteTeam(Team team) {
+    String? x;
     for (Match match in matches) {
       if ((match.red?.hasTeam(team) ?? false) ||
           (match.blue?.hasTeam(team) ?? false)) {
         if (type == EventType.remote)
           match.red?.team1 == null;
         else
-          return 'some';
+          x = 'some';
       }
     }
-    teams.remove(team);
+    if (x == null) {
+      teams.remove(team);
+      getRef()?.runTransaction((mutableData) async {
+        var newTeams = ((mutableData.value as Map)['teams'] as List)
+            .where((e) => e['number'] != team.number)
+            .toList();
+        mutableData.value['teams'] = newTeams;
+        return mutableData;
+      });
+    }
+    return x;
   }
 
   void deleteMatch(Match e) {
-    e.red?.team1?.scores.removeWhere((f) => f.id == e.id);
-    e.red?.team2?.scores.removeWhere((f) => f.id == e.id);
-    e.blue?.team1?.scores.removeWhere((f) => f.id == e.id);
-    e.blue?.team2?.scores.removeWhere((f) => f.id == e.id);
-    matches.remove(e);
+    if (shared) {
+      e.red?.team1?.scores.removeWhere((f) => f.id == e.id);
+      e.red?.team2?.scores.removeWhere((f) => f.id == e.id);
+      e.blue?.team1?.scores.removeWhere((f) => f.id == e.id);
+      e.blue?.team2?.scores.removeWhere((f) => f.id == e.id);
+      matches.remove(e);
+    }
+    getRef()?.runTransaction((mutableData) async {
+      var newMatches = ((mutableData.value as Map)['matches'] as List)
+          .where((element) => element['id'] != e.id)
+          .toList();
+      mutableData.value['matches'] = newMatches;
+      for (var team in e.getTeams()) {
+        var teamIndex = (mutableData.value['teams'] as List)
+            .indexWhere((element) => element['number'] == team?.number);
+        if (teamIndex >= 0) {
+          var tempScores =
+              (mutableData.value['teams'][teamIndex]['scores'] as List)
+                  .where((element) => element['id'] != e.id)
+                  .toList();
+          mutableData.value['teams'][teamIndex]['scores'] = tempScores;
+        }
+      }
+      return mutableData;
+    });
   }
 
   void updateLocal(Map<String, dynamic>? json) {
@@ -302,7 +347,10 @@ class Event {
 
   Database.DatabaseReference? getRef() {
     if (!shared) return null;
-    return firebaseDatabase.reference().child('Events/UltimateGoal').child(id);
+    return firebaseDatabase
+        .reference()
+        .child('Events/${Statics.gameName}')
+        .child(id);
   }
 
   Event.fromJson(Map<String, dynamic> json) {
@@ -502,32 +550,42 @@ class Match {
   Alliance? red;
   Alliance? blue;
   String id = '';
-  Match(this.red, this.blue, this.type) {
+  Match(this.red, this.blue, this.type, {required Event? event}) {
     id = Uuid().v4();
-    red?.team1?.scores.addScore(Score(
-      id,
-      dice,
-    ));
-    if (type != EventType.remote) {
-      red?.team2?.scores.addScore(
-        Score(
-          id,
-          dice,
-        ),
-      );
-      blue?.team1?.scores.addScore(
-        Score(
-          id,
-          dice,
-        ),
-      );
-      blue?.team2?.scores.addScore(
-        Score(
-          id,
-          dice,
-        ),
-      );
-    }
+    // red?.team1?.scores.addScore(
+    //   Score(
+    //     id,
+    //     dice,
+    //   ),
+    //   event,
+    //   red?.team1,
+    // );
+    // if (type != EventType.remote) {
+    //   red?.team2?.scores.addScore(
+    //     Score(
+    //       id,
+    //       dice,
+    //     ),
+    //     event,
+    //     red?.team2,
+    //   );
+    //   blue?.team1?.scores.addScore(
+    //     Score(
+    //       id,
+    //       dice,
+    //     ),
+    //     event,
+    //     blue?.team1,
+    //   );
+    //   blue?.team2?.scores.addScore(
+    //     Score(
+    //       id,
+    //       dice,
+    //     ),
+    //     event,
+    //     blue?.team2,
+    //   );
+    // }
     red?.opposingAlliance = blue;
     blue?.opposingAlliance = red;
     red?.id = id;
@@ -535,18 +593,23 @@ class Match {
   }
   static Match defaultMatch(EventType type) {
     return Match(Alliance(Team('1', 'Alpha'), Team('2', 'Beta'), type),
-        Alliance(Team('3', 'Charlie'), Team('4', 'Delta'), type), type);
+        Alliance(Team('3', 'Charlie'), Team('4', 'Delta'), type), type,
+        event: null);
   }
 
   Alliance? alliance(Team team) {
-    if (red!.team1!.equals(team) || red!.team2!.equals(team)) {
+    if ((red?.team1?.equals(team) ?? false) ||
+        (red?.team2?.equals(team) ?? false)) {
       return red;
-    } else if (blue!.team1.equals(team) || blue!.team2!.equals(team)) {
+    } else if ((blue?.team1?.equals(team) ?? false) ||
+        (blue?.team2?.equals(team) ?? false)) {
       return blue;
     } else {
       return null;
     }
   }
+
+  List<Team?> getTeams() => [red?.team1, red?.team2, blue?.team1, blue?.team2];
 
   void setDice(Dice dice) {
     this.dice = dice;
@@ -788,7 +851,7 @@ extension colorExt on OpModeType? {
 }
 
 extension TeamsExtension on List<Team> {
-  Team findAdd(String number, String name) {
+  Team findAdd(String number, String name, Event event) {
     bool found = false;
     for (Team team in this)
       if (team.number ==
@@ -806,7 +869,7 @@ extension TeamsExtension on List<Team> {
       var newTeam = Team(
           number.replaceAll(new RegExp(r' -,[^\w\s]+'), '').replaceAll(' ', ''),
           name);
-      this.add(newTeam);
+      event.addTeam(newTeam);
       return newTeam;
     }
   }

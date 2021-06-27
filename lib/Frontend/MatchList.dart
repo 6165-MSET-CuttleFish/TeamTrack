@@ -65,23 +65,25 @@ class _MatchList extends State<MatchList> {
                                 () {
                                   widget.event.matches.add(
                                     Match(
-                                        Alliance(
-                                          widget.event.teams.firstWhere(
-                                              (element) =>
-                                                  element.number ==
-                                                  widget.team!.number),
-                                          null,
-                                          widget.event.type,
-                                        ),
-                                        Alliance(
-                                          null,
-                                          null,
-                                          widget.event.type,
-                                        ),
-                                        EventType.remote),
+                                      Alliance(
+                                        widget.event.teams.firstWhere(
+                                            (element) =>
+                                                element.number ==
+                                                widget.team!.number),
+                                        null,
+                                        widget.event.type,
+                                      ),
+                                      Alliance(
+                                        null,
+                                        null,
+                                        widget.event.type,
+                                      ),
+                                      EventType.remote,
+                                      event: widget.event,
+                                    ),
                                   );
                                   dataModel.saveEvents();
-                                  dataModel.uploadEvent(widget.event);
+                                  //dataModel.uploadEvent(widget.event);
                                   Navigator.pop(context);
                                 },
                               );
@@ -136,7 +138,7 @@ class _MatchList extends State<MatchList> {
                                       },
                                     );
                                     dataModel.saveEvents();
-                                    dataModel.uploadEvent(widget.event);
+                                   // dataModel.uploadEvent(widget.event);
                                     Navigator.of(context).pop();
                                   },
                                 ),
@@ -199,7 +201,8 @@ class _MatchList extends State<MatchList> {
           .where((e) =>
               e.alliance(
                 widget.event.teams.firstWhere(
-                    (element) => element.number == widget.team?.number),
+                    (element) => element.number == widget.team?.number,
+                    orElse: () => Team.nullTeam()),
               ) !=
               null)
           .toList();
@@ -230,15 +233,9 @@ class _MatchList extends State<MatchList> {
                           isDestructive: true,
                           child: Text('Confirm'),
                           onPressed: () {
-                            matches[i]
-                                .red
-                                ?.team1
-                                ?.scores
-                                .removeWhere((f) => f.id == matches[i].id);
-                            widget.event.matches.remove(matches[i]);
-                            setState(() {});
+                            setState(() => widget.event.deleteMatch(matches[i]));
                             dataModel.saveEvents();
-                            dataModel.uploadEvent(widget.event);
+                            //dataModel.uploadEvent(widget.event);
                             Navigator.of(context).pop();
                           },
                         ),
@@ -324,20 +321,10 @@ class _MatchList extends State<MatchList> {
                         child: Text('Confirm'),
                         onPressed: () {
                           setState(
-                            () {
-                              e.red?.team1?.scores
-                                  .removeWhere((f) => f.id == e.id);
-                              e.red?.team2?.scores
-                                  .removeWhere((f) => f.id == e.id);
-                              e.blue?.team1?.scores
-                                  .removeWhere((f) => f.id == e.id);
-                              e.blue?.team2?.scores
-                                  .removeWhere((f) => f.id == e.id);
-                              widget.event.matches.remove(e);
-                            },
+                            () => widget.event.deleteMatch(e),
                           );
                           dataModel.saveEvents();
-                          dataModel.uploadEvent(widget.event);
+                          //dataModel.uploadEvent(widget.event);
                           Navigator.of(context).pop();
                         },
                       ),

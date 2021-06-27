@@ -662,8 +662,17 @@ class _TeamView extends State<TeamView> {
                 Uuid().v4(),
                 Dice.none,
               );
+              widget.event.getRef()?.runTransaction((mutableData) async {
+                var index = ((mutableData.value as Map)['teams'] as List)
+                    .indexWhere(
+                        (element) => element['number'] == widget.team.number);
+                if (index >= 0)
+                  mutableData.value['teams'][index]['targetScore'] =
+                      Score(Uuid().v4(), Dice.none);
+                return mutableData;
+              });
               dataModel.saveEvents();
-              dataModel.uploadEvent(widget.event);
+              //dataModel.uploadEvent(widget.event);
             }
             await Navigator.push(
               context,

@@ -162,7 +162,7 @@ class _EventView extends State<EventView> {
                 },
               );
               dataModel.saveEvents();
-              dataModel.uploadEvent(widget.event);
+              //dataModel.uploadEvent(widget.event);
               Navigator.of(context).pop();
             },
           ),
@@ -276,7 +276,7 @@ class _EventView extends State<EventView> {
                 validator: (String? value) {
                   if (value?.isEmpty ?? false)
                     return 'Name is required';
-                  else 
+                  else
                     return null;
                 },
                 onChanged: (String val) {
@@ -305,23 +305,25 @@ class _EventView extends State<EventView> {
           if (_formKey.currentState?.validate() ?? false) {
             setState(
               () {
-                widget.event.matches.add(
+                widget.event.addMatch(
                   Match(
-                      Alliance(
-                        widget.event.teams
-                            .findAdd(names[0], controllers[0].text),
-                        widget.event.teams
-                            .findAdd(names[1], controllers[1].text),
-                        widget.event.type,
-                      ),
-                      Alliance(
-                        widget.event.teams
-                            .findAdd(names[2], controllers[2].text),
-                        widget.event.teams
-                            .findAdd(names[3], controllers[3].text),
-                        widget.event.type,
-                      ),
-                      widget.event.type),
+                    Alliance(
+                      widget.event.teams
+                          .findAdd(names[0], controllers[0].text, widget.event),
+                      widget.event.teams
+                          .findAdd(names[1], controllers[1].text, widget.event),
+                      widget.event.type,
+                    ),
+                    Alliance(
+                      widget.event.teams
+                          .findAdd(names[2], controllers[2].text, widget.event),
+                      widget.event.teams
+                          .findAdd(names[3], controllers[3].text, widget.event),
+                      widget.event.type,
+                    ),
+                    widget.event.type,
+                    event: widget.event,
+                  ),
                 );
               },
             );
@@ -329,7 +331,7 @@ class _EventView extends State<EventView> {
               controller.text = '';
             }
             dataModel.saveEvents();
-            dataModel.uploadEvent(widget.event);
+            //dataModel.uploadEvent(widget.event);
             Navigator.pop(context);
           }
         },

@@ -70,7 +70,7 @@ class _TeamList extends State<TeamList> {
                                       () => s = widget.event.deleteTeam(e),
                                     );
                                     dataModel.saveEvents();
-                                    dataModel.uploadEvent(widget.event);
+                                    //dataModel.uploadEvent(widget.event);
                                     Navigator.of(context).pop();
                                     if (s != null)
                                       showPlatformDialog(

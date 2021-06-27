@@ -129,7 +129,7 @@ class _ChangeList extends State<ChangeList> {
                                         () => widget.team.deleteChange(e),
                                       );
                                       dataModel.saveEvents();
-                                      dataModel.uploadEvent(widget.event);
+                                      //dataModel.uploadEvent(widget.event);
                                       Navigator.of(context).pop();
                                     },
                                   ),
