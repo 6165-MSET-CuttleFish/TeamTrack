@@ -45,6 +45,7 @@ class Score extends ScoreDivision {
   @override
   Dice getDice() => dice;
   void setDice(Dice value) {
+    dice = value;
     autoScore.dice = value;
     teleScore.dice = value;
     endgameScore.dice = value;
@@ -195,7 +196,7 @@ class TeleScore extends ScoreDivision {
           name: "Misses", value: 1, key: 'Misses', count: map['Misses']);
     }
     try {
-      cycles = List<double>.from(json.decode(map['Cycles']));
+      cycles = List.from(json.decode(map['Cycles']));
     } catch (e) {
       cycles = [];
     }
