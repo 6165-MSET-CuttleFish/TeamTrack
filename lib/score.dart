@@ -196,7 +196,9 @@ class TeleScore extends ScoreDivision {
           name: "Misses", value: 1, key: 'Misses', count: map['Misses']);
     }
     try {
-      cycles = List.from(json.decode(map['Cycles']));
+      cycles = List<num>.from(json.decode(map['Cycles'].toString()))
+          .map((e) => e.toDouble())
+          .toList();
     } catch (e) {
       cycles = [];
     }
