@@ -83,20 +83,11 @@ EventType getTypeFromString(String statusAsString) {
 }
 
 extension scoreList on List<Score> {
-  void addScore(Score value, Event? event, Team? team) {
+  void addScore(Score value, Team? team) {
     var found = false;
     for (int i = 0; i < this.length; i++)
       if (this[i].id == value.id) found = true;
     if (!found) this.add(value);
-    int teamIndex = event?.teams.indexOf(team ?? Team.nullTeam()) ?? -1;
-    if (teamIndex >= 0)
-      event
-          ?.getRef()
-          ?.child('teams/$teamIndex/scores')
-          .runTransaction((transaction) async {
-        transaction.value = [...(transaction.value ?? []), value.toJson()];
-        return transaction;
-      });
   }
 }
 

@@ -79,7 +79,6 @@ class _MatchList extends State<MatchList> {
                                         widget.event.type,
                                       ),
                                       EventType.remote,
-                                      event: widget.event,
                                     ),
                                   );
                                   dataModel.saveEvents();

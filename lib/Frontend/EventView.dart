@@ -322,7 +322,6 @@ class _EventView extends State<EventView> {
                       widget.event.type,
                     ),
                     widget.event.type,
-                    event: widget.event,
                   ),
                 );
               },

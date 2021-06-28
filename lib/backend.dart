@@ -241,7 +241,39 @@ class Event {
   }
 
   void addMatch(Match e) {
-    if (shared) matches.add(e);
+    if (shared) {
+      matches.add(e);
+      e.red?.team1?.scores.addScore(
+        Score(
+          id,
+          e.dice,
+        ),
+        e.red?.team1,
+      );
+      if (type != EventType.remote) {
+        e.red?.team2?.scores.addScore(
+          Score(
+            id,
+            e.dice,
+          ),
+          e.red?.team2,
+        );
+        e.blue?.team1?.scores.addScore(
+          Score(
+            id,
+            e.dice,
+          ),
+          e.blue?.team1,
+        );
+        e.blue?.team2?.scores.addScore(
+          Score(
+            id,
+            e.dice,
+          ),
+          e.blue?.team2,
+        );
+      }
+    }
     getRef()?.runTransaction((mutableData) async {
       mutableData.value['matches'] = [
         ...mutableData.value['matches'] ?? [],
@@ -550,51 +582,19 @@ class Match {
   Alliance? red;
   Alliance? blue;
   String id = '';
-  Match(this.red, this.blue, this.type, {required Event? event}) {
+  Match(this.red, this.blue, this.type) {
     id = Uuid().v4();
-    // red?.team1?.scores.addScore(
-    //   Score(
-    //     id,
-    //     dice,
-    //   ),
-    //   event,
-    //   red?.team1,
-    // );
-    // if (type != EventType.remote) {
-    //   red?.team2?.scores.addScore(
-    //     Score(
-    //       id,
-    //       dice,
-    //     ),
-    //     event,
-    //     red?.team2,
-    //   );
-    //   blue?.team1?.scores.addScore(
-    //     Score(
-    //       id,
-    //       dice,
-    //     ),
-    //     event,
-    //     blue?.team1,
-    //   );
-    //   blue?.team2?.scores.addScore(
-    //     Score(
-    //       id,
-    //       dice,
-    //     ),
-    //     event,
-    //     blue?.team2,
-    //   );
-    // }
     red?.opposingAlliance = blue;
     blue?.opposingAlliance = red;
     red?.id = id;
     blue?.id = id;
   }
   static Match defaultMatch(EventType type) {
-    return Match(Alliance(Team('1', 'Alpha'), Team('2', 'Beta'), type),
-        Alliance(Team('3', 'Charlie'), Team('4', 'Delta'), type), type,
-        event: null);
+    return Match(
+      Alliance(Team('1', 'Alpha'), Team('2', 'Beta'), type),
+      Alliance(Team('3', 'Charlie'), Team('4', 'Delta'), type),
+      type,
+    );
   }
 
   Alliance? alliance(Team team) {
@@ -619,28 +619,28 @@ class Match {
                   Uuid().v4(),
                   Dice.none,
                 ))
-        .dice = dice;
+        .setDice(dice);
     red?.team2?.scores
         .firstWhere((e) => e.id == id,
             orElse: () => Score(
                   Uuid().v4(),
                   Dice.none,
                 ))
-        .dice = dice;
+        .setDice(dice);
     blue?.team1?.scores
         .firstWhere((e) => e.id == id,
             orElse: () => Score(
                   Uuid().v4(),
                   Dice.none,
                 ))
-        .dice = dice;
+        .setDice(dice);
     blue?.team2?.scores
         .firstWhere((e) => e.id == id,
             orElse: () => Score(
                   Uuid().v4(),
                   Dice.none,
                 ))
-        .dice = dice;
+        .setDice(dice);
   }
 
   String score({bool? showPenalties}) {
