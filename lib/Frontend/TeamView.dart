@@ -666,9 +666,11 @@ class _TeamView extends State<TeamView> {
                 var index = ((mutableData.value as Map)['teams'] as List)
                     .indexWhere(
                         (element) => element['number'] == widget.team.number);
-                if (index >= 0)
+                if (index >= 0) {
                   mutableData.value['teams'][index]['targetScore'] =
-                      Score(Uuid().v4(), Dice.none);
+                      Score(Uuid().v4(), Dice.none).toJson();
+                  var x = 0;
+                }
                 return mutableData;
               });
               dataModel.saveEvents();
