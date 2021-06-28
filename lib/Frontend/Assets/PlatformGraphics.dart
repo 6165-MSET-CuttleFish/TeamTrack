@@ -315,14 +315,20 @@ class Incrementor extends StatefulWidget {
     this.onIncrement,
     this.onDecrement,
     this.backgroundColor,
-    required this.ref,
+    this.team,
+    this.event,
+    this.score,
+    this.opModeType,
   }) : super(key: key);
   final ScoringElement element;
   final void Function() onPressed;
   final void Function()? onIncrement;
   final void Function()? onDecrement;
   final Color? backgroundColor;
-  final Db.DatabaseReference? ref;
+  final Team? team;
+  final Event? event;
+  final Score? score;
+  final OpModeType? opModeType;
   @override
   State<StatefulWidget> createState() => _Incrementor();
 }
@@ -348,11 +354,30 @@ class _Incrementor extends State<Incrementor> {
                             if (widget.onDecrement != null)
                               widget.onDecrement!();
                             widget.onPressed();
-                            widget.ref?.runTransaction((transaction) async {
-                              if (transaction.value > widget.element.min!())
-                                transaction.value = (transaction.value ?? 0) -
-                                    widget.element.decrementValue;
-                              return transaction;
+                            widget.event
+                                ?.getRef()
+                                ?.runTransaction((mutableData) async {
+                              final teamIndex =
+                                  (mutableData.value['teams'] as List)
+                                      .indexWhere((element) =>
+                                          element['number'] ==
+                                          (widget.team?.number ?? ''));
+                              final scoreIndex = (mutableData.value['teams']
+                                      [teamIndex]['scores'] as List)
+                                  .indexWhere((element) =>
+                                      element['id'] ==
+                                      (widget.score?.id ?? ''));
+                              var ref = mutableData.value['teams'][teamIndex]
+                                          ['scores'][scoreIndex]
+                                      [widget.opModeType?.toRep()]
+                                  [widget.element.key];
+                              if (ref > widget.element.min!())
+                                mutableData.value['teams'][teamIndex]['scores']
+                                                [scoreIndex]
+                                            [widget.opModeType?.toRep()]
+                                        [widget.element.key] =
+                                    (ref ?? 0) - widget.element.decrementValue;
+                              return mutableData;
                             });
                           }
                         : null,
@@ -378,11 +403,30 @@ class _Incrementor extends State<Incrementor> {
                             if (widget.onIncrement != null)
                               widget.onIncrement!();
                             widget.onPressed();
-                            widget.ref?.runTransaction((transaction) async {
-                              if (transaction.value < widget.element.max!())
-                                transaction.value = (transaction.value ?? 0) +
-                                    widget.element.incrementValue;
-                              return transaction;
+                            widget.event
+                                ?.getRef()
+                                ?.runTransaction((mutableData) async {
+                              final teamIndex =
+                                  (mutableData.value['teams'] as List)
+                                      .indexWhere((element) =>
+                                          element['number'] ==
+                                          (widget.team?.number ?? ''));
+                              final scoreIndex = (mutableData.value['teams']
+                                      [teamIndex]['scores'] as List)
+                                  .indexWhere((element) =>
+                                      element['id'] ==
+                                      (widget.score?.id ?? ''));
+                              var ref = mutableData.value['teams'][teamIndex]
+                                          ['scores'][scoreIndex]
+                                      [widget.opModeType?.toRep()]
+                                  [widget.element.key];
+                              if (ref < widget.element.max!())
+                                mutableData.value['teams'][teamIndex]['scores']
+                                                [scoreIndex]
+                                            [widget.opModeType?.toRep()]
+                                        [widget.element.key] =
+                                    (ref ?? 0) + widget.element.incrementValue;
+                              return mutableData;
                             });
                           }
                         : null,
@@ -401,10 +445,21 @@ class _Incrementor extends State<Incrementor> {
                       else
                         widget.element.count = 0;
                       widget.onPressed();
-                      widget.ref?.runTransaction((transaction) async {
-                        if (transaction.value < widget.element.max!())
-                          transaction.value = val ? 1 : 0;
-                        return transaction;
+                      widget.event
+                          ?.getRef()
+                          ?.runTransaction((mutableData) async {
+                        final teamIndex = (mutableData.value['teams'] as List)
+                            .indexWhere((element) =>
+                                element['number'] ==
+                                (widget.team?.number ?? ''));
+                        final scoreIndex = (mutableData.value['teams']
+                                [teamIndex]['scores'] as List)
+                            .indexWhere((element) =>
+                                element['id'] == (widget.score?.id ?? ''));
+                        mutableData.value['teams'][teamIndex]['scores']
+                                [scoreIndex][widget.opModeType?.toRep()]
+                            [widget.element.key] = val ? 1 : 0;
+                        return mutableData;
                       });
                     },
                   )

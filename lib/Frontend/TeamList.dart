@@ -78,7 +78,7 @@ class _TeamList extends State<TeamList> {
                                         builder: (context) => PlatformAlert(
                                           title: Text('Error'),
                                           content: Text(
-                                              'Team is currently being used in matches'),
+                                              'Team is present in matches'),
                                           actions: [
                                             PlatformDialogAction(
                                               child: Text('Okay'),

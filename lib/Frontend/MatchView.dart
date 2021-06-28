@@ -297,9 +297,10 @@ class _MatchView extends State<MatchView> {
                                       (e) => Incrementor(
                                         element: e,
                                         onPressed: stateSetter,
-                                        ref: ref
-                                            ?.child('Penalty')
-                                            .child(e.key ?? ''),
+                                        event: widget.event,
+                                        team: _selectedTeam,
+                                        score: _score,
+                                        opModeType: OpModeType.penalty,
                                       ),
                                     )
                                     .toList()),
@@ -460,7 +461,10 @@ class _MatchView extends State<MatchView> {
             (e) => Incrementor(
               element: e,
               onPressed: stateSetter,
-              ref: ref?.child('EndgameScore').child(e.key ?? ''),
+              opModeType: OpModeType.endgame,
+              event: widget.event,
+              team: _selectedTeam,
+              score: _score,
             ),
           )
           .toList()
@@ -506,7 +510,6 @@ class _MatchView extends State<MatchView> {
                   element.incrementValue = incrementValue.count;
               },
             ),
-            ref: null,
           ),
           Incrementor(
             backgroundColor: Colors.red.withOpacity(0.3),
@@ -518,7 +521,10 @@ class _MatchView extends State<MatchView> {
                 }
               },
             ),
-            ref: ref?.child('TeleScore').child('Misses'),
+            opModeType: OpModeType.tele,
+            event: widget.event,
+            team: _selectedTeam,
+            score: _score,
           ),
           Padding(padding: EdgeInsets.all(5)),
           ..._score.teleScore
@@ -529,7 +535,10 @@ class _MatchView extends State<MatchView> {
                   onPressed: stateSetter,
                   onIncrement: onIncrement,
                   onDecrement: increaseMisses,
-                  ref: ref?.child('TeleScore').child(e.key ?? ''),
+                  opModeType: OpModeType.tele,
+                  event: widget.event,
+                  team: _selectedTeam,
+                  score: _score,
                 ),
               )
               .toList()
@@ -559,7 +568,10 @@ class _MatchView extends State<MatchView> {
         (e) => Incrementor(
           element: e,
           onPressed: stateSetter,
-          ref: ref?.child('AutoScore').child(e.key ?? ''),
+          opModeType: OpModeType.auto,
+          event: widget.event,
+          team: _selectedTeam,
+          score: _score,
         ),
       )
       .toList();

@@ -58,17 +58,12 @@ class DarkThemePreference {
 class DatabaseServices {
   String? id;
   DatabaseServices({this.id});
-  Stream<Database.Event> get getEventChanges => firebaseDatabase
-      .reference()
-      .child('Events')
-      .child(Statics.gameName)
-      .child(id ?? '')
-      .onValue;
-  Database.DatabaseReference getRef() => firebaseDatabase
-      .reference()
-      .child('Events')
-      .child(Statics.gameName)
-      .child(id ?? '');
+  Stream<Database.Event>? get getEventChanges => id != null
+      ? firebaseDatabase
+          .reference()
+          .child('Events/${Statics.gameName}/$id')
+          .onValue
+      : null;
 }
 
 class AuthenticationService {
@@ -178,7 +173,7 @@ class DataModel {
   DataModel() {
     try {
       restoreEvents();
-    } catch (Exception) {
+    } catch (e) {
       print('No events');
     }
   }
@@ -325,15 +320,15 @@ class Event {
       matches.remove(e);
     }
     getRef()?.runTransaction((mutableData) async {
-      var newMatches = ((mutableData.value as Map)['matches'] as List)
+      final newMatches = ((mutableData.value as Map)['matches'] as List)
           .where((element) => element['id'] != e.id)
           .toList();
       mutableData.value['matches'] = newMatches;
       for (var team in e.getTeams()) {
-        var teamIndex = (mutableData.value['teams'] as List)
+        final teamIndex = (mutableData.value['teams'] as List)
             .indexWhere((element) => element['number'] == team?.number);
         if (teamIndex >= 0) {
-          var tempScores =
+          final tempScores =
               (mutableData.value['teams'][teamIndex]['scores'] as List)
                   .where((element) => element['id'] != e.id)
                   .toList();
@@ -695,7 +690,22 @@ class Match {
 
 enum EventType { live, local, remote }
 enum Dice { one, two, three, none }
-enum OpModeType { auto, tele, endgame }
+enum OpModeType { auto, tele, endgame, penalty }
+
+extension extOp on OpModeType {
+  String toRep() {
+    switch (this) {
+      case OpModeType.auto:
+        return 'AutoScore';
+      case OpModeType.tele:
+        return 'TeleScore';
+      case OpModeType.endgame:
+        return 'EndgameScore';
+      default:
+        return 'Penalty';
+    }
+  }
+}
 
 extension DiceExtension on Dice {
   String stackHeight() {
