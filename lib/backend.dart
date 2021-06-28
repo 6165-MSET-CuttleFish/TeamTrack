@@ -569,6 +569,9 @@ class Team {
         'targetScore': targetScore?.toJson(),
         'changes': changes.map((e) => e.toJson()).toList(),
       };
+  int getIndex(Database.MutableData mutableData) =>
+      (mutableData.value['teams'] as List)
+          .indexWhere((element) => element['number'] == number);
 }
 
 class Match {
@@ -686,6 +689,9 @@ class Match {
         'dice': dice.toString(),
         'id': id.toString()
       };
+  int geIndex(Database.MutableData mutableData) =>
+      (mutableData.value['matches'] as List)
+          .indexWhere((element) => element['id'] == id);
 }
 
 enum EventType { live, local, remote }

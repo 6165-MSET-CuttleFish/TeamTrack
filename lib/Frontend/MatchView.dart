@@ -36,37 +36,20 @@ class _MatchView extends State<MatchView> {
   int? _previousStreamValue = 0;
   bool _paused = true;
   bool _allowView = false;
-  Database.DatabaseReference? ref;
-  Database.DatabaseReference? matchRef;
   _MatchView(this._match, Team? team, Event event) {
     _selectedAlliance = _match?.red;
     if (team != null) {
       _score = team.targetScore ?? Score(Uuid().v4(), Dice.none);
       _selectedTeam = team;
       _color = CupertinoColors.systemGreen;
-      int teamIndex = event.teams.indexOf(_selectedTeam);
-      if (teamIndex >= 0 && _selectedTeam.targetScore != null)
-        ref = event.getRef()?.child('teams/$teamIndex/targetScore');
-      else
-        ref = null;
     } else {
       _selectedTeam = _match?.red?.team1 ?? Team.nullTeam();
-      int matchIndex =
-          event.matches.indexOf(_match ?? Match.defaultMatch(EventType.local));
-      if (matchIndex >= 0)
-        matchRef = event.getRef()?.child('matches/$matchIndex');
       _score = _selectedTeam.scores.firstWhere(
         (element) => element.id == _match?.id,
         orElse: () => Score(Uuid().v4(), Dice.none),
       );
       if (_match?.type == EventType.remote)
         _color = CupertinoColors.systemGreen;
-      int teamIndex = event.teams.indexOf(_selectedTeam);
-      int scoreIndex = _selectedTeam.scores.indexOf(_score);
-      if (teamIndex >= 0 && scoreIndex >= 0)
-        ref = event.getRef()?.child('teams/$teamIndex/scores/$scoreIndex');
-      else
-        ref = null;
     }
   }
 
@@ -89,10 +72,6 @@ class _MatchView extends State<MatchView> {
                   return Match.defaultMatch(EventType.remote);
                 },
               );
-              int matchIndex = widget.event.matches
-                  .indexOf(_match ?? Match.defaultMatch(EventType.local));
-              if (matchIndex >= 0)
-                matchRef = widget.event.getRef()?.child('matches/$matchIndex');
             }
             _selectedTeam = widget.event.teams.firstWhere(
               (team) => team.number == _selectedTeam.number,
@@ -106,13 +85,6 @@ class _MatchView extends State<MatchView> {
             if (widget.team != null) {
               _score =
                   _selectedTeam.targetScore ?? Score(Uuid().v4(), Dice.none);
-              int teamIndex = widget.event.teams.indexOf(_selectedTeam);
-              if (teamIndex >= 0 && _selectedTeam.targetScore != null)
-                ref = widget.event
-                    .getRef()
-                    ?.child('teams/$teamIndex/targetScore');
-              else
-                ref = null;
             } else {
               _score = _selectedTeam.scores.firstWhere(
                 (element) => element.id == _match?.id,
@@ -121,14 +93,6 @@ class _MatchView extends State<MatchView> {
               for (var element in _score.teleScore.getElements()) {
                 element.incrementValue = incrementValue.count;
               }
-              int teamIndex = widget.event.teams.indexOf(_selectedTeam);
-              int scoreIndex = _selectedTeam.scores.indexOf(_score);
-              if (teamIndex >= 0 && scoreIndex >= 0)
-                ref = widget.event
-                    .getRef()
-                    ?.child('teams/$teamIndex/scores/$scoreIndex');
-              else
-                ref = null;
             }
           }
           return StreamBuilder<int>(
@@ -257,10 +221,15 @@ class _MatchView extends State<MatchView> {
                                     _match?.setDice(newValue ?? Dice.one);
                                   },
                                 );
-                                matchRef
-                                    ?.child('dice')
-                                    .runTransaction((mutableData) async {
-                                  mutableData.value = newValue.toString();
+                                widget.event
+                                    .getRef()
+                                    ?.runTransaction((mutableData) async {
+                                  final matchIndex = (mutableData
+                                          .value['matches'] as List)
+                                      .indexWhere((element) =>
+                                          element['id'] == (_match?.id ?? ''));
+                                  mutableData.value['matches'][matchIndex]
+                                      ['dice'] = newValue ?? Dice.one;
                                   return mutableData;
                                 });
                                 dataModel.saveEvents();
@@ -431,8 +400,14 @@ class _MatchView extends State<MatchView> {
             lapses.reduce((value, element) => value + element),
       );
     _score.teleScore.cycles = lapses;
-    ref?.child('TeleScore/Cycles').runTransaction((mutableData) async {
-      mutableData.value = _score.teleScore.cycles;
+    widget.event.getRef()?.runTransaction((mutableData) async {
+      final teamIndex = (mutableData.value['teams'] as List).indexWhere(
+          (element) => element['number'] == (widget.team?.number ?? ''));
+      final scoreIndex =
+          (mutableData.value['teams'][teamIndex]['scores'] as List)
+              .indexWhere((element) => element['id'] == (_score.id));
+      mutableData.value['teams'][teamIndex]['scores'][scoreIndex]['TeleScore']
+          ['Cycles'] = _score.teleScore.cycles;
       return mutableData;
     });
   }
@@ -490,11 +465,16 @@ class _MatchView extends State<MatchView> {
       name: 'Increment Value', min: () => 1, count: 1, key: null);
   void increaseMisses() {
     _score.teleScore.misses.count++;
-    ref
-        ?.child('TeleScore')
-        .child(_score.teleScore.misses.key ?? '')
-        .runTransaction((mutableData) async {
-      mutableData.value = (mutableData.value ?? 0) + 1;
+    widget.event.getRef()?.runTransaction((mutableData) async {
+      final teamIndex = (mutableData.value['teams'] as List).indexWhere(
+          (element) => element['number'] == (widget.team?.number ?? ''));
+      final scoreIndex =
+          (mutableData.value['teams'][teamIndex]['scores'] as List)
+              .indexWhere((element) => element['id'] == (_score.id));
+      var ref = mutableData.value['teams'][teamIndex]['scores'][scoreIndex]
+          ['TeleScore']['Misses'];
+      mutableData.value['teams'][teamIndex]['scores'][scoreIndex]['TeleScore']
+          ['Misses'] = (ref ?? 0) + 1;
       return mutableData;
     });
   }
