@@ -35,7 +35,7 @@ dependencies:
   # cloud_functions: ^1.1.0
   # firebase_analytics: ^8.1.0
   firebase_database: ^7.1.0
-  google_sign_in: "^5.0.4"
+  google_sign_in: ^5.0.4
   sign_in_with_apple: ^3.0.0
   crypto: ^3.0.1
   syncfusion_flutter_charts: ^19.1.67

@@ -1,4 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
+import 'package:teamtrack/Frontend/EventsList.dart';
+import 'package:teamtrack/Frontend/Provider/google_sign_in.dart';
 import 'package:teamtrack/backend.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +22,25 @@ class _LoginView extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     size = MediaQuery.of(context).size;
+    // return Scaffold(
+    //   body: ChangeNotifierProvider(
+    //     create: (context) => GoogleSignInProvider(),
+    //     child: StreamBuilder(
+    //       stream: FirebaseAuth.instance.authStateChanges(),
+    //       builder: (context, snapshot) {
+    //         final provider = Provider.of<GoogleSignInProvider>(context);
+    //
+    //         if (provider.isSigningIn) {
+    //           return buildLoading();
+    //         } else if (snapshot.hasData) {
+    //           return EventsList();
+    //         } else {
+    //           return signInList();
+    //         }
+    //       },
+    //     ),
+    //   ),
+    // );
     return Scaffold(
       body: Stack(
         alignment: Alignment.bottomCenter,
@@ -63,6 +86,8 @@ class _LoginView extends State<LoginView> {
       ),
     );
   }
+
+  Widget buildLoading() => Center(child: CircularProgressIndicator());
 
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
@@ -155,7 +180,9 @@ class _LoginView extends State<LoginView> {
         ),
         GoogleAuthButton(
           onPressed: () async {
-            await context.read<AuthenticationService>().signInWithGoogle();
+            final provider =
+                Provider.of<GoogleSignInProvider>(context, listen: false);
+            provider.login();
           },
           darkMode: true,
           style: AuthButtonStyle(
