@@ -229,7 +229,7 @@ class _MatchView extends State<MatchView> {
                                       .indexWhere((element) =>
                                           element['id'] == (_match?.id ?? ''));
                                   mutableData.value['matches'][matchIndex]
-                                      ['dice'] = newValue ?? Dice.one;
+                                      ['dice'] = newValue.toString();
                                   return mutableData;
                                 });
                                 dataModel.saveEvents();
@@ -270,6 +270,7 @@ class _MatchView extends State<MatchView> {
                                         team: _selectedTeam,
                                         score: _score,
                                         opModeType: OpModeType.penalty,
+                                        isTargetScore: widget.team != null,
                                       ),
                                     )
                                     .toList()),
@@ -401,11 +402,15 @@ class _MatchView extends State<MatchView> {
       );
     _score.teleScore.cycles = lapses;
     widget.event.getRef()?.runTransaction((mutableData) async {
-      final teamIndex = (mutableData.value['teams'] as List).indexWhere(
-          (element) => element['number'] == (widget.team?.number ?? ''));
-      final scoreIndex =
-          (mutableData.value['teams'][teamIndex]['scores'] as List)
-              .indexWhere((element) => element['id'] == (_score.id));
+      final teamIndex = _selectedTeam.getIndex(mutableData);
+      if (widget.team != null) {
+        // mutableData.value['teams'][teamIndex]['targetScore']['TeleScore']
+        //     ['Cycles'] = mutableData.value['teams']
+        //         [teamIndex]['targetScore']['TeleScore']['Cycles'] =
+        //     _score.teleScore.cycles;
+        return mutableData;
+      }
+      final scoreIndex = _score.getIndex(mutableData, teamIndex);
       mutableData.value['teams'][teamIndex]['scores'][scoreIndex]['TeleScore']
           ['Cycles'] = _score.teleScore.cycles;
       return mutableData;
@@ -440,6 +445,7 @@ class _MatchView extends State<MatchView> {
               event: widget.event,
               team: _selectedTeam,
               score: _score,
+              isTargetScore: widget.team != null,
             ),
           )
           .toList()
@@ -466,11 +472,8 @@ class _MatchView extends State<MatchView> {
   void increaseMisses() {
     _score.teleScore.misses.count++;
     widget.event.getRef()?.runTransaction((mutableData) async {
-      final teamIndex = (mutableData.value['teams'] as List).indexWhere(
-          (element) => element['number'] == (widget.team?.number ?? ''));
-      final scoreIndex =
-          (mutableData.value['teams'][teamIndex]['scores'] as List)
-              .indexWhere((element) => element['id'] == (_score.id));
+      final teamIndex = _selectedTeam.getIndex(mutableData);
+      final scoreIndex = _score.getIndex(mutableData, teamIndex);
       var ref = mutableData.value['teams'][teamIndex]['scores'][scoreIndex]
           ['TeleScore']['Misses'];
       mutableData.value['teams'][teamIndex]['scores'][scoreIndex]['TeleScore']
@@ -505,6 +508,7 @@ class _MatchView extends State<MatchView> {
             event: widget.event,
             team: _selectedTeam,
             score: _score,
+            isTargetScore: widget.team != null,
           ),
           Padding(padding: EdgeInsets.all(5)),
           ..._score.teleScore
@@ -519,6 +523,7 @@ class _MatchView extends State<MatchView> {
                   event: widget.event,
                   team: _selectedTeam,
                   score: _score,
+                  isTargetScore: widget.team != null,
                 ),
               )
               .toList()
@@ -552,6 +557,7 @@ class _MatchView extends State<MatchView> {
           event: widget.event,
           team: _selectedTeam,
           score: _score,
+          isTargetScore: widget.team != null,
         ),
       )
       .toList();

@@ -275,8 +275,7 @@ class Event {
         e.toJson()
       ];
       for (var team in e.getTeams()) {
-        var teamIndex = (mutableData.value['teams'] as List)
-            .indexWhere((element) => element['number'] == team?.number);
+        final teamIndex = team?.getIndex(mutableData) ?? -1;
         if (teamIndex >= 0)
           mutableData.value['teams'][teamIndex]['scores'] = [
             ...mutableData.value['teams'][teamIndex]['scores'] ?? [],
@@ -325,8 +324,7 @@ class Event {
           .toList();
       mutableData.value['matches'] = newMatches;
       for (var team in e.getTeams()) {
-        final teamIndex = (mutableData.value['teams'] as List)
-            .indexWhere((element) => element['number'] == team?.number);
+        final teamIndex = team?.getIndex(mutableData) ?? -1;
         if (teamIndex >= 0) {
           final tempScores =
               (mutableData.value['teams'][teamIndex]['scores'] as List)

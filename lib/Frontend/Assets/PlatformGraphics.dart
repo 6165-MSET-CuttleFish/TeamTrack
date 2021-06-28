@@ -319,6 +319,7 @@ class Incrementor extends StatefulWidget {
     this.event,
     this.score,
     this.opModeType,
+    this.isTargetScore = false,
   }) : super(key: key);
   final ScoringElement element;
   final void Function() onPressed;
@@ -329,6 +330,7 @@ class Incrementor extends StatefulWidget {
   final Event? event;
   final Score? score;
   final OpModeType? opModeType;
+  final bool isTargetScore;
   @override
   State<StatefulWidget> createState() => _Incrementor();
 }
@@ -358,15 +360,9 @@ class _Incrementor extends State<Incrementor> {
                                 ?.getRef()
                                 ?.runTransaction((mutableData) async {
                               final teamIndex =
-                                  (mutableData.value['teams'] as List)
-                                      .indexWhere((element) =>
-                                          element['number'] ==
-                                          (widget.team?.number ?? ''));
-                              final scoreIndex = (mutableData.value['teams']
-                                      [teamIndex]['scores'] as List)
-                                  .indexWhere((element) =>
-                                      element['id'] ==
-                                      (widget.score?.id ?? ''));
+                                  widget.team?.getIndex(mutableData) ?? -1;
+                              final scoreIndex = widget.score
+                                  ?.getIndex(mutableData, teamIndex);
                               var ref = mutableData.value['teams'][teamIndex]
                                           ['scores'][scoreIndex]
                                       [widget.opModeType?.toRep()]
@@ -407,15 +403,24 @@ class _Incrementor extends State<Incrementor> {
                                 ?.getRef()
                                 ?.runTransaction((mutableData) async {
                               final teamIndex =
-                                  (mutableData.value['teams'] as List)
-                                      .indexWhere((element) =>
-                                          element['number'] ==
-                                          (widget.team?.number ?? ''));
-                              final scoreIndex = (mutableData.value['teams']
-                                      [teamIndex]['scores'] as List)
-                                  .indexWhere((element) =>
-                                      element['id'] ==
-                                      (widget.score?.id ?? ''));
+                                  widget.team?.getIndex(mutableData) ?? -1;
+                              if (widget.isTargetScore) {
+                                var ref = mutableData.value['teams'][teamIndex]
+                                            ['targetScore']
+                                        [widget.opModeType?.toRep()]
+                                    [widget.element.key];
+                                if (ref < widget.element.max!())
+                                  mutableData.value['teams'][teamIndex]
+                                                  ['targetScore']
+                                              [widget.opModeType?.toRep()]
+                                          [widget.element.key] =
+                                      (ref ?? 0) +
+                                          widget.element.incrementValue;
+                                return mutableData;
+                              }
+                              final scoreIndex = widget.score
+                                      ?.getIndex(mutableData, teamIndex) ??
+                                  -1;
                               var ref = mutableData.value['teams'][teamIndex]
                                           ['scores'][scoreIndex]
                                       [widget.opModeType?.toRep()]
@@ -448,14 +453,11 @@ class _Incrementor extends State<Incrementor> {
                       widget.event
                           ?.getRef()
                           ?.runTransaction((mutableData) async {
-                        final teamIndex = (mutableData.value['teams'] as List)
-                            .indexWhere((element) =>
-                                element['number'] ==
-                                (widget.team?.number ?? ''));
-                        final scoreIndex = (mutableData.value['teams']
-                                [teamIndex]['scores'] as List)
-                            .indexWhere((element) =>
-                                element['id'] == (widget.score?.id ?? ''));
+                        final teamIndex =
+                            widget.team?.getIndex(mutableData) ?? -1;
+                        final scoreIndex =
+                            widget.score?.getIndex(mutableData, teamIndex) ??
+                                -1;
                         mutableData.value['teams'][teamIndex]['scores']
                                 [scoreIndex][widget.opModeType?.toRep()]
                             [widget.element.key] = val ? 1 : 0;
