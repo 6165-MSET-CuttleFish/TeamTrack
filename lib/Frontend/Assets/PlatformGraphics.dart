@@ -361,6 +361,20 @@ class _Incrementor extends State<Incrementor> {
                                 ?.runTransaction((mutableData) async {
                               final teamIndex =
                                   widget.team?.getIndex(mutableData) ?? -1;
+                              if (widget.isTargetScore) {
+                                var ref = mutableData.value['teams'][teamIndex]
+                                            ['targetScore']
+                                        [widget.opModeType?.toRep()]
+                                    [widget.element.key];
+                                if (ref > widget.element.min!())
+                                  mutableData.value['teams'][teamIndex]
+                                                  ['targetScore']
+                                              [widget.opModeType?.toRep()]
+                                          [widget.element.key] =
+                                      (ref ?? 0) -
+                                          widget.element.decrementValue;
+                                return mutableData;
+                              }
                               final scoreIndex = widget.score
                                   ?.getIndex(mutableData, teamIndex);
                               var ref = mutableData.value['teams'][teamIndex]
@@ -455,6 +469,12 @@ class _Incrementor extends State<Incrementor> {
                           ?.runTransaction((mutableData) async {
                         final teamIndex =
                             widget.team?.getIndex(mutableData) ?? -1;
+                        if (widget.isTargetScore) {
+                          mutableData.value['teams'][teamIndex]['targetScore']
+                                  [widget.opModeType?.toRep()]
+                              [widget.element.key] = val ? 1 : 0;
+                          return mutableData;
+                        }
                         final scoreIndex =
                             widget.score?.getIndex(mutableData, teamIndex) ??
                                 -1;
