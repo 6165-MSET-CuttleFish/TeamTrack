@@ -29,7 +29,7 @@ class _LoginView extends State<LoginView> {
     //       stream: FirebaseAuth.instance.authStateChanges(),
     //       builder: (context, snapshot) {
     //         final provider = Provider.of<GoogleSignInProvider>(context);
-    //
+
     //         if (provider.isSigningIn) {
     //           return buildLoading();
     //         } else if (snapshot.hasData) {
@@ -180,9 +180,7 @@ class _LoginView extends State<LoginView> {
         ),
         GoogleAuthButton(
           onPressed: () async {
-            final provider =
-                Provider.of<GoogleSignInProvider>(context, listen: false);
-            provider.login();
+            await context.read<AuthenticationService>().signInWithGoogle();
           },
           darkMode: true,
           style: AuthButtonStyle(

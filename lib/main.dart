@@ -26,7 +26,6 @@ class TeamTrack extends StatefulWidget {
 }
 
 class _TeamTrack extends State<TeamTrack> {
-
   late PushNotifications notification;
 
   final lightTheme = ThemeData(
@@ -55,7 +54,6 @@ class _TeamTrack extends State<TeamTrack> {
     primarySwatch: Colors.cyan,
     visualDensity: VisualDensity.adaptivePlatformDensity,
   );
-
 
   void getCurrentAppTheme() async {
     themeChangeProvider.darkTheme =
@@ -139,6 +137,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-
-
