@@ -50,7 +50,7 @@ class _EventView extends State<EventView> {
                   context: context,
                   delegate: _tab == 0
                       ? TeamSearch(
-                          teams: widget.event.teams.sortedTeams(),
+                          teams: widget.event.teams.values.toList(),
                           event: widget.event,
                         )
                       : MatchSearch(
@@ -228,7 +228,7 @@ class _EventView extends State<EventView> {
           children: [
             Expanded(
               child: TextFormField(
-                autofillHints: widget.event.teams.map((e) => e.number),
+                autofillHints: widget.event.teams.keys,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(labelText: 'Team number'),
                 validator: (String? value) {
@@ -243,21 +243,7 @@ class _EventView extends State<EventView> {
                     () {
                       names[i] = val;
                       controllers[i].value = TextEditingValue(
-                        text: widget.event.teams
-                            .firstWhere(
-                              (element) =>
-                                  element.number ==
-                                  val
-                                      .replaceAll(
-                                        RegExp(r' ,-.[^\w\s]+'),
-                                        '',
-                                      )
-                                      .replaceAll(
-                                        ' ',
-                                        '',
-                                      ),
-                            )
-                            .name,
+                        text: widget.event.teams[val]?.name ?? '',
                         selection: TextSelection.fromPosition(
                           TextPosition(offset: val.length),
                         ),

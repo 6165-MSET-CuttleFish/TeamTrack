@@ -215,78 +215,68 @@ class Event {
   String? authorEmail;
   bool shared = false;
   EventType type = EventType.remote;
-  List<Team> teams = [];
+  Map<String, Team> teams = Map<String, Team>();
   List<Match> matches = [];
   late String name;
   Timestamp timeStamp = Timestamp.now();
-  void addTeam(Team newTeam) {
-    bool isIn = false;
-    teams.forEach(
-      (element) {
-        if (element.equals(newTeam)) isIn = true;
-      },
-    );
-    if (!isIn) {
-      teams.add(newTeam);
-      getRef()?.child('teams').runTransaction((mutableData) async {
-        mutableData.value = [...(mutableData.value ?? []), newTeam.toJson()];
-        return mutableData;
-      });
-    }
+  void addTeam(Team newTeam) async {
+    await getRef()?.child('teams').runTransaction((mutableData) async {
+      mutableData.value[newTeam.number]['name'] = newTeam.name;
+      mutableData.value[newTeam.number]['number'] = newTeam.number;
+      return mutableData;
+    });
+    teams[newTeam.number] = newTeam;
   }
 
-  void addMatch(Match e) {
-    if (shared) {
-      matches.add(e);
-      e.red?.team1?.scores.addScore(
-        Score(
-          id,
-          e.dice,
-        ),
-        e.red?.team1,
-      );
-      if (type != EventType.remote) {
-        e.red?.team2?.scores.addScore(
-          Score(
-            id,
-            e.dice,
-          ),
-          e.red?.team2,
-        );
-        e.blue?.team1?.scores.addScore(
-          Score(
-            id,
-            e.dice,
-          ),
-          e.blue?.team1,
-        );
-        e.blue?.team2?.scores.addScore(
-          Score(
-            id,
-            e.dice,
-          ),
-          e.blue?.team2,
-        );
-      }
-    }
-    getRef()?.runTransaction((mutableData) async {
+  void addMatch(Match e) async {
+    await getRef()?.runTransaction((mutableData) async {
       mutableData.value['matches'] = [
         ...mutableData.value['matches'] ?? [],
         e.toJson()
       ];
       for (var team in e.getTeams()) {
-        final teamIndex = team?.getIndex(mutableData) ?? -1;
-        if (teamIndex >= 0)
-          mutableData.value['teams'][teamIndex]['scores'] = [
-            ...mutableData.value['teams'][teamIndex]['scores'] ?? [],
-            Score(e.id, Dice.none).toJson()
-          ];
+        final teamIndex = team?.number;
+        mutableData.value['teams'][teamIndex]['scores'] = [
+          ...mutableData.value['teams'][teamIndex]['scores'] ?? [],
+          Score(e.id, Dice.none).toJson()
+        ];
       }
       return mutableData;
     });
+    matches.add(e);
+    e.red?.team1?.scores.addScore(
+      Score(
+        e.id,
+        e.dice,
+      ),
+      e.red?.team1,
+    );
+    if (type != EventType.remote) {
+      e.red?.team2?.scores.addScore(
+        Score(
+          e.id,
+          e.dice,
+        ),
+        e.red?.team2,
+      );
+      e.blue?.team1?.scores.addScore(
+        Score(
+          e.id,
+          e.dice,
+        ),
+        e.blue?.team1,
+      );
+      e.blue?.team2?.scores.addScore(
+        Score(
+          e.id,
+          e.dice,
+        ),
+        e.blue?.team2,
+      );
+    }
   }
 
-  String? deleteTeam(Team team) {
+  Future<String?> deleteTeam(Team team) async {
     String? x;
     for (Match match in matches) {
       if ((match.red?.hasTeam(team) ?? false) ||
@@ -299,10 +289,9 @@ class Event {
     }
     if (x == null) {
       teams.remove(team);
-      getRef()?.runTransaction((mutableData) async {
-        var newTeams = ((mutableData.value as Map)['teams'] as List)
-            .where((e) => e['number'] != team.number)
-            .toList();
+      await getRef()?.runTransaction((mutableData) async {
+        var newTeams =
+            ((mutableData.value as Map)['teams'] as Map).remove(team.number);
         mutableData.value['teams'] = newTeams;
         return mutableData;
       });
@@ -324,14 +313,12 @@ class Event {
           .toList();
       mutableData.value['matches'] = newMatches;
       for (var team in e.getTeams()) {
-        final teamIndex = team?.getIndex(mutableData) ?? -1;
-        if (teamIndex >= 0) {
-          final tempScores =
-              (mutableData.value['teams'][teamIndex]['scores'] as List)
-                  .where((element) => element['id'] != e.id)
-                  .toList();
-          mutableData.value['teams'][teamIndex]['scores'] = tempScores;
-        }
+        final teamIndex = team?.number;
+        final tempScores =
+            (mutableData.value['teams'][teamIndex]['scores'] as List)
+                .where((element) => element['id'] != e.id)
+                .toList();
+        mutableData.value['teams'][teamIndex]['scores'] = tempScores;
       }
       return mutableData;
     });
@@ -341,25 +328,17 @@ class Event {
     if (json != null) {
       type = getTypeFromString(json['type']);
       name = json['name'];
-      try {
-        teams = List<Team>.from(
-            json['teams'].map((model) => Team.fromJson(model, type)));
-      } catch (e) {
-        teams = [];
-      }
-      try {
-        matches = List<Match>.from(
-          json['matches'].map(
-            (model) => Match.fromJson(
-              model,
-              teams,
-              getTypeFromString(json['type']),
-            ),
+      teams =
+          Map.from(json['teams'].map((model) => Team.fromJson(model, type)));
+      matches = List<Match>.from(
+        json['matches'].map(
+          (model) => Match.fromJson(
+            model,
+            teams,
+            getTypeFromString(json['type']),
           ),
-        );
-      } catch (e) {
-        matches = [];
-      }
+        ),
+      );
       shared = json['shared'] ?? true;
       id = json['id'] ?? Uuid().v4();
       authorEmail = json['authorEmail'];
@@ -381,14 +360,8 @@ class Event {
   Event.fromJson(Map<String, dynamic> json) {
     type = getTypeFromString(json['type']);
     name = json['name'];
-    teams = List<Team>.from(
-      json['teams'].map(
-        (model) => Team.fromJson(
-          model,
-          type,
-        ),
-      ),
-    );
+    teams = (json['teams'] as Map)
+        .map((key, value) => MapEntry(key, Team.fromJson(value, type)));
     matches = List<Match>.from(
       json['matches'].map(
         (model) => Match.fromJson(
@@ -413,7 +386,8 @@ class Event {
   }
   Map<String, dynamic> toJson() => {
         'name': name,
-        'teams': teams.map((e) => e.toJson()).toList(),
+        'teams': teams
+            .map<String, dynamic>((num, team) => MapEntry(num, team.toJson())),
         'matches': matches.map((e) => e.toJson()).toList(),
         'type': type.toString(),
         'shared': shared,
@@ -496,16 +470,10 @@ class Alliance {
 
   Alliance.fromJson(
     Map<String, dynamic> json,
-    List<Team> teamList,
+    Map<String, Team> teamList,
     this.eventType,
-  )   : team1 = teamList.firstWhere(
-          (e) => e.number.trim() == json['team1']?.trim(),
-          orElse: () => Team.nullTeam(),
-        ),
-        team2 = teamList.firstWhere(
-          (e) => e.number.trim() == json['team2']?.trim(),
-          orElse: () => Team.nullTeam(),
-        );
+  )   : team1 = teamList[json['team1']],
+        team2 = teamList[json['team2']];
   Map<String, dynamic> toJson() => {
         'team1': team1?.number,
         'team2': team2?.number,
@@ -567,9 +535,6 @@ class Team {
         'targetScore': targetScore?.toJson(),
         'changes': changes.map((e) => e.toJson()).toList(),
       };
-  int getIndex(Database.MutableData mutableData) =>
-      (mutableData.value['teams'] as List)
-          .indexWhere((element) => element['number'] == number);
 }
 
 class Match {
@@ -654,7 +619,8 @@ class Match {
   String blueScore({bool? showPenalties}) =>
       (blue?.allianceTotal(id, showPenalties) ?? 0).toString();
 
-  Match.fromJson(Map<String, dynamic> json, List<Team> teamList, this.type) {
+  Match.fromJson(
+      Map<String, dynamic> json, Map<String, Team> teamList, this.type) {
     try {
       red = Alliance.fromJson(
         json['red'],
@@ -866,21 +832,14 @@ extension colorExt on OpModeType? {
   }
 }
 
-extension TeamsExtension on List<Team> {
+extension TeamsExtension on Map<String, Team> {
   Team findAdd(String number, String name, Event event) {
-    bool found = false;
-    for (Team team in this)
-      if (team.number ==
-          number.replaceAll(new RegExp(r' -,[^\w\s]+'), '').replaceAll(' ', ''))
-        found = true;
-    if (found) {
-      var team = this.firstWhere((e) =>
-          e.number ==
-          number
-              .replaceAll(new RegExp(r' -,[^\w\s]+'), '')
-              .replaceAll(' ', ''));
-      team.name = name;
-      return team;
+    if (this.containsKey(number)) {
+      var team = this[number
+          .replaceAll(new RegExp(r' -,[^\w\s]+'), '')
+          .replaceAll(' ', '')];
+      team?.name = name;
+      return team ?? Team.nullTeam();
     } else {
       var newTeam = Team(
           number.replaceAll(new RegExp(r' -,[^\w\s]+'), '').replaceAll(' ', ''),
@@ -890,18 +849,19 @@ extension TeamsExtension on List<Team> {
     }
   }
 
-  List<Team> sortedTeams() {
-    List<Team> val = [];
-    for (Team team in this) {
-      val.add(team);
-    }
-    val.sort((a, b) => int.parse(a.number).compareTo(int.parse(b.number)));
-    return val;
-  }
+  // List<Team> sortedTeams() {
+  //   List<Team> val = [];
+  //   for (Team team in this) {
+  //     val.add(team);
+  //   }
+  //   val.sort((a, b) => int.parse(a.number).compareTo(int.parse(b.number)));
+  //   return val;
+  // }
 
   double maxScore(Dice? dice, bool removeOutliers, OpModeType? type) {
     if (this.length == 0) return 1;
     return this
+        .values
         .map((e) => e.scores.maxScore(dice, removeOutliers, type))
         .reduce(max);
   }
@@ -910,6 +870,7 @@ extension TeamsExtension on List<Team> {
       Dice? dice, bool removeOutliers, OpModeType? type) {
     if (this.length == 0) return 1;
     return this
+        .values
         .map((e) => e.scores.standardDeviationScore(dice, removeOutliers, type))
         .reduce(min);
   }

@@ -66,10 +66,7 @@ class _MatchList extends State<MatchList> {
                                   widget.event.matches.add(
                                     Match(
                                       Alliance(
-                                        widget.event.teams.firstWhere(
-                                            (element) =>
-                                                element.number ==
-                                                widget.team!.number),
+                                        widget.event.teams[widget.team?.number],
                                         null,
                                         widget.event.type,
                                       ),
@@ -137,7 +134,7 @@ class _MatchList extends State<MatchList> {
                                       },
                                     );
                                     dataModel.saveEvents();
-                                   // dataModel.uploadEvent(widget.event);
+                                    // dataModel.uploadEvent(widget.event);
                                     Navigator.of(context).pop();
                                   },
                                 ),
@@ -199,9 +196,7 @@ class _MatchList extends State<MatchList> {
       var matches = widget.event.matches
           .where((e) =>
               e.alliance(
-                widget.event.teams.firstWhere(
-                    (element) => element.number == widget.team?.number,
-                    orElse: () => Team.nullTeam()),
+                widget.event.teams[widget.team?.number] ?? Team.nullTeam(),
               ) !=
               null)
           .toList();
@@ -232,7 +227,8 @@ class _MatchList extends State<MatchList> {
                           isDestructive: true,
                           child: Text('Confirm'),
                           onPressed: () {
-                            setState(() => widget.event.deleteMatch(matches[i]));
+                            setState(
+                                () => widget.event.deleteMatch(matches[i]));
                             dataModel.saveEvents();
                             //dataModel.uploadEvent(widget.event);
                             Navigator.of(context).pop();
@@ -255,10 +251,8 @@ class _MatchList extends State<MatchList> {
                 leading: Text(
                   (i + 1).toString(),
                 ),
-                title: Text(widget.event.teams
-                    .firstWhere(
-                        (element) => element.number == widget.team?.number)
-                    .name),
+                title:
+                    Text(widget.event.teams[widget.team?.number]?.name ?? ''),
                 trailing: Text(
                   matches[i].score(showPenalties: true),
                 ),
@@ -288,8 +282,7 @@ class _MatchList extends State<MatchList> {
   List<Widget> _teamSpecMatches() => widget.event.matches
       .where((e) =>
           e.alliance(
-            widget.event.teams
-                .firstWhere((element) => element.number == widget.team!.number),
+            widget.event.teams[widget.team?.number] ?? Team.nullTeam(),
           ) !=
           null)
       .toList()

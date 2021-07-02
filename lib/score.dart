@@ -67,7 +67,7 @@ class Score extends ScoreDivision {
         'Penalty': penalties.toJson(),
         'id': id.toString(),
       };
-  int getIndex(MutableData mutableData, int teamIndex) =>
+  int getIndex(MutableData mutableData, String? teamIndex) =>
       (mutableData.value['teams'][teamIndex]['scores'] as List)
           .indexWhere((element) => element['id'] == id);
 }

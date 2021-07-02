@@ -37,8 +37,7 @@ class _TeamList extends State<TeamList> {
             );
           }
           return ListView(
-            children: widget.event.teams
-                .sortedTeams()
+            children: widget.event.teams.values
                 .map(
                   (e) => Slidable(
                     actionPane: slider,
@@ -66,9 +65,9 @@ class _TeamList extends State<TeamList> {
                                   child: Text('Confirm'),
                                   onPressed: () {
                                     String? s;
-                                    setState(
-                                      () => s = widget.event.deleteTeam(e),
-                                    );
+                                    setState(() async {
+                                      s = await widget.event.deleteTeam(e);
+                                    });
                                     dataModel.saveEvents();
                                     //dataModel.uploadEvent(widget.event);
                                     Navigator.of(context).pop();

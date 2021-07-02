@@ -359,8 +359,7 @@ class _Incrementor extends State<Incrementor> {
                             widget.event
                                 ?.getRef()
                                 ?.runTransaction((mutableData) async {
-                              final teamIndex =
-                                  widget.team?.getIndex(mutableData) ?? -1;
+                              final teamIndex = widget.team?.number;
                               if (widget.isTargetScore) {
                                 var ref = mutableData.value['teams'][teamIndex]
                                             ['targetScore']
@@ -416,8 +415,7 @@ class _Incrementor extends State<Incrementor> {
                             widget.event
                                 ?.getRef()
                                 ?.runTransaction((mutableData) async {
-                              final teamIndex =
-                                  widget.team?.getIndex(mutableData) ?? -1;
+                              final teamIndex = widget.team?.number;
                               if (widget.isTargetScore) {
                                 var ref = mutableData.value['teams'][teamIndex]
                                             ['targetScore']
@@ -467,19 +465,20 @@ class _Incrementor extends State<Incrementor> {
                       widget.event
                           ?.getRef()
                           ?.runTransaction((mutableData) async {
-                        final teamIndex =
-                            widget.team?.getIndex(mutableData) ?? -1;
-                        if (widget.isTargetScore) {
-                          mutableData.value['teams'][teamIndex]['targetScore']
-                                  [widget.opModeType?.toRep()]
+                        if (widget.isTargetScore &&
+                            (mutableData.value['teams'] as Map)
+                                .containsKey(widget.team?.number)) {
+                          mutableData.value['teams'][widget.team?.number]
+                                  ['targetScore'][widget.opModeType?.toRep()]
                               [widget.element.key] = val ? 1 : 0;
                           return mutableData;
                         }
-                        final scoreIndex =
-                            widget.score?.getIndex(mutableData, teamIndex) ??
-                                -1;
-                        mutableData.value['teams'][teamIndex]['scores']
-                                [scoreIndex][widget.opModeType?.toRep()]
+                        final scoreIndex = widget.score
+                                ?.getIndex(mutableData, widget.team?.number) ??
+                            -1;
+                        mutableData.value['teams'][widget.team?.number]
+                                    ['scores'][scoreIndex]
+                                [widget.opModeType?.toRep()]
                             [widget.element.key] = val ? 1 : 0;
                         return mutableData;
                       });

@@ -22,10 +22,10 @@ class MatchView extends StatefulWidget {
 }
 
 class _MatchView extends State<MatchView> {
-  Team _selectedTeam = Team.nullTeam();
+  Team? _selectedTeam = Team.nullTeam();
   Alliance? _selectedAlliance;
   Color _color = CupertinoColors.systemRed;
-  Score _score = Score(Uuid().v4(), Dice.none);
+  Score? _score;
   int _view = 0;
   Match? _match;
   bool _showPenalties = false;
@@ -44,7 +44,7 @@ class _MatchView extends State<MatchView> {
       _color = CupertinoColors.systemGreen;
     } else {
       _selectedTeam = _match?.red?.team1 ?? Team.nullTeam();
-      _score = _selectedTeam.scores.firstWhere(
+      _score = _selectedTeam?.scores.firstWhere(
         (element) => element.id == _match?.id,
         orElse: () => Score(Uuid().v4(), Dice.none),
       );
@@ -73,26 +73,22 @@ class _MatchView extends State<MatchView> {
                 },
               );
             }
-            _selectedTeam = widget.event.teams.firstWhere(
-              (team) => team.number == _selectedTeam.number,
-              orElse: () => Team.nullTeam(),
-            );
+            _selectedTeam = widget.event.teams[_selectedTeam?.number];
             _selectedAlliance = _match?.red;
             if (_color == CupertinoColors.systemRed)
               _selectedAlliance = _match?.red;
             else if (_color == CupertinoColors.systemBlue)
               _selectedAlliance = _match?.blue;
             if (widget.team != null) {
-              _score =
-                  _selectedTeam.targetScore ?? Score(Uuid().v4(), Dice.none);
+              _score = _selectedTeam?.targetScore;
             } else {
-              _score = _selectedTeam.scores.firstWhere(
+              _score = _selectedTeam?.scores.firstWhere(
                 (element) => element.id == _match?.id,
                 orElse: () => Score(Uuid().v4(), Dice.none),
               );
-              for (var element in _score.teleScore.getElements()) {
+              _score?.teleScore.getElements().forEach((element) {
                 element.incrementValue = incrementValue.count;
-              }
+              });
             }
           }
           return StreamBuilder<int>(
@@ -192,15 +188,17 @@ class _MatchView extends State<MatchView> {
                               _match != null)
                             buttonRow(),
                           Text(
-                              _selectedTeam.name +
+                              (_selectedTeam?.name ?? '') +
                                   ' : ' +
-                                  _score
-                                      .total(
-                                          showPenalties: widget.event.type ==
-                                                  EventType.remote
-                                              ? _showPenalties
-                                              : false)
-                                      .toString(),
+                                  (_score
+                                          ?.total(
+                                            showPenalties: widget.event.type ==
+                                                    EventType.remote
+                                                ? _showPenalties
+                                                : false,
+                                          )
+                                          .toString() ??
+                                      ''),
                               style: Theme.of(context).textTheme.headline6),
                           if (widget.team == null)
                             DropdownButton<Dice>(
@@ -260,20 +258,21 @@ class _MatchView extends State<MatchView> {
                                   'Penalties',
                                   style: TextStyle(fontSize: 16),
                                 ),
-                                children: _score.penalties
-                                    .getElements()
-                                    .map(
-                                      (e) => Incrementor(
-                                        element: e,
-                                        onPressed: stateSetter,
-                                        event: widget.event,
-                                        team: _selectedTeam,
-                                        score: _score,
-                                        opModeType: OpModeType.penalty,
-                                        isTargetScore: widget.team != null,
-                                      ),
-                                    )
-                                    .toList()),
+                                children: _score?.penalties
+                                        .getElements()
+                                        .map(
+                                          (e) => Incrementor(
+                                            element: e,
+                                            onPressed: stateSetter,
+                                            event: widget.event,
+                                            team: _selectedTeam,
+                                            score: _score,
+                                            opModeType: OpModeType.penalty,
+                                            isTargetScore: widget.team != null,
+                                          ),
+                                        )
+                                        .toList() ??
+                                    []),
                           Padding(
                             padding: EdgeInsets.only(
                                 left: 25, right: 25, bottom: 10, top: 10),
@@ -283,23 +282,28 @@ class _MatchView extends State<MatchView> {
                                 SizedBox(
                                   child: Text(
                                     'Autonomous : ' +
-                                        _score.autoScore.total().toString(),
+                                        (_score?.autoScore.total().toString() ??
+                                            '0'),
                                     style: Theme.of(context).textTheme.caption,
                                   ),
                                 ),
                                 SizedBox(
                                   child: Text(
                                       'Tele-Op : ' +
-                                          _score.teleScore.total().toString(),
+                                          (_score?.teleScore
+                                                  .total()
+                                                  .toString() ??
+                                              '0'),
                                       style:
                                           Theme.of(context).textTheme.caption),
                                 ),
                                 SizedBox(
                                   child: Text(
                                       'Endgame : ' +
-                                          _score.endgameScore
-                                              .total()
-                                              .toString(),
+                                          (_score?.endgameScore
+                                                  .total()
+                                                  .toString() ??
+                                              '0'),
                                       style:
                                           Theme.of(context).textTheme.caption),
                                 )
@@ -400,9 +404,8 @@ class _MatchView extends State<MatchView> {
         _time.toPrecision(3) -
             lapses.reduce((value, element) => value + element),
       );
-    _score.teleScore.cycles = lapses;
+    _score?.teleScore.cycles = lapses;
     widget.event.getRef()?.runTransaction((mutableData) async {
-      final teamIndex = _selectedTeam.getIndex(mutableData);
       if (widget.team != null) {
         // mutableData.value['teams'][teamIndex]['targetScore']['TeleScore']
         //     ['Cycles'] = mutableData.value['teams']
@@ -410,9 +413,9 @@ class _MatchView extends State<MatchView> {
         //     _score.teleScore.cycles;
         return mutableData;
       }
-      final scoreIndex = _score.getIndex(mutableData, teamIndex);
-      mutableData.value['teams'][teamIndex]['scores'][scoreIndex]['TeleScore']
-          ['Cycles'] = _score.teleScore.cycles;
+      final scoreIndex = _score?.getIndex(mutableData, _selectedTeam?.number);
+      mutableData.value['teams'][_selectedTeam?.number]['scores'][scoreIndex]
+          ['TeleScore']['Cycles'] = _score?.teleScore.cycles;
       return mutableData;
     });
   }
@@ -435,20 +438,21 @@ class _MatchView extends State<MatchView> {
   }
 
   List<Widget> endView() => !_paused || _allowView
-      ? _score.endgameScore
-          .getElements()
-          .map(
-            (e) => Incrementor(
-              element: e,
-              onPressed: stateSetter,
-              opModeType: OpModeType.endgame,
-              event: widget.event,
-              team: _selectedTeam,
-              score: _score,
-              isTargetScore: widget.team != null,
-            ),
-          )
-          .toList()
+      ? _score?.endgameScore
+              .getElements()
+              .map(
+                (e) => Incrementor(
+                  element: e,
+                  onPressed: stateSetter,
+                  opModeType: OpModeType.endgame,
+                  event: widget.event,
+                  team: _selectedTeam,
+                  score: _score,
+                  isTargetScore: widget.team != null,
+                ),
+              )
+              .toList() ??
+          []
       : [
           Material(
             child: IconButton(
@@ -470,14 +474,13 @@ class _MatchView extends State<MatchView> {
   ScoringElement incrementValue = ScoringElement(
       name: 'Increment Value', min: () => 1, count: 1, key: null);
   void increaseMisses() {
-    _score.teleScore.misses.count++;
+    _score?.teleScore.misses.count++;
     widget.event.getRef()?.runTransaction((mutableData) async {
-      final teamIndex = _selectedTeam.getIndex(mutableData);
-      final scoreIndex = _score.getIndex(mutableData, teamIndex);
-      var ref = mutableData.value['teams'][teamIndex]['scores'][scoreIndex]
-          ['TeleScore']['Misses'];
-      mutableData.value['teams'][teamIndex]['scores'][scoreIndex]['TeleScore']
-          ['Misses'] = (ref ?? 0) + 1;
+      final scoreIndex = _score?.getIndex(mutableData, _selectedTeam?.number);
+      var ref = mutableData.value['teams'][_selectedTeam?.number]['scores']
+          [scoreIndex]['TeleScore']['Misses'];
+      mutableData.value['teams'][_selectedTeam?.number]['scores'][scoreIndex]
+          ['TeleScore']['Misses'] = (ref ?? 0) + 1;
       return mutableData;
     });
   }
@@ -489,21 +492,16 @@ class _MatchView extends State<MatchView> {
             element: incrementValue,
             onPressed: () => setState(
               () {
-                for (var element in _score.teleScore.getElements())
+                _score?.teleScore.getElements().forEach((element) {
                   element.incrementValue = incrementValue.count;
+                });
               },
             ),
           ),
           Incrementor(
             backgroundColor: Colors.red.withOpacity(0.3),
-            element: _score.teleScore.misses,
-            onPressed: () => setState(
-              () {
-                for (var element in _score.teleScore.getElements()) {
-                  element.incrementValue = incrementValue.count;
-                }
-              },
-            ),
+            element: _score?.teleScore.misses ?? ScoringElement(),
+            onPressed: stateSetter,
             opModeType: OpModeType.tele,
             event: widget.event,
             team: _selectedTeam,
@@ -511,22 +509,23 @@ class _MatchView extends State<MatchView> {
             isTargetScore: widget.team != null,
           ),
           Padding(padding: EdgeInsets.all(5)),
-          ..._score.teleScore
-              .getElements()
-              .map(
-                (e) => Incrementor(
-                  element: e,
-                  onPressed: stateSetter,
-                  onIncrement: onIncrement,
-                  onDecrement: increaseMisses,
-                  opModeType: OpModeType.tele,
-                  event: widget.event,
-                  team: _selectedTeam,
-                  score: _score,
-                  isTargetScore: widget.team != null,
-                ),
-              )
-              .toList()
+          ..._score?.teleScore
+                  .getElements()
+                  .map(
+                    (e) => Incrementor(
+                      element: e,
+                      onPressed: stateSetter,
+                      onIncrement: onIncrement,
+                      onDecrement: increaseMisses,
+                      opModeType: OpModeType.tele,
+                      event: widget.event,
+                      team: _selectedTeam,
+                      score: _score,
+                      isTargetScore: widget.team != null,
+                    ),
+                  )
+                  .toList() ??
+              []
         ]
       : [
           Material(
@@ -547,20 +546,22 @@ class _MatchView extends State<MatchView> {
           ),
         ];
 
-  List<Widget> autoView() => _score.autoScore
-      .getElements()
-      .map(
-        (e) => Incrementor(
-          element: e,
-          onPressed: stateSetter,
-          opModeType: OpModeType.auto,
-          event: widget.event,
-          team: _selectedTeam,
-          score: _score,
-          isTargetScore: widget.team != null,
-        ),
-      )
-      .toList();
+  List<Widget> autoView() =>
+      _score?.autoScore
+          .getElements()
+          .map(
+            (e) => Incrementor(
+              element: e,
+              onPressed: stateSetter,
+              opModeType: OpModeType.auto,
+              event: widget.event,
+              team: _selectedTeam,
+              score: _score,
+              isTargetScore: widget.team != null,
+            ),
+          )
+          .toList() ??
+      [];
 
   Row buttonRow() {
     return Row(
@@ -583,7 +584,7 @@ class _MatchView extends State<MatchView> {
                         _selectedTeam = _match?.red?.team1 ?? Team.nullTeam();
                         _selectedAlliance = _match?.red;
                         _color = CupertinoColors.systemRed;
-                        _score = _selectedTeam.scores.firstWhere(
+                        _score = _selectedTeam?.scores.firstWhere(
                           (element) => element.id == _match?.id,
                           orElse: () => Score(
                             Uuid().v4(),
@@ -591,7 +592,8 @@ class _MatchView extends State<MatchView> {
                           ),
                         );
                         incrementValue.count =
-                            _score.teleScore.getElements()[0].incrementValue;
+                            _score?.teleScore.getElements()[0].incrementValue ??
+                                1;
                       },
                     ),
           ),
@@ -615,7 +617,7 @@ class _MatchView extends State<MatchView> {
                         _selectedTeam = _match?.red?.team2 ?? Team.nullTeam();
                         _selectedAlliance = _match?.red;
                         _color = CupertinoColors.systemRed;
-                        _score = _selectedTeam.scores.firstWhere(
+                        _score = _selectedTeam?.scores.firstWhere(
                           (element) => element.id == _match?.id,
                           orElse: () => Score(
                             Uuid().v4(),
@@ -646,7 +648,7 @@ class _MatchView extends State<MatchView> {
                         _selectedTeam = _match?.blue?.team1 ?? Team.nullTeam();
                         _selectedAlliance = _match?.blue;
                         _color = Colors.blue;
-                        _score = _selectedTeam.scores.firstWhere(
+                        _score = _selectedTeam?.scores.firstWhere(
                           (element) => element.id == _match?.id,
                           orElse: () => Score(
                             Uuid().v4(),
@@ -675,7 +677,7 @@ class _MatchView extends State<MatchView> {
                         _selectedTeam = _match?.blue?.team2 ?? Team.nullTeam();
                         _selectedAlliance = _match?.blue;
                         _color = Colors.blue;
-                        _score = _selectedTeam.scores.firstWhere(
+                        _score = _selectedTeam?.scores.firstWhere(
                           (element) => element.id == _match?.id,
                           orElse: () => Score(
                             Uuid().v4(),

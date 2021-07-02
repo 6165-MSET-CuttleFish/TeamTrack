@@ -191,13 +191,7 @@ class _TeamView extends State<TeamView> {
                 json.encode(eventHandler.data?.snapshot.value),
               ),
             );
-            _team = widget.event.teams.firstWhere(
-              (element) => element.number == _team.number,
-              orElse: () {
-                Navigator.of(context).pop();
-                return Team.nullTeam();
-              },
-            );
+            _team = widget.event.teams[widget.team.number] ?? Team.nullTeam();
           }
           return ListView(
             children: [
@@ -663,13 +657,10 @@ class _TeamView extends State<TeamView> {
                 Dice.none,
               );
               widget.event.getRef()?.runTransaction((mutableData) async {
-                var index = ((mutableData.value as Map)['teams'] as List)
-                    .indexWhere(
-                        (element) => element['number'] == widget.team.number);
-                if (index >= 0) {
-                  mutableData.value['teams'][index]['targetScore'] =
-                      Score(Uuid().v4(), Dice.none).toJson();
-                  var x = 0;
+                if ((mutableData.value['teams'] as Map)
+                    .containsKey(widget.team.number)) {
+                  mutableData.value['teams'][widget.team.number]
+                      ['targetScore'] = Score(Uuid().v4(), Dice.none).toJson();
                 }
                 return mutableData;
               });
