@@ -365,7 +365,7 @@ class _TeamView extends State<TeamView> {
                                       )
                                     : null,
                                 show: _selections[1],
-                                spots: _team.scores
+                                spots: _team.scores.values
                                     .where((e) =>
                                         e.dice == _dice || _dice == Dice.none)
                                     .toList()
@@ -381,7 +381,7 @@ class _TeamView extends State<TeamView> {
                               ),
                               LineChartBarData(
                                 show: _selections[2],
-                                spots: _team.scores
+                                spots: _team.scores.values
                                     .where((e) =>
                                         e.dice == _dice || _dice == Dice.none)
                                     .toList()
@@ -397,15 +397,12 @@ class _TeamView extends State<TeamView> {
                               ),
                               LineChartBarData(
                                 show: _selections[3],
-                                spots: _dice != Dice.none
-                                    ? _team.scores
-                                        .where((e) => e.dice == _dice)
-                                        .toList()
-                                        .spots(OpModeType.tele)
-                                        .removeOutliers(removeOutliers)
-                                    : _team.scores
-                                        .spots(OpModeType.tele)
-                                        .removeOutliers(removeOutliers),
+                                spots: _team.scores.values
+                                    .where((e) =>
+                                        e.dice == _dice || _dice == Dice.none)
+                                    .toList()
+                                    .spots(OpModeType.tele)
+                                    .removeOutliers(removeOutliers),
                                 colors: [
                                   teleColor,
                                 ],
@@ -416,7 +413,7 @@ class _TeamView extends State<TeamView> {
                               ),
                               LineChartBarData(
                                 show: _selections[4],
-                                spots: _team.scores
+                                spots: _team.scores.values
                                     .where((e) =>
                                         e.dice == _dice || _dice == Dice.none)
                                     .toList()
@@ -693,7 +690,7 @@ class _TeamView extends State<TeamView> {
       ScoreCard(
         team: _team,
         event: widget.event,
-        scoreDivisions: _team.scores,
+        scoreDivisions: _team.scores.values.toList(),
         dice: _dice,
         removeOutliers: removeOutliers,
         matches:
@@ -710,7 +707,7 @@ class _TeamView extends State<TeamView> {
         team: _team,
         event: widget.event,
         type: OpModeType.auto,
-        scoreDivisions: _team.scores.map((e) => e.autoScore).toList(),
+        scoreDivisions: _team.scores.values.map((e) => e.autoScore).toList(),
         dice: _dice,
         removeOutliers: removeOutliers,
         matches:
@@ -727,7 +724,7 @@ class _TeamView extends State<TeamView> {
         team: _team,
         event: widget.event,
         type: OpModeType.tele,
-        scoreDivisions: _team.scores.map((e) => e.teleScore).toList(),
+        scoreDivisions: _team.scores.values.map((e) => e.teleScore).toList(),
         dice: _dice,
         removeOutliers: removeOutliers,
         matches:
@@ -744,7 +741,7 @@ class _TeamView extends State<TeamView> {
         team: _team,
         event: widget.event,
         type: OpModeType.endgame,
-        scoreDivisions: _team.scores.map((e) => e.endgameScore).toList(),
+        scoreDivisions: _team.scores.values.map((e) => e.endgameScore).toList(),
         dice: _dice,
         removeOutliers: removeOutliers,
         matches:

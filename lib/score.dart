@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/services.dart';
 import 'package:teamtrack/backend.dart';
 
@@ -67,9 +68,6 @@ class Score extends ScoreDivision {
         'Penalty': penalties.toJson(),
         'id': id.toString(),
       };
-  int getIndex(MutableData mutableData, String? teamIndex) =>
-      (mutableData.value['teams'][teamIndex]['scores'] as List)
-          .indexWhere((element) => element['id'] == id);
 }
 
 Dice getDiceFromString(String statusAsString) {
@@ -87,12 +85,9 @@ EventType getTypeFromString(String statusAsString) {
   return EventType.remote;
 }
 
-extension scoreList on List<Score> {
+extension scoreList on Map<String, Score> {
   void addScore(Score value, Team? team) {
-    var found = false;
-    for (int i = 0; i < this.length; i++)
-      if (this[i].id == value.id) found = true;
-    if (!found) this.add(value);
+    this[value.id] = value;
   }
 }
 

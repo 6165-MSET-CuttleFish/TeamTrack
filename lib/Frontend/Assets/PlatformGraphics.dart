@@ -374,8 +374,7 @@ class _Incrementor extends State<Incrementor> {
                                           widget.element.decrementValue;
                                 return mutableData;
                               }
-                              final scoreIndex = widget.score
-                                  ?.getIndex(mutableData, teamIndex);
+                              final scoreIndex = widget.score?.id;
                               var ref = mutableData.value['teams'][teamIndex]
                                           ['scores'][scoreIndex]
                                       [widget.opModeType?.toRep()]
@@ -430,9 +429,7 @@ class _Incrementor extends State<Incrementor> {
                                           widget.element.incrementValue;
                                 return mutableData;
                               }
-                              final scoreIndex = widget.score
-                                      ?.getIndex(mutableData, teamIndex) ??
-                                  -1;
+                              final scoreIndex = widget.score?.id;
                               var ref = mutableData.value['teams'][teamIndex]
                                           ['scores'][scoreIndex]
                                       [widget.opModeType?.toRep()]
@@ -473,9 +470,7 @@ class _Incrementor extends State<Incrementor> {
                               [widget.element.key] = val ? 1 : 0;
                           return mutableData;
                         }
-                        final scoreIndex = widget.score
-                                ?.getIndex(mutableData, widget.team?.number) ??
-                            -1;
+                        final scoreIndex = widget.score?.id;
                         mutableData.value['teams'][widget.team?.number]
                                     ['scores'][scoreIndex]
                                 [widget.opModeType?.toRep()]

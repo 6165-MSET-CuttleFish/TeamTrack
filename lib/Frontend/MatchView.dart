@@ -44,10 +44,7 @@ class _MatchView extends State<MatchView> {
       _color = CupertinoColors.systemGreen;
     } else {
       _selectedTeam = _match?.red?.team1 ?? Team.nullTeam();
-      _score = _selectedTeam?.scores.firstWhere(
-        (element) => element.id == _match?.id,
-        orElse: () => Score(Uuid().v4(), Dice.none),
-      );
+      _score = _selectedTeam?.scores[_match?.id];
       if (_match?.type == EventType.remote)
         _color = CupertinoColors.systemGreen;
     }
@@ -82,10 +79,7 @@ class _MatchView extends State<MatchView> {
             if (widget.team != null) {
               _score = _selectedTeam?.targetScore;
             } else {
-              _score = _selectedTeam?.scores.firstWhere(
-                (element) => element.id == _match?.id,
-                orElse: () => Score(Uuid().v4(), Dice.none),
-              );
+              _score = _selectedTeam?.scores[_match?.id];
               _score?.teleScore.getElements().forEach((element) {
                 element.incrementValue = incrementValue.count;
               });
@@ -413,7 +407,7 @@ class _MatchView extends State<MatchView> {
         //     _score.teleScore.cycles;
         return mutableData;
       }
-      final scoreIndex = _score?.getIndex(mutableData, _selectedTeam?.number);
+      final scoreIndex = _score?.id;
       mutableData.value['teams'][_selectedTeam?.number]['scores'][scoreIndex]
           ['TeleScore']['Cycles'] = _score?.teleScore.cycles;
       return mutableData;
@@ -476,7 +470,7 @@ class _MatchView extends State<MatchView> {
   void increaseMisses() {
     _score?.teleScore.misses.count++;
     widget.event.getRef()?.runTransaction((mutableData) async {
-      final scoreIndex = _score?.getIndex(mutableData, _selectedTeam?.number);
+      final scoreIndex = _score?.id;
       var ref = mutableData.value['teams'][_selectedTeam?.number]['scores']
           [scoreIndex]['TeleScore']['Misses'];
       mutableData.value['teams'][_selectedTeam?.number]['scores'][scoreIndex]
@@ -584,13 +578,7 @@ class _MatchView extends State<MatchView> {
                         _selectedTeam = _match?.red?.team1 ?? Team.nullTeam();
                         _selectedAlliance = _match?.red;
                         _color = CupertinoColors.systemRed;
-                        _score = _selectedTeam?.scores.firstWhere(
-                          (element) => element.id == _match?.id,
-                          orElse: () => Score(
-                            Uuid().v4(),
-                            Dice.none,
-                          ),
-                        );
+                        _score = _selectedTeam?.scores[_match?.id];
                         incrementValue.count =
                             _score?.teleScore.getElements()[0].incrementValue ??
                                 1;
@@ -617,13 +605,7 @@ class _MatchView extends State<MatchView> {
                         _selectedTeam = _match?.red?.team2 ?? Team.nullTeam();
                         _selectedAlliance = _match?.red;
                         _color = CupertinoColors.systemRed;
-                        _score = _selectedTeam?.scores.firstWhere(
-                          (element) => element.id == _match?.id,
-                          orElse: () => Score(
-                            Uuid().v4(),
-                            Dice.none,
-                          ),
-                        );
+                        _score = _selectedTeam?.scores[_match?.id];
                       },
                     );
                   },
@@ -648,13 +630,7 @@ class _MatchView extends State<MatchView> {
                         _selectedTeam = _match?.blue?.team1 ?? Team.nullTeam();
                         _selectedAlliance = _match?.blue;
                         _color = Colors.blue;
-                        _score = _selectedTeam?.scores.firstWhere(
-                          (element) => element.id == _match?.id,
-                          orElse: () => Score(
-                            Uuid().v4(),
-                            Dice.none,
-                          ),
-                        );
+                        _score = _selectedTeam?.scores[_match?.id];
                       },
                     );
                   },
@@ -677,13 +653,7 @@ class _MatchView extends State<MatchView> {
                         _selectedTeam = _match?.blue?.team2 ?? Team.nullTeam();
                         _selectedAlliance = _match?.blue;
                         _color = Colors.blue;
-                        _score = _selectedTeam?.scores.firstWhere(
-                          (element) => element.id == _match?.id,
-                          orElse: () => Score(
-                            Uuid().v4(),
-                            Dice.none,
-                          ),
-                        );
+                        _score = _selectedTeam?.scores[_match?.id];
                       },
                     ),
           ),

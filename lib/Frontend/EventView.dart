@@ -50,7 +50,7 @@ class _EventView extends State<EventView> {
                   context: context,
                   delegate: _tab == 0
                       ? TeamSearch(
-                          teams: widget.event.teams.values.toList(),
+                          teams: widget.event.teams.sortedTeams(),
                           event: widget.event,
                         )
                       : MatchSearch(

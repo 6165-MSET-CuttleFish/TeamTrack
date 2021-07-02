@@ -37,7 +37,7 @@ class _TeamList extends State<TeamList> {
             );
           }
           return ListView(
-            children: widget.event.teams.values
+            children: widget.event.teams.sortedTeams()
                 .map(
                   (e) => Slidable(
                     actionPane: slider,

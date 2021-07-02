@@ -236,10 +236,8 @@ class Event {
       ];
       for (var team in e.getTeams()) {
         final teamIndex = team?.number;
-        mutableData.value['teams'][teamIndex]['scores'] = [
-          ...mutableData.value['teams'][teamIndex]['scores'] ?? [],
-          Score(e.id, Dice.none).toJson()
-        ];
+        mutableData.value['teams'][teamIndex]['scores'][id] =
+            Score(e.id, e.dice).toJson();
       }
       return mutableData;
     });
@@ -290,8 +288,8 @@ class Event {
     if (x == null) {
       teams.remove(team);
       await getRef()?.runTransaction((mutableData) async {
-        var newTeams =
-            ((mutableData.value as Map)['teams'] as Map).remove(team.number);
+        var newTeams = ((mutableData.value as Map)['teams'] as Map);
+        newTeams.remove(team.number);
         mutableData.value['teams'] = newTeams;
         return mutableData;
       });
@@ -301,10 +299,10 @@ class Event {
 
   void deleteMatch(Match e) {
     if (shared) {
-      e.red?.team1?.scores.removeWhere((f) => f.id == e.id);
-      e.red?.team2?.scores.removeWhere((f) => f.id == e.id);
-      e.blue?.team1?.scores.removeWhere((f) => f.id == e.id);
-      e.blue?.team2?.scores.removeWhere((f) => f.id == e.id);
+      e.red?.team1?.scores.removeWhere((f, _) => f == e.id);
+      e.red?.team2?.scores.removeWhere((f, _) => f == e.id);
+      e.blue?.team1?.scores.removeWhere((f, _) => f == e.id);
+      e.blue?.team2?.scores.removeWhere((f, _) => f == e.id);
       matches.remove(e);
     }
     getRef()?.runTransaction((mutableData) async {
@@ -314,10 +312,9 @@ class Event {
       mutableData.value['matches'] = newMatches;
       for (var team in e.getTeams()) {
         final teamIndex = team?.number;
-        final tempScores =
-            (mutableData.value['teams'][teamIndex]['scores'] as List)
-                .where((element) => element['id'] != e.id)
-                .toList();
+        var tempScores =
+            (mutableData.value['teams'][teamIndex]['scores'] as Map);
+        tempScores.remove(e.id);
         mutableData.value['teams'][teamIndex]['scores'] = tempScores;
       }
       return mutableData;
@@ -408,12 +405,7 @@ class Alliance {
   Alliance(this.team1, this.team2, this.eventType);
   int getPenalty() {
     if (eventType == EventType.remote)
-      return team1?.scores
-              .firstWhere((element) => element.id == id,
-                  orElse: () => Score('', Dice.none))
-              .penalties
-              .total() ??
-          0;
+      return team1?.scores[id]?.penalties.total() ?? 0;
     return opposingAlliance?.penaltyTotal() ?? 0;
   }
 
@@ -421,46 +413,12 @@ class Alliance {
       (team1 != null && team1!.equals(team)) ||
       (team2 != null && team2!.equals(team));
   int penaltyTotal() =>
-      (team1?.scores
-              .firstWhere(
-                (element) => element.id == id,
-                orElse: () => Score('', Dice.none),
-              )
-              .penalties
-              .total() ??
-          0) +
-      (team2?.scores
-              .firstWhere(
-                (element) => element.id == id,
-                orElse: () => Score('', Dice.none),
-              )
-              .penalties
-              .total() ??
-          0);
+      (team1?.scores[id]?.penalties.total() ?? 0) +
+      (team2?.scores[id]?.penalties.total() ?? 0);
 
   int allianceTotal(String? id, bool? showPenalties, {OpModeType? type}) =>
-      ((team1?.scores
-                      .firstWhere(
-                        (e) => e.id == id,
-                        orElse: () => Score(
-                          Uuid().v4(),
-                          Dice.none,
-                        ),
-                      )
-                      .getScoreDivision(type)
-                      .total() ??
-                  0) +
-              (team2?.scores
-                      .firstWhere(
-                        (e) => e.id == id,
-                        orElse: () => Score(
-                          Uuid().v4(),
-                          Dice.none,
-                        ),
-                      )
-                      .getScoreDivision(type)
-                      .total() ??
-                  0) +
+      ((team1?.scores[id]?.getScoreDivision(type).total() ?? 0) +
+              (team2?.scores[id]?.getScoreDivision(type).total() ?? 0) +
               ((showPenalties ?? false)
                   ? (eventType == EventType.remote
                       ? getPenalty()
@@ -483,13 +441,12 @@ class Alliance {
 class Team {
   String name = '';
   String number = '';
-  List<Score> scores = [];
+  Map<String, Score> scores = Map();
   List<Change> changes = [];
   Score? targetScore;
   Team(String number, String name) {
     this.name = name;
     this.number = number;
-    scores = [];
   }
   static Team nullTeam() {
     return Team("?", "?");
@@ -508,13 +465,10 @@ class Team {
     number = json['number'];
     name = json['name'];
     try {
-      scores = List<Score>.from(
-        json['scores'].map(
-          (model) => Score.fromJson(model, eventType),
-        ),
-      );
+      scores = (json['scores'] as Map)
+          .map((key, value) => MapEntry(key, Score.fromJson(value, eventType)));
     } catch (e) {
-      scores = [];
+      scores = Map();
     }
     if (json['targetScore'] != null)
       targetScore = Score.fromJson(json['targetScore'], eventType);
@@ -531,7 +485,7 @@ class Team {
   Map<String, dynamic> toJson() => {
         'name': name,
         'number': number,
-        'scores': scores.map((e) => e.toJson()).toList(),
+        'scores': scores.map((key, value) => MapEntry(key, value.toJson())),
         'targetScore': targetScore?.toJson(),
         'changes': changes.map((e) => e.toJson()).toList(),
       };
@@ -574,34 +528,10 @@ class Match {
 
   void setDice(Dice dice) {
     this.dice = dice;
-    red?.team1?.scores
-        .firstWhere((e) => e.id == id,
-            orElse: () => Score(
-                  Uuid().v4(),
-                  Dice.none,
-                ))
-        .setDice(dice);
-    red?.team2?.scores
-        .firstWhere((e) => e.id == id,
-            orElse: () => Score(
-                  Uuid().v4(),
-                  Dice.none,
-                ))
-        .setDice(dice);
-    blue?.team1?.scores
-        .firstWhere((e) => e.id == id,
-            orElse: () => Score(
-                  Uuid().v4(),
-                  Dice.none,
-                ))
-        .setDice(dice);
-    blue?.team2?.scores
-        .firstWhere((e) => e.id == id,
-            orElse: () => Score(
-                  Uuid().v4(),
-                  Dice.none,
-                ))
-        .setDice(dice);
+    red?.team1?.scores[id]?.setDice(dice);
+    red?.team2?.scores[id]?.setDice(dice);
+    blue?.team1?.scores[id]?.setDice(dice);
+    blue?.team2?.scores[id]?.setDice(dice);
   }
 
   String score({bool? showPenalties}) {
@@ -817,6 +747,20 @@ extension SpotExtensions on List<FlSpot> {
   }
 }
 
+extension ListScore on List<Score> {
+  List<FlSpot> spots(OpModeType? type, {bool? showPenalties}) {
+    final list = this
+        .map(
+            (e) => e.getScoreDivision(type).total(showPenalties: showPenalties))
+        .toList();
+    List<FlSpot> val = [];
+    for (int i = 0; i < list.length; i++) {
+      val.add(FlSpot(i.toDouble(), list[i].toDouble()));
+    }
+    return val;
+  }
+}
+
 extension colorExt on OpModeType? {
   Color getColor() {
     switch (this) {
@@ -849,14 +793,14 @@ extension TeamsExtension on Map<String, Team> {
     }
   }
 
-  // List<Team> sortedTeams() {
-  //   List<Team> val = [];
-  //   for (Team team in this) {
-  //     val.add(team);
-  //   }
-  //   val.sort((a, b) => int.parse(a.number).compareTo(int.parse(b.number)));
-  //   return val;
-  // }
+  List<Team> sortedTeams() {
+    List<Team> val = [];
+    for (Team team in this.values) {
+      val.add(team);
+    }
+    val.sort((a, b) => int.parse(a.number).compareTo(int.parse(b.number)));
+    return val;
+  }
 
   double maxScore(Dice? dice, bool removeOutliers, OpModeType? type) {
     if (this.length == 0) return 1;
@@ -931,19 +875,7 @@ extension ScoreDivExtension on List<ScoreDivision> {
           .toList();
 }
 
-extension ScoresExtension on List<Score> {
-  List<FlSpot> spots(OpModeType? type, {bool? showPenalties}) {
-    final list = this
-        .map(
-            (e) => e.getScoreDivision(type).total(showPenalties: showPenalties))
-        .toList();
-    List<FlSpot> val = [];
-    for (int i = 0; i < list.length; i++) {
-      val.add(FlSpot(i.toDouble(), list[i].toDouble()));
-    }
-    return val;
-  }
-
+extension ScoresExtension on Map<String, Score> {
   double maxScore(Dice? dice, bool removeOutliers, OpModeType? type) {
     final arr = this.diceScores(dice);
     if (arr.length == 0) return 0;
@@ -985,6 +917,8 @@ extension ScoresExtension on List<Score> {
     return 0;
   }
 
-  List<Score> diceScores(Dice? dice) =>
-      (dice != Dice.none ? this.where((e) => e.dice == dice) : this).toList();
+  List<Score> diceScores(Dice? dice) => (dice != Dice.none
+          ? this.values.where((e) => e.dice == dice)
+          : this.values)
+      .toList();
 }
