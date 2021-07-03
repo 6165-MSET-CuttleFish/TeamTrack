@@ -452,7 +452,7 @@ class _TeamView extends State<TeamView> {
                               ),
                               dataSource: _team.scores
                                   .diceScores(_dice)
-                                  .map((e) => e.teleScore.cycles)
+                                  .map((e) => e.teleScore.cycleTimes)
                                   .toList(),
                               boxPlotMode: BoxPlotMode.exclusive,
                               xValueMapper: (List<double> cycles, _) => _ + 1,

@@ -84,7 +84,7 @@ EventType getTypeFromString(String statusAsString) {
 }
 
 extension scoreList on Map<String, Score> {
-  void addScore(Score value, Team? team) {
+  void addScore(Score value) {
     this[value.id] = value;
   }
 }
@@ -92,45 +92,22 @@ extension scoreList on Map<String, Score> {
 class AutoScore extends ScoreDivision {
   late Dice dice;
   Set keys = {};
-  Map<String, ScoringElement> elements = {
-    'HighGoals':
-        ScoringElement(name: 'High Goals', value: 12, key: "HighGoals"),
-    'MiddleGoals':
-        ScoringElement(name: 'Middle Goals', value: 6, key: "MiddleGoals"),
-    'LowGoals': ScoringElement(name: 'Low Goals', value: 3, key: "LowGoals"),
-    'WobbleGoals': ScoringElement(
-      name: 'Wobble Goals',
-      value: 15,
-      max: () => 2,
-      key: "WobbleGoals",
-    ),
-    'PowerShots': ScoringElement(
-      name: 'Power Shots',
-      value: 15,
-      max: () => 3,
-      key: "PowerShots",
-    ),
-    'Navigated': ScoringElement(
-      name: 'Navigated',
-      value: 5,
-      max: () => 1,
-      isBool: true,
-      key: "Navigated",
-    )
-  };
+  Map<String, ScoringElement> elements = Map();
   void setCount(String key, int n) {
     elements[key]?.count = n;
   }
 
+  var ref = Statics.skeleton['AutoScore'] as Map;
   List<ScoringElement> getElements() => elements.values.toList();
   Dice getDice() => dice;
   AutoScore() {
-    (Statics.skeleton['AutoScore'] as Map).keys.forEach(
+    ref.keys.forEach(
       (e) {
         elements[e] = ScoringElement(
-          min: () => e['min'] ?? 0,
-          value: e['value'] ?? 1,
-          isBool: e['isBool'] ?? false,
+          name: ref[e]['name'],
+          min: () => ref[e]['min'] ?? 0,
+          value: ref[e]['value'] ?? 1,
+          isBool: ref[e]['isBool'] ?? false,
         );
       },
     );
@@ -138,25 +115,29 @@ class AutoScore extends ScoreDivision {
   }
 
   void maxSet() {
-    (Statics.skeleton['AutoScore'] as Map).keys.forEach(
+    ref.keys.forEach(
       (e) {
-        if (e['maxIsReference']) {
-          int ceil = e['max']['total'];
+        if (ref[e]['maxIsReference'] ?? false) {
+          int ceil = ref[e]['max']['total'];
           elements[e]?.max = () =>
-              (ceil - (elements[e['max']['reference']]?.count ?? 0)).toInt();
+              (ceil - (elements[ref[e]['max']['reference']]?.count ?? 0))
+                  .toInt();
+        } else {
+          elements[e]?.max = () => ref[e]['max'];
         }
       },
     );
   }
 
   AutoScore.fromJson(Map<String, dynamic> map) {
-    (Statics.skeleton['AutoScore'] as Map).keys.forEach(
+    ref.keys.forEach(
       (e) {
         elements[e] = ScoringElement(
+          name: ref[e]['name'],
           count: map[e] ?? 0,
-          min: () => e['min'] ?? 0,
-          value: e['value'] ?? 1,
-          isBool: e['isBool'] ?? false,
+          min: () => ref[e]['min'] ?? 0,
+          value: ref[e]['value'] ?? 1,
+          isBool: ref[e]['isBool'] ?? false,
         );
       },
     );
@@ -168,24 +149,23 @@ class AutoScore extends ScoreDivision {
 
 class TeleScore extends ScoreDivision {
   late Dice dice;
-  Map<String, ScoringElement> elements = {
-    'HighGoals': ScoringElement(name: 'High Goals', value: 6, key: "HighGoals"),
-    'MiddleGoals':
-        ScoringElement(name: 'Middle Goals', value: 4, key: "MiddleGoals"),
-    'LowGoals': ScoringElement(name: 'Low Goals', value: 2, key: "LowGoals"),
-  };
+  Map<String, ScoringElement> elements = Map();
   List<ScoringElement> getElements() => elements.values.toList();
-  List<double> cycles = [];
+  List<double> cycleTimes = [];
+  int teleCycles = 0;
+  int endgameCycles = 0;
   ScoringElement misses =
       ScoringElement(name: "Misses", value: 1, key: 'Misses');
   Dice getDice() => dice;
+  var ref = Statics.skeleton['TeleScore'] as Map;
   TeleScore() {
-    (Statics.skeleton['TeleScore'] as Map).keys.forEach(
+    ref.keys.forEach(
       (e) {
         elements[e] = ScoringElement(
-          min: () => e['min'] ?? 0,
-          value: e['value'] ?? 1,
-          isBool: e['isBool'] ?? false,
+          name: ref[e]['name'],
+          min: () => ref[e]['min'] ?? 0,
+          value: ref[e]['value'] ?? 1,
+          isBool: ref[e]['isBool'] ?? false,
         );
       },
     );
@@ -193,50 +173,62 @@ class TeleScore extends ScoreDivision {
   }
 
   void maxSet() {
-    (Statics.skeleton['TeleScore'] as Map).keys.forEach(
+    ref.keys.forEach(
       (e) {
-        if (e['maxIsReference']) {
-          int ceil = e['max']['total'];
+        if (ref[e]['maxIsReference'] ?? false) {
+          int ceil = ref[e]['max']['total'];
           elements[e]?.max = () =>
-              (ceil - (elements[e['max']['reference']]?.count ?? 0)).toInt();
+              (ceil - (elements[ref[e]['max']['reference']]?.count ?? 0))
+                  .toInt();
+        } else {
+          elements[e]?.max = () => ref[e]['max'];
         }
       },
     );
   }
 
   TeleScore.fromJson(Map<String, dynamic> map) {
-    (Statics.skeleton['TeleScore'] as Map).keys.forEach(
+    ref.keys.forEach(
       (e) {
         elements[e] = ScoringElement(
+          name: ref[e]['name'],
           count: map[e] ?? 0,
-          min: () => e['min'] ?? 0,
-          value: e['value'] ?? 1,
-          isBool: e['isBool'] ?? false,
+          min: () => ref[e]['min'] ?? 0,
+          value: ref[e]['value'] ?? 1,
+          isBool: ref[e]['isBool'] ?? false,
         );
       },
     );
+    try {
+      cycleTimes = json.decode(map['CycleTimes'].toString());
+    } catch (e) {
+      cycleTimes = [];
+    }
+    misses = map['Misses'] ?? 0;
+
     maxSet();
   }
   Map<String, dynamic> toJson() => {
         ...elements.map((key, value) => MapEntry(key, value.count)),
         'Misses': misses.count,
-        'CycleTimes': json.encode(cycles),
+        'CycleTimes': json.encode(cycleTimes),
       };
 }
 
 class EndgameScore extends ScoreDivision {
   late Dice dice;
-  Map<String, ScoringElement> elements = {};
+  Map<String, ScoringElement> elements = Map();
   List<ScoringElement> getElements() => elements.values.toList();
-
+  var ref = Statics.skeleton['EndgameScore'] as Map;
   Dice getDice() => dice;
   EndgameScore() {
-    (Statics.skeleton['EndgameScore'] as Map).keys.forEach(
+    ref.keys.forEach(
       (e) {
         elements[e] = ScoringElement(
-          min: () => e['min'] ?? 0,
-          value: e['value'] ?? 1,
-          isBool: e['isBool'] ?? false,
+          name: ref[e]['name'],
+          min: () => ref[e]['min'] ?? 0,
+          value: ref[e]['value'] ?? 1,
+          isBool: ref[e]['isBool'] ?? false,
         );
       },
     );
@@ -244,25 +236,29 @@ class EndgameScore extends ScoreDivision {
   }
 
   void maxSet() {
-    (Statics.skeleton['EndgameScore'] as Map).keys.forEach(
+    ref.keys.forEach(
       (e) {
-        if (e['maxIsReference']) {
-          int ceil = e['max']['total'];
+        if (ref[e]['maxIsReference'] ?? false) {
+          int ceil = ref[e]['max']['total'];
           elements[e]?.max = () =>
-              (ceil - (elements[e['max']['reference']]?.count ?? 0)).toInt();
+              (ceil - (elements[ref[e]['max']['reference']]?.count ?? 0))
+                  .toInt();
+        } else {
+          elements[e]?.max = () => ref[e]['max'];
         }
       },
     );
   }
 
   EndgameScore.fromJson(Map<String, dynamic> json) {
-    (Statics.skeleton['EndgameScore'] as Map).keys.forEach(
+    ref.keys.forEach(
       (e) {
         elements[e] = ScoringElement(
+          name: ref[e]['name'],
           count: json[e] ?? 0,
-          min: () => e['min'] ?? 0,
-          value: e['value'] ?? 1,
-          isBool: e['isBool'] ?? false,
+          min: () => ref[e]['min'] ?? 0,
+          value: ref[e]['value'] ?? 1,
+          isBool: ref[e]['isBool'] ?? false,
         );
       },
     );

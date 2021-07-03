@@ -398,7 +398,7 @@ class _MatchView extends State<MatchView> {
         _time.toPrecision(3) -
             lapses.reduce((value, element) => value + element),
       );
-    _score?.teleScore.cycles = lapses;
+    _score?.teleScore.cycleTimes = lapses;
     widget.event.getRef()?.runTransaction((mutableData) async {
       if (widget.team != null) {
         // mutableData.value['teams'][teamIndex]['targetScore']['TeleScore']
@@ -409,7 +409,7 @@ class _MatchView extends State<MatchView> {
       }
       final scoreIndex = _score?.id;
       mutableData.value['teams'][_selectedTeam?.number]['scores'][scoreIndex]
-          ['TeleScore']['Cycles'] = _score?.teleScore.cycles;
+          ['TeleScore']['Cycles'] = _score?.teleScore.cycleTimes;
       return mutableData;
     });
   }
