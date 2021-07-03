@@ -1,7 +1,5 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_database/firebase_database.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/services.dart';
 import 'package:teamtrack/backend.dart';
 
@@ -93,180 +91,185 @@ extension scoreList on Map<String, Score> {
 
 class AutoScore extends ScoreDivision {
   late Dice dice;
-  ScoringElement wobbleGoals = ScoringElement(
-      name: 'Wobble Goals', value: 15, max: () => 2, key: "WobbleGoals");
-  ScoringElement lowGoals =
-      ScoringElement(name: 'Low Goals', value: 3, key: "LowGoals");
-  ScoringElement midGoals =
-      ScoringElement(name: 'Middle Goals', value: 6, key: "MiddleGoals");
-  ScoringElement hiGoals =
-      ScoringElement(name: 'High Goals', value: 12, key: "HighGoals");
-  ScoringElement pwrShots = ScoringElement(
-      name: 'Power Shots', value: 15, max: () => 3, key: "PowerShots");
-  ScoringElement navigated = ScoringElement(
+  Set keys = {};
+  Map<String, ScoringElement> elements = {
+    'HighGoals':
+        ScoringElement(name: 'High Goals', value: 12, key: "HighGoals"),
+    'MiddleGoals':
+        ScoringElement(name: 'Middle Goals', value: 6, key: "MiddleGoals"),
+    'LowGoals': ScoringElement(name: 'Low Goals', value: 3, key: "LowGoals"),
+    'WobbleGoals': ScoringElement(
+      name: 'Wobble Goals',
+      value: 15,
+      max: () => 2,
+      key: "WobbleGoals",
+    ),
+    'PowerShots': ScoringElement(
+      name: 'Power Shots',
+      value: 15,
+      max: () => 3,
+      key: "PowerShots",
+    ),
+    'Navigated': ScoringElement(
       name: 'Navigated',
       value: 5,
       max: () => 1,
       isBool: true,
-      key: "Navigated");
-  List<ScoringElement> getElements() =>
-      [hiGoals, midGoals, lowGoals, wobbleGoals, pwrShots, navigated];
-  Dice getDice() => dice;
-  AutoScore();
-  AutoScore.fromJson(Map<String, dynamic> json) {
-    hiGoals = ScoringElement(
-        name: 'High Goals',
-        count: json['HighGoals'],
-        value: 12,
-        key: 'HighGoals');
-    midGoals = ScoringElement(
-        name: 'Middle Goals',
-        count: json['MiddleGoals'],
-        value: 6,
-        key: 'MiddleGoals');
-    lowGoals = ScoringElement(
-      name: 'Low Goals',
-      count: json['LowGoals'],
-      value: 3,
-      key: 'LowGoals',
-    );
-    wobbleGoals = ScoringElement(
-      name: 'Wobble Goals',
-      count: json['WobbleGoals'],
-      value: 15,
-      max: () => 2,
-      key: 'WobbleGoals',
-    );
-    pwrShots = ScoringElement(
-      name: 'Power Shots',
-      count: json['PowerShots'],
-      value: 15,
-      max: () => 3,
-      key: 'PowerShots',
-    );
-    navigated = ScoringElement(
-        name: 'Navigated',
-        count: json['Navigated'],
-        value: 5,
-        isBool: true,
-        key: 'Navigated');
+      key: "Navigated",
+    )
+  };
+  void setCount(String key, int n) {
+    elements[key]?.count = n;
   }
-  Map<String, dynamic> toJson() => {
-        'HighGoals': hiGoals.count,
-        'MiddleGoals': midGoals.count,
-        'LowGoals': lowGoals.count,
-        'WobbleGoals': wobbleGoals.count,
-        'PowerShots': pwrShots.count,
-        'Navigated': navigated.count,
-      };
+
+  List<ScoringElement> getElements() => elements.values.toList();
+  Dice getDice() => dice;
+  AutoScore() {
+    (Statics.skeleton['AutoScore'] as Map).keys.forEach(
+      (e) {
+        elements[e] = ScoringElement(
+          min: () => e['min'] ?? 0,
+          value: e['value'] ?? 1,
+          isBool: e['isBool'] ?? false,
+        );
+      },
+    );
+    maxSet();
+  }
+
+  void maxSet() {
+    (Statics.skeleton['AutoScore'] as Map).keys.forEach(
+      (e) {
+        if (e['maxIsReference']) {
+          int ceil = e['max']['total'];
+          elements[e]?.max = () =>
+              (ceil - (elements[e['max']['reference']]?.count ?? 0)).toInt();
+        }
+      },
+    );
+  }
+
+  AutoScore.fromJson(Map<String, dynamic> map) {
+    (Statics.skeleton['AutoScore'] as Map).keys.forEach(
+      (e) {
+        elements[e] = ScoringElement(
+          count: map[e] ?? 0,
+          min: () => e['min'] ?? 0,
+          value: e['value'] ?? 1,
+          isBool: e['isBool'] ?? false,
+        );
+      },
+    );
+    maxSet();
+  }
+  Map<String, dynamic> toJson() =>
+      elements.map((key, value) => MapEntry(key, value.count));
 }
 
 class TeleScore extends ScoreDivision {
   late Dice dice;
-  ScoringElement lowGoals =
-      ScoringElement(name: "Low Goals", value: 2, key: 'LowGoals');
-  ScoringElement midGoals =
-      ScoringElement(name: "Middle Goals", value: 4, key: 'MiddleGoals');
-  ScoringElement hiGoals =
-      ScoringElement(name: "High Goals", value: 6, key: 'HighGoals');
-  List<ScoringElement> getElements() => [hiGoals, midGoals, lowGoals];
+  Map<String, ScoringElement> elements = {
+    'HighGoals': ScoringElement(name: 'High Goals', value: 6, key: "HighGoals"),
+    'MiddleGoals':
+        ScoringElement(name: 'Middle Goals', value: 4, key: "MiddleGoals"),
+    'LowGoals': ScoringElement(name: 'Low Goals', value: 2, key: "LowGoals"),
+  };
+  List<ScoringElement> getElements() => elements.values.toList();
   List<double> cycles = [];
   ScoringElement misses =
       ScoringElement(name: "Misses", value: 1, key: 'Misses');
   Dice getDice() => dice;
-  TeleScore();
+  TeleScore() {
+    (Statics.skeleton['TeleScore'] as Map).keys.forEach(
+      (e) {
+        elements[e] = ScoringElement(
+          min: () => e['min'] ?? 0,
+          value: e['value'] ?? 1,
+          isBool: e['isBool'] ?? false,
+        );
+      },
+    );
+    maxSet();
+  }
+
+  void maxSet() {
+    (Statics.skeleton['TeleScore'] as Map).keys.forEach(
+      (e) {
+        if (e['maxIsReference']) {
+          int ceil = e['max']['total'];
+          elements[e]?.max = () =>
+              (ceil - (elements[e['max']['reference']]?.count ?? 0)).toInt();
+        }
+      },
+    );
+  }
+
   TeleScore.fromJson(Map<String, dynamic> map) {
-    hiGoals = ScoringElement(
-        name: 'High Goals',
-        count: map['HighGoals'],
-        value: 6,
-        key: 'HighGoals');
-    midGoals = ScoringElement(
-        name: 'Middle Goals',
-        count: map['MiddleGoals'],
-        value: 4,
-        key: 'MiddleGoals');
-    lowGoals = ScoringElement(
-        name: 'Low Goals', count: map['LowGoals'], value: 2, key: 'LowGoals');
-    try {
-      misses = map['Misses'];
-    } catch (e) {
-      misses = ScoringElement(
-          name: "Misses", value: 1, key: 'Misses', count: map['Misses']);
-    }
-    try {
-      cycles = List<num>.from(json.decode(map['Cycles'].toString()))
-          .map((e) => e.toDouble())
-          .toList();
-    } catch (e) {
-      cycles = [];
-    }
+    (Statics.skeleton['TeleScore'] as Map).keys.forEach(
+      (e) {
+        elements[e] = ScoringElement(
+          count: map[e] ?? 0,
+          min: () => e['min'] ?? 0,
+          value: e['value'] ?? 1,
+          isBool: e['isBool'] ?? false,
+        );
+      },
+    );
+    maxSet();
   }
   Map<String, dynamic> toJson() => {
-        'HighGoals': hiGoals.count,
-        'MiddleGoals': midGoals.count,
-        'LowGoals': lowGoals.count,
+        ...elements.map((key, value) => MapEntry(key, value.count)),
         'Misses': misses.count,
-        'Cycles': json.encode(cycles),
+        'CycleTimes': json.encode(cycles),
       };
 }
 
 class EndgameScore extends ScoreDivision {
   late Dice dice;
-  ScoringElement wobbleGoalsInDrop =
-      ScoringElement(name: 'Wobbles In Drop', value: 20, key: 'WobblesInDrop');
-  ScoringElement wobbleGoalsInStart =
-      ScoringElement(name: 'Wobbles In Start', value: 5, key: 'WobblesInStart');
-  ScoringElement pwrShots = ScoringElement(
-      name: 'Power Shots', value: 15, max: () => 3, key: 'PowerShots');
-  ScoringElement ringsOnWobble =
-      ScoringElement(name: 'Rings On Wobble', value: 5, key: 'RingsOnWobble');
-  List<ScoringElement> getElements() =>
-      [pwrShots, wobbleGoalsInDrop, wobbleGoalsInStart, ringsOnWobble];
+  Map<String, ScoringElement> elements = {};
+  List<ScoringElement> getElements() => elements.values.toList();
 
   Dice getDice() => dice;
   EndgameScore() {
+    (Statics.skeleton['EndgameScore'] as Map).keys.forEach(
+      (e) {
+        elements[e] = ScoringElement(
+          min: () => e['min'] ?? 0,
+          value: e['value'] ?? 1,
+          isBool: e['isBool'] ?? false,
+        );
+      },
+    );
     maxSet();
   }
+
   void maxSet() {
-    wobbleGoalsInStart.max = () => 2 - wobbleGoalsInDrop.count;
-    wobbleGoalsInDrop.max = () => 2 - wobbleGoalsInStart.count;
+    (Statics.skeleton['EndgameScore'] as Map).keys.forEach(
+      (e) {
+        if (e['maxIsReference']) {
+          int ceil = e['max']['total'];
+          elements[e]?.max = () =>
+              (ceil - (elements[e['max']['reference']]?.count ?? 0)).toInt();
+        }
+      },
+    );
   }
 
   EndgameScore.fromJson(Map<String, dynamic> json) {
-    wobbleGoalsInDrop = ScoringElement(
-      name: 'Wobbles In Drop',
-      count: json['WobblesInDrop'],
-      value: 20,
-      max: () => 2 - wobbleGoalsInStart.count,
-      key: 'WobblesInDrop',
+    (Statics.skeleton['EndgameScore'] as Map).keys.forEach(
+      (e) {
+        elements[e] = ScoringElement(
+          count: json[e] ?? 0,
+          min: () => e['min'] ?? 0,
+          value: e['value'] ?? 1,
+          isBool: e['isBool'] ?? false,
+        );
+      },
     );
-    wobbleGoalsInStart = ScoringElement(
-        name: 'Wobbles In Start',
-        count: json['WobblesInStart'],
-        value: 5,
-        max: () => 2 - wobbleGoalsInDrop.count,
-        key: 'WobblesInStart');
-    pwrShots = ScoringElement(
-      name: 'Power Shots',
-      count: json['PowerShots'],
-      value: 15,
-      max: () => 3,
-      key: 'PowerShots',
-    );
-    ringsOnWobble = ScoringElement(
-      name: 'Rings On Wobble',
-      count: json['RingsOnWobble'],
-      value: 5,
-      key: 'RingsOnWobble',
-    );
+    maxSet();
   }
-  Map<String, dynamic> toJson() => {
-        'WobblesInDrop': wobbleGoalsInDrop.count,
-        'WobblesInStart': wobbleGoalsInStart.count,
-        'PowerShots': pwrShots.count,
-        'RingsOnWobble': ringsOnWobble.count
-      };
+  Map<String, dynamic> toJson() =>
+      elements.map((key, value) => MapEntry(key, value.count));
 }
 
 class Penalty extends ScoreDivision {
