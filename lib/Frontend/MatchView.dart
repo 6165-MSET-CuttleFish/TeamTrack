@@ -22,7 +22,7 @@ class MatchView extends StatefulWidget {
 }
 
 class _MatchView extends State<MatchView> {
-  Team? _selectedTeam = Team.nullTeam();
+  Team? _selectedTeam;
   Alliance? _selectedAlliance;
   Color _color = CupertinoColors.systemRed;
   Score? _score;
@@ -39,11 +39,11 @@ class _MatchView extends State<MatchView> {
   _MatchView(this._match, Team? team, Event event) {
     _selectedAlliance = _match?.red;
     if (team != null) {
-      _score = team.targetScore ?? Score(Uuid().v4(), Dice.none);
+      _score = team.targetScore;
       _selectedTeam = team;
       _color = CupertinoColors.systemGreen;
     } else {
-      _selectedTeam = _match?.red?.team1 ?? Team.nullTeam();
+      _selectedTeam = _match?.red?.team1;
       _score = _selectedTeam?.scores[_match?.id];
       if (_match?.type == EventType.remote)
         _color = CupertinoColors.systemGreen;
@@ -575,7 +575,7 @@ class _MatchView extends State<MatchView> {
                 ? null
                 : () => setState(
                       () {
-                        _selectedTeam = _match?.red?.team1 ?? Team.nullTeam();
+                        _selectedTeam = _match?.red?.team1;
                         _selectedAlliance = _match?.red;
                         _color = CupertinoColors.systemRed;
                         _score = _selectedTeam?.scores[_match?.id];
@@ -602,7 +602,7 @@ class _MatchView extends State<MatchView> {
                 : () {
                     setState(
                       () {
-                        _selectedTeam = _match?.red?.team2 ?? Team.nullTeam();
+                        _selectedTeam = _match?.red?.team2;
                         _selectedAlliance = _match?.red;
                         _color = CupertinoColors.systemRed;
                         _score = _selectedTeam?.scores[_match?.id];
@@ -627,7 +627,7 @@ class _MatchView extends State<MatchView> {
                 : () {
                     setState(
                       () {
-                        _selectedTeam = _match?.blue?.team1 ?? Team.nullTeam();
+                        _selectedTeam = _match?.blue?.team1;
                         _selectedAlliance = _match?.blue;
                         _color = Colors.blue;
                         _score = _selectedTeam?.scores[_match?.id];
@@ -650,7 +650,7 @@ class _MatchView extends State<MatchView> {
                 ? null
                 : () => setState(
                       () {
-                        _selectedTeam = _match?.blue?.team2 ?? Team.nullTeam();
+                        _selectedTeam = _match?.blue?.team2;
                         _selectedAlliance = _match?.blue;
                         _color = Colors.blue;
                         _score = _selectedTeam?.scores[_match?.id];

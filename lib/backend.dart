@@ -26,6 +26,95 @@ save(String key, value) async {
 
 class Statics {
   static final String gameName = 'UltimateGoal';
+  static Map<String, dynamic> skeleton = {
+    'AutoScore': {
+      'HighGoals': {
+        'name' : 'High Goals',
+        'min': 0,
+        'max': 999999999999999999,
+        'value': 12,
+      },
+      'MidGoals': {
+        'name' : 'Middle Goals',
+        'min': 0,
+        'max': 999999999999999999,
+        'value': 6,
+      },
+      'LowGoals': {
+        'name' : 'Low Goals',
+        'min': 0,
+        'max': 999999999999999999,
+        'value': 3,
+      },
+      'WobbleGoals': {
+        'name' : 'Wobble Goals',
+        'min': 0,
+        'max': 2,
+        'value': 15,
+      },
+      'PowerShots': {
+        'name' : 'Power Shots',
+        'min': 0,
+        'max': 3,
+        'value': 15,
+      },
+      'Navigated': {
+        'name' : 'Navigated',
+        'min': 0,
+        'max': 1,
+        'value': 5,
+        'isBool': true,
+      },
+    },
+    'TeleScore': {
+      'HighGoals': {
+        'name' : 'High Goals',
+        'min': 0,
+        'max': 999999999999999999,
+        'value': 6,
+      },
+      'MidGoals': {
+        'name' : 'Middle Goals',
+        'min': 0,
+        'max': 999999999999999999,
+        'value': 4,
+      },
+      'LowGoals': {
+        'name' : 'Low Goals',
+        'min': 0,
+        'max': 999999999999999999,
+        'value': 2,
+      },
+    },
+    'EndgameScore': {
+      'PowerShots': {
+        'name' : 'Power Shots',
+        'min': 0,
+        'max': 3,
+        'value': 15,
+      },
+      'WobblesInDrop': {
+        'name' : 'Wobbles in Drop',
+        'maxIsReference': true,
+        'min': 0,
+        'max': {'total': 2, 'reference': 'WobblesInStart'},
+        'value': 20,
+      },
+      'WobblesInStart': {
+        'name' : 'Wobbles in Start',
+        'maxIsReference': true,
+        'min': 0,
+        'max': {'total': 2, 'reference': 'WobblesInDrop'},
+        'value': 5,
+      },
+      'RingsOnWobble': {
+        'name' : 'Rings on Wobble',
+        'min': 0,
+        'max': {'total': 2, 'reference': 'WobblesInDrop'},
+        'value': 5,
+      }
+    },
+  };
 }
 
 class DarkThemeProvider with ChangeNotifier {
@@ -512,7 +601,7 @@ class Match {
     );
   }
 
-  Alliance? alliance(Team team) {
+  Alliance? alliance(Team? team) {
     if ((red?.team1?.equals(team) ?? false) ||
         (red?.team2?.equals(team) ?? false)) {
       return red;
@@ -777,13 +866,13 @@ extension colorExt on OpModeType? {
 }
 
 extension TeamsExtension on Map<String, Team> {
-  Team findAdd(String number, String name, Event event) {
+  Team? findAdd(String number, String name, Event event) {
     if (this.containsKey(number)) {
       var team = this[number
           .replaceAll(new RegExp(r' -,[^\w\s]+'), '')
           .replaceAll(' ', '')];
       team?.name = name;
-      return team ?? Team.nullTeam();
+      return team;
     } else {
       var newTeam = Team(
           number.replaceAll(new RegExp(r' -,[^\w\s]+'), '').replaceAll(' ', ''),

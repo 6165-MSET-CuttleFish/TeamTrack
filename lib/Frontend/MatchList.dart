@@ -196,7 +196,7 @@ class _MatchList extends State<MatchList> {
       var matches = widget.event.matches
           .where((e) =>
               e.alliance(
-                widget.event.teams[widget.team?.number] ?? Team.nullTeam(),
+                widget.event.teams[widget.team?.number],
               ) !=
               null)
           .toList();
@@ -282,7 +282,7 @@ class _MatchList extends State<MatchList> {
   List<Widget> _teamSpecMatches() => widget.event.matches
       .where((e) =>
           e.alliance(
-            widget.event.teams[widget.team?.number] ?? Team.nullTeam(),
+            widget.event.teams[widget.team?.number],
           ) !=
           null)
       .toList()
