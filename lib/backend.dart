@@ -13,6 +13,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 
 read(String key) async {
   final prefs = await SharedPreferences.getInstance();
@@ -29,37 +30,37 @@ class Statics {
   static Map<String, dynamic> skeleton = {
     'AutoScore': {
       'HighGoals': {
-        'name' : 'High Goals',
+        'name': 'High Goals',
         'min': 0,
         'max': 999999999999999999,
         'value': 12,
       },
       'MidGoals': {
-        'name' : 'Middle Goals',
+        'name': 'Middle Goals',
         'min': 0,
         'max': 999999999999999999,
         'value': 6,
       },
       'LowGoals': {
-        'name' : 'Low Goals',
+        'name': 'Low Goals',
         'min': 0,
         'max': 999999999999999999,
         'value': 3,
       },
       'WobbleGoals': {
-        'name' : 'Wobble Goals',
+        'name': 'Wobble Goals',
         'min': 0,
         'max': 2,
         'value': 15,
       },
       'PowerShots': {
-        'name' : 'Power Shots',
+        'name': 'Power Shots',
         'min': 0,
         'max': 3,
         'value': 15,
       },
       'Navigated': {
-        'name' : 'Navigated',
+        'name': 'Navigated',
         'min': 0,
         'max': 1,
         'value': 5,
@@ -68,19 +69,19 @@ class Statics {
     },
     'TeleScore': {
       'HighGoals': {
-        'name' : 'High Goals',
+        'name': 'High Goals',
         'min': 0,
         'max': 999999999999999999,
         'value': 6,
       },
       'MidGoals': {
-        'name' : 'Middle Goals',
+        'name': 'Middle Goals',
         'min': 0,
         'max': 999999999999999999,
         'value': 4,
       },
       'LowGoals': {
-        'name' : 'Low Goals',
+        'name': 'Low Goals',
         'min': 0,
         'max': 999999999999999999,
         'value': 2,
@@ -88,29 +89,29 @@ class Statics {
     },
     'EndgameScore': {
       'PowerShots': {
-        'name' : 'Power Shots',
+        'name': 'Power Shots',
         'min': 0,
         'max': 3,
         'value': 15,
       },
       'WobblesInDrop': {
-        'name' : 'Wobbles in Drop',
+        'name': 'Wobbles in Drop',
         'maxIsReference': true,
         'min': 0,
         'max': {'total': 2, 'reference': 'WobblesInStart'},
         'value': 20,
       },
       'WobblesInStart': {
-        'name' : 'Wobbles in Start',
+        'name': 'Wobbles in Start',
         'maxIsReference': true,
         'min': 0,
         'max': {'total': 2, 'reference': 'WobblesInDrop'},
         'value': 5,
       },
       'RingsOnWobble': {
-        'name' : 'Rings on Wobble',
+        'name': 'Rings on Wobble',
         'min': 0,
-        'max': {'total': 2, 'reference': 'WobblesInDrop'},
+        'max': 999999999999999999,
         'value': 5,
       }
     },
@@ -255,6 +256,7 @@ DataModel dataModel = DataModel();
 final DarkThemeProvider themeChangeProvider = new DarkThemeProvider();
 final Database.FirebaseDatabase firebaseDatabase =
     Database.FirebaseDatabase.instance;
+final FirebaseFunctions functions = FirebaseFunctions.instance;
 final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 
 class DataModel {
@@ -294,6 +296,14 @@ class DataModel {
     var y = x.map((e) => Event.fromJson(e)).toList();
     events = y;
     print('reloaded');
+  }
+
+  Future<void> shareEvent({required Map metaData, String? email}) async {
+    final HttpsCallable callable = functions.httpsCallable('shareEvent');
+    var resp = await callable.call(<String, dynamic>{
+      'email': email,
+      'metaData': metaData,
+    });
   }
 }
 
@@ -336,7 +346,6 @@ class Event {
         e.id,
         e.dice,
       ),
-      e.red?.team1,
     );
     if (type != EventType.remote) {
       e.red?.team2?.scores.addScore(
@@ -344,21 +353,18 @@ class Event {
           e.id,
           e.dice,
         ),
-        e.red?.team2,
       );
       e.blue?.team1?.scores.addScore(
         Score(
           e.id,
           e.dice,
         ),
-        e.blue?.team1,
       );
       e.blue?.team2?.scores.addScore(
         Score(
           e.id,
           e.dice,
         ),
-        e.blue?.team2,
       );
     }
   }
