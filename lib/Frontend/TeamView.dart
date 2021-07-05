@@ -210,7 +210,7 @@ class _TeamView extends State<TeamView> {
     );
   }
 
-  Widget _lineChart() => _team.scores.diceScores(_dice).length >= 2
+  Widget _lineChart() => _team.scores.diceScores(_dice).length >= 1
       ? Stack(
           alignment: Alignment.topRight,
           children: [
@@ -516,7 +516,7 @@ class _TeamView extends State<TeamView> {
   List<Widget> body() {
     return <Widget>[
       Collapsible(
-        isCollapsed: _team.scores.diceScores(_dice).length < 2,
+        isCollapsed: _team.scores.diceScores(_dice).length < 1,
         child: Column(
           children: [
             Padding(

@@ -104,10 +104,11 @@ class AutoScore extends ScoreDivision {
     ref.keys.forEach(
       (e) {
         elements[e] = ScoringElement(
-          name: ref[e]['name'],
+          name: ref[e]['name'] ?? e,
           min: () => ref[e]['min'] ?? 0,
           value: ref[e]['value'] ?? 1,
           isBool: ref[e]['isBool'] ?? false,
+          key: e,
         );
       },
     );
@@ -133,11 +134,12 @@ class AutoScore extends ScoreDivision {
     ref.keys.forEach(
       (e) {
         elements[e] = ScoringElement(
-          name: ref[e]['name'],
+          name: ref[e]['name'] ?? e,
           count: map[e] ?? 0,
           min: () => ref[e]['min'] ?? 0,
           value: ref[e]['value'] ?? 1,
           isBool: ref[e]['isBool'] ?? false,
+          key: e,
         );
       },
     );
@@ -162,10 +164,11 @@ class TeleScore extends ScoreDivision {
     ref.keys.forEach(
       (e) {
         elements[e] = ScoringElement(
-          name: ref[e]['name'],
+          name: ref[e]['name'] ?? e,
           min: () => ref[e]['min'] ?? 0,
           value: ref[e]['value'] ?? 1,
           isBool: ref[e]['isBool'] ?? false,
+          key: e,
         );
       },
     );
@@ -191,11 +194,12 @@ class TeleScore extends ScoreDivision {
     ref.keys.forEach(
       (e) {
         elements[e] = ScoringElement(
-          name: ref[e]['name'],
+          name: ref[e]['name'] ?? e,
           count: map[e] ?? 0,
           min: () => ref[e]['min'] ?? 0,
           value: ref[e]['value'] ?? 1,
           isBool: ref[e]['isBool'] ?? false,
+          key: e,
         );
       },
     );
@@ -204,7 +208,8 @@ class TeleScore extends ScoreDivision {
     } catch (e) {
       cycleTimes = [];
     }
-    misses = map['Misses'] ?? 0;
+    misses = ScoringElement(
+        name: 'Misses', count: map['Misses'] ?? 0, key: 'Misses', value: 1);
 
     maxSet();
   }
@@ -225,10 +230,11 @@ class EndgameScore extends ScoreDivision {
     ref.keys.forEach(
       (e) {
         elements[e] = ScoringElement(
-          name: ref[e]['name'],
+          name: ref[e]['name'] ?? e,
           min: () => ref[e]['min'] ?? 0,
           value: ref[e]['value'] ?? 1,
           isBool: ref[e]['isBool'] ?? false,
+          key: e,
         );
       },
     );
@@ -254,11 +260,12 @@ class EndgameScore extends ScoreDivision {
     ref.keys.forEach(
       (e) {
         elements[e] = ScoringElement(
-          name: ref[e]['name'],
+          name: ref[e]['name'] ?? e,
           count: json[e] ?? 0,
           min: () => ref[e]['min'] ?? 0,
           value: ref[e]['value'] ?? 1,
           isBool: ref[e]['isBool'] ?? false,
+          key: e,
         );
       },
     );

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:convert';
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -290,12 +291,10 @@ class DataModel {
 
   bool isProcessing = false;
 
-  void restoreEvents() async {
+  Future<void> restoreEvents() async {
     final prefs = await SharedPreferences.getInstance();
     var x = jsonDecode(prefs.getString(keys[0]) ?? '') as List;
-    var y = x.map((e) => Event.fromJson(e)).toList();
-    events = y;
-    print('reloaded');
+    events = x.map((e) => Event.fromJson(e)).toList();
   }
 
   Future<void> shareEvent({required Map metaData, String? email}) async {
@@ -319,9 +318,12 @@ class Event {
   late String name;
   Timestamp timeStamp = Timestamp.now();
   void addTeam(Team newTeam) async {
-    await getRef()?.child('teams').runTransaction((mutableData) async {
-      mutableData.value[newTeam.number]['name'] = newTeam.name;
-      mutableData.value[newTeam.number]['number'] = newTeam.number;
+    await getRef()
+        ?.child('teams/${newTeam.number}')
+        .runTransaction((mutableData) async {
+      if (mutableData.value == null) {
+        mutableData.value = newTeam.toJson();
+      }
       return mutableData;
     });
     teams[newTeam.number] = newTeam;
@@ -334,9 +336,31 @@ class Event {
         e.toJson()
       ];
       for (var team in e.getTeams()) {
+        if (team != null) {
+          try {
+            var ref = mutableData.value['teams'] as Map? ?? {};
+            ref.putIfAbsent(team.number, () => team.toJson());
+
+            mutableData.value['teams'] = ref;
+          } catch (e) {
+            var ref;
+            if (mutableData.value['teams'] != null) {
+              ref = List.from(mutableData.value['teams'])
+                  .where((element) => element != null)
+                  .toList();
+            } else {
+              ref = [];
+            }
+            var map = Map<String, dynamic>.fromIterable(ref,
+                key: (item) => item["number"], value: (item) => item);
+            map.putIfAbsent(team.number, () => team.toJson());
+            mutableData.value['teams'] = map;
+          }
+        }
         final teamIndex = team?.number;
-        mutableData.value['teams'][teamIndex]['scores'][id] =
-            Score(e.id, e.dice).toJson();
+        var ref = mutableData.value['teams'][teamIndex]['scores'] as Map? ?? {};
+        ref.putIfAbsent(e.id, () => Score(e.id, e.dice).toJson());
+        mutableData.value['teams'][teamIndex]['scores'] = ref;
       }
       return mutableData;
     });
@@ -369,7 +393,7 @@ class Event {
     }
   }
 
-  Future<String?> deleteTeam(Team team) async {
+  String? deleteTeam(Team team) {
     String? x;
     for (Match match in matches) {
       if ((match.red?.hasTeam(team) ?? false) ||
@@ -382,7 +406,7 @@ class Event {
     }
     if (x == null) {
       teams.remove(team);
-      await getRef()?.runTransaction((mutableData) async {
+      getRef()?.runTransaction((mutableData) async {
         var newTeams = ((mutableData.value as Map)['teams'] as Map);
         newTeams.remove(team.number);
         mutableData.value['teams'] = newTeams;
@@ -416,25 +440,50 @@ class Event {
     });
   }
 
-  void updateLocal(Map<String, dynamic>? json) {
-    if (json != null) {
-      type = getTypeFromString(json['type']);
-      name = json['name'];
-      teams =
-          Map.from(json['teams'].map((model) => Team.fromJson(model, type)));
-      matches = List<Match>.from(
-        json['matches'].map(
-          (model) => Match.fromJson(
-            model,
-            teams,
-            getTypeFromString(json['type']),
+  void updateLocal(dynamic map) {
+    if (map != null) {
+      type = getTypeFromString(map['type']);
+      name = map['name'];
+      try {
+        teams = (map['teams'] as Map)
+            .map((key, value) => MapEntry(key, Team.fromJson(value, type)));
+      } catch (e) {
+        try {
+          var teamList = List<Team>.from(
+            map['teams']
+                ?.map(
+                  (model) => model != null ? Team.fromJson(model, type) : null,
+                )
+                .where((e) => e != null),
+          );
+          teams = Map.fromIterable(teamList,
+              key: (item) => item.number, value: (item) => item);
+        } catch (e) {
+          teams = {};
+        }
+      }
+      try {
+        matches = List<Match>.from(
+          map['matches']?.map(
+            (model) => Match.fromJson(
+              model,
+              teams,
+              getTypeFromString(map['type']),
+            ),
           ),
-        ),
-      );
-      shared = json['shared'] ?? true;
-      id = json['id'] ?? Uuid().v4();
-      authorEmail = json['authorEmail'];
-      authorName = json['authorName'];
+        );
+      } catch (e) {
+        matches = [];
+      }
+      shared = map['shared'] ?? true;
+      id = map['id'] ?? Uuid().v4();
+      try {
+        timeStamp = Timestamp(map['seconds'], map['nanoSeconds']);
+      } catch (e) {
+        timeStamp = Timestamp.now();
+      }
+      authorEmail = map['authorEmail'];
+      authorName = map['authorName'];
       for (var match in matches) {
         match.setDice(match.dice);
       }
@@ -883,7 +932,7 @@ extension TeamsExtension on Map<String, Team> {
       var newTeam = Team(
           number.replaceAll(new RegExp(r' -,[^\w\s]+'), '').replaceAll(' ', ''),
           name);
-      event.addTeam(newTeam);
+      event.teams[newTeam.number] = newTeam; //addTeam(newTeam);
       return newTeam;
     }
   }

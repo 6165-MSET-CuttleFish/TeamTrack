@@ -31,13 +31,11 @@ class _TeamList extends State<TeamList> {
               !eventHandler.hasError &&
               !dataModel.isProcessing) {
             widget.event.updateLocal(
-              json.decode(
-                json.encode(eventHandler.data?.snapshot.value),
-              ),
-            );
+                json.decode(json.encode(eventHandler.data?.snapshot.value)));
           }
           return ListView(
-            children: widget.event.teams.sortedTeams()
+            children: widget.event.teams
+                .sortedTeams()
                 .map(
                   (e) => Slidable(
                     actionPane: slider,
@@ -65,8 +63,8 @@ class _TeamList extends State<TeamList> {
                                   child: Text('Confirm'),
                                   onPressed: () {
                                     String? s;
-                                    setState(() async {
-                                      s = await widget.event.deleteTeam(e);
+                                    setState(() {
+                                      s = widget.event.deleteTeam(e);
                                     });
                                     dataModel.saveEvents();
                                     //dataModel.uploadEvent(widget.event);
