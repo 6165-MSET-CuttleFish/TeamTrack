@@ -356,6 +356,7 @@ class _Incrementor extends State<Incrementor> {
                               setState(widget.element.decrement);
                             if (widget.onDecrement != null)
                               widget.onDecrement!();
+                            widget.onPressed();
                             await widget.event
                                 ?.getRef()
                                 ?.runTransaction((mutableData) async {
@@ -394,7 +395,6 @@ class _Incrementor extends State<Incrementor> {
                                     (ref ?? 0) - widget.element.decrementValue;
                               return mutableData;
                             });
-                            widget.onPressed();
                           }
                         : null,
                     elevation: 2.0,
@@ -415,6 +415,7 @@ class _Incrementor extends State<Incrementor> {
                   RawMaterialButton(
                     onPressed: widget.element.count < widget.element.max!()
                         ? () async {
+                            widget.onPressed();
                             await widget.event
                                 ?.getRef()
                                 ?.runTransaction((mutableData) async {
@@ -457,7 +458,6 @@ class _Incrementor extends State<Incrementor> {
                               widget.element.increment();
                             if (widget.onIncrement != null)
                               widget.onIncrement!();
-                            widget.onPressed();
                           }
                         : null,
                     elevation: 2.0,
@@ -476,6 +476,7 @@ class _Incrementor extends State<Incrementor> {
                         else
                           widget.element.count = 0;
                       }
+                      widget.onPressed();
                       await widget.event
                           ?.getRef()
                           ?.runTransaction((mutableData) async {
@@ -500,7 +501,6 @@ class _Incrementor extends State<Incrementor> {
                             [widget.element.key] = val ? 1 : 0;
                         return mutableData;
                       });
-                      widget.onPressed();
                     },
                   )
               ],
