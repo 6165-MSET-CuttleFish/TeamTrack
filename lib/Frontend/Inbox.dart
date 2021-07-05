@@ -10,8 +10,8 @@ import 'package:teamtrack/score.dart';
 import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-final DocumentReference docRef = firebaseFirestore.collection('inboxes').doc(Statics.gameName);
-
+final DocumentReference docRef =
+    firebaseFirestore.collection('inboxes').doc(Statics.gameName);
 
 class Inbox extends StatefulWidget {
   const Inbox({Key? key}) : super(key: key);
@@ -23,9 +23,7 @@ class _InboxState extends State<Inbox> {
   QuerySnapshot<Map<String, dynamic>>? query;
   bool isLoaded = false;
 
-  void docListener(){
-
-  }
+  void docListener() {}
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +71,7 @@ class _InboxState extends State<Inbox> {
                         children: [
                           IconButton(
                             icon: Icon(
-                              Icons.thumb_up_alt,
+                              Icons.check,
                               color: Colors.green,
                             ),
                             onPressed: () async {
@@ -106,7 +104,7 @@ class _InboxState extends State<Inbox> {
                           ),
                           IconButton(
                             icon: Icon(
-                              Icons.thumb_down_alt,
+                              Icons.delete,
                               color: Colors.red,
                             ),
                             onPressed: () {
@@ -141,8 +139,5 @@ class _InboxState extends State<Inbox> {
     isLoaded = true;
   }
 
-  void sendNotif() async{
-
-  }
-
+  void sendNotif() async {}
 }

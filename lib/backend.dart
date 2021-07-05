@@ -356,11 +356,18 @@ class Event {
             map.putIfAbsent(team.number, () => team.toJson());
             mutableData.value['teams'] = map;
           }
+          var teamIndex;
+          try {
+            mutableData.value['teams'] as Map;
+            teamIndex = team.number;
+          } catch (e) {
+            teamIndex = int.parse(team.number);
+          }
+          var ref =
+              mutableData.value['teams'][teamIndex]['scores'] as Map? ?? {};
+          ref.putIfAbsent(e.id, () => Score(e.id, e.dice).toJson());
+          mutableData.value['teams'][teamIndex]['scores'] = ref;
         }
-        final teamIndex = team?.number;
-        var ref = mutableData.value['teams'][teamIndex]['scores'] as Map? ?? {};
-        ref.putIfAbsent(e.id, () => Score(e.id, e.dice).toJson());
-        mutableData.value['teams'][teamIndex]['scores'] = ref;
       }
       return mutableData;
     });
@@ -430,7 +437,13 @@ class Event {
           .toList();
       mutableData.value['matches'] = newMatches;
       for (var team in e.getTeams()) {
-        final teamIndex = team?.number;
+        var teamIndex;
+        try {
+          mutableData.value['teams'] as Map;
+          teamIndex = team?.number;
+        } catch (e) {
+          teamIndex = int.parse(team?.number ?? '');
+        }
         var tempScores =
             (mutableData.value['teams'][teamIndex]['scores'] as Map);
         tempScores.remove(e.id);

@@ -204,7 +204,7 @@ class TeleScore extends ScoreDivision {
       },
     );
     try {
-      cycleTimes = json.decode(map['CycleTimes'].toString());
+      cycleTimes = List<double>.from(json.decode(map['CycleTimes'].toString()));
     } catch (e) {
       cycleTimes = [];
     }

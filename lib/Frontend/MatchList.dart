@@ -63,7 +63,7 @@ class _MatchList extends State<MatchList> {
                             onPressed: () {
                               setState(
                                 () {
-                                  widget.event.matches.add(
+                                  widget.event.addMatch(
                                     Match(
                                       Alliance(
                                         widget.event.teams[widget.team?.number],

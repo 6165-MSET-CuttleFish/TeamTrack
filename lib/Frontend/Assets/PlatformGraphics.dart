@@ -351,15 +351,22 @@ class _Incrementor extends State<Incrementor> {
                 if (!widget.element.isBool)
                   RawMaterialButton(
                     onPressed: widget.element.count > widget.element.min!()
-                        ? () {
-                            setState(widget.element.decrement);
+                        ? () async {
+                            if (!(widget.event?.shared ?? false))
+                              setState(widget.element.decrement);
                             if (widget.onDecrement != null)
                               widget.onDecrement!();
-                            widget.onPressed();
-                            widget.event
+                            await widget.event
                                 ?.getRef()
                                 ?.runTransaction((mutableData) async {
-                              final teamIndex = widget.team?.number;
+                              var teamIndex;
+                              try {
+                                mutableData.value['teams'] as Map;
+                                teamIndex = widget.team?.number;
+                              } catch (e) {
+                                teamIndex =
+                                    int.parse(widget.team?.number ?? '');
+                              }
                               if (widget.isTargetScore) {
                                 var ref = mutableData.value['teams'][teamIndex]
                                             ['targetScore']
@@ -387,6 +394,7 @@ class _Incrementor extends State<Incrementor> {
                                     (ref ?? 0) - widget.element.decrementValue;
                               return mutableData;
                             });
+                            widget.onPressed();
                           }
                         : null,
                     elevation: 2.0,
@@ -406,15 +414,18 @@ class _Incrementor extends State<Incrementor> {
                 if (!widget.element.isBool)
                   RawMaterialButton(
                     onPressed: widget.element.count < widget.element.max!()
-                        ? () {
-                            setState(widget.element.increment);
-                            if (widget.onIncrement != null)
-                              widget.onIncrement!();
-                            widget.onPressed();
-                            widget.event
+                        ? () async {
+                            await widget.event
                                 ?.getRef()
                                 ?.runTransaction((mutableData) async {
-                              final teamIndex = widget.team?.number;
+                              var teamIndex;
+                              try {
+                                mutableData.value['teams'] as Map;
+                                teamIndex = widget.team?.number;
+                              } catch (e) {
+                                teamIndex =
+                                    int.parse(widget.team?.number ?? '');
+                              }
                               if (widget.isTargetScore) {
                                 var ref = mutableData.value['teams'][teamIndex]
                                             ['targetScore']
@@ -442,6 +453,11 @@ class _Incrementor extends State<Incrementor> {
                                     (ref ?? 0) + widget.element.incrementValue;
                               return mutableData;
                             });
+                            if (!(widget.event?.shared ?? false))
+                              widget.element.increment();
+                            if (widget.onIncrement != null)
+                              widget.onIncrement!();
+                            widget.onPressed();
                           }
                         : null,
                     elevation: 2.0,
@@ -453,30 +469,38 @@ class _Incrementor extends State<Incrementor> {
                 else
                   PlatformSwitch(
                     value: widget.element.asBool(),
-                    onChanged: (val) {
-                      if (val)
-                        widget.element.count = 1;
-                      else
-                        widget.element.count = 0;
-                      widget.onPressed();
-                      widget.event
+                    onChanged: (val) async {
+                      if (!(widget.event?.shared ?? false)) {
+                        if (val)
+                          widget.element.count = 1;
+                        else
+                          widget.element.count = 0;
+                      }
+                      await widget.event
                           ?.getRef()
                           ?.runTransaction((mutableData) async {
+                        var teamIndex;
+                        try {
+                          mutableData.value['teams'] as Map;
+                          teamIndex = widget.team?.number;
+                        } catch (e) {
+                          teamIndex = int.parse(widget.team?.number ?? '');
+                        }
                         if (widget.isTargetScore &&
                             (mutableData.value['teams'] as Map)
                                 .containsKey(widget.team?.number)) {
-                          mutableData.value['teams'][widget.team?.number]
-                                  ['targetScore'][widget.opModeType?.toRep()]
+                          mutableData.value['teams'][teamIndex]['targetScore']
+                                  [widget.opModeType?.toRep()]
                               [widget.element.key] = val ? 1 : 0;
                           return mutableData;
                         }
                         final scoreIndex = widget.score?.id;
-                        mutableData.value['teams'][widget.team?.number]
-                                    ['scores'][scoreIndex]
-                                [widget.opModeType?.toRep()]
+                        mutableData.value['teams'][teamIndex]['scores']
+                                [scoreIndex][widget.opModeType?.toRep()]
                             [widget.element.key] = val ? 1 : 0;
                         return mutableData;
                       });
+                      widget.onPressed();
                     },
                   )
               ],

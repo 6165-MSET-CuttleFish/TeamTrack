@@ -408,8 +408,15 @@ class _MatchView extends State<MatchView> {
         return mutableData;
       }
       final scoreIndex = _score?.id;
-      mutableData.value['teams'][_selectedTeam?.number]['scores'][scoreIndex]
-          ['TeleScore']['Cycles'] = _score?.teleScore.cycleTimes;
+      var teamIndex;
+      try {
+        mutableData.value['teams'] as Map;
+        teamIndex = _selectedTeam?.number;
+      } catch (e) {
+        teamIndex = int.parse(_selectedTeam?.number ?? '');
+      }
+      mutableData.value['teams'][teamIndex]['scores'][scoreIndex]['TeleScore']
+          ['CycleTimes'] = _score?.teleScore.cycleTimes;
       return mutableData;
     });
   }
@@ -467,14 +474,21 @@ class _MatchView extends State<MatchView> {
         ];
   ScoringElement incrementValue = ScoringElement(
       name: 'Increment Value', min: () => 1, count: 1, key: null);
-  void increaseMisses() {
+  void increaseMisses() async {
     _score?.teleScore.misses.count++;
-    widget.event.getRef()?.runTransaction((mutableData) async {
+    await widget.event.getRef()?.runTransaction((mutableData) async {
+      var teamIndex;
+      try {
+        mutableData.value['teams'] as Map;
+        teamIndex = _selectedTeam?.number;
+      } catch (e) {
+        teamIndex = int.parse(_selectedTeam?.number ?? '');
+      }
       final scoreIndex = _score?.id;
-      var ref = mutableData.value['teams'][_selectedTeam?.number]['scores']
-          [scoreIndex]['TeleScore']['Misses'];
-      mutableData.value['teams'][_selectedTeam?.number]['scores'][scoreIndex]
-          ['TeleScore']['Misses'] = (ref ?? 0) + 1;
+      var ref = mutableData.value['teams'][teamIndex]['scores'][scoreIndex]
+          ['TeleScore']['Misses'];
+      mutableData.value['teams'][teamIndex]['scores'][scoreIndex]['TeleScore']
+          ['Misses'] = (ref ?? 0) + 1;
       return mutableData;
     });
   }
