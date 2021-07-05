@@ -365,10 +365,8 @@ class _TeamView extends State<TeamView> {
                                       )
                                     : null,
                                 show: _selections[1],
-                                spots: _team.scores.values
-                                    .where((e) =>
-                                        e.dice == _dice || _dice == Dice.none)
-                                    .toList()
+                                spots: _team.scores
+                                    .diceScores(_dice)
                                     .spots(null, showPenalties: showPenalties)
                                     .removeOutliers(removeOutliers),
                                 colors: [
@@ -381,10 +379,8 @@ class _TeamView extends State<TeamView> {
                               ),
                               LineChartBarData(
                                 show: _selections[2],
-                                spots: _team.scores.values
-                                    .where((e) =>
-                                        e.dice == _dice || _dice == Dice.none)
-                                    .toList()
+                                spots: _team.scores
+                                    .diceScores(_dice)
                                     .spots(OpModeType.auto)
                                     .removeOutliers(removeOutliers),
                                 colors: [
@@ -397,10 +393,8 @@ class _TeamView extends State<TeamView> {
                               ),
                               LineChartBarData(
                                 show: _selections[3],
-                                spots: _team.scores.values
-                                    .where((e) =>
-                                        e.dice == _dice || _dice == Dice.none)
-                                    .toList()
+                                spots: _team.scores
+                                    .diceScores(_dice)
                                     .spots(OpModeType.tele)
                                     .removeOutliers(removeOutliers),
                                 colors: [
@@ -413,10 +407,8 @@ class _TeamView extends State<TeamView> {
                               ),
                               LineChartBarData(
                                 show: _selections[4],
-                                spots: _team.scores.values
-                                    .where((e) =>
-                                        e.dice == _dice || _dice == Dice.none)
-                                    .toList()
+                                spots: _team.scores
+                                    .diceScores(_dice)
                                     .spots(OpModeType.endgame)
                                     .removeOutliers(removeOutliers),
                                 colors: [

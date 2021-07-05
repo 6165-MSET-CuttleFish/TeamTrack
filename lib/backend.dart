@@ -33,19 +33,19 @@ class Statics {
       'HighGoals': {
         'name': 'High Goals',
         'min': 0,
-        'max': 999999999999999999,
+        'max': 999,
         'value': 12,
       },
       'MidGoals': {
         'name': 'Middle Goals',
         'min': 0,
-        'max': 999999999999999999,
+        'max': 999,
         'value': 6,
       },
       'LowGoals': {
         'name': 'Low Goals',
         'min': 0,
-        'max': 999999999999999999,
+        'max': 999,
         'value': 3,
       },
       'WobbleGoals': {
@@ -72,19 +72,19 @@ class Statics {
       'HighGoals': {
         'name': 'High Goals',
         'min': 0,
-        'max': 999999999999999999,
+        'max': 999,
         'value': 6,
       },
       'MidGoals': {
         'name': 'Middle Goals',
         'min': 0,
-        'max': 999999999999999999,
+        'max': 999,
         'value': 4,
       },
       'LowGoals': {
         'name': 'Low Goals',
         'min': 0,
-        'max': 999999999999999999,
+        'max': 999,
         'value': 2,
       },
     },
@@ -112,7 +112,7 @@ class Statics {
       'RingsOnWobble': {
         'name': 'Rings on Wobble',
         'min': 0,
-        'max': 999999999999999999,
+        'max': 999,
         'value': 5,
       }
     },
@@ -581,7 +581,7 @@ class Alliance {
                       ? getPenalty()
                       : -getPenalty())
                   : 0))
-          .clamp(0, 999999999999999999);
+          .clamp(0, 999);
 
   Alliance.fromJson(
     Map<String, dynamic> json,
@@ -654,8 +654,10 @@ class Match {
   Alliance? red;
   Alliance? blue;
   String id = '';
+  Timestamp timeStamp = Timestamp.now();
   Match(this.red, this.blue, this.type) {
     id = Uuid().v4();
+    timeStamp = Timestamp.now();
     red?.opposingAlliance = blue;
     blue?.opposingAlliance = red;
     red?.id = id;
@@ -685,10 +687,10 @@ class Match {
 
   void setDice(Dice dice) {
     this.dice = dice;
-    red?.team1?.scores[id]?.setDice(dice);
-    red?.team2?.scores[id]?.setDice(dice);
-    blue?.team1?.scores[id]?.setDice(dice);
-    blue?.team2?.scores[id]?.setDice(dice);
+    red?.team1?.scores[id]?.setDice(dice, timeStamp);
+    red?.team2?.scores[id]?.setDice(dice, timeStamp);
+    blue?.team1?.scores[id]?.setDice(dice, timeStamp);
+    blue?.team2?.scores[id]?.setDice(dice, timeStamp);
   }
 
   String score({bool? showPenalties}) {
@@ -732,13 +734,20 @@ class Match {
     blue?.opposingAlliance = red;
     red?.id = id;
     blue?.id = id;
+    try {
+      timeStamp = Timestamp(json['seconds'], json['nanoSeconds']);
+    } catch (e) {
+      timeStamp = Timestamp.now();
+    }
   }
   Map<String, dynamic> toJson() => {
         'red': red?.toJson(),
         'blue': blue?.toJson(),
         'type': type.toString(),
         'dice': dice.toString(),
-        'id': id.toString()
+        'id': id.toString(),
+        'seconds': timeStamp.seconds,
+        'nanoSeconds': timeStamp.nanoseconds,
       };
   int geIndex(Database.MutableData mutableData) =>
       (mutableData.value['matches'] as List)
@@ -808,7 +817,7 @@ extension Arithmetic on Iterable<num> {
     final arr = this.sorted();
     int index = this.length ~/ 2;
     if (this.length % 2 == 0)
-      return [arr[(index - 1).clamp(0, 999999999999999999)], arr[index]].mean();
+      return [arr[(index - 1).clamp(0, 999)], arr[index]].mean();
     return arr[index];
   }
 
@@ -1027,9 +1036,14 @@ extension ScoreDivExtension on List<ScoreDivision> {
         .standardDeviation();
   }
 
-  List<ScoreDivision> diceScores(Dice dice) =>
-      (dice != Dice.none ? this.where((e) => e.getDice() == dice) : this)
-          .toList();
+  List<ScoreDivision> diceScores(Dice dice) {
+    var returnList =
+        (dice != Dice.none ? this.where((e) => e.getDice() == dice) : this)
+            .toList();
+    returnList
+        .sort((a, b) => a.timeStamp.toDate().compareTo(b.timeStamp.toDate()));
+    return returnList;
+  }
 }
 
 extension ScoresExtension on Map<String, Score> {
@@ -1074,8 +1088,13 @@ extension ScoresExtension on Map<String, Score> {
     return 0;
   }
 
-  List<Score> diceScores(Dice? dice) => (dice != Dice.none
-          ? this.values.where((e) => e.dice == dice)
-          : this.values)
-      .toList();
+  List<Score> diceScores(Dice? dice) {
+    var returnList = (dice != Dice.none
+            ? this.values.where((e) => e.getDice() == dice)
+            : this.values)
+        .toList();
+    returnList
+        .sort((a, b) => a.timeStamp.toDate().compareTo(b.timeStamp.toDate()));
+    return returnList;
+  }
 }

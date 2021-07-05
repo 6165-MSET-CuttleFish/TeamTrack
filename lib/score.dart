@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/services.dart';
 import 'package:teamtrack/backend.dart';
 
 class Score extends ScoreDivision {
@@ -8,7 +7,6 @@ class Score extends ScoreDivision {
   AutoScore autoScore = AutoScore();
   EndgameScore endgameScore = EndgameScore();
   Penalty penalties = Penalty();
-  Timestamp timeStamp = Timestamp.now();
   String id = '';
   late Dice dice;
   Score(this.id, this.dice) {
@@ -16,7 +14,7 @@ class Score extends ScoreDivision {
     autoScore = AutoScore();
     endgameScore = EndgameScore();
     penalties = Penalty();
-    setDice(dice);
+    setDice(dice, Timestamp.now());
   }
   List<ScoringElement> getElements({bool? showPenalties}) => [
         ...teleScore.getElements(),
@@ -28,7 +26,7 @@ class Score extends ScoreDivision {
   int total({bool? showPenalties}) => getElements(showPenalties: showPenalties)
       .map((e) => e.scoreValue())
       .reduce((value, element) => value + element)
-      .clamp(0, 999999999999999999);
+      .clamp(0, 999);
   ScoreDivision getScoreDivision(OpModeType? type) {
     switch (type) {
       case OpModeType.auto:
@@ -44,12 +42,17 @@ class Score extends ScoreDivision {
 
   @override
   Dice getDice() => dice;
-  void setDice(Dice value) {
+  void setDice(Dice value, Timestamp time) {
     dice = value;
     autoScore.dice = value;
     teleScore.dice = value;
     endgameScore.dice = value;
     penalties.dice = value;
+    timeStamp = time;
+    autoScore.timeStamp = time;
+    teleScore.timeStamp = time;
+    endgameScore.timeStamp = time;
+    penalties.timeStamp = time;
   }
 
   Score.fromJson(Map<String, dynamic> json, eventType) {
@@ -363,7 +366,7 @@ class ScoringElement {
   int value;
   bool isBool;
   late int Function()? min = () => 0;
-  late int Function()? max = () => 999999999999999999;
+  late int Function()? max = () => 999;
   int incrementValue = 1;
   int decrementValue = 1;
 
@@ -371,7 +374,7 @@ class ScoringElement {
 
   void setStuff() {
     if (min == null) min = () => 0;
-    if (max == null) max = () => 999999999999999999;
+    if (max == null) max = () => 999;
   }
 
   int scoreValue() => count * value;
@@ -395,7 +398,8 @@ abstract class ScoreDivision {
   int total({bool? showPenalties}) => getElements()
       .map((e) => e.scoreValue())
       .reduce((value, element) => value + element)
-      .clamp(0, 999999999999999999);
+      .clamp(0, 999);
   Dice getDice();
   List<ScoringElement> getElements();
+  late Timestamp timeStamp;
 }
