@@ -451,7 +451,7 @@ class _TeamView extends State<TeamView> {
                               yValueMapper: (List<double> cycles, _) =>
                                   cycles.length != 0 ? cycles : [0, 0, 0, 0],
                             ),
-                            ScatterSeries<int, int>(
+                            SplineSeries<int, int>(
                               dataSource: _team.scores
                                   .diceScores(_dice)
                                   .map((e) => e.teleScore.misses.count)

@@ -354,8 +354,6 @@ class _Incrementor extends State<Incrementor> {
                         ? () async {
                             if (!(widget.event?.shared ?? false))
                               setState(widget.element.decrement);
-                            if (widget.onDecrement != null)
-                              widget.onDecrement!();
                             widget.onPressed();
                             await widget.event
                                 ?.getRef()
@@ -395,6 +393,8 @@ class _Incrementor extends State<Incrementor> {
                                     (ref ?? 0) - widget.element.decrementValue;
                               return mutableData;
                             });
+                            if (widget.onDecrement != null)
+                              widget.onDecrement!();
                           }
                         : null,
                     elevation: 2.0,

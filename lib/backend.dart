@@ -601,10 +601,7 @@ class Team {
   Map<String, Score> scores = Map();
   List<Change> changes = [];
   Score? targetScore;
-  Team(String number, String name) {
-    this.name = name;
-    this.number = number;
-  }
+  Team(this.number, this.name);
   static Team nullTeam() {
     return Team("?", "?");
   }

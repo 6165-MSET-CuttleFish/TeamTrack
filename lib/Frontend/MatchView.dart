@@ -477,7 +477,7 @@ class _MatchView extends State<MatchView> {
       name: 'Increment Value', min: () => 1, count: 1, key: null);
   void increaseMisses() async {
     if (!widget.event.shared) _score?.teleScore.misses.count++;
-    await widget.event.getRef()?.runTransaction((mutableData) async {
+    widget.event.getRef()?.runTransaction((mutableData) async {
       var teamIndex;
       try {
         mutableData.value['teams'] as Map;
