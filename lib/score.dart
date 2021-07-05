@@ -378,7 +378,6 @@ class ScoringElement {
 
   void increment() {
     if (count < max!()) {
-      HapticFeedback.mediumImpact();
       count += incrementValue;
       count = count.clamp(min!(), max!());
     }
@@ -386,7 +385,6 @@ class ScoringElement {
 
   void decrement() {
     if (count > min!()) {
-      HapticFeedback.mediumImpact();
       count -= decrementValue;
       count = count.clamp(min!(), max!());
     }

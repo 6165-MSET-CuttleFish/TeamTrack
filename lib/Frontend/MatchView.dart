@@ -380,6 +380,7 @@ class _MatchView extends State<MatchView> {
       );
 
   void stateSetter() {
+    HapticFeedback.mediumImpact();
     dataModel.saveEvents();
     //dataModel.uploadEvent(widget.event);
   }
@@ -475,7 +476,7 @@ class _MatchView extends State<MatchView> {
   ScoringElement incrementValue = ScoringElement(
       name: 'Increment Value', min: () => 1, count: 1, key: null);
   void increaseMisses() async {
-    _score?.teleScore.misses.count++;
+    if (!widget.event.shared) _score?.teleScore.misses.count++;
     await widget.event.getRef()?.runTransaction((mutableData) async {
       var teamIndex;
       try {
@@ -502,6 +503,7 @@ class _MatchView extends State<MatchView> {
               () {
                 _score?.teleScore.getElements().forEach((element) {
                   element.incrementValue = incrementValue.count;
+                  stateSetter();
                 });
               },
             ),
