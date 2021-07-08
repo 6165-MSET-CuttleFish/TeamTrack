@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:collection';
 import 'dart:convert';
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -28,7 +27,7 @@ save(String key, value) async {
 }
 
 class Statics {
-  static String gameName = 'UltimateGoal';
+  static String gameName = remoteConfig.getString("gameName");
   static Map<String, dynamic> skeleton =
       json.decode(remoteConfig.getString("skeleton"));
   // static Map<String, dynamic> skeleton = {

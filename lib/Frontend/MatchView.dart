@@ -39,6 +39,7 @@ class _MatchView extends State<MatchView> {
   _MatchView(this._match, Team? team, Event event) {
     _selectedAlliance = _match?.red;
     if (team != null) {
+      _allowView = true;
       _score = team.targetScore;
       _selectedTeam = team;
       _color = CupertinoColors.systemGreen;
@@ -525,7 +526,7 @@ class _MatchView extends State<MatchView> {
                       element: e,
                       onPressed: stateSetter,
                       onIncrement: onIncrement,
-                      onDecrement: increaseMisses,
+                      onDecrement: widget.team == null ? increaseMisses : null,
                       opModeType: OpModeType.tele,
                       event: widget.event,
                       team: _selectedTeam,
