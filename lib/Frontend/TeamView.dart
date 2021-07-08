@@ -166,18 +166,18 @@ class _TeamView extends State<TeamView> {
               ),
             ),
           ),
-          IconButton(
-            icon: Icon(Icons.list),
-            tooltip: 'Changelist',
-            onPressed: () => Navigator.of(context).push(
-              platformPageRoute(
-                (context) => ChangeList(
-                  team: _team,
-                  event: widget.event,
-                ),
-              ),
-            ),
-          ),
+          // IconButton(
+          //   icon: Icon(Icons.list),
+          //   tooltip: 'Changelist',
+          //   onPressed: () => Navigator.of(context).push(
+          //     platformPageRoute(
+          //       (context) => ChangeList(
+          //         team: _team,
+          //         event: widget.event,
+          //       ),
+          //     ),
+          //   ),
+          // ),
         ],
       ),
       body: StreamBuilder<Database.Event>(
@@ -646,15 +646,20 @@ class _TeamView extends State<TeamView> {
                 Dice.none,
               );
               widget.event.getRef()?.runTransaction((mutableData) async {
-                if ((mutableData.value['teams'] as Map)
-                    .containsKey(widget.team.number)) {
-                  mutableData.value['teams'][widget.team.number]
+                try {
+                  if ((mutableData.value['teams'] as Map)
+                      .containsKey(widget.team.number)) {
+                    mutableData.value['teams'][widget.team.number]
+                            ['targetScore'] =
+                        Score(Uuid().v4(), Dice.none).toJson();
+                  }
+                } catch (e) {
+                  mutableData.value['teams'][int.parse(widget.team.number)]
                       ['targetScore'] = Score(Uuid().v4(), Dice.none).toJson();
                 }
                 return mutableData;
               });
               dataModel.saveEvents();
-              //dataModel.uploadEvent(widget.event);
             }
             await Navigator.push(
               context,

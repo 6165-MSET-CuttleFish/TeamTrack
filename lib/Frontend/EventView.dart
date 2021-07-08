@@ -162,7 +162,6 @@ class _EventView extends State<EventView> {
                 },
               );
               dataModel.saveEvents();
-              //dataModel.uploadEvent(widget.event);
               Navigator.of(context).pop();
             },
           ),
@@ -316,7 +315,6 @@ class _EventView extends State<EventView> {
               controller.text = '';
             }
             dataModel.saveEvents();
-            //dataModel.uploadEvent(widget.event);
             Navigator.pop(context);
           }
         },

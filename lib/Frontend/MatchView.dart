@@ -382,7 +382,6 @@ class _MatchView extends State<MatchView> {
   void stateSetter() {
     HapticFeedback.mediumImpact();
     dataModel.saveEvents();
-    //dataModel.uploadEvent(widget.event);
   }
 
   Alliance? getPenaltyAlliance() {
@@ -417,7 +416,7 @@ class _MatchView extends State<MatchView> {
         teamIndex = int.parse(_selectedTeam?.number ?? '');
       }
       mutableData.value['teams'][teamIndex]['scores'][scoreIndex]['TeleScore']
-          ['CycleTimes'] = _score?.teleScore.cycleTimes;
+          ['CycleTimes'] = lapses;
       return mutableData;
     });
   }

@@ -622,12 +622,13 @@ class _EventsList extends State<EventsList> {
               );
               if (!e.shared) {
                 e.shared = true;
+                var json = e.toJson();
+                var uid = context.read<User?>()?.uid;
+                if (uid != null) json.addAll({uid: true});
                 firebaseDatabase
                     .reference()
-                    .child("Events")
-                    .child(Statics.gameName)
-                    .child(e.id)
-                    .set(e.toJson());
+                    .child("Events/${Statics.gameName}/${e.id}}")
+                    .set(json);
                 dataModel.saveEvents();
               }
               Navigator.of(context).pop();
