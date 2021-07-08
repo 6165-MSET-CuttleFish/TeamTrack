@@ -29,7 +29,8 @@ class _TeamView extends State<TeamView> {
   final _selections = [true, true, false, false, false];
   Team _team = Team.nullTeam();
   bool removeOutliers = false;
-  final endgameColor = Colors.red;
+  final endgameColor = Colors.deepOrange;
+  final penaltyColor = Colors.red;
   final teleColor = Colors.blue;
   final autoColor = Colors.green;
   final generalColor = Color.fromRGBO(230, 30, 213, 1);

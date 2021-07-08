@@ -20,9 +20,9 @@ Future<void> main() async {
   bool updated = await remoteConfig.fetchAndActivate();
   if (updated) {
     Statics.gameName = remoteConfig.getString("gameName");
-    var x = remoteConfig.getValue("skeleton").asString();
-    Statics.skeleton = json.decode(
-        x); // the config has been updated, new parameter values are available.
+    Statics.skeleton = json.decode(remoteConfig
+        .getValue("skeleton")
+        .asString()); // the config has been updated, new parameter values are available.
   } else {
     // the config values were previously updated.
   }

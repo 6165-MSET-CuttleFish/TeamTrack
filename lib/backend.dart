@@ -28,13 +28,6 @@ save(String key, value) async {
 }
 
 class Statics {
-  Statics() {
-    updateFields();
-  }
-  void updateFields() async {
-    
-  }
-
   static String gameName = 'UltimateGoal';
   static Map<String, dynamic> skeleton =
       json.decode(remoteConfig.getString("skeleton"));
@@ -270,7 +263,6 @@ final Database.FirebaseDatabase firebaseDatabase =
 final FirebaseFunctions functions = FirebaseFunctions.instance;
 final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 final RemoteConfig remoteConfig = RemoteConfig.instance;
-final Statics statics = Statics();
 
 class DataModel {
   final List<String> keys = [Statics.gameName];
@@ -944,6 +936,8 @@ extension colorExt on OpModeType? {
       case OpModeType.tele:
         return Colors.blue;
       case OpModeType.endgame:
+        return Colors.deepOrange;
+      case OpModeType.penalty:
         return Colors.red;
       default:
         return Color.fromRGBO(230, 30, 213, 1);
