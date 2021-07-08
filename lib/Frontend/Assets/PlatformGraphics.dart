@@ -320,11 +320,13 @@ class Incrementor extends StatefulWidget {
     this.score,
     this.opModeType,
     this.isTargetScore = false,
+    this.mutableDataDealer,
   }) : super(key: key);
   final ScoringElement element;
   final void Function() onPressed;
   final void Function()? onIncrement;
   final void Function()? onDecrement;
+  final Future<void> Function(Db.MutableData)? mutableDataDealer;
   final Color? backgroundColor;
   final Team? team;
   final Event? event;
@@ -479,24 +481,18 @@ class _Incrementor extends State<Incrementor> {
                       widget.onPressed();
                       await widget.event
                           ?.getRef()
-                          ?.runTransaction((mutableData) async {
-                        var teamIndex;
-                        try {
-                          mutableData.value['teams'] as Map;
-                          teamIndex = widget.team?.number;
-                        } catch (e) {
-                          teamIndex = int.parse(widget.team?.number ?? '');
-                        }
+                          ?.child('teams/${widget.team?.number}')
+                          .runTransaction((mutableData) async {
                         if (widget.isTargetScore &&
                             (mutableData.value['teams'] as Map)
                                 .containsKey(widget.team?.number)) {
-                          mutableData.value['teams'][teamIndex]['targetScore']
+                          mutableData.value['targetScore']
                                   [widget.opModeType?.toRep()]
                               [widget.element.key] = val ? 1 : 0;
                           return mutableData;
                         }
                         final scoreIndex = widget.score?.id;
-                        mutableData.value['teams'][teamIndex]['scores']
+                        mutableData.value['scores']
                                 [scoreIndex][widget.opModeType?.toRep()]
                             [widget.element.key] = val ? 1 : 0;
                         return mutableData;
