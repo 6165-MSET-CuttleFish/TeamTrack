@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:collection';
 import 'dart:convert';
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -15,6 +14,7 @@ import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 
 read(String key) async {
   final prefs = await SharedPreferences.getInstance();
@@ -27,96 +27,98 @@ save(String key, value) async {
 }
 
 class Statics {
-  static final String gameName = 'UltimateGoal';
-  static Map<String, dynamic> skeleton = {
-    'AutoScore': {
-      'HighGoals': {
-        'name': 'High Goals',
-        'min': 0,
-        'max': 999,
-        'value': 12,
-      },
-      'MidGoals': {
-        'name': 'Middle Goals',
-        'min': 0,
-        'max': 999,
-        'value': 6,
-      },
-      'LowGoals': {
-        'name': 'Low Goals',
-        'min': 0,
-        'max': 999,
-        'value': 3,
-      },
-      'WobbleGoals': {
-        'name': 'Wobble Goals',
-        'min': 0,
-        'max': 2,
-        'value': 15,
-      },
-      'PowerShots': {
-        'name': 'Power Shots',
-        'min': 0,
-        'max': 3,
-        'value': 15,
-      },
-      'Navigated': {
-        'name': 'Navigated',
-        'min': 0,
-        'max': 1,
-        'value': 5,
-        'isBool': true,
-      },
-    },
-    'TeleScore': {
-      'HighGoals': {
-        'name': 'High Goals',
-        'min': 0,
-        'max': 999,
-        'value': 6,
-      },
-      'MidGoals': {
-        'name': 'Middle Goals',
-        'min': 0,
-        'max': 999,
-        'value': 4,
-      },
-      'LowGoals': {
-        'name': 'Low Goals',
-        'min': 0,
-        'max': 999,
-        'value': 2,
-      },
-    },
-    'EndgameScore': {
-      'PowerShots': {
-        'name': 'Power Shots',
-        'min': 0,
-        'max': 3,
-        'value': 15,
-      },
-      'WobblesInDrop': {
-        'name': 'Wobbles in Drop',
-        'maxIsReference': true,
-        'min': 0,
-        'max': {'total': 2, 'reference': 'WobblesInStart'},
-        'value': 20,
-      },
-      'WobblesInStart': {
-        'name': 'Wobbles in Start',
-        'maxIsReference': true,
-        'min': 0,
-        'max': {'total': 2, 'reference': 'WobblesInDrop'},
-        'value': 5,
-      },
-      'RingsOnWobble': {
-        'name': 'Rings on Wobble',
-        'min': 0,
-        'max': 999,
-        'value': 5,
-      }
-    },
-  };
+  static String gameName = remoteConfig.getString("gameName");
+  static Map<String, dynamic> skeleton =
+      json.decode(remoteConfig.getString("skeleton"));
+  // static Map<String, dynamic> skeleton = {
+  //   'AutoScore': {
+  //     'HighGoals': {
+  //       'name': 'High Goals',
+  //       'min': 0,
+  //       'max': 999,
+  //       'value': 12,
+  //     },
+  //     'MidGoals': {
+  //       'name': 'Middle Goals',
+  //       'min': 0,
+  //       'max': 999,
+  //       'value': 6,
+  //     },
+  //     'LowGoals': {
+  //       'name': 'Low Goals',
+  //       'min': 0,
+  //       'max': 999,
+  //       'value': 3,
+  //     },
+  //     'WobbleGoals': {
+  //       'name': 'Wobble Goals',
+  //       'min': 0,
+  //       'max': 2,
+  //       'value': 15,
+  //     },
+  //     'PowerShots': {
+  //       'name': 'Power Shots',
+  //       'min': 0,
+  //       'max': 3,
+  //       'value': 15,
+  //     },
+  //     'Navigated': {
+  //       'name': 'Navigated',
+  //       'min': 0,
+  //       'max': 1,
+  //       'value': 5,
+  //       'isBool': true,
+  //     },
+  //   },
+  //   'TeleScore': {
+  //     'HighGoals': {
+  //       'name': 'High Goals',
+  //       'min': 0,
+  //       'max': 999,
+  //       'value': 6,
+  //     },
+  //     'MidGoals': {
+  //       'name': 'Middle Goals',
+  //       'min': 0,
+  //       'max': 999,
+  //       'value': 4,
+  //     },
+  //     'LowGoals': {
+  //       'name': 'Low Goals',
+  //       'min': 0,
+  //       'max': 999,
+  //       'value': 2,
+  //     },
+  //   },
+  //   'EndgameScore': {
+  //     'PowerShots': {
+  //       'name': 'Power Shots',
+  //       'min': 0,
+  //       'max': 3,
+  //       'value': 15,
+  //     },
+  //     'WobblesInDrop': {
+  //       'name': 'Wobbles in Drop',
+  //       'maxIsReference': true,
+  //       'min': 0,
+  //       'max': {'total': 2, 'reference': 'WobblesInStart'},
+  //       'value': 20,
+  //     },
+  //     'WobblesInStart': {
+  //       'name': 'Wobbles in Start',
+  //       'maxIsReference': true,
+  //       'min': 0,
+  //       'max': {'total': 2, 'reference': 'WobblesInDrop'},
+  //       'value': 5,
+  //     },
+  //     'RingsOnWobble': {
+  //       'name': 'Rings on Wobble',
+  //       'min': 0,
+  //       'max': 999,
+  //       'value': 5,
+  //     }
+  //   },
+  // };
 }
 
 class DarkThemeProvider with ChangeNotifier {
@@ -259,6 +261,7 @@ final Database.FirebaseDatabase firebaseDatabase =
     Database.FirebaseDatabase.instance;
 final FirebaseFunctions functions = FirebaseFunctions.instance;
 final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+final RemoteConfig remoteConfig = RemoteConfig.instance;
 
 class DataModel {
   final List<String> keys = [Statics.gameName];
@@ -932,6 +935,8 @@ extension colorExt on OpModeType? {
       case OpModeType.tele:
         return Colors.blue;
       case OpModeType.endgame:
+        return Colors.deepOrange;
+      case OpModeType.penalty:
         return Colors.red;
       default:
         return Color.fromRGBO(230, 30, 213, 1);

@@ -79,7 +79,6 @@ class _MatchList extends State<MatchList> {
                                     ),
                                   );
                                   dataModel.saveEvents();
-                                  //dataModel.uploadEvent(widget.event);
                                   Navigator.pop(context);
                                 },
                               );
@@ -134,7 +133,6 @@ class _MatchList extends State<MatchList> {
                                       },
                                     );
                                     dataModel.saveEvents();
-                                    // dataModel.uploadEvent(widget.event);
                                     Navigator.of(context).pop();
                                   },
                                 ),
@@ -230,7 +228,6 @@ class _MatchList extends State<MatchList> {
                             setState(
                                 () => widget.event.deleteMatch(matches[i]));
                             dataModel.saveEvents();
-                            //dataModel.uploadEvent(widget.event);
                             Navigator.of(context).pop();
                           },
                         ),
@@ -316,7 +313,6 @@ class _MatchList extends State<MatchList> {
                             () => widget.event.deleteMatch(e),
                           );
                           dataModel.saveEvents();
-                          //dataModel.uploadEvent(widget.event);
                           Navigator.of(context).pop();
                         },
                       ),

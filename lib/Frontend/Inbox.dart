@@ -75,17 +75,45 @@ class _InboxState extends State<Inbox> {
                               color: Colors.green,
                             ),
                             onPressed: () async {
+                              var doc = e.data();
+                              doc['receiveDate'] = Timestamp.now();
+                              final documentReference = firebaseFirestore
+                                  .collection('users')
+                                  .doc(context.read<User?>()?.uid);
+                              firebaseFirestore
+                                  .runTransaction((transaction) async {
+                                    // Get the document
+                                    DocumentSnapshot snapshot =
+                                        await transaction
+                                            .get(documentReference);
+
+                                    if (!snapshot.exists) {
+                                      throw Exception("User does not exist!");
+                                    }
+
+                                    List<Map> newEventsList =
+                                        (snapshot.data() as Map)["Events"]
+                                            [Statics.gameName] as List<Map>;
+                                    newEventsList.add(doc);
+                                    List<Map> newInbox =
+                                        (snapshot.data() as Map)["Inbox"]
+                                            [Statics.gameName] as List<Map>;
+                                    newInbox.remove(e.data());
+                                    // Perform an update on the document
+                                    transaction.update(documentReference, {
+                                      'Events': newEventsList,
+                                      'Inbox': newInbox,
+                                    });
+                                    return doc;
+                                  })
+                                  .then((value) =>
+                                      print("Follower count updated to $value"))
+                                  .catchError((error) => print(
+                                      "Failed to update user followers: $error"));
                               firebaseFirestore
                                   .collection('users')
-                                  .doc(context.read<User?>()?.email)
-                                  .collection(Statics.gameName)
-                                  .add(
-                                {
-                                  'id': e['id'],
-                                  'name': e['name'],
-                                  'type': e['type'],
-                                },
-                              );
+                                  .doc(context.read<User?>()?.uid)
+                                  .collection(Statics.gameName);
                               var event = Event(
                                   name: e['name'],
                                   type: getTypeFromString(e['type']));

@@ -39,6 +39,7 @@ class _MatchView extends State<MatchView> {
   _MatchView(this._match, Team? team, Event event) {
     _selectedAlliance = _match?.red;
     if (team != null) {
+      _allowView = true;
       _score = team.targetScore;
       _selectedTeam = team;
       _color = CupertinoColors.systemGreen;
@@ -382,7 +383,6 @@ class _MatchView extends State<MatchView> {
   void stateSetter() {
     HapticFeedback.mediumImpact();
     dataModel.saveEvents();
-    //dataModel.uploadEvent(widget.event);
   }
 
   Alliance? getPenaltyAlliance() {
@@ -417,7 +417,7 @@ class _MatchView extends State<MatchView> {
         teamIndex = int.parse(_selectedTeam?.number ?? '');
       }
       mutableData.value['teams'][teamIndex]['scores'][scoreIndex]['TeleScore']
-          ['CycleTimes'] = _score?.teleScore.cycleTimes;
+          ['CycleTimes'] = lapses;
       return mutableData;
     });
   }
@@ -526,7 +526,7 @@ class _MatchView extends State<MatchView> {
                       element: e,
                       onPressed: stateSetter,
                       onIncrement: onIncrement,
-                      onDecrement: increaseMisses,
+                      onDecrement: widget.team == null ? increaseMisses : null,
                       opModeType: OpModeType.tele,
                       event: widget.event,
                       team: _selectedTeam,

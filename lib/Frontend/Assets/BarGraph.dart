@@ -18,6 +18,10 @@ class BarGraph extends StatelessWidget {
   final double height;
   @override
   Widget build(BuildContext context) {
+    var percentage = (inverted
+            ? (val != 0 ? (max / val).clamp(0, 1) : 1) * 100.0
+            : (max != 0 ? val / max : 0) * 100.0)
+        .toInt();
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -46,6 +50,15 @@ class BarGraph extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(60),
                 color: _colorSelect(val, max),
+              ),
+              child: Center(
+                child: Text(
+                  percentage != 0 ? percentage.toString() + '%' : '',
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: Colors.black,
+                  ),
+                ),
               ),
             ),
           ],

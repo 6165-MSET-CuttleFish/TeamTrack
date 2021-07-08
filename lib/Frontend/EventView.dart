@@ -153,6 +153,10 @@ class _EventView extends State<EventView> {
             onPressed: () {
               setState(
                 () {
+                  _newNumber = _newNumber.split('').reduce((value, element) =>
+                      int.tryParse(element) != null
+                          ? value += element
+                          : value = value);
                   if (_newNumber.isNotEmpty && _newName.isNotEmpty)
                     widget.event.addTeam(
                       Team(_newNumber, _newName),
@@ -162,7 +166,6 @@ class _EventView extends State<EventView> {
                 },
               );
               dataModel.saveEvents();
-              //dataModel.uploadEvent(widget.event);
               Navigator.of(context).pop();
             },
           ),
@@ -178,10 +181,6 @@ class _EventView extends State<EventView> {
     TextEditingController(),
   ];
   final names = ['', '', '', ''];
-  String r0 = '';
-  String r1 = '';
-  String b0 = '';
-  String b1 = '';
   final _formKey = GlobalKey<FormState>();
   List<Widget> _textFields() {
     var list = <Widget>[];
@@ -241,9 +240,12 @@ class _EventView extends State<EventView> {
                 onChanged: (String val) {
                   setState(
                     () {
-                      names[i] = val;
+                      names[i] = val.split('').reduce((value, element) =>
+                          int.tryParse(element) != null
+                              ? value += element
+                              : value = value);
                       controllers[i].value = TextEditingValue(
-                        text: widget.event.teams[val]?.name ?? '',
+                        text: widget.event.teams[names[i]]?.name ?? '',
                         selection: TextSelection.fromPosition(
                           TextPosition(offset: val.length),
                         ),
@@ -316,7 +318,6 @@ class _EventView extends State<EventView> {
               controller.text = '';
             }
             dataModel.saveEvents();
-            //dataModel.uploadEvent(widget.event);
             Navigator.pop(context);
           }
         },
