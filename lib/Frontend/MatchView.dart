@@ -8,7 +8,6 @@ import 'package:teamtrack/backend.dart';
 import 'package:teamtrack/score.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
-import 'package:uuid/uuid.dart';
 
 class MatchView extends StatefulWidget {
   MatchView({Key? key, this.match, this.team, required this.event})
@@ -55,9 +54,7 @@ class _MatchView extends State<MatchView> {
   Widget build(BuildContext context) => StreamBuilder<Database.Event>(
         stream: DatabaseServices(id: widget.event.id).getEventChanges,
         builder: (context, eventHandler) {
-          if (eventHandler.hasData &&
-              !eventHandler.hasError &&
-              !dataModel.isProcessing) {
+          if (eventHandler.hasData && !eventHandler.hasError) {
             widget.event.updateLocal(
               json.decode(
                 json.encode(eventHandler.data?.snapshot.value),

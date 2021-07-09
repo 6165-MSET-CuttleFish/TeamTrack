@@ -10,9 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'score.dart';
 import 'package:uuid/uuid.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 
@@ -74,8 +72,10 @@ class AuthenticationService {
   final FirebaseAuth _firebaseAuth;
   AuthenticationService(this._firebaseAuth);
   Stream<User?> get authStateChanges => _firebaseAuth.idTokenChanges();
-  Future<String?> signIn(
-      {required String email, required String password}) async {
+  Future<String?> signIn({
+    required String email,
+    required String password,
+  }) async {
     try {
       await _firebaseAuth.signInWithEmailAndPassword(
           email: email, password: password);
@@ -85,10 +85,11 @@ class AuthenticationService {
     }
   }
 
-  Future<String?> signUp(
-      {required String email,
-      required String password,
-      required String displayName}) async {
+  Future<String?> signUp({
+    required String email,
+    required String password,
+    required String displayName,
+  }) async {
     try {
       await _firebaseAuth.createUserWithEmailAndPassword(
           email: email, password: password);
@@ -104,8 +105,7 @@ class AuthenticationService {
   }
 
   Future<UserCredential?> signInWithGoogle() async {
-    // Trigger the authentication flow
-    final GoogleSignInAccount? googleUser = await (GoogleSignIn().signIn());
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
     if (googleUser != null) {
       // Obtain the auth details from the request
       final GoogleSignInAuthentication googleAuth =
@@ -157,8 +157,6 @@ class DataModel {
     prefs.setString(keys[0], jsonEncode(coded));
     print(coded);
   }
-
-  bool isProcessing = false;
 
   Future<void> restoreEvents() async {
     try {

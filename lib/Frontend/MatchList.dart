@@ -22,9 +22,7 @@ class _MatchList extends State<MatchList> {
     return StreamBuilder<Database.Event>(
       stream: DatabaseServices(id: widget.event.id).getEventChanges,
       builder: (context, eventHandler) {
-        if (eventHandler.hasData &&
-            !eventHandler.hasError &&
-            !dataModel.isProcessing) {
+        if (eventHandler.hasData && !eventHandler.hasError) {
           widget.event.updateLocal(
             json.decode(
               json.encode(eventHandler.data?.snapshot.value),

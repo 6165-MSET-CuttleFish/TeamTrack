@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
 import 'package:teamtrack/Frontend/EventsList.dart';
 import 'package:teamtrack/Frontend/Login.dart';
+import 'package:teamtrack/Frontend/Verify.dart';
 import 'package:teamtrack/PushNotifications.dart';
 import 'package:teamtrack/backend.dart';
 import 'package:flutter/cupertino.dart';
@@ -109,6 +110,8 @@ class AuthenticationWrapper extends StatelessWidget {
     final firebaseUser = context.watch<User?>();
     if (firebaseUser == null) {
       return LoginView();
+    } else if (!firebaseUser.emailVerified && !firebaseUser.isAnonymous) {
+      return Verify();
     } else {
       return EventsList();
     }
