@@ -74,6 +74,7 @@ class _EventsList extends State<EventsList> {
                   child: Row(
                     children: [
                       Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -87,8 +88,14 @@ class _EventsList extends State<EventsList> {
                             )
                           else
                             Icon(Icons.account_circle, size: 70),
-                          Text(context.read<User?>()?.displayName ?? "Guest"),
-                          Text(context.read<User?>()?.email ?? ""),
+                          Text(
+                            context.read<User?>()?.displayName ?? "Guest",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          Text(
+                            context.read<User?>()?.email ?? "",
+                            style: TextStyle(color: Colors.white),
+                          ),
                         ],
                       ),
                     ],
@@ -573,59 +580,77 @@ class _EventsList extends State<EventsList> {
       );
   TextEditingController _emailController = TextEditingController();
   void _onShare(Event e) {
-    showPlatformDialog(
-      context: context,
-      builder: (context) => PlatformAlert(
-        title: Text('Share Event'),
-        content: PlatformTextField(
-          placeholder: 'Email',
-          keyboardType: TextInputType.emailAddress,
-          controller: _emailController,
+    if (!(context.read<User?>()?.isAnonymous ?? true))
+      showPlatformDialog(
+        context: context,
+        builder: (context) => PlatformAlert(
+          title: Text('Share Event'),
+          content: PlatformTextField(
+            placeholder: 'Email',
+            keyboardType: TextInputType.emailAddress,
+            controller: _emailController,
+          ),
+          actions: [
+            PlatformDialogAction(
+              child: Text('Cancel'),
+              isDefaultAction: true,
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            PlatformDialogAction(
+              child: Text('Share'),
+              onPressed: () {
+                firebaseFirestore
+                    .collection('inboxes')
+                    .doc(Statics.gameName)
+                    .collection(_emailController.text.trim())
+                    .add(
+                  {
+                    'name': e.name,
+                    'senderEmail': context.read<User?>()?.email,
+                    'senderName': context.read<User?>()?.displayName,
+                    'sendDate': Timestamp.now(),
+                    'authorName': e.authorName,
+                    'authorEmail': e.authorEmail,
+                    'creationDate': e.timeStamp,
+                    'id': e.id,
+                    'type': e.type.toString(),
+                  },
+                );
+                if (!e.shared) {
+                  e.shared = true;
+                  var json = e.toJson();
+                  var uid = context.read<User?>()?.uid;
+                  if (uid != null) json.addAll({uid: true});
+                  firebaseDatabase
+                      .reference()
+                      .child("Events/${Statics.gameName}/${e.id}}")
+                      .set(json);
+                  dataModel.saveEvents();
+                }
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
         ),
-        actions: [
-          PlatformDialogAction(
-            child: Text('Cancel'),
-            isDefaultAction: true,
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-          PlatformDialogAction(
-            child: Text('Share'),
-            onPressed: () {
-              firebaseFirestore
-                  .collection('inboxes')
-                  .doc(Statics.gameName)
-                  .collection(_emailController.text.trim())
-                  .add(
-                {
-                  'name': e.name,
-                  'senderEmail': context.read<User?>()?.email,
-                  'senderName': context.read<User?>()?.displayName,
-                  'sendDate': Timestamp.now(),
-                  'authorName': e.authorName,
-                  'authorEmail': e.authorEmail,
-                  'creationDate': e.timeStamp,
-                  'id': e.id,
-                  'type': e.type.toString(),
-                },
-              );
-              if (!e.shared) {
-                e.shared = true;
-                var json = e.toJson();
-                var uid = context.read<User?>()?.uid;
-                if (uid != null) json.addAll({uid: true});
-                firebaseDatabase
-                    .reference()
-                    .child("Events/${Statics.gameName}/${e.id}}")
-                    .set(json);
-                dataModel.saveEvents();
-              }
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      ),
-    );
+      );
+    else
+      showPlatformDialog(
+        context: context,
+        builder: (context) => PlatformAlert(
+          title: Text('Cannot Share Event'),
+          content: Text('You must be logged in to share an event.'),
+          actions: [
+            PlatformDialogAction(
+              child: Text('OK'),
+              isDefaultAction: true,
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        ),
+      );
   }
 }

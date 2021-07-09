@@ -165,7 +165,7 @@ class _LoginView extends State<LoginView> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [Icon(Icons.person), Text('Anonymous Sign In')],
+            children: [Icon(Icons.visibility_off), Text('Anonymous Sign In')],
           ),
         ),
         EmailAuthButton(
