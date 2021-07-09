@@ -320,13 +320,15 @@ class Incrementor extends StatefulWidget {
     this.score,
     this.opModeType,
     this.isTargetScore = false,
-    this.mutableDataDealer,
+    this.mutableIncrement,
+    this.mutableDecrement,
   }) : super(key: key);
   final ScoringElement element;
   final void Function() onPressed;
   final void Function()? onIncrement;
   final void Function()? onDecrement;
-  final Future<void> Function(Db.MutableData)? mutableDataDealer;
+  final Db.MutableData Function(Db.MutableData)? mutableIncrement;
+  final Db.MutableData Function(Db.MutableData)? mutableDecrement;
   final Color? backgroundColor;
   final Team? team;
   final Event? event;
@@ -354,28 +356,24 @@ class _Incrementor extends State<Incrementor> {
                   RawMaterialButton(
                     onPressed: widget.element.count > widget.element.min!()
                         ? () async {
-                            if (!(widget.event?.shared ?? false))
+                            if (!(widget.event?.shared ?? false)) {
                               setState(widget.element.decrement);
-                            widget.onPressed();
+                              if (widget.onDecrement != null)
+                                widget.onDecrement!();
+                            }
                             await widget.event
                                 ?.getRef()
-                                ?.runTransaction((mutableData) async {
-                              var teamIndex;
-                              try {
-                                mutableData.value['teams'] as Map;
-                                teamIndex = widget.team?.number;
-                              } catch (e) {
-                                teamIndex =
-                                    int.parse(widget.team?.number ?? '');
+                                ?.child('teams/${widget.team?.number}')
+                                .runTransaction((mutableData) async {
+                              if (widget.mutableDecrement != null) {
+                                return widget.mutableDecrement!(mutableData);
                               }
                               if (widget.isTargetScore) {
-                                var ref = mutableData.value['teams'][teamIndex]
-                                            ['targetScore']
+                                var ref = mutableData.value['targetScore']
                                         [widget.opModeType?.toRep()]
                                     [widget.element.key];
                                 if (ref > widget.element.min!())
-                                  mutableData.value['teams'][teamIndex]
-                                                  ['targetScore']
+                                  mutableData.value['targetScore']
                                               [widget.opModeType?.toRep()]
                                           [widget.element.key] =
                                       (ref ?? 0) -
@@ -383,20 +381,17 @@ class _Incrementor extends State<Incrementor> {
                                 return mutableData;
                               }
                               final scoreIndex = widget.score?.id;
-                              var ref = mutableData.value['teams'][teamIndex]
-                                          ['scores'][scoreIndex]
+                              var ref = mutableData.value['scores'][scoreIndex]
                                       [widget.opModeType?.toRep()]
                                   [widget.element.key];
                               if (ref > widget.element.min!())
-                                mutableData.value['teams'][teamIndex]['scores']
-                                                [scoreIndex]
+                                mutableData.value['scores'][scoreIndex]
                                             [widget.opModeType?.toRep()]
                                         [widget.element.key] =
                                     (ref ?? 0) - widget.element.decrementValue;
                               return mutableData;
                             });
-                            if (widget.onDecrement != null)
-                              widget.onDecrement!();
+                            widget.onPressed();
                           }
                         : null,
                     elevation: 2.0,
@@ -417,26 +412,24 @@ class _Incrementor extends State<Incrementor> {
                   RawMaterialButton(
                     onPressed: widget.element.count < widget.element.max!()
                         ? () async {
-                            widget.onPressed();
+                            if (!(widget.event?.shared ?? false)) {
+                              widget.element.increment();
+                              if (widget.onIncrement != null)
+                                widget.onIncrement!();
+                            }
                             await widget.event
                                 ?.getRef()
-                                ?.runTransaction((mutableData) async {
-                              var teamIndex;
-                              try {
-                                mutableData.value['teams'] as Map;
-                                teamIndex = widget.team?.number;
-                              } catch (e) {
-                                teamIndex =
-                                    int.parse(widget.team?.number ?? '');
+                                ?.child('teams/${widget.team?.number}')
+                                .runTransaction((mutableData) async {
+                              if (widget.mutableIncrement != null) {
+                                return widget.mutableIncrement!(mutableData);
                               }
                               if (widget.isTargetScore) {
-                                var ref = mutableData.value['teams'][teamIndex]
-                                            ['targetScore']
+                                var ref = mutableData.value['targetScore']
                                         [widget.opModeType?.toRep()]
                                     [widget.element.key];
                                 if (ref < widget.element.max!())
-                                  mutableData.value['teams'][teamIndex]
-                                                  ['targetScore']
+                                  mutableData.value['targetScore']
                                               [widget.opModeType?.toRep()]
                                           [widget.element.key] =
                                       (ref ?? 0) +
@@ -444,22 +437,17 @@ class _Incrementor extends State<Incrementor> {
                                 return mutableData;
                               }
                               final scoreIndex = widget.score?.id;
-                              var ref = mutableData.value['teams'][teamIndex]
-                                          ['scores'][scoreIndex]
+                              var ref = mutableData.value['scores'][scoreIndex]
                                       [widget.opModeType?.toRep()]
                                   [widget.element.key];
                               if (ref < widget.element.max!())
-                                mutableData.value['teams'][teamIndex]['scores']
-                                                [scoreIndex]
+                                mutableData.value['scores'][scoreIndex]
                                             [widget.opModeType?.toRep()]
                                         [widget.element.key] =
                                     (ref ?? 0) + widget.element.incrementValue;
                               return mutableData;
                             });
-                            if (!(widget.event?.shared ?? false))
-                              widget.element.increment();
-                            if (widget.onIncrement != null)
-                              widget.onIncrement!();
+                            widget.onPressed();
                           }
                         : null,
                     elevation: 2.0,
@@ -478,25 +466,23 @@ class _Incrementor extends State<Incrementor> {
                         else
                           widget.element.count = 0;
                       }
-                      widget.onPressed();
                       await widget.event
                           ?.getRef()
                           ?.child('teams/${widget.team?.number}')
                           .runTransaction((mutableData) async {
-                        if (widget.isTargetScore &&
-                            (mutableData.value['teams'] as Map)
-                                .containsKey(widget.team?.number)) {
+                        if (widget.isTargetScore) {
                           mutableData.value['targetScore']
                                   [widget.opModeType?.toRep()]
                               [widget.element.key] = val ? 1 : 0;
                           return mutableData;
                         }
                         final scoreIndex = widget.score?.id;
-                        mutableData.value['scores']
-                                [scoreIndex][widget.opModeType?.toRep()]
+                        mutableData.value['scores'][scoreIndex]
+                                [widget.opModeType?.toRep()]
                             [widget.element.key] = val ? 1 : 0;
                         return mutableData;
                       });
+                      widget.onPressed();
                     },
                   )
               ],

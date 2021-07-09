@@ -213,6 +213,8 @@ class TeleScore extends ScoreDivision {
     } catch (e) {
       cycleTimes = [];
     }
+    teleCycles = map['TeleCycles'] ?? 0;
+    endgameCycles = map['EndgameCycles'] ?? 0;
     misses = ScoringElement(
         name: 'Misses', count: map['Misses'] ?? 0, key: 'Misses', value: 1);
 
@@ -222,6 +224,8 @@ class TeleScore extends ScoreDivision {
         ...elements.map((key, value) => MapEntry(key, value.count)),
         'Misses': misses.count,
         'CycleTimes': json.encode(cycleTimes),
+        'TeleCycles': teleCycles,
+        'EndgameCycles': endgameCycles,
       };
 }
 

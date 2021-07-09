@@ -18,12 +18,19 @@ Future<void> main() async {
   bool updated = await remoteConfig.fetchAndActivate();
   if (updated) {
     Statics.gameName = remoteConfig.getString("gameName");
-    Statics.skeleton = json.decode(remoteConfig
-        .getValue("skeleton")
-        .asString()); // the config has been updated, new parameter values are available.
+    Statics.skeleton =
+        json.decode(remoteConfig.getValue(Statics.gameName).asString());
   } else {
-    // the config values were previously updated.
+    Statics.gameName = remoteConfig.getString("gameName");
+    try {
+      Statics.skeleton =
+          json.decode(remoteConfig.getValue(Statics.gameName).asString());
+    } catch (e) {
+      Statics.skeleton =
+          json.decode(remoteConfig.getValue("skeleton").asString());
+    }
   }
+  await dataModel.restoreEvents();
   runApp(MyApp());
 }
 

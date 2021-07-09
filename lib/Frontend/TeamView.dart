@@ -1,7 +1,6 @@
 import 'dart:math';
 import 'package:teamtrack/Frontend/Assets/Collapsible.dart';
 import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
-import 'package:teamtrack/Frontend/ChangeList.dart';
 import 'package:teamtrack/Frontend/MatchList.dart';
 import 'package:teamtrack/Frontend/MatchView.dart';
 import 'package:teamtrack/backend.dart';
@@ -551,7 +550,7 @@ class _TeamView extends State<TeamView> {
                       color: generalColor,
                     ),
                   ),
-                  child: Text('General'),
+                  child: Text('Subtotal'),
                   onPressed: () {
                     setState(
                       () {
@@ -646,18 +645,12 @@ class _TeamView extends State<TeamView> {
                 Uuid().v4(),
                 Dice.none,
               );
-              widget.event.getRef()?.runTransaction((mutableData) async {
-                try {
-                  if ((mutableData.value['teams'] as Map)
-                      .containsKey(widget.team.number)) {
-                    mutableData.value['teams'][widget.team.number]
-                            ['targetScore'] =
-                        Score(Uuid().v4(), Dice.none).toJson();
-                  }
-                } catch (e) {
-                  mutableData.value['teams'][int.parse(widget.team.number)]
-                      ['targetScore'] = Score(Uuid().v4(), Dice.none).toJson();
-                }
+              widget.event
+                  .getRef()
+                  ?.child('teams/${widget.team.number}')
+                  .runTransaction((mutableData) async {
+                mutableData.value['targetScore'] =
+                    Score(Uuid().v4(), Dice.none).toJson();
                 return mutableData;
               });
               dataModel.saveEvents();
@@ -681,7 +674,7 @@ class _TeamView extends State<TeamView> {
       Padding(
         padding: const EdgeInsets.only(top: 20, bottom: 10),
         child: Text(
-          'General',
+          'Subtotal',
           style: Theme.of(context).textTheme.bodyText1,
         ),
       ),

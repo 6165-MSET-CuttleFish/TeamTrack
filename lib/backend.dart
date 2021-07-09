@@ -29,96 +29,7 @@ save(String key, value) async {
 class Statics {
   static String gameName = remoteConfig.getString("gameName");
   static Map<String, dynamic> skeleton =
-      json.decode(remoteConfig.getString("skeleton"));
-  // static Map<String, dynamic> skeleton = {
-  //   'AutoScore': {
-  //     'HighGoals': {
-  //       'name': 'High Goals',
-  //       'min': 0,
-  //       'max': 999,
-  //       'value': 12,
-  //     },
-  //     'MidGoals': {
-  //       'name': 'Middle Goals',
-  //       'min': 0,
-  //       'max': 999,
-  //       'value': 6,
-  //     },
-  //     'LowGoals': {
-  //       'name': 'Low Goals',
-  //       'min': 0,
-  //       'max': 999,
-  //       'value': 3,
-  //     },
-  //     'WobbleGoals': {
-  //       'name': 'Wobble Goals',
-  //       'min': 0,
-  //       'max': 2,
-  //       'value': 15,
-  //     },
-  //     'PowerShots': {
-  //       'name': 'Power Shots',
-  //       'min': 0,
-  //       'max': 3,
-  //       'value': 15,
-  //     },
-  //     'Navigated': {
-  //       'name': 'Navigated',
-  //       'min': 0,
-  //       'max': 1,
-  //       'value': 5,
-  //       'isBool': true,
-  //     },
-  //   },
-  //   'TeleScore': {
-  //     'HighGoals': {
-  //       'name': 'High Goals',
-  //       'min': 0,
-  //       'max': 999,
-  //       'value': 6,
-  //     },
-  //     'MidGoals': {
-  //       'name': 'Middle Goals',
-  //       'min': 0,
-  //       'max': 999,
-  //       'value': 4,
-  //     },
-  //     'LowGoals': {
-  //       'name': 'Low Goals',
-  //       'min': 0,
-  //       'max': 999,
-  //       'value': 2,
-  //     },
-  //   },
-  //   'EndgameScore': {
-  //     'PowerShots': {
-  //       'name': 'Power Shots',
-  //       'min': 0,
-  //       'max': 3,
-  //       'value': 15,
-  //     },
-  //     'WobblesInDrop': {
-  //       'name': 'Wobbles in Drop',
-  //       'maxIsReference': true,
-  //       'min': 0,
-  //       'max': {'total': 2, 'reference': 'WobblesInStart'},
-  //       'value': 20,
-  //     },
-  //     'WobblesInStart': {
-  //       'name': 'Wobbles in Start',
-  //       'maxIsReference': true,
-  //       'min': 0,
-  //       'max': {'total': 2, 'reference': 'WobblesInDrop'},
-  //       'value': 5,
-  //     },
-  //     'RingsOnWobble': {
-  //       'name': 'Rings on Wobble',
-  //       'min': 0,
-  //       'max': 999,
-  //       'value': 5,
-  //     }
-  //   },
-  // };
+      json.decode(remoteConfig.getString(remoteConfig.getString("gameName")));
 }
 
 class DarkThemeProvider with ChangeNotifier {
@@ -212,47 +123,8 @@ class AuthenticationService {
     return null;
   }
 
-  String generateNonce([int length = 32]) {
-    final charset =
-        '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
-    final random = Random.secure();
-    return List.generate(length, (_) => charset[random.nextInt(charset.length)])
-        .join();
-  }
-
-  /// Returns the sha256 hash of [input] in hex notation.
-  String sha256ofString(String input) {
-    final bytes = utf8.encode(input);
-    final digest = sha256.convert(bytes);
-    return digest.toString();
-  }
-
-  Future<UserCredential> signInWithApple() async {
-    // To prevent replay attacks with the credential returned from Apple, we
-    // include a nonce in the credential request. When signing in with
-    // Firebase, the nonce in the id token returned by Apple, is expected to
-    // match the sha256 hash of `rawNonce`.
-    final rawNonce = generateNonce();
-    final nonce = sha256ofString(rawNonce);
-
-    // Request credential for the currently signed in Apple account.
-    final appleCredential = await SignInWithApple.getAppleIDCredential(
-      scopes: [
-        AppleIDAuthorizationScopes.email,
-        AppleIDAuthorizationScopes.fullName,
-      ],
-      nonce: nonce,
-    );
-
-    // Create an `OAuthCredential` from the credential returned by Apple.
-    final oauthCredential = OAuthProvider("apple.com").credential(
-      idToken: appleCredential.identityToken,
-      rawNonce: rawNonce,
-    );
-
-    // Sign in the user with Firebase. If the nonce we generated earlier does
-    // not match the nonce in `appleCredential.identityToken`, sign in will fail.
-    return await _firebaseAuth.signInWithCredential(oauthCredential);
+  Future<UserCredential> signInWithAnonymous() async {
+    return _firebaseAuth.signInAnonymously();
   }
 }
 
@@ -266,13 +138,6 @@ final RemoteConfig remoteConfig = RemoteConfig.instance;
 
 class DataModel {
   final List<String> keys = [Statics.gameName];
-  DataModel() {
-    try {
-      restoreEvents();
-    } catch (e) {
-      print('No events');
-    }
-  }
   List<Event> events = [];
   List<Event> localEvents() {
     return events.where((e) => e.type == EventType.local).toList();
@@ -296,25 +161,30 @@ class DataModel {
   bool isProcessing = false;
 
   Future<void> restoreEvents() async {
-    final prefs = await SharedPreferences.getInstance();
-    var x = jsonDecode(prefs.getString(keys[0]) ?? '') as List;
-    events = x.map((e) => Event.fromJson(e)).toList();
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      var x = jsonDecode(prefs.getString(keys[0]) ?? '') as List;
+      events = x.map((e) => Event.fromJson(e)).toList();
+    } catch (e) {
+      print("failed");
+    }
   }
 
-  Future<void> shareEvent({required Map metaData, String? email}) async {
+  Future<void> shareEvent({required Map metaData, String? username}) async {
     final HttpsCallable callable = functions.httpsCallable('shareEvent');
     var resp = await callable.call(<String, dynamic>{
-      'email': email,
+      'username': username,
       'metaData': metaData,
     });
   }
 }
 
 class Event {
-  Event({required this.name, required this.type});
+  Event({required this.name, required this.type, required this.gameName});
   String id = Uuid().v4();
   String? authorName;
   String? authorEmail;
+  String gameName = Statics.gameName;
   bool shared = false;
   EventType type = EventType.remote;
   Map<String, Team> teams = Map<String, Team>();
@@ -375,32 +245,34 @@ class Event {
       }
       return mutableData;
     });
-    matches.add(e);
-    e.red?.team1?.scores.addScore(
-      Score(
-        e.id,
-        e.dice,
-      ),
-    );
-    if (type != EventType.remote) {
-      e.red?.team2?.scores.addScore(
+    if (!shared) {
+      matches.add(e);
+      e.red?.team1?.scores.addScore(
         Score(
           e.id,
           e.dice,
         ),
       );
-      e.blue?.team1?.scores.addScore(
-        Score(
-          e.id,
-          e.dice,
-        ),
-      );
-      e.blue?.team2?.scores.addScore(
-        Score(
-          e.id,
-          e.dice,
-        ),
-      );
+      if (type != EventType.remote) {
+        e.red?.team2?.scores.addScore(
+          Score(
+            e.id,
+            e.dice,
+          ),
+        );
+        e.blue?.team1?.scores.addScore(
+          Score(
+            e.id,
+            e.dice,
+          ),
+        );
+        e.blue?.team2?.scores.addScore(
+          Score(
+            e.id,
+            e.dice,
+          ),
+        );
+      }
     }
   }
 
@@ -459,6 +331,7 @@ class Event {
 
   void updateLocal(dynamic map) {
     if (map != null) {
+      gameName = map['gameName'] ?? Statics.gameName;
       type = getTypeFromString(map['type']);
       name = map['name'];
       try {
@@ -516,6 +389,7 @@ class Event {
   }
 
   Event.fromJson(Map<String, dynamic> json) {
+    gameName = json['gameName'] ?? Statics.gameName;
     type = getTypeFromString(json['type']);
     name = json['name'];
     teams = (json['teams'] as Map)

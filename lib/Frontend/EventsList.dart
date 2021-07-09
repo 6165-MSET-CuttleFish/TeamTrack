@@ -28,136 +28,134 @@ class _EventsList extends State<EventsList> {
 
   @override
   Widget build(BuildContext context) {
-    restoreEvents();
     final themeChange = Provider.of<DarkThemeProvider>(context);
-    if (isLoaded) {
-      for (var event in dataModel.events.where((e) => !e.shared)) {
-        event.authorEmail = context.read<User?>()?.email;
-        event.authorName = context.read<User?>()?.displayName;
-      }
-      return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).accentColor,
-          title: Builder(
-            builder: (_) {
-              switch (_tab) {
-                case 1:
-                  return Text("Inbox");
-                default:
-                  return Text("Events");
-              }
-            },
-          ),
-          actions: [
-            Padding(
-              padding: EdgeInsets.only(left: 30),
-            ),
-            IconButton(
-              icon: themeChange.darkTheme
-                  ? Icon(CupertinoIcons.sun_max)
-                  : Icon(CupertinoIcons.moon),
-              onPressed: () {
-                setState(() =>
-                    themeChange.darkTheme = !themeChangeProvider.darkTheme);
-              },
-            )
-          ],
+    for (var event in dataModel.events.where((e) => !e.shared)) {
+      event.authorEmail = context.read<User?>()?.email;
+      event.authorName = context.read<User?>()?.displayName;
+    }
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).accentColor,
+        title: Builder(
+          builder: (_) {
+            switch (_tab) {
+              case 1:
+                return Text("Inbox");
+              default:
+                return Text("Events");
+            }
+          },
         ),
-        drawer: Drawer(
-          elevation: 1,
-          child: Material(
-            child: ListView(
-              children: [
-                DrawerHeader(
-                  decoration:
-                      BoxDecoration(color: Theme.of(context).accentColor),
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 5.0, right: 5.0),
-                    child: Row(
-                      children: [
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            if (context.read<User?>()?.photoURL != null)
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(300),
-                                child: Image.network(
-                                  context.read<User?>()!.photoURL!,
-                                  height: 70,
-                                ),
-                              )
-                            else
-                              Icon(Icons.account_circle, size: 70),
-                            Text(context.read<User?>()?.displayName ?? "Guest"),
-                            Text(context.read<User?>()?.email ?? ""),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                ListTile(
-                  leading: Icon(Icons.event_note_outlined),
-                  title: Text("Events"),
-                  onTap: () {
-                    setState(() => _tab = 0);
-                    Navigator.of(context).pop();
-                  },
-                ),
-                ListTile(
-                  leading: Icon(Icons.mail_rounded),
-                  title: Text("Inbox"),
-                  onTap: () {
-                    setState(() => _tab = 1);
-                    Navigator.of(context).pop();
-                  },
-                ),
-                ListTile(
-                  leading: Icon(Icons.logout),
-                  title: Text('Sign Out'),
-                  onTap: () {
-                    showPlatformDialog(
-                      context: context,
-                      builder: (context) => PlatformAlert(
-                        title: Text('Sign Out'),
-                        content: Text('Are you sure?'),
-                        actions: [
-                          PlatformDialogAction(
-                            isDefaultAction: true,
-                            child: Text('Cancel'),
-                            onPressed: () => Navigator.of(context).pop(),
-                          ),
-                          PlatformDialogAction(
-                            isDestructive: true,
-                            child: Text('Sign Out'),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                              context.read<AuthenticationService>().signOut();
-                            },
-                          ),
+        actions: [
+          Padding(
+            padding: EdgeInsets.only(left: 30),
+          ),
+          IconButton(
+            icon: themeChange.darkTheme
+                ? Icon(CupertinoIcons.sun_max)
+                : Icon(CupertinoIcons.moon),
+            onPressed: () {
+              setState(
+                  () => themeChange.darkTheme = !themeChangeProvider.darkTheme);
+            },
+          )
+        ],
+      ),
+      drawer: Drawer(
+        elevation: 1,
+        child: Material(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              DrawerHeader(
+                decoration: BoxDecoration(color: Theme.of(context).accentColor),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 5.0, right: 5.0),
+                  child: Row(
+                    children: [
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (context.read<User?>()?.photoURL != null)
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(300),
+                              child: Image.network(
+                                context.read<User?>()!.photoURL!,
+                                height: 70,
+                              ),
+                            )
+                          else
+                            Icon(Icons.account_circle, size: 70),
+                          Text(context.read<User?>()?.displayName ?? "Guest"),
+                          Text(context.read<User?>()?.email ?? ""),
                         ],
                       ),
-                    );
-                  },
+                    ],
+                  ),
                 ),
-              ],
-            ),
+              ),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                    leading: Icon(Icons.event_note_outlined),
+                    title: Text("Events"),
+                    onTap: () {
+                      setState(() => _tab = 0);
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.mail_rounded),
+                    title: Text("Inbox"),
+                    onTap: () {
+                      setState(() => _tab = 1);
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.logout),
+                    title: Text('Sign Out'),
+                    onTap: () {
+                      showPlatformDialog(
+                        context: context,
+                        builder: (context) => PlatformAlert(
+                          title: Text('Sign Out'),
+                          content: Text('Are you sure?'),
+                          actions: [
+                            PlatformDialogAction(
+                              isDefaultAction: true,
+                              child: Text('Cancel'),
+                              onPressed: () => Navigator.of(context).pop(),
+                            ),
+                            PlatformDialogAction(
+                              isDestructive: true,
+                              child: Text('Sign Out'),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                                context.read<AuthenticationService>().signOut();
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              )
+            ],
           ),
         ),
-        body: Builder(builder: (_) => getHome()),
-        floatingActionButton: _tab == 0
-            ? FloatingActionButton(
-                child: Icon(Icons.add),
-                onPressed: _onPressed,
-              )
-            : null,
-      );
-    } else {
-      return Center(
-        child: PlatformProgressIndicator(),
-      );
-    }
+      ),
+      body: Builder(builder: (_) => getHome()),
+      floatingActionButton: _tab == 0
+          ? FloatingActionButton(
+              child: Icon(Icons.add),
+              onPressed: _onPressed,
+            )
+          : null,
+    );
   }
 
   Widget getHome() {
@@ -427,16 +425,6 @@ class _EventsList extends State<EventsList> {
 
   String? _newName;
 
-  bool isLoaded = false;
-  restoreEvents() async {
-    await SharedPreferences.getInstance();
-    setState(
-      () {
-        isLoaded = true;
-      },
-    );
-  }
-
   void _onPressed() {
     if (NewPlatform.isIOS())
       showCupertinoModalPopup(
@@ -569,8 +557,10 @@ class _EventsList extends State<EventsList> {
                   () {
                     if (_newName!.isNotEmpty)
                       dataModel.events.add(Event(
-                          name: _newName ?? '',
-                          type: _newType ?? EventType.remote));
+                        name: _newName ?? '',
+                        type: _newType ?? EventType.remote,
+                        gameName: Statics.gameName,
+                      ));
                     dataModel.saveEvents();
                     _newName = '';
                   },

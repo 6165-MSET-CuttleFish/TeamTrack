@@ -104,26 +104,30 @@ class _MatchView extends State<MatchView> {
                     backgroundColor: _color,
                     title: Text('Match Stats'),
                     elevation: 0,
-                    actions: [
-                      Center(
-                        child: Text(
-                          _time.roundToDouble().toString(),
-                        ),
-                      ),
-                      IconButton(
-                        icon: Icon(_paused ? Icons.play_arrow : Icons.pause),
-                        onPressed: () => setState(() => _paused = !_paused),
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.stop),
-                        onPressed: () => setState(
-                          () {
-                            _paused = true;
-                            _time = 0;
-                          },
-                        ),
-                      ),
-                    ],
+                    actions: widget.team == null
+                        ? [
+                            Center(
+                              child: Text(
+                                _time.roundToDouble().toString(),
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(
+                                  _paused ? Icons.play_arrow : Icons.pause),
+                              onPressed: () =>
+                                  setState(() => _paused = !_paused),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.stop),
+                              onPressed: () => setState(
+                                () {
+                                  _paused = true;
+                                  _time = 0;
+                                },
+                              ),
+                            ),
+                          ]
+                        : [],
                   ),
                   body: Container(
                     decoration: BoxDecoration(
@@ -392,34 +396,25 @@ class _MatchView extends State<MatchView> {
   }
 
   void onIncrement() {
-    if (lapses.length == 0)
-      lapses.add(_time.toPrecision(3));
-    else
-      lapses.add(
-        _time.toPrecision(3) -
-            lapses.reduce((value, element) => value + element),
-      );
+    lapses.add(
+      (_time -
+              (lapses.length != 0
+                  ? lapses.reduce((value, element) => value + element)
+                  : 0))
+          .toPrecision(3),
+    );
     _score?.teleScore.cycleTimes = lapses;
-    widget.event.getRef()?.runTransaction((mutableData) async {
-      if (widget.team != null) {
-        // mutableData.value['teams'][teamIndex]['targetScore']['TeleScore']
-        //     ['Cycles'] = mutableData.value['teams']
-        //         [teamIndex]['targetScore']['TeleScore']['Cycles'] =
-        //     _score.teleScore.cycles;
+    if (widget.team != null) {
+      widget.event
+          .getRef()
+          ?.child('teams/${_selectedTeam?.number}')
+          .runTransaction((mutableData) async {
+        final scoreIndex = _score?.id;
+        mutableData.value['scores'][scoreIndex]['TeleScore']['CycleTimes'] =
+            lapses;
         return mutableData;
-      }
-      final scoreIndex = _score?.id;
-      var teamIndex;
-      try {
-        mutableData.value['teams'] as Map;
-        teamIndex = _selectedTeam?.number;
-      } catch (e) {
-        teamIndex = int.parse(_selectedTeam?.number ?? '');
-      }
-      mutableData.value['teams'][teamIndex]['scores'][scoreIndex]['TeleScore']
-          ['CycleTimes'] = lapses;
-      return mutableData;
-    });
+      });
+    }
   }
 
   ListView viewSelect() {
@@ -532,6 +527,61 @@ class _MatchView extends State<MatchView> {
                       team: _selectedTeam,
                       score: _score,
                       isTargetScore: widget.team != null,
+                      mutableIncrement: (mutableData) {
+                        if (widget.team != null) {
+                          var ref = mutableData.value['targetScore']
+                              ['TeleScore'][e.key];
+                          if (ref < e.max!())
+                            mutableData.value['targetScore']['TeleScore']
+                                [e.key] = (ref ?? 0) + incrementValue.count;
+                          return mutableData;
+                        }
+                        final scoreIndex = _score?.id;
+                        var ref = mutableData.value['scores'][scoreIndex]
+                            ['TeleScore'];
+                        if (ref[e.key] < e.max!()) {
+                          mutableData.value['scores'][scoreIndex]['TeleScore']
+                              [e.key] = (ref[e.key] ?? 0) + e.incrementValue;
+                          lapses.add(
+                            (_time -
+                                    (lapses.length != 0
+                                        ? lapses.reduce(
+                                            (value, element) => value + element)
+                                        : 0))
+                                .toPrecision(3),
+                          );
+                          mutableData.value['scores'][scoreIndex]['TeleScore']
+                              ['CycleTimes'] = lapses;
+                          if (_time < 90)
+                            mutableData.value['scores'][scoreIndex]['TeleScore']
+                                ['TeleCycles'] = (ref['TeleCycles'] ?? 0) + 1;
+                          else
+                            mutableData.value['scores'][scoreIndex]['TeleScore']
+                                    ['EndgameCycles'] =
+                                (ref['EndgameCycles'] ?? 0) + 1;
+                        }
+                        return mutableData;
+                      },
+                      mutableDecrement: (mutableData) {
+                        if (widget.team != null) {
+                          var ref = mutableData.value['targetScore']
+                              ['TeleScore'][e.key];
+                          if (ref < e.max!())
+                            mutableData.value['targetScore']['TeleScore']
+                                [e.key] = (ref ?? 0) - 1;
+                          return mutableData;
+                        }
+                        final scoreIndex = _score?.id;
+                        var ref = mutableData.value['scores'][scoreIndex]
+                            ['TeleScore'];
+                        if (ref[e.key] < e.max!()) {
+                          mutableData.value['scores'][scoreIndex]['TeleScore']
+                              [e.key] = (ref[e.key] ?? 0) - e.decrementValue;
+                          mutableData.value['scores'][scoreIndex]['TeleScore']
+                              ['Misses'] = (ref['Misses'] ?? 0) + 1;
+                        }
+                        return mutableData;
+                      },
                     ),
                   )
                   .toList() ??

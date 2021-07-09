@@ -1,8 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
-import 'package:teamtrack/Frontend/EventsList.dart';
-import 'package:teamtrack/Frontend/Provider/google_sign_in.dart';
 import 'package:teamtrack/backend.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -152,13 +148,6 @@ class _LoginView extends State<LoginView> {
             children: [Icon(Icons.person), Text('Sign Up')],
           ),
         ),
-        GithubAuthButton(
-          onPressed: () {},
-          style: AuthButtonStyle(
-              iconSize: 20,
-              textStyle: TextStyle(fontSize: 14),
-              width: size.width - 80),
-        ),
         GoogleAuthButton(
           onPressed: () async {
             await context.read<AuthenticationService>().signInWithGoogle();
@@ -169,15 +158,15 @@ class _LoginView extends State<LoginView> {
               textStyle: TextStyle(fontSize: 14, color: Colors.white),
               width: size.width - 80),
         ),
-        AppleAuthButton(
-          onPressed: () async {
-            await context.read<AuthenticationService>().signInWithApple();
-          },
-          darkMode: true,
-          style: AuthButtonStyle(
-              iconSize: 20,
-              textStyle: TextStyle(fontSize: 14, color: Colors.white),
-              width: size.width - 80),
+        PlatformButton(
+          color: CupertinoColors.systemBlue,
+          onPressed: () =>
+              context.read<AuthenticationService>().signInWithAnonymous(),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [Icon(Icons.person), Text('Anonymous Sign In')],
+          ),
         ),
         EmailAuthButton(
           onPressed: () {
