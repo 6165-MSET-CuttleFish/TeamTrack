@@ -415,6 +415,7 @@ class Event {
     }
   }
   Map<String, dynamic> toJson() => {
+        'gameName': Statics.gameName,
         'name': name,
         'teams': teams
             .map<String, dynamic>((num, team) => MapEntry(num, team.toJson())),
@@ -625,6 +626,15 @@ class Match {
   int geIndex(Database.MutableData mutableData) =>
       (mutableData.value['matches'] as List)
           .indexWhere((element) => element['id'] == id);
+  Score? getScore(String? number) {
+    if (number == red?.team1?.number)
+      return red?.team1?.scores[id];
+    else if (number == red?.team2?.number)
+      return red?.team2?.scores[id];
+    else if (number == blue?.team1?.number)
+      return blue?.team1?.scores[id];
+    else if (number == blue?.team2?.number) return blue?.team2?.scores[id];
+  }
 }
 
 enum EventType { live, local, remote }
@@ -655,6 +665,19 @@ extension DiceExtension on Dice {
         return '1';
       case Dice.three:
         return '4';
+      default:
+        return 'All Cases';
+    }
+  }
+
+  String toVal() {
+    switch (this) {
+      case Dice.one:
+        return '1';
+      case Dice.two:
+        return '2';
+      case Dice.three:
+        return '3';
       default:
         return 'All Cases';
     }
@@ -854,10 +877,11 @@ extension TeamsExtension on Map<String, Team> {
   double lowestStandardDeviationScore(
       Dice? dice, bool removeOutliers, OpModeType? type) {
     if (this.length == 0) return 1;
-    return this
+    final arr = this
         .values
         .map((e) => e.scores.standardDeviationScore(dice, removeOutliers, type))
-        .reduce(min);
+        .where((element) => element != 0);
+    return arr.length != 0 ? arr.reduce(min) : 1;
   }
 }
 

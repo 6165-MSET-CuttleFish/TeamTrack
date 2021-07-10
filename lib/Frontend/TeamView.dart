@@ -44,9 +44,9 @@ class _TeamView extends State<TeamView> {
               child: CupertinoSlidingSegmentedControl(
                 groupValue: _dice,
                 children: <Dice, Widget>{
-                  Dice.one: Text('0'),
-                  Dice.two: Text('1'),
-                  Dice.three: Text('4'),
+                  Dice.one: Text('1'),
+                  Dice.two: Text('2'),
+                  Dice.three: Text('3'),
                   Dice.none: Text('All Cases')
                 },
                 onValueChanged: (Dice? newDice) {
@@ -67,7 +67,7 @@ class _TeamView extends State<TeamView> {
                   disabledBorderColor: Theme.of(context).accentColor,
                   color:
                       _dice == Dice.one ? Theme.of(context).accentColor : null,
-                  child: Text('0'),
+                  child: Text('1'),
                   onPressed: _dice != Dice.one
                       ? () {
                           setState(
@@ -84,7 +84,7 @@ class _TeamView extends State<TeamView> {
                   disabledBorderColor: Theme.of(context).accentColor,
                   color:
                       _dice == Dice.two ? Theme.of(context).accentColor : null,
-                  child: Text('1'),
+                  child: Text('2'),
                   onPressed: _dice != Dice.two
                       ? () {
                           setState(
@@ -102,7 +102,7 @@ class _TeamView extends State<TeamView> {
                   color: _dice == Dice.three
                       ? Theme.of(context).accentColor
                       : null,
-                  child: Text('4'),
+                  child: Text('3'),
                   onPressed: _dice != Dice.three
                       ? () {
                           setState(
@@ -124,7 +124,18 @@ class _TeamView extends State<TeamView> {
               ],
             ),
       appBar: AppBar(
-        title: Text(_team.name),
+        title: Column(
+          crossAxisAlignment: NewPlatform.isAndroid()
+              ? CrossAxisAlignment.start
+              : CrossAxisAlignment.center,
+          children: [
+            Text(_team.name),
+            Text(
+              _team.number,
+              style: Theme.of(context).textTheme.caption,
+            ),
+          ],
+        ),
         backgroundColor: Theme.of(context).accentColor,
         actions: [
           IconButton(
@@ -436,8 +447,8 @@ class _TeamView extends State<TeamView> {
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
                                 colors: [
-                                  Theme.of(context).accentColor,
-                                  Theme.of(context).splashColor
+                                  CupertinoColors.systemBlue,
+                                  CupertinoColors.systemRed
                                 ],
                               ),
                               dataSource: _team.scores

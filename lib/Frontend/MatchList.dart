@@ -95,96 +95,104 @@ class _MatchList extends State<MatchList> {
   }
 
   Widget _matches() {
+    int i = 0;
     if (widget.event.type != EventType.remote) {
       return ListView(
         children: widget.team == null
-            ? widget.event.matches
-                .map(
-                  (e) => Slidable(
-                    actionPane: slider,
-                    secondaryActions: [
-                      IconSlideAction(
-                        icon: Icons.delete,
-                        color: Colors.red,
-                        onTap: () {
-                          showPlatformDialog(
-                            context: context,
-                            builder: (BuildContext context) => PlatformAlert(
-                              title: Text('Delete Match'),
-                              content: Text('Are you sure?'),
-                              actions: [
-                                PlatformDialogAction(
-                                  isDefaultAction: true,
-                                  child: Text('Cancel'),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                                PlatformDialogAction(
-                                  isDefaultAction: false,
-                                  isDestructive: true,
-                                  child: Text('Confirm'),
-                                  onPressed: () {
-                                    setState(
-                                      () {
-                                        widget.event.deleteMatch(e);
-                                      },
-                                    );
-                                    dataModel.saveEvents();
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Colors.grey,
-                          width: 1,
-                        ),
-                      ),
-                      child: ListTile(
-                        leading: Column(children: [
-                          Text(
-                            (e.red?.team1?.name ?? '?') +
-                                ' & ' +
-                                (e.red?.team2?.name ?? '?'),
-                          ),
-                          Text(
-                            'VS',
-                            style: TextStyle(
-                                color: Colors.red, fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            (e.blue?.team1?.name ?? '?') +
-                                ' & ' +
-                                (e.blue?.team2?.name ?? '?'),
-                          )
-                        ]),
-                        trailing: Text(
-                          e.score(showPenalties: true),
-                        ),
-                        onTap: () async {
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => MatchView(
-                                match: e,
-                                event: widget.event,
+            ? widget.event.matches.map((e) {
+                i++;
+                return Slidable(
+                  actionPane: slider,
+                  secondaryActions: [
+                    IconSlideAction(
+                      icon: Icons.delete,
+                      color: Colors.red,
+                      onTap: () {
+                        showPlatformDialog(
+                          context: context,
+                          builder: (BuildContext context) => PlatformAlert(
+                            title: Text('Delete Match'),
+                            content: Text('Are you sure?'),
+                            actions: [
+                              PlatformDialogAction(
+                                isDefaultAction: true,
+                                child: Text('Cancel'),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
                               ),
-                            ),
-                          );
-                          setState(() {});
-                        },
+                              PlatformDialogAction(
+                                isDefaultAction: false,
+                                isDestructive: true,
+                                child: Text('Confirm'),
+                                onPressed: () {
+                                  setState(
+                                    () {
+                                      widget.event.deleteMatch(e);
+                                    },
+                                  );
+                                  dataModel.saveEvents();
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.grey,
+                        width: 1,
                       ),
                     ),
+                    child: ListTile(
+                      leading: Text(i.toString()),
+                      title: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              (e.red?.team1?.name ?? '?') +
+                                  ' & ' +
+                                  (e.red?.team2?.name ?? '?'),
+                              style: Theme.of(context).textTheme.caption,
+                            ),
+                            Text(
+                              'VS',
+                              style: TextStyle(
+                                color: Colors.red,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
+                            ),
+                            Text(
+                              (e.blue?.team1?.name ?? '?') +
+                                  ' & ' +
+                                  (e.blue?.team2?.name ?? '?'),
+                              style: Theme.of(context).textTheme.caption,
+                            )
+                          ]),
+                      trailing: Text(
+                        e.score(showPenalties: true),
+                      ),
+                      onTap: () async {
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MatchView(
+                              match: e,
+                              event: widget.event,
+                            ),
+                          ),
+                        );
+                        setState(() {});
+                      },
+                    ),
                   ),
-                )
-                .toList()
+                );
+              }).toList()
             : _teamSpecMatches(),
       );
     } else {
@@ -224,7 +232,10 @@ class _MatchList extends State<MatchList> {
                           child: Text('Confirm'),
                           onPressed: () {
                             setState(
-                                () => widget.event.deleteMatch(matches[i]));
+                              () => widget.event.deleteMatch(
+                                matches[i],
+                              ),
+                            );
                             dataModel.saveEvents();
                             Navigator.of(context).pop();
                           },
@@ -246,8 +257,23 @@ class _MatchList extends State<MatchList> {
                 leading: Text(
                   (i + 1).toString(),
                 ),
-                title:
-                    Text(widget.event.teams[widget.team?.number]?.name ?? ''),
+                title: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Auto : ${matches[i].getScore(widget.team?.number)?.autoScore.total()}',
+                      style: Theme.of(context).textTheme.caption,
+                    ),
+                    Text(
+                      'Tele : ${matches[i].getScore(widget.team?.number)?.teleScore.total()}',
+                      style: Theme.of(context).textTheme.caption,
+                    ),
+                    Text(
+                      'Endgame : ${matches[i].getScore(widget.team?.number)?.endgameScore.total()}',
+                      style: Theme.of(context).textTheme.caption,
+                    )
+                  ],
+                ),
                 trailing: Text(
                   matches[i].score(showPenalties: true),
                 ),
@@ -274,97 +300,106 @@ class _MatchList extends State<MatchList> {
     }
   }
 
-  List<Widget> _teamSpecMatches() => widget.event.matches
-      .where((e) =>
-          e.alliance(
-            widget.event.teams[widget.team?.number],
-          ) !=
-          null)
-      .toList()
-      .map(
-        (e) => Slidable(
-          actionPane: slider,
-          secondaryActions: [
-            IconSlideAction(
-              icon: Icons.delete,
-              color: Colors.red,
-              onTap: () {
-                showPlatformDialog(
-                  context: context,
-                  builder: (context) => PlatformAlert(
-                    title: Text('Delete Match'),
-                    content: Text('Are you sure?'),
-                    actions: [
-                      PlatformDialogAction(
-                        isDefaultAction: true,
-                        child: Text('Cancel'),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                      PlatformDialogAction(
-                        isDefaultAction: false,
-                        isDestructive: true,
-                        child: Text('Confirm'),
-                        onPressed: () {
-                          setState(
-                            () => widget.event.deleteMatch(e),
-                          );
-                          dataModel.saveEvents();
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ],
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Colors.grey,
-                width: 1,
-              ),
-            ),
-            child: ListTile(
-              leading: Column(children: [
-                Text(
-                  (e.red?.team1?.name ?? '?') +
-                      ' & ' +
-                      (e.red?.team2?.name ?? '?'),
-                ),
-                Text(
-                  'VS',
-                  style:
-                      TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  (e.blue?.team1?.name ?? '?') +
-                      ' & ' +
-                      (e.blue?.team2?.name ?? '?'),
-                )
-              ]),
-              trailing: Text(
-                e.score(showPenalties: true),
-              ),
-              onTap: () async {
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => MatchView(
-                      match: e,
-                      event: widget.event,
+  List<Widget> _teamSpecMatches() {
+    int i = 0;
+    return widget.event.matches
+        .where((e) =>
+            e.alliance(
+              widget.event.teams[widget.team?.number],
+            ) !=
+            null)
+        .toList()
+        .map((e) {
+      i++;
+      return Slidable(
+        actionPane: slider,
+        secondaryActions: [
+          IconSlideAction(
+            icon: Icons.delete,
+            color: Colors.red,
+            onTap: () {
+              showPlatformDialog(
+                context: context,
+                builder: (context) => PlatformAlert(
+                  title: Text('Delete Match'),
+                  content: Text('Are you sure?'),
+                  actions: [
+                    PlatformDialogAction(
+                      isDefaultAction: true,
+                      child: Text('Cancel'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
                     ),
-                  ),
-                );
-                setState(() {});
-              },
+                    PlatformDialogAction(
+                      isDefaultAction: false,
+                      isDestructive: true,
+                      child: Text('Confirm'),
+                      onPressed: () {
+                        setState(
+                          () => widget.event.deleteMatch(e),
+                        );
+                        dataModel.saveEvents();
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Colors.grey,
+              width: 1,
             ),
           ),
+          child: ListTile(
+            leading: Text(i.toString()),
+            title:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(
+                (e.red?.team1?.name ?? '?') +
+                    ' & ' +
+                    (e.red?.team2?.name ?? '?'),
+                style: Theme.of(context).textTheme.caption,
+              ),
+              Text(
+                'VS',
+                style: TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12),
+              ),
+              Text(
+                (e.blue?.team1?.name ?? '?') +
+                    ' & ' +
+                    (e.blue?.team2?.name ?? '?'),
+                style: Theme.of(context).textTheme.caption,
+              )
+            ]),
+            trailing: Text(
+              e.score(showPenalties: true),
+            ),
+            onTap: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MatchView(
+                    match: e,
+                    event: widget.event,
+                  ),
+                ),
+              );
+              setState(() {});
+            },
+          ),
         ),
-      )
-      .toList();
+      );
+    }).toList();
+  }
 }
 
 class MatchSearch extends SearchDelegate<String?> {
@@ -391,7 +426,6 @@ class MatchSearch extends SearchDelegate<String?> {
 
   @override
   Widget buildResults(context) => buildSuggestions(context);
-
   @override
   Widget buildSuggestions(context) {
     final suggestionList = matches
@@ -407,49 +441,60 @@ class MatchSearch extends SearchDelegate<String?> {
               (m.blue?.team2?.name.contains(query) ?? false),
         )
         .toList();
+    int i = 0;
     return ListView.builder(
-      itemCount: suggestionList.length,
-      itemBuilder: (context, index) => Container(
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: Colors.grey,
-            width: 1,
-          ),
-        ),
-        child: ListTile(
-          leading: Column(children: [
-            Text(
-              (suggestionList[index].red?.team1?.name ?? '?') +
-                  ' & ' +
-                  (suggestionList[index].red?.team2?.name ?? '?'),
-            ),
-            Text(
-              'VS',
-              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
-            ),
-            Text(
-              (suggestionList[index].blue?.team1?.name ?? '?') +
-                  ' & ' +
-                  (suggestionList[index].blue?.team2?.name ?? '?'),
-            )
-          ]),
-          trailing: Text(
-            suggestionList[index].score(showPenalties: true),
-          ),
-          onTap: () {
-            close(context, null);
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => MatchView(
-                  match: suggestionList[index],
-                  event: event,
-                ),
+        itemCount: suggestionList.length,
+        itemBuilder: (context, index) {
+          i++;
+          return Container(
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Colors.grey,
+                width: 1,
               ),
-            );
-          },
-        ),
-      ),
-    );
+            ),
+            child: ListTile(
+              leading: Text(i.toString()),
+              title: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      (suggestionList[index].red?.team1?.name ?? '?') +
+                          ' & ' +
+                          (suggestionList[index].red?.team2?.name ?? '?'),
+                      style: Theme.of(context).textTheme.caption,
+                    ),
+                    Text(
+                      'VS',
+                      style: TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12),
+                    ),
+                    Text(
+                      (suggestionList[index].blue?.team1?.name ?? '?') +
+                          ' & ' +
+                          (suggestionList[index].blue?.team2?.name ?? '?'),
+                      style: Theme.of(context).textTheme.caption,
+                    )
+                  ]),
+              trailing: Text(
+                suggestionList[index].score(showPenalties: true),
+              ),
+              onTap: () {
+                close(context, null);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MatchView(
+                      match: suggestionList[index],
+                      event: event,
+                    ),
+                  ),
+                );
+              },
+            ),
+          );
+        });
   }
 }

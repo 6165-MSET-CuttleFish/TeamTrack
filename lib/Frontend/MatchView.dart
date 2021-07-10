@@ -111,8 +111,10 @@ class _MatchView extends State<MatchView> {
                             IconButton(
                               icon: Icon(
                                   _paused ? Icons.play_arrow : Icons.pause),
-                              onPressed: () =>
-                                  setState(() => _paused = !_paused),
+                              onPressed: () => setState(() {
+                                _paused = !_paused;
+                                _allowView = true;
+                              }),
                             ),
                             IconButton(
                               icon: Icon(Icons.stop),
@@ -234,8 +236,7 @@ class _MatchView extends State<MatchView> {
                                   return DropdownMenuItem<Dice>(
                                     value: value,
                                     child: Text(
-                                      'Stack Height : ' +
-                                          value.stackHeight().toString(),
+                                      'Dice Roll : ' + value.toVal(),
                                     ),
                                   );
                                 },
@@ -453,6 +454,7 @@ class _MatchView extends State<MatchView> {
               icon: Icon(Icons.play_arrow),
               onPressed: () {
                 _paused = false;
+                _allowView = true;
               },
             ),
           ),
@@ -547,15 +549,18 @@ class _MatchView extends State<MatchView> {
                                         : 0))
                                 .toPrecision(3),
                           );
-                          mutableData.value['scores'][scoreIndex]['TeleScore']
-                              ['CycleTimes'] = lapses;
-                          if (_time < 90)
+                          if (!_paused) {
                             mutableData.value['scores'][scoreIndex]['TeleScore']
-                                ['TeleCycles'] = (ref['TeleCycles'] ?? 0) + 1;
-                          else
-                            mutableData.value['scores'][scoreIndex]['TeleScore']
-                                    ['EndgameCycles'] =
-                                (ref['EndgameCycles'] ?? 0) + 1;
+                                ['CycleTimes'] = lapses;
+                            if (_time < 90)
+                              mutableData.value['scores'][scoreIndex]
+                                      ['TeleScore']['TeleCycles'] =
+                                  (ref['TeleCycles'] ?? 0) + 1;
+                            else
+                              mutableData.value['scores'][scoreIndex]
+                                      ['TeleScore']['EndgameCycles'] =
+                                  (ref['EndgameCycles'] ?? 0) + 1;
+                          }
                         }
                         return mutableData;
                       },
@@ -574,8 +579,10 @@ class _MatchView extends State<MatchView> {
                         if (ref[e.key] < e.max!()) {
                           mutableData.value['scores'][scoreIndex]['TeleScore']
                               [e.key] = (ref[e.key] ?? 0) - e.decrementValue;
-                          mutableData.value['scores'][scoreIndex]['TeleScore']
-                              ['Misses'] = (ref['Misses'] ?? 0) + 1;
+                          if (!_paused) {
+                            mutableData.value['scores'][scoreIndex]['TeleScore']
+                                ['Misses'] = (ref['Misses'] ?? 0) + 1;
+                          }
                         }
                         return mutableData;
                       },
@@ -590,6 +597,7 @@ class _MatchView extends State<MatchView> {
               icon: Icon(Icons.play_arrow),
               onPressed: () {
                 _paused = false;
+                _allowView = true;
               },
             ),
           ),
