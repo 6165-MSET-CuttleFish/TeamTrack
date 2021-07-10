@@ -69,6 +69,13 @@ class Score extends ScoreDivision {
         'Penalty': penalties.toJson(),
         'id': id.toString(),
       };
+  Score operator +(Score other) {
+    var score = Score('', dice);
+    score.autoScore = autoScore + other.autoScore;
+    score.teleScore = teleScore + other.teleScore;
+    score.endgameScore = endgameScore + other.endgameScore;
+    return score;
+  }
 }
 
 Dice getDiceFromString(String statusAsString) {
@@ -133,6 +140,17 @@ class AutoScore extends ScoreDivision {
     );
   }
 
+  AutoScore operator +(AutoScore other) {
+    var autoScore = AutoScore();
+    autoScore.elements.keys.forEach(
+      (key) {
+        autoScore.elements[key] = (elements[key] ?? ScoringElement()) +
+            (other.elements[key] ?? ScoringElement());
+      },
+    );
+    return autoScore;
+  }
+
   AutoScore.fromJson(Map<String, dynamic> map) {
     ref.keys.forEach(
       (e) {
@@ -191,6 +209,18 @@ class TeleScore extends ScoreDivision {
         }
       },
     );
+  }
+
+  TeleScore operator +(TeleScore other) {
+    var teleScore = TeleScore();
+    teleScore.dice = dice;
+    teleScore.elements.keys.forEach(
+      (key) {
+        teleScore.elements[key] = (elements[key] ?? ScoringElement()) +
+            (other.elements[key] ?? ScoringElement());
+      },
+    );
+    return teleScore;
   }
 
   TeleScore.fromJson(Map<String, dynamic> map) {
@@ -263,6 +293,18 @@ class EndgameScore extends ScoreDivision {
         }
       },
     );
+  }
+
+  EndgameScore operator +(EndgameScore other) {
+    var endgameScore = EndgameScore();
+    endgameScore.dice = dice;
+    endgameScore.elements.keys.forEach(
+      (key) {
+        endgameScore.elements[key] = (elements[key] ?? ScoringElement()) +
+            (other.elements[key] ?? ScoringElement());
+      },
+    );
+    return endgameScore;
   }
 
   EndgameScore.fromJson(Map<String, dynamic> json) {
@@ -397,6 +439,17 @@ class ScoringElement {
       count -= decrementValue;
       count = count.clamp(min!(), max!());
     }
+  }
+
+  ScoringElement operator +(ScoringElement other) {
+    return ScoringElement(
+        count: other.count + count,
+        value: value,
+        key: other.key,
+        name: name,
+        isBool: isBool,
+        min: min,
+        max: max);
   }
 }
 

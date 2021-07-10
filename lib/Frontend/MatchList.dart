@@ -257,21 +257,30 @@ class _MatchList extends State<MatchList> {
                 leading: Text(
                   (i + 1).toString(),
                 ),
-                title: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                title: Row(
                   children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Auto : ${matches[i].getScore(widget.team?.number)?.autoScore.total()}',
+                          style: Theme.of(context).textTheme.caption,
+                        ),
+                        Text(
+                          'Tele : ${matches[i].getScore(widget.team?.number)?.teleScore.total()}',
+                          style: Theme.of(context).textTheme.caption,
+                        ),
+                        Text(
+                          'Endgame : ${matches[i].getScore(widget.team?.number)?.endgameScore.total()}',
+                          style: Theme.of(context).textTheme.caption,
+                        )
+                      ],
+                    ),
+                    Spacer(),
                     Text(
-                      'Auto : ${matches[i].getScore(widget.team?.number)?.autoScore.total()}',
+                      'Dice : ${matches[i].dice.toVal()}',
                       style: Theme.of(context).textTheme.caption,
                     ),
-                    Text(
-                      'Tele : ${matches[i].getScore(widget.team?.number)?.teleScore.total()}',
-                      style: Theme.of(context).textTheme.caption,
-                    ),
-                    Text(
-                      'Endgame : ${matches[i].getScore(widget.team?.number)?.endgameScore.total()}',
-                      style: Theme.of(context).textTheme.caption,
-                    )
                   ],
                 ),
                 trailing: Text(

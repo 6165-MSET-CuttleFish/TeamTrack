@@ -253,7 +253,16 @@ class _EventsList extends State<EventsList> {
                 CupertinoIcons.person_3_fill,
                 color: Theme.of(context).accentColor,
               ),
-              title: Text(e.name),
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(e.name),
+                  Text(
+                    e.gameName.spaceBeforeCapital(),
+                    style: Theme.of(context).textTheme.caption,
+                  ),
+                ],
+              ),
               onTap: () {
                 Navigator.push(
                   context,
@@ -329,85 +338,16 @@ class _EventsList extends State<EventsList> {
                 CupertinoIcons.rectangle_stack_person_crop_fill,
                 color: Theme.of(context).accentColor,
               ),
-              title: Text(e.name),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  platformPageRoute(
-                    (context) => EventView(
-                      event: e,
-                    ),
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(e.name),
+                  Text(
+                    e.gameName.spaceBeforeCapital(),
+                    style: Theme.of(context).textTheme.caption,
                   ),
-                );
-              },
-            ),
-          ),
-          actionPane: slider,
-        ),
-      )
-      .toList();
-
-  List<Widget> liveEvents() => dataModel
-      .liveEvents()
-      .map(
-        (e) => Slidable(
-          actions: [
-            IconSlideAction(
-              onTap: () {},
-              icon: Icons.share,
-              color: Colors.blue,
-            )
-          ],
-          secondaryActions: [
-            IconSlideAction(
-              onTap: () {
-                showPlatformDialog(
-                  context: context,
-                  builder: (BuildContext context) => PlatformAlert(
-                    title: Text('Delete Event'),
-                    content: Text('Are you sure?'),
-                    actions: [
-                      PlatformDialogAction(
-                        isDefaultAction: true,
-                        child: Text('Cancel'),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                      PlatformDialogAction(
-                        isDefaultAction: false,
-                        isDestructive: true,
-                        child: Text('Confirm'),
-                        onPressed: () {
-                          setState(
-                            () {
-                              dataModel.localEvents().remove(e);
-                            },
-                          );
-                          dataModel.saveEvents();
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                    ],
-                  ),
-                );
-              },
-              icon: Icons.delete,
-              color: Colors.red,
-            )
-          ],
-          child: ListTileTheme(
-            iconColor: Theme.of(context).primaryColor,
-            child: ListTile(
-              trailing: Icon(
-                CupertinoIcons.location,
-                color: Theme.of(context).accentColor,
+                ],
               ),
-              leading: Icon(
-                CupertinoIcons.person_3_fill,
-                color: Theme.of(context).accentColor,
-              ),
-              title: Text(e.name),
               onTap: () {
                 Navigator.push(
                   context,
@@ -437,7 +377,6 @@ class _EventsList extends State<EventsList> {
       showCupertinoModalPopup(
         context: context,
         builder: (context) => CupertinoActionSheet(
-          //title: Text('New Event'),
           message: Text('Select Event Type'),
           actions: [
             CupertinoActionSheetAction(
@@ -625,7 +564,7 @@ class _EventsList extends State<EventsList> {
                   if (uid != null) json.addAll({uid: true});
                   firebaseDatabase
                       .reference()
-                      .child("Events/${Statics.gameName}/${e.id}}")
+                      .child("Events/${Statics.gameName}/${e.id}")
                       .set(json);
                   dataModel.saveEvents();
                 }

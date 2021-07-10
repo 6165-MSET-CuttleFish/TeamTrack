@@ -157,7 +157,7 @@ class _MatchView extends State<MatchView> {
                                   width: 100,
                                   child: Text(
                                       _match?.redScore(
-                                              showPenalties: _showPenalties) ??
+                                              showPenalties: _showPenalties).toString() ??
                                           '0',
                                       style: Theme.of(context)
                                           .textTheme
@@ -174,7 +174,7 @@ class _MatchView extends State<MatchView> {
                                   width: 100,
                                   child: Text(
                                       _match?.blueScore(
-                                              showPenalties: _showPenalties) ??
+                                              showPenalties: _showPenalties).toString() ??
                                           '0',
                                       style: Theme.of(context)
                                           .textTheme

@@ -499,16 +499,17 @@ class _Incrementor extends State<Incrementor> {
 }
 
 class ScoreCard extends StatelessWidget {
-  ScoreCard({
-    Key? key,
-    required this.scoreDivisions,
-    required this.dice,
-    required this.team,
-    required this.event,
-    this.type,
-    required this.removeOutliers,
-    this.matches,
-  }) : super(key: key) {
+  ScoreCard(
+      {Key? key,
+      required this.scoreDivisions,
+      required this.dice,
+      required this.team,
+      required this.event,
+      this.type,
+      required this.removeOutliers,
+      this.matches,
+      required this.matchTotal})
+      : super(key: key) {
     switch (type) {
       case OpModeType.auto:
         targetScore = team.targetScore?.autoScore;
@@ -528,6 +529,7 @@ class ScoreCard extends StatelessWidget {
   final Dice dice;
   final Team team;
   final Event event;
+  final bool matchTotal;
   final OpModeType? type;
   ScoreDivision? targetScore;
   final bool removeOutliers;
@@ -542,18 +544,82 @@ class ScoreCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             BarGraph(
-              val: scoreDivisions.meanScore(dice, removeOutliers),
-              max: event.teams.maxScore(dice, removeOutliers, type),
+              val: !matchTotal
+                  ? scoreDivisions.meanScore(dice, removeOutliers)
+                  : matches
+                          ?.where(
+                            (e) => e.dice == dice || dice == Dice.none,
+                          )
+                          .toList()
+                          .spots(team, dice, false, type: type)
+                          .removeOutliers(removeOutliers)
+                          .map((e) => e.y)
+                          .mean() ??
+                      0,
+              max: !matchTotal
+                  ? event.teams.maxScore(dice, removeOutliers, type)
+                  : matches
+                          ?.where(
+                            (e) => e.dice == dice || dice == Dice.none,
+                          )
+                          .toList()
+                          .maxScore(false) ??
+                      0,
               title: 'Average',
             ),
             BarGraph(
-                val: scoreDivisions.maxScore(dice, removeOutliers),
-                max: event.teams.maxScore(dice, removeOutliers, type),
+                val: !matchTotal
+                    ? scoreDivisions.maxScore(dice, removeOutliers)
+                    : matches
+                            ?.where(
+                              (e) => e.dice == dice || dice == Dice.none,
+                            )
+                            .toList()
+                            .spots(team, dice, false, type: type)
+                            //.removeOutliers(removeOutliers)
+                            .map((e) => e.y)
+                            .maxValue() ??
+                        0,
+                max: !matchTotal
+                    ? event.teams.maxScore(dice, removeOutliers, type)
+                    : matches
+                            ?.where(
+                              (e) => e.dice == dice || dice == Dice.none,
+                            )
+                            .toList()
+                            .maxScore(false) ??
+                        0,
                 title: 'Best Score'),
             BarGraph(
-              val: scoreDivisions.standardDeviationScore(dice, removeOutliers),
-              max: event.teams
-                  .lowestStandardDeviationScore(dice, removeOutliers, type),
+              val: !matchTotal
+                  ? scoreDivisions.standardDeviationScore(dice, removeOutliers)
+                  : matches
+                          ?.where(
+                            (e) => e.dice == dice || dice == Dice.none,
+                          )
+                          .toList()
+                          .spots(team, dice, false, type: type)
+                          .removeOutliers(removeOutliers)
+                          .map((e) => e.y)
+                          .standardDeviation() ??
+                      0,
+              max: !matchTotal
+                  ? event.teams
+                      .lowestStandardDeviationScore(dice, removeOutliers, type)
+                  : event
+                      .getMatchLists()
+                      .map(
+                        (matches) => matches.item2
+                            .where(
+                              (e) => e.dice == dice || dice == Dice.none,
+                            )
+                            .toList()
+                            .spots(matches.item1, dice, false, type: type)
+                            .removeOutliers(removeOutliers)
+                            .map((e) => e.y)
+                            .standardDeviation(),
+                      )
+                      .minValue(),
               inverted: true,
               title: 'Deviation',
             ),
@@ -668,9 +734,10 @@ class ScoreCard extends StatelessWidget {
                                     applyCutOffY: true,
                                   )
                                 : null,
-                            spots: matches!
-                                .where(
-                                    (e) => e.dice == dice || dice == Dice.none)
+                            spots: matches
+                                ?.where(
+                                  (e) => e.dice == dice || dice == Dice.none,
+                                )
                                 .toList()
                                 .spots(team, dice, false, type: type)
                                 .removeOutliers(removeOutliers),

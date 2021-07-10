@@ -13,7 +13,7 @@ class BarGraph extends StatelessWidget {
   }) : super(key: key);
   final String title;
   final double max;
-  final double val;
+  double val;
   final bool inverted;
   final double height;
   @override
@@ -22,6 +22,12 @@ class BarGraph extends StatelessWidget {
             ? (val != 0 ? (max / val).clamp(0, 1) : 1) * 100.0
             : (max != 0 ? val / max : 0) * 100.0)
         .toInt();
+    if (!inverted && val / max > 1) {
+      print('oops');
+    }
+    if (val == 0 && val == max) {
+      val += 0.0001;
+    }
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -46,7 +52,7 @@ class BarGraph extends StatelessWidget {
               width: 30,
               height: inverted
                   ? (val != 0 ? (max / val).clamp(0, 1) : 1) * height
-                  : (max != 0 ? val / max : 0) * height,
+                  : (max != 0 ? (val / max).clamp(0, 1) : 0) * height,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(60),
                 color: _colorSelect(val, max),

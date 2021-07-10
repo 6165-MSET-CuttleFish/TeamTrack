@@ -35,6 +35,7 @@ class _TeamView extends State<TeamView> {
   final generalColor = Color.fromRGBO(230, 30, 213, 1);
   bool showPenalties = false;
   bool _showCycles = false;
+  bool _matchIsScore = false;
   @override
   Widget build(BuildContext context) {
     _team = widget.team;
@@ -146,6 +147,20 @@ class _TeamView extends State<TeamView> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   CheckboxListTile(
+                    value: _matchIsScore,
+                    onChanged: (_) => setState(
+                      () {
+                        _matchIsScore = _ ?? false;
+                        Navigator.pop(context);
+                      },
+                    ),
+                    checkColor: Colors.black,
+                    tileColor: Colors.green,
+                    title: Text('Match Total'),
+                    subtitle: Text('Consider match total as score total'),
+                    secondary: Icon(CupertinoIcons.arrow_branch),
+                  ),
+                  CheckboxListTile(
                     value: removeOutliers,
                     onChanged: (_) => setState(
                       () {
@@ -156,7 +171,7 @@ class _TeamView extends State<TeamView> {
                     checkColor: Colors.black,
                     tileColor: Colors.green,
                     title: Text('Remove Outliers'),
-                    subtitle: Icon(CupertinoIcons.arrow_branch),
+                    secondary: Icon(CupertinoIcons.arrow_branch),
                   ),
                   CheckboxListTile(
                     value: showPenalties,
@@ -171,7 +186,7 @@ class _TeamView extends State<TeamView> {
                     checkColor: Colors.black,
                     tileColor: Colors.red,
                     title: Text('Include Penalties'),
-                    subtitle: Icon(Icons.score_rounded),
+                    secondary: Icon(Icons.score_rounded),
                   ),
                 ],
               ),
@@ -688,6 +703,7 @@ class _TeamView extends State<TeamView> {
         ),
       ),
       ScoreCard(
+        matchTotal: _matchIsScore,
         team: _team,
         event: widget.event,
         scoreDivisions: _team.scores.values.toList(),
@@ -704,6 +720,7 @@ class _TeamView extends State<TeamView> {
         ),
       ),
       ScoreCard(
+        matchTotal: _matchIsScore,
         team: _team,
         event: widget.event,
         type: OpModeType.auto,
@@ -721,6 +738,7 @@ class _TeamView extends State<TeamView> {
         ),
       ),
       ScoreCard(
+        matchTotal: _matchIsScore,
         team: _team,
         event: widget.event,
         type: OpModeType.tele,
@@ -738,6 +756,7 @@ class _TeamView extends State<TeamView> {
         ),
       ),
       ScoreCard(
+        matchTotal: _matchIsScore,
         team: _team,
         event: widget.event,
         type: OpModeType.endgame,

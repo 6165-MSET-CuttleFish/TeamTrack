@@ -1,6 +1,5 @@
 import 'package:teamtrack/Frontend/Assets/Collapsible.dart';
 import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
-import 'package:teamtrack/backend.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -79,23 +78,28 @@ class _CardView extends State<CardView> {
               ),
             ],
           ),
-          child: Column(children: [
-            AnimatedContainer(
+          child: Column(
+            children: [
+              AnimatedContainer(
                 curve: Curves.fastLinearToSlowEaseIn,
                 duration: Duration(milliseconds: 800),
                 width: getWidth(),
                 height: getHeight(),
-                child: widget.child),
-            Collapsible(
-              isCollapsed: _genBool,
-              child: Column(children: [
-                Padding(
-                  padding: EdgeInsets.only(bottom: 50),
+                child: widget.child,
+              ),
+              Collapsible(
+                isCollapsed: _genBool,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 50),
+                    ),
+                    widget.collapsed!
+                  ],
                 ),
-                widget.collapsed!
-              ]),
-            )
-          ]),
+              )
+            ],
+          ),
         ),
       ),
     );

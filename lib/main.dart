@@ -16,21 +16,11 @@ import 'package:provider/provider.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  bool updated = await remoteConfig.fetchAndActivate();
-  if (updated) {
-    Statics.gameName = remoteConfig.getString("gameName");
-    Statics.skeleton =
-        json.decode(remoteConfig.getValue(Statics.gameName).asString());
-  } else {
-    Statics.gameName = remoteConfig.getString("gameName");
-    try {
-      Statics.skeleton =
-          json.decode(remoteConfig.getValue(Statics.gameName).asString());
-    } catch (e) {
-      Statics.skeleton =
-          json.decode(remoteConfig.getValue("skeleton").asString());
-    }
-  }
+  await remoteConfig.fetchAndActivate();
+  Statics.gameName = remoteConfig.getString("gameName");
+  Statics.skeleton =
+      json.decode(remoteConfig.getValue(Statics.gameName).asString());
+
   await dataModel.restoreEvents();
   runApp(MyApp());
 }

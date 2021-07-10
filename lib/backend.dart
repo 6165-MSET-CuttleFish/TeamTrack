@@ -7,6 +7,7 @@ import 'package:firebase_database/firebase_database.dart' as Database;
 import 'package:flutter/cupertino.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tuple/tuple.dart';
 import 'score.dart';
 import 'package:uuid/uuid.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -199,6 +200,30 @@ class Event {
       return mutableData;
     });
     teams[newTeam.number] = newTeam;
+  }
+
+  List<Match> getMatches(Team team) {
+    var arr = <Match>[];
+    for (var match in matches) {
+      if (team.scores[match.id] != null) {
+        arr.add(match);
+      }
+    }
+    return arr;
+  }
+
+  List<Tuple2<Team, List<Match>>> getMatchLists() {
+    var bigArr = <Tuple2<Team, List<Match>>>[];
+    for (var team in teams.values) {
+      var smallArr = <Match>[];
+      for (var match in matches) {
+        if (match.alliance(team) != null) {
+          smallArr.add(match);
+        }
+      }
+      bigArr.add(Tuple2(team, smallArr));
+    }
+    return bigArr;
   }
 
   void addMatch(Match e) async {
@@ -569,18 +594,25 @@ class Match {
 
   String score({bool? showPenalties}) {
     if (type == EventType.remote) {
-      return redScore(showPenalties: showPenalties);
+      return redScore(showPenalties: showPenalties).toString();
     }
-    return redScore(showPenalties: showPenalties) +
+    return redScore(showPenalties: showPenalties).toString() +
         " - " +
-        blueScore(showPenalties: showPenalties);
+        blueScore(showPenalties: showPenalties).toString();
   }
 
-  String redScore({bool? showPenalties}) =>
-      (red?.allianceTotal(id, showPenalties) ?? 0).toString();
+  int getScoreTotal(bool showPenalties) {
+    return [
+      redScore(showPenalties: showPenalties),
+      blueScore(showPenalties: showPenalties)
+    ].reduce(max);
+  }
 
-  String blueScore({bool? showPenalties}) =>
-      (blue?.allianceTotal(id, showPenalties) ?? 0).toString();
+  int redScore({bool? showPenalties}) =>
+      red?.allianceTotal(id, showPenalties) ?? 0;
+
+  int blueScore({bool? showPenalties}) =>
+      blue?.allianceTotal(id, showPenalties) ?? 0;
 
   Match.fromJson(
       Map<String, dynamic> json, Map<String, Team> teamList, this.type) {
@@ -684,18 +716,19 @@ extension DiceExtension on Dice {
   }
 }
 
-extension Arithmetic on Iterable<num> {
+extension Arithmetic on Iterable<num?> {
   double mean() {
     if (this.length == 0) return 0;
-    return this
-            .reduce((value, element) => value.toDouble() + element.toDouble()) /
+    return (this.reduce((value, element) =>
+                (value?.toDouble() ?? 0) + (element?.toDouble() ?? 0)) ??
+            0) /
         this.length;
   }
 
   List<FlSpot> spots() {
     List<FlSpot> val = [];
     for (int i = 0; i < this.length; i++)
-      val.add(FlSpot(i.toDouble(), this.toList()[i].toDouble()));
+      val.add(FlSpot(i.toDouble(), (this.toList()[i]?.toDouble() ?? 0)));
     return val;
   }
 
@@ -703,7 +736,7 @@ extension Arithmetic on Iterable<num> {
     if (this.length == 0) return 0;
     double mean = this.mean();
     return sqrt(this
-            .map((e) => pow(e - mean, 2).toDouble())
+            .map((e) => pow((e ?? 0) - mean, 2).toDouble())
             .reduce((value, element) => value + element) /
         this.length);
   }
@@ -734,28 +767,30 @@ extension Arithmetic on Iterable<num> {
     return arr.sublist(this.length ~/ 2).median();
   }
 
-  double maxValue() => this.map((e) => e.toDouble()).reduce(max);
-  double minValue() => this.map((e) => e.toDouble()).reduce(min);
+  double maxValue() =>
+      this.length != 0 ? this.map((e) => e?.toDouble() ?? 0).reduce(max) : 0;
+  double minValue() =>
+      this.length != 0 ? this.map((e) => e?.toDouble() ?? 0).reduce(min) : 0;
 
   List<double> sorted() {
     if (this.length < 2) return [];
     List<double> val = [];
-    for (num i in this) val.add(i.toDouble());
+    for (num? i in this) val.add(i?.toDouble() ?? 0);
     val.sort((a, b) => a.compareTo(b));
     return val;
   }
 
   List<double> removeOutliers(bool removeOutliers) {
-    if (this.length < 3) return this.map((e) => e.toDouble()).toList();
+    if (this.length < 3) return this.map((e) => e?.toDouble() ?? 0).toList();
     return this
-        .map((e) => e.toDouble())
+        .map((e) => e?.toDouble() ?? 0)
         .where((e) => removeOutliers ? !e.isOutlier(this) : true)
         .toList();
   }
 }
 
 extension moreArithmetic on num {
-  bool isOutlier(Iterable<num> list) =>
+  bool isOutlier(Iterable<num?> list) =>
       this < list.q1() - 1.5 * list.iqr() ||
       this > list.q3() + 1.5 * list.iqr();
 }
@@ -800,6 +835,9 @@ extension MatchExtensions on List<Match> {
     }
     return val.reduce(max);
   }
+
+  double maxScore(bool showPenalties) =>
+      this.map((e) => e.getScoreTotal(showPenalties)).maxValue();
 }
 
 extension SpotExtensions on List<FlSpot> {
@@ -995,5 +1033,20 @@ extension ScoresExtension on Map<String, Score> {
     returnList
         .sort((a, b) => a.timeStamp.toDate().compareTo(b.timeStamp.toDate()));
     return returnList;
+  }
+}
+
+extension StrExt on String {
+  // return new string with spaces added before capital letters
+  String spaceBeforeCapital() {
+    var returnString = "";
+    for (var i = 0; i < this.length; i++) {
+      var currentChar = this[i];
+      if (currentChar.toUpperCase() == currentChar && i != 0) {
+        returnString += " ";
+      }
+      returnString += currentChar;
+    }
+    return returnString;
   }
 }
