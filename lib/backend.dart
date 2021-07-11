@@ -169,10 +169,10 @@ class DataModel {
     }
   }
 
-  Future<void> shareEvent({required Map metaData, String? username}) async {
+  Future<HttpsCallableResult<dynamic>> shareEvent({required Map metaData, String? email}) async {
     final HttpsCallable callable = functions.httpsCallable('shareEvent');
-    var resp = await callable.call(<String, dynamic>{
-      'username': username,
+    return callable.call(<String, dynamic>{
+      'email': email,
       'metaData': metaData,
     });
   }
@@ -484,6 +484,9 @@ class Alliance {
                       : -getPenalty())
                   : 0))
           .clamp(0, 999);
+  Score total() =>
+      (team1?.scores[id] ?? Score('', Dice.none)) +
+      (team2?.scores[id] ?? Score('', Dice.none));
 
   Alliance.fromJson(
     Map<String, dynamic> json,
@@ -601,18 +604,20 @@ class Match {
         blueScore(showPenalties: showPenalties).toString();
   }
 
-  int getScoreTotal(bool showPenalties) {
+  Score getMaxScoreVal(bool showPenalties) {
     return [
       redScore(showPenalties: showPenalties),
       blueScore(showPenalties: showPenalties)
-    ].reduce(max);
+    ].reduce((a, b) => a.compareTo(b) > 0 ? a : b);
   }
 
-  int redScore({bool? showPenalties}) =>
-      red?.allianceTotal(id, showPenalties) ?? 0;
+  Score redScore({bool? showPenalties}) =>
+      red?.total() ??
+      Score('', Dice.none);
 
-  int blueScore({bool? showPenalties}) =>
-      blue?.allianceTotal(id, showPenalties) ?? 0;
+  Score blueScore({bool? showPenalties}) =>
+      blue?.total() ??
+      Score('', Dice.none);
 
   Match.fromJson(
       Map<String, dynamic> json, Map<String, Team> teamList, this.type) {
@@ -837,7 +842,7 @@ extension MatchExtensions on List<Match> {
   }
 
   double maxScore(bool showPenalties) =>
-      this.map((e) => e.getScoreTotal(showPenalties)).maxValue();
+      this.map((e) => e.getMaxScoreVal(showPenalties).total().toDouble()).maxValue();
 }
 
 extension SpotExtensions on List<FlSpot> {

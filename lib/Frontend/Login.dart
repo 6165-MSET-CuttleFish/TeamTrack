@@ -37,7 +37,7 @@ class _LoginView extends State<LoginView> {
               Image.asset(
                 "LoadingScreen2.png",
               ),
-              Spacer()
+              Spacer(),
             ],
           ),
           SafeArea(
@@ -148,25 +148,24 @@ class _LoginView extends State<LoginView> {
             children: [Icon(Icons.person), Text('Sign Up')],
           ),
         ),
-        GoogleAuthButton(
-          onPressed: () async {
-            await context.read<AuthenticationService>().signInWithGoogle();
-          },
-          darkMode: true,
-          style: AuthButtonStyle(
-              iconSize: 20,
-              textStyle: TextStyle(fontSize: 14, color: Colors.white),
-              width: size.width - 80),
-        ),
         PlatformButton(
           color: CupertinoColors.systemBlue,
-          onPressed: () =>
-              context.read<AuthenticationService>().signInWithAnonymous(),
+          onPressed: () async =>
+              await context.read<AuthenticationService>().signInWithAnonymous(),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [Icon(Icons.visibility_off), Text('Anonymous Sign In')],
           ),
+        ),
+        GoogleAuthButton(
+          onPressed: () async =>
+              await context.read<AuthenticationService>().signInWithGoogle(),
+          darkMode: true,
+          style: AuthButtonStyle(
+              iconSize: 20,
+              textStyle: TextStyle(fontSize: 14, color: Colors.white),
+              width: size.width - 80),
         ),
         EmailAuthButton(
           onPressed: () {
@@ -199,17 +198,17 @@ class _LoginView extends State<LoginView> {
                 padding: EdgeInsets.all(20),
               ),
               PlatformTextField(
+                controller: displayNameController,
+                keyboardType: TextInputType.emailAddress,
+                placeholder: "Display Name",
+              ),
+              PlatformTextField(
                 controller: emailController,
                 keyboardType: TextInputType.emailAddress,
                 placeholder: "Email",
               ),
               Padding(
                 padding: EdgeInsets.all(5),
-              ),
-              PlatformTextField(
-                controller: displayNameController,
-                keyboardType: TextInputType.emailAddress,
-                placeholder: "Display Name",
               ),
               Padding(
                 padding: EdgeInsets.all(5),
@@ -218,6 +217,12 @@ class _LoginView extends State<LoginView> {
                 controller: passwordController,
                 keyboardType: TextInputType.visiblePassword,
                 placeholder: "Password",
+                obscureText: true,
+              ),
+              PlatformTextField(
+                controller: passwordController,
+                keyboardType: TextInputType.visiblePassword,
+                placeholder: "Confirm Password",
                 obscureText: true,
               ),
               Padding(

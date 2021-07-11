@@ -156,8 +156,11 @@ class _MatchView extends State<MatchView> {
                                   alignment: Alignment.center,
                                   width: 100,
                                   child: Text(
-                                      _match?.redScore(
-                                              showPenalties: _showPenalties).toString() ??
+                                      _match
+                                              ?.redScore(
+                                                  showPenalties: _showPenalties)
+                                              .total()
+                                              .toString() ??
                                           '0',
                                       style: Theme.of(context)
                                           .textTheme
@@ -173,8 +176,11 @@ class _MatchView extends State<MatchView> {
                                   alignment: Alignment.center,
                                   width: 100,
                                   child: Text(
-                                      _match?.blueScore(
-                                              showPenalties: _showPenalties).toString() ??
+                                      _match
+                                              ?.blueScore(
+                                                  showPenalties: _showPenalties)
+                                              .total()
+                                              .toString() ??
                                           '0',
                                       style: Theme.of(context)
                                           .textTheme
@@ -242,7 +248,8 @@ class _MatchView extends State<MatchView> {
                                 },
                               ).toList(),
                             ),
-                          if (getPenaltyAlliance() != null)
+                          if (getPenaltyAlliance() != null &&
+                              widget.team == null)
                             ExpansionTile(
                                 leading: Checkbox(
                                   checkColor: Colors.black,
@@ -471,21 +478,23 @@ class _MatchView extends State<MatchView> {
       name: 'Increment Value', min: () => 1, count: 1, key: null);
   void increaseMisses() async {
     if (!widget.event.shared) _score?.teleScore.misses.count++;
-    widget.event.getRef()?.runTransaction((mutableData) async {
-      var teamIndex;
-      try {
-        mutableData.value['teams'] as Map;
-        teamIndex = _selectedTeam?.number;
-      } catch (e) {
-        teamIndex = int.parse(_selectedTeam?.number ?? '');
-      }
-      final scoreIndex = _score?.id;
-      var ref = mutableData.value['teams'][teamIndex]['scores'][scoreIndex]
-          ['TeleScore']['Misses'];
-      mutableData.value['teams'][teamIndex]['scores'][scoreIndex]['TeleScore']
-          ['Misses'] = (ref ?? 0) + 1;
-      return mutableData;
-    });
+    widget.event.getRef()?.runTransaction(
+      (mutableData) async {
+        var teamIndex;
+        try {
+          mutableData.value['teams'] as Map;
+          teamIndex = _selectedTeam?.number;
+        } catch (e) {
+          teamIndex = int.parse(_selectedTeam?.number ?? '');
+        }
+        final scoreIndex = _score?.id;
+        var ref = mutableData.value['teams'][teamIndex]['scores'][scoreIndex]
+            ['TeleScore']['Misses'];
+        mutableData.value['teams'][teamIndex]['scores'][scoreIndex]['TeleScore']
+            ['Misses'] = (ref ?? 0) + 1;
+        return mutableData;
+      },
+    );
   }
 
   List<Widget> teleView() => !_paused || _allowView

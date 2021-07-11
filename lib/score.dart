@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:teamtrack/backend.dart';
 
-class Score extends ScoreDivision {
+class Score extends ScoreDivision implements Comparable<Score> {
   TeleScore teleScore = TeleScore();
   AutoScore autoScore = AutoScore();
   EndgameScore endgameScore = EndgameScore();
@@ -74,8 +74,12 @@ class Score extends ScoreDivision {
     score.autoScore = autoScore + other.autoScore;
     score.teleScore = teleScore + other.teleScore;
     score.endgameScore = endgameScore + other.endgameScore;
+    score.penalties = penalties + other.penalties;
     return score;
   }
+
+  @override
+  int compareTo(Score other) => total().compareTo(other.total());
 }
 
 Dice getDiceFromString(String statusAsString) {
@@ -347,6 +351,14 @@ class Penalty extends ScoreDivision {
   int total({bool? showPenalties}) => getElements()
       .map((e) => e.scoreValue())
       .reduce((value, element) => value + element);
+
+  Penalty operator +(Penalty other) {
+    var penalty = Penalty();
+    penalty.dice = dice;
+    penalty.majorPenalty = other.majorPenalty + majorPenalty;
+    penalty.minorPenalty = other.minorPenalty + minorPenalty;
+    return penalty;
+  }
 
   Penalty.fromJson(Map<String, dynamic> json)
       : majorPenalty = ScoringElement(

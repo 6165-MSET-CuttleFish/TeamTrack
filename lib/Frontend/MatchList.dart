@@ -174,8 +174,29 @@ class _MatchList extends State<MatchList> {
                               style: Theme.of(context).textTheme.caption,
                             )
                           ]),
-                      trailing: Text(
-                        e.score(showPenalties: true),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            e.redScore(showPenalties: true).total().toString(),
+                            style: TextStyle(
+                              color: e.redScore(showPenalties: true).total() >
+                                      e.blueScore(showPenalties: true).total()
+                                  ? CupertinoColors.systemRed
+                                  : Colors.grey,
+                            ),
+                          ),
+                          Text(" - "),
+                          Text(
+                            e.blueScore(showPenalties: true).total().toString(),
+                            style: TextStyle(
+                              color: e.redScore(showPenalties: true).total() <
+                                      e.blueScore(showPenalties: true).total()
+                                  ? CupertinoColors.systemBlue
+                                  : Colors.grey,
+                            ),
+                          ),
+                        ],
                       ),
                       onTap: () async {
                         await Navigator.push(
@@ -389,8 +410,27 @@ class _MatchList extends State<MatchList> {
                 style: Theme.of(context).textTheme.caption,
               )
             ]),
-            trailing: Text(
-              e.score(showPenalties: true),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  e.redScore(showPenalties: true).total().toString(),
+                  style: TextStyle(
+                    color: e.alliance(widget.team) == e.red
+                        ? CupertinoColors.systemYellow
+                        : Colors.grey,
+                  ),
+                ),
+                Text(" - "),
+                Text(
+                  e.blueScore(showPenalties: true).total().toString(),
+                  style: TextStyle(
+                    color: e.alliance(widget.team) == e.blue
+                        ? CupertinoColors.systemYellow
+                        : Colors.grey,
+                  ),
+                ),
+              ],
             ),
             onTap: () async {
               await Navigator.push(
@@ -487,8 +527,43 @@ class MatchSearch extends SearchDelegate<String?> {
                       style: Theme.of(context).textTheme.caption,
                     )
                   ]),
-              trailing: Text(
-                suggestionList[index].score(showPenalties: true),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    suggestionList[index]
+                        .redScore(showPenalties: true)
+                        .total()
+                        .toString(),
+                    style: TextStyle(
+                      color: suggestionList[index]
+                                  .redScore(showPenalties: true)
+                                  .total() >
+                              suggestionList[index]
+                                  .blueScore(showPenalties: true)
+                                  .total()
+                          ? CupertinoColors.systemRed
+                          : Colors.grey,
+                    ),
+                  ),
+                  Text(" - "),
+                  Text(
+                    suggestionList[index]
+                        .blueScore(showPenalties: true)
+                        .total()
+                        .toString(),
+                    style: TextStyle(
+                      color: suggestionList[index]
+                                  .redScore(showPenalties: true)
+                                  .total() <
+                              suggestionList[index]
+                                  .blueScore(showPenalties: true)
+                                  .total()
+                          ? CupertinoColors.systemBlue
+                          : Colors.grey,
+                    ),
+                  ),
+                ],
               ),
               onTap: () {
                 close(context, null);

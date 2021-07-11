@@ -147,20 +147,6 @@ class _TeamView extends State<TeamView> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   CheckboxListTile(
-                    value: _matchIsScore,
-                    onChanged: (_) => setState(
-                      () {
-                        _matchIsScore = _ ?? false;
-                        Navigator.pop(context);
-                      },
-                    ),
-                    checkColor: Colors.black,
-                    tileColor: Colors.green,
-                    title: Text('Match Total'),
-                    subtitle: Text('Consider match total as score total'),
-                    secondary: Icon(CupertinoIcons.arrow_branch),
-                  ),
-                  CheckboxListTile(
                     value: removeOutliers,
                     onChanged: (_) => setState(
                       () {
@@ -185,9 +171,24 @@ class _TeamView extends State<TeamView> {
                     },
                     checkColor: Colors.black,
                     tileColor: Colors.red,
-                    title: Text('Include Penalties'),
-                    secondary: Icon(Icons.score_rounded),
+                    title: Text('Count Penalties'),
+                    secondary: Icon(CupertinoIcons.xmark_seal_fill),
                   ),
+                  if (widget.event.type != EventType.remote)
+                    CheckboxListTile(
+                      value: _matchIsScore,
+                      onChanged: (_) => setState(
+                        () {
+                          _matchIsScore = _ ?? false;
+                          Navigator.pop(context);
+                        },
+                      ),
+                      checkColor: Colors.black,
+                      tileColor: Colors.blue,
+                      title: Text('Match Total'),
+                      subtitle: Text('Consider match total as score total'),
+                      secondary: Icon(CupertinoIcons.square_stack),
+                    ),
                 ],
               ),
             ),
@@ -307,11 +308,6 @@ class _TeamView extends State<TeamView> {
                                   color: const Color(0xff37434d), width: 1),
                             ),
                             minX: 0,
-                            maxX: _team.scores
-                                    .diceScores(_dice)
-                                    .length
-                                    .toDouble() -
-                                1,
                             minY: 0,
                             maxY: [
                               widget.event.matches

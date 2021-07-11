@@ -27,7 +27,7 @@ class _Verify extends State<Verify> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      "Please verify your email address.",
+                      "A verfication email has been sent,",
                       style: TextStyle(
                         fontSize: 20,
                       ),
@@ -36,7 +36,7 @@ class _Verify extends State<Verify> {
                       color: CupertinoColors.systemRed,
                       child: Text("Sign Out"),
                       onPressed: () =>
-                          {context.read<AuthenticationService>().signOut()},
+                          context.read<AuthenticationService>().signOut(),
                     ),
                   ],
                 ),

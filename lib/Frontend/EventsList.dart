@@ -539,29 +539,33 @@ class _EventsList extends State<EventsList> {
             ),
             PlatformDialogAction(
               child: Text('Share'),
-              onPressed: () {
-                firebaseFirestore
-                    .collection('inboxes')
-                    .doc(Statics.gameName)
-                    .collection(_emailController.text.trim())
-                    .add(
-                  {
-                    'name': e.name,
-                    'senderEmail': context.read<User?>()?.email,
-                    'senderName': context.read<User?>()?.displayName,
-                    'sendDate': Timestamp.now(),
-                    'authorName': e.authorName,
-                    'authorEmail': e.authorEmail,
-                    'creationDate': e.timeStamp,
-                    'id': e.id,
-                    'type': e.type.toString(),
-                  },
-                );
+              onPressed: () async {
+                if (_emailController.text.trim().isEmpty) {
+                  await dataModel.shareEvent(
+                    metaData: {
+                      'name': e.name,
+                      'senderEmail': context.read<User?>()?.email,
+                      'senderName': context.read<User?>()?.displayName,
+                      'sendDate': Timestamp.now(),
+                      'authorName': e.authorName,
+                      'authorEmail': e.authorEmail,
+                      'creationDate': e.timeStamp,
+                      'id': e.id,
+                      'type': e.type.toString(),
+                    },
+                    email: _emailController.text.trim(),
+                  );
+                }
                 if (!e.shared) {
                   e.shared = true;
                   var json = e.toJson();
                   var uid = context.read<User?>()?.uid;
-                  if (uid != null) json.addAll({uid: true});
+                  if (uid != null)
+                    json.addAll(
+                      {
+                        'Permissions': {},
+                      },
+                    );
                   firebaseDatabase
                       .reference()
                       .child("Events/${Statics.gameName}/${e.id}")
