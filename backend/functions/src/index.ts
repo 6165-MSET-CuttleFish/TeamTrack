@@ -22,26 +22,13 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
     );
   }
   const ref = admin.firestore().collection("users").doc(user.uid);
-  let tokens:string[] = [];
-  const name = data.metaData["name"];
-  const sender = data.metaData["senderName"];
-  await admin.firestore().runTransaction(async (t) => {
+  return admin.firestore().runTransaction(async (t) => {
     const doc = await t.get(ref);
     const newInbox = doc?.data()?.inbox;
-    tokens = doc?.data()?.FCMtokens;
     newInbox.push(data.metaData);
     console.log(newInbox);
     t.update(ref, {inbox: newInbox});
   });
-
-  const message = {
-    data: {name: name, sender: sender},
-    tokens: tokens,
-  };
-  admin.messaging().sendMulticast(message)
-      .then((response) => {
-        console.log(response.successCount + " messages were sent successfully");
-      });
 });
 
 export const createUser = functions.auth.user().onCreate(async (user) => {
