@@ -36,6 +36,7 @@ export const createUser = functions.auth.user().onCreate(async (user) => {
     inbox: [],
     events: [],
     blockedUsers: [],
+    FCMtokens: [],
   });
 });
 
