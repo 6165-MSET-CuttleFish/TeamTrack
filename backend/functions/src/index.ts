@@ -2,7 +2,7 @@ import admin = require("firebase-admin");
 import * as functions from "firebase-functions";
 // Start writing Firebase Functions
 // https://firebase.google.com/docs/functions/typescript
-
+admin.initializeApp();
 export const shareEvent = functions.https.onCall(async (data, context) => {
   functions.logger.info("Event share", {structuredData: true});
   if (!context.auth) {
