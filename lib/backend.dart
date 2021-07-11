@@ -169,8 +169,10 @@ class DataModel {
     }
   }
 
-  Future<HttpsCallableResult<dynamic>> shareEvent({required Map metaData, required String email}) async {
-    final HttpsCallable callable = functions.httpsCallable('https://us-central1-teamtrack-cf8f3.cloudfunctions.net/shareEvent');
+  Future<HttpsCallableResult<dynamic>> shareEvent(
+      {required Map metaData, required String email}) async {
+    final HttpsCallable callable = functions.httpsCallable(
+        'https://us-central1-teamtrack-cf8f3.cloudfunctions.net/shareEvent');
     return callable.call(<String, dynamic>{
       'email': email,
       'metaData': metaData,
@@ -611,13 +613,10 @@ class Match {
     ].reduce((a, b) => a.compareTo(b) > 0 ? a : b);
   }
 
-  Score redScore({bool? showPenalties}) =>
-      red?.total() ??
-      Score('', Dice.none);
+  Score redScore({bool? showPenalties}) => red?.total() ?? Score('', Dice.none);
 
   Score blueScore({bool? showPenalties}) =>
-      blue?.total() ??
-      Score('', Dice.none);
+      blue?.total() ?? Score('', Dice.none);
 
   Match.fromJson(
       Map<String, dynamic> json, Map<String, Team> teamList, this.type) {
@@ -841,8 +840,9 @@ extension MatchExtensions on List<Match> {
     return val.reduce(max);
   }
 
-  double maxScore(bool showPenalties) =>
-      this.map((e) => e.getMaxScoreVal(showPenalties).total().toDouble()).maxValue();
+  double maxScore(bool showPenalties) => this
+      .map((e) => e.getMaxScoreVal(showPenalties).total().toDouble())
+      .maxValue();
 }
 
 extension SpotExtensions on List<FlSpot> {

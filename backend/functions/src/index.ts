@@ -21,6 +21,7 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
         "Requested user does not exist"
     );
   }
+  console.log(data.email);
   const ref = admin.firestore().collection("users").doc(user.uid);
   return admin.firestore().runTransaction(async (t) => {
     const doc = await t.get(ref);
