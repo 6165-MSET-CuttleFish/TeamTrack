@@ -606,7 +606,7 @@ class Match {
     blue?.team2?.scores[id]?.setDice(dice, timeStamp);
   }
 
-  String score({bool? showPenalties}) {
+  String score({required bool? showPenalties}) {
     if (type == EventType.remote) {
       return redScore(showPenalties: showPenalties).toString();
     }
@@ -615,17 +615,18 @@ class Match {
         blueScore(showPenalties: showPenalties).toString();
   }
 
-  Score getMaxScoreVal(bool showPenalties) {
+  int getMaxScoreVal({required bool? showPenalties}) {
     return [
       redScore(showPenalties: showPenalties),
       blueScore(showPenalties: showPenalties)
-    ].reduce((a, b) => a.compareTo(b) > 0 ? a : b);
+    ].reduce(max);
   }
 
-  Score redScore({bool? showPenalties}) => red?.total() ?? Score('', Dice.none);
+  int redScore({required bool? showPenalties}) =>
+      red?.allianceTotal(id, showPenalties) ?? 0;
 
-  Score blueScore({bool? showPenalties}) =>
-      blue?.total() ?? Score('', Dice.none);
+  int blueScore({required bool? showPenalties}) =>
+      blue?.allianceTotal(id, showPenalties) ?? 0;
 
   Match.fromJson(
       Map<String, dynamic> json, Map<String, Team> teamList, this.type) {
@@ -849,9 +850,10 @@ extension MatchExtensions on List<Match> {
     return val.reduce(max);
   }
 
-  double maxScore(bool showPenalties) => this
-      .map((e) => e.getMaxScoreVal(showPenalties).total().toDouble())
-      .maxValue();
+  double maxScore(bool showPenalties) => this.toList()
+      .map((e) => e.getMaxScoreVal(showPenalties: showPenalties))
+      .reduce(max)
+      .toDouble();
 }
 
 extension SpotExtensions on List<FlSpot> {

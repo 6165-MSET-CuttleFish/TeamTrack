@@ -178,20 +178,20 @@ class _MatchList extends State<MatchList> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            e.redScore(showPenalties: true).total().toString(),
+                            e.redScore(showPenalties: true).toString(),
                             style: TextStyle(
-                              color: e.redScore(showPenalties: true).total() >
-                                      e.blueScore(showPenalties: true).total()
+                              color: e.redScore(showPenalties: true) >
+                                      e.blueScore(showPenalties: true)
                                   ? CupertinoColors.systemRed
                                   : Colors.grey,
                             ),
                           ),
                           Text(" - "),
                           Text(
-                            e.blueScore(showPenalties: true).total().toString(),
+                            e.blueScore(showPenalties: true).toString(),
                             style: TextStyle(
-                              color: e.redScore(showPenalties: true).total() <
-                                      e.blueScore(showPenalties: true).total()
+                              color: e.redScore(showPenalties: true) <
+                                      e.blueScore(showPenalties: true)
                                   ? CupertinoColors.systemBlue
                                   : Colors.grey,
                             ),
@@ -414,7 +414,7 @@ class _MatchList extends State<MatchList> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  e.redScore(showPenalties: true).total().toString(),
+                  e.redScore(showPenalties: true).toString(),
                   style: TextStyle(
                     color: e.alliance(widget.team) == e.red
                         ? CupertinoColors.systemYellow
@@ -423,7 +423,7 @@ class _MatchList extends State<MatchList> {
                 ),
                 Text(" - "),
                 Text(
-                  e.blueScore(showPenalties: true).total().toString(),
+                  e.blueScore(showPenalties: true).toString(),
                   style: TextStyle(
                     color: e.alliance(widget.team) == e.blue
                         ? CupertinoColors.systemYellow
@@ -533,34 +533,28 @@ class MatchSearch extends SearchDelegate<String?> {
                   Text(
                     suggestionList[index]
                         .redScore(showPenalties: true)
-                        .total()
                         .toString(),
                     style: TextStyle(
-                      color: suggestionList[index]
-                                  .redScore(showPenalties: true)
-                                  .total() >
-                              suggestionList[index]
-                                  .blueScore(showPenalties: true)
-                                  .total()
-                          ? CupertinoColors.systemRed
-                          : Colors.grey,
+                      color:
+                          suggestionList[index].redScore(showPenalties: true) >
+                                  suggestionList[index]
+                                      .blueScore(showPenalties: true)
+                              ? CupertinoColors.systemRed
+                              : Colors.grey,
                     ),
                   ),
                   Text(" - "),
                   Text(
                     suggestionList[index]
                         .blueScore(showPenalties: true)
-                        .total()
                         .toString(),
                     style: TextStyle(
-                      color: suggestionList[index]
-                                  .redScore(showPenalties: true)
-                                  .total() <
-                              suggestionList[index]
-                                  .blueScore(showPenalties: true)
-                                  .total()
-                          ? CupertinoColors.systemBlue
-                          : Colors.grey,
+                      color:
+                          suggestionList[index].redScore(showPenalties: true) <
+                                  suggestionList[index]
+                                      .blueScore(showPenalties: true)
+                              ? CupertinoColors.systemBlue
+                              : Colors.grey,
                     ),
                   ),
                 ],
