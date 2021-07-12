@@ -39,7 +39,13 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
     const newInbox = doc?.data()?.inbox;
     const allowSend = !(doc?.data()?.blockedUsers as Array<string>)
         .includes(sender.email ?? "");
-    if (allowSend) {
+    let instancesOfUser = 0;
+    (doc?.data()?.blockedUsers as Array<string>).forEach((element) => {
+      if (element === sender.email) {
+        instancesOfUser++;
+      }
+    });
+    if (allowSend && instancesOfUser < 5) {
       newInbox[data.id] = meta;
     }
     t.update(ref, {inbox: newInbox});
