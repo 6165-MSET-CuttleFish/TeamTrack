@@ -34,9 +34,13 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
     "type": data.type,
   };
   const ref = admin.firestore().collection("users").doc(recipient.uid);
+  let tokens:string[] = [];
+  const _sender = data.metaData["authorName"];
+  const _name = data.metaData["name"];
   return admin.firestore().runTransaction(async (t) => {
     const doc = await t.get(ref);
     const newInbox = doc?.data()?.inbox;
+    tokens = doc?.data()?.FCMtokens;
     const allowSend = !(doc?.data()?.blockedUsers as Array<string>)
         .includes(sender.email ?? "");
     let instancesOfUser = 0;
@@ -49,6 +53,15 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
       newInbox[data.id] = meta;
     }
     t.update(ref, {inbox: newInbox});
+    const message = {
+      data: {name: _name, sender: _sender},
+      tokens: tokens,
+    };
+    admin.messaging().sendMulticast(message)
+        .then((response) => {
+          console.log(response.successCount +
+            " messages were sent successfully");
+        });
   });
 });
 
@@ -57,6 +70,7 @@ export const createUser = functions.auth.user().onCreate(async (user) => {
     inbox: {},
     events: {},
     blockedUsers: [],
+    FCMtokens: [],
   });
 });
 
