@@ -540,19 +540,13 @@ class _EventsList extends State<EventsList> {
             PlatformDialogAction(
               child: Text('Share'),
               onPressed: () async {
-                if (_emailController.text.trim().isEmpty) {
+                if (_emailController.text.trim().isNotEmpty) {
                   await dataModel.shareEvent(
-                    metaData: {
-                      'name': e.name,
-                      'senderEmail': context.read<User?>()?.email,
-                      'senderName': context.read<User?>()?.displayName,
-                      'sendDate': Timestamp.now(),
-                      'authorName': e.authorName,
-                      'authorEmail': e.authorEmail,
-                      'creationDate': e.timeStamp,
-                      'id': e.id,
-                      'type': e.type.toString(),
-                    },
+                    name: e.name,
+                    authorName: e.authorName ?? '',
+                    authorEmail: e.authorEmail ?? '',
+                    id: e.id,
+                    type: e.type.toString(),
                     email: _emailController.text.trim(),
                   );
                 }

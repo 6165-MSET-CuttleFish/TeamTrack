@@ -11,33 +11,46 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
         "User not logged in"
     );
   }
-  const user = await admin
+  const sender = await admin
+      .auth()
+      .getUser(context.auth.uid);
+  const recipient = await admin
       .auth()
       .getUserByEmail(data.email);
-  if (user == null) {
-    console.log("User not found");
+  if (recipient == null) {
     throw new functions.https.HttpsError(
         "invalid-argument",
         "Requested user does not exist"
     );
   }
-  console.log(data.email);
-  const ref = admin.firestore().collection("users").doc(user.uid);
+  const meta = {
+    "id": data.id,
+    "name": data.name,
+    "authorEmail": data.authorEmail,
+    "authorName": data.authorName,
+    "senderName": sender.displayName,
+    "senderEmail": sender.email,
+    "sendTime": admin.firestore.FieldValue.serverTimestamp(),
+    "type": data.type,
+  };
+  const ref = admin.firestore().collection("users").doc(recipient.uid);
   return admin.firestore().runTransaction(async (t) => {
     const doc = await t.get(ref);
     const newInbox = doc?.data()?.inbox;
-    newInbox.push(data.metaData);
-    console.log(newInbox);
+    const allowSend = !(doc?.data()?.blockedUsers as Array<string>)
+        .includes(sender.email ?? "");
+    if (allowSend) {
+      newInbox[data.id] = meta;
+    }
     t.update(ref, {inbox: newInbox});
   });
 });
 
 export const createUser = functions.auth.user().onCreate(async (user) => {
   return admin.firestore().collection("users").doc(user.uid).set({
-    inbox: [],
-    events: [],
+    inbox: {},
+    events: {},
     blockedUsers: [],
-    FCMtokens: [],
   });
 });
 

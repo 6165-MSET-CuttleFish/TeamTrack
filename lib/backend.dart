@@ -169,13 +169,22 @@ class DataModel {
     }
   }
 
-  Future<HttpsCallableResult<dynamic>> shareEvent(
-      {required Map metaData, required String email}) async {
-    final HttpsCallable callable = functions.httpsCallable(
-        'https://us-central1-teamtrack-cf8f3.cloudfunctions.net/shareEvent');
+  Future<HttpsCallableResult<dynamic>> shareEvent({
+    required String name,
+    required String email,
+    required String authorEmail,
+    required String id,
+    required String type,
+    required String authorName,
+  }) async {
+    final HttpsCallable callable = functions.httpsCallable('shareEvent');
     return callable.call(<String, dynamic>{
       'email': email,
-      'metaData': metaData,
+      'name': name,
+      'id' : id,
+      'authorEmail': authorEmail,
+      'type' : type,
+      'authorName' : authorName,
     });
   }
 }
