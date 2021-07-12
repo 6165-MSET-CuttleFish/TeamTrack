@@ -35,8 +35,8 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
   };
   const ref = admin.firestore().collection("users").doc(recipient.uid);
   let tokens:string[] = [];
+  const _sender = data.metaData["authorName"];
   const _name = data.metaData["name"];
-  const _sender = data.metaData["sender"];
   return admin.firestore().runTransaction(async (t) => {
     const doc = await t.get(ref);
     const newInbox = doc?.data()?.inbox;
