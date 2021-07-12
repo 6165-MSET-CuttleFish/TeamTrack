@@ -540,6 +540,38 @@ class _EventsList extends State<EventsList> {
             PlatformDialogAction(
               child: Text('Share'),
               onPressed: () async {
+                if (!e.shared) {
+                  e.shared = true;
+                  var json = e.toJson();
+                  json['Editors'] = {};
+                  var uid = context.read<User?>()?.uid;
+                  if (uid != null)
+                    json.addAll(
+                      {
+                        'Permissions': {},
+                      },
+                    );
+                  await firebaseDatabase
+                      .reference()
+                      .child("Events/${Statics.gameName}/${e.id}")
+                      .set(json);
+                  var ref = firebaseFirestore.collection('users').doc(uid);
+                  firebaseFirestore.runTransaction((transaction) async {
+                    var doc = await transaction.get(ref);
+                    var newEvents = doc.data()?['events'] as Map;
+                    newEvents[e.id] = {
+                      'name': e.name,
+                      'sendDate': Timestamp.now(),
+                      'authorName': e.authorName,
+                      'authorEmail': e.authorEmail,
+                      'creationDate': e.timeStamp,
+                      'id': e.id,
+                      'type': e.type.toString(),
+                    };
+                    transaction.update(ref, {'events': newEvents});
+                  });
+                  dataModel.saveEvents();
+                }
                 if (_emailController.text.trim().isNotEmpty) {
                   await dataModel.shareEvent(
                     name: e.name,
@@ -549,22 +581,6 @@ class _EventsList extends State<EventsList> {
                     type: e.type.toString(),
                     email: _emailController.text.trim(),
                   );
-                }
-                if (!e.shared) {
-                  e.shared = true;
-                  var json = e.toJson();
-                  var uid = context.read<User?>()?.uid;
-                  if (uid != null)
-                    json.addAll(
-                      {
-                        'Permissions': {},
-                      },
-                    );
-                  firebaseDatabase
-                      .reference()
-                      .child("Events/${Statics.gameName}/${e.id}")
-                      .set(json);
-                  dataModel.saveEvents();
                 }
                 Navigator.of(context).pop();
               },

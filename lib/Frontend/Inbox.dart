@@ -14,17 +14,20 @@ class Inbox extends StatefulWidget {
 }
 
 class _InboxState extends State<Inbox> {
-  late DocumentReference docRef;
   @override
   Widget build(BuildContext context) {
-    docRef =
+    var docRef =
         firebaseFirestore.collection('users').doc(context.read<User?>()?.uid);
     return FutureBuilder<DocumentSnapshot>(
       future: docRef.get(),
       builder: (context, query) {
-        if (query.data != null)
+        if (query.data != null) {
+          var queryResult =
+              (query.data?['inbox'] as Map<String, dynamic>?)?.values.toList();
+          queryResult?.sort(
+              (a, b) => (a['sendTime'] as Timestamp).compareTo(b['sendTime']));
           return ListView(
-            children: (query.data?['inbox'] as List<Map>?)
+            children: queryResult
                     ?.map(
                       (e) => Container(
                         decoration: BoxDecoration(
@@ -49,16 +52,19 @@ class _InboxState extends State<Inbox> {
                                 ),
                               ),
                               Text(
-                                e['senderName'] ?? "Guest",
+                                e['name'] ?? "Unnamed Event",
                               ),
                             ],
                           ),
                           title: Column(
                             children: [
                               Text(
-                                e['name'],
+                                e['senderName'] ?? "Guest",
                               ),
-                              Text(e['senderEmail'])
+                              Text(
+                                e['senderEmail'] ?? "Suspicious Email",
+                                style: TextStyle(fontSize: 12),
+                              )
                             ],
                           ),
                           trailing: Row(
@@ -69,46 +75,33 @@ class _InboxState extends State<Inbox> {
                                   Icons.check,
                                   color: Colors.green,
                                 ),
-                                onPressed: () {
-                                  var doc = e;
-                                  doc['receiveDate'] = Timestamp.now();
-                                  firebaseFirestore
-                                      .runTransaction(
-                                        (transaction) async {
-                                          // Get the document
-                                          DocumentSnapshot snapshot =
-                                              await transaction.get(docRef);
-
-                                          if (!snapshot.exists) {
-                                            throw Exception(
-                                                "User does not exist!");
-                                          }
-
-                                          List<Map> newEventsList =
-                                              (snapshot.data() as Map)["Events"]
-                                                      [Statics.gameName]
-                                                  as List<Map>;
-                                          newEventsList.add(doc);
-                                          List<Map> newInbox = (snapshot.data()
-                                                  as Map)["Inbox"]
-                                              [Statics.gameName] as List<Map>;
-                                          newInbox.removeWhere((element) =>
-                                              element['id'] == e['id']);
-                                          // Perform an update on the document
-                                          transaction.update(
-                                            docRef,
-                                            {
-                                              'Events': newEventsList,
-                                              'Inbox': newInbox,
-                                            },
-                                          );
-                                          return doc;
+                                onPressed: () async {
+                                  await firebaseFirestore.runTransaction(
+                                    (transaction) async {
+                                      var snapshot =
+                                          await transaction.get(docRef);
+                                      if (!snapshot.exists) {
+                                        throw Exception("User does not exist!");
+                                      }
+                                      Map<String, dynamic> newInbox =
+                                          snapshot.data()?["inbox"]
+                                              as Map<String, dynamic>;
+                                      newInbox.removeWhere(
+                                          (key, value) => key == e['id']);
+                                      Map<String, dynamic> newEvents =
+                                          snapshot.data()?["events"]
+                                              as Map<String, dynamic>;
+                                      newEvents[e['id']] = e;
+                                      return transaction.update(
+                                        docRef,
+                                        {
+                                          'events': newEvents,
+                                          'inbox': newInbox,
                                         },
-                                      )
-                                      .then((value) => print(
-                                          "Follower count updated to $value"))
-                                      .catchError((error) => print(
-                                          "Failed to update user followers: $error"));
+                                      );
+                                    },
+                                  );
+                                  setState(() {});
                                 },
                               ),
                               IconButton(
@@ -116,31 +109,28 @@ class _InboxState extends State<Inbox> {
                                   Icons.delete,
                                   color: Colors.red,
                                 ),
-                                onPressed: () {
-                                  firebaseFirestore.runTransaction(
+                                onPressed: () async {
+                                  await firebaseFirestore.runTransaction(
                                     (transaction) async {
-                                      // Get the document
-                                      DocumentSnapshot snapshot =
+                                      var snapshot =
                                           await transaction.get(docRef);
-
                                       if (!snapshot.exists) {
                                         throw Exception("User does not exist!");
                                       }
-                                      List<Map> newInbox =
-                                          (snapshot.data() as Map)["Inbox"]
-                                              [Statics.gameName] as List<Map>;
-                                      newInbox.removeWhere((element) =>
-                                          element['id'] == e['id']);
-                                      // Perform an update on the document
-                                      transaction.update(
+                                      Map<String, dynamic> newInbox =
+                                          snapshot.data()?["inbox"]
+                                              as Map<String, dynamic>;
+                                      newInbox.removeWhere(
+                                          (key, value) => key == e['id']);
+                                      return transaction.update(
                                         docRef,
                                         {
-                                          'Inbox': newInbox,
+                                          'inbox': newInbox,
                                         },
                                       );
-                                      return e;
                                     },
                                   );
+                                  setState(() {});
                                 },
                               ),
                             ],
@@ -151,7 +141,7 @@ class _InboxState extends State<Inbox> {
                     .toList() ??
                 [Text('')],
           );
-        else
+        } else
           return PlatformProgressIndicator();
       },
     );

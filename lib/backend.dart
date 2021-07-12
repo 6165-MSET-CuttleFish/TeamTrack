@@ -181,10 +181,10 @@ class DataModel {
     return callable.call(<String, dynamic>{
       'email': email,
       'name': name,
-      'id' : id,
+      'id': id,
       'authorEmail': authorEmail,
-      'type' : type,
-      'authorName' : authorName,
+      'type': type,
+      'authorName': authorName,
     });
   }
 }
@@ -926,6 +926,23 @@ extension TeamsExtension on Map<String, Team> {
         .reduce(max);
   }
 
+  double maxMeanScore(Dice? dice, bool removeOutliers, OpModeType? type) {
+    if (this.length == 0) return 1;
+    return this
+        .values
+        .map((e) => e.scores.meanScore(dice ?? Dice.none, removeOutliers, type))
+        .reduce(max);
+  }
+
+  double maxMedianScore(Dice? dice, bool removeOutliers, OpModeType? type) {
+    if (this.length == 0) return 1;
+    return this
+        .values
+        .map((e) =>
+            e.scores.medianScore(dice ?? Dice.none, removeOutliers, type))
+        .reduce(max);
+  }
+
   double lowestStandardDeviationScore(
       Dice? dice, bool removeOutliers, OpModeType? type) {
     if (this.length == 0) return 1;
@@ -948,6 +965,15 @@ extension ScoreDivExtension on List<ScoreDivision> {
         .removeOutliers(removeOutliers)
         .reduce(max)
         .toDouble();
+  }
+
+  double medianScore(Dice dice, bool removeOutliers) {
+    final arr = this.diceScores(dice);
+    if (arr.length == 0) return 0;
+    return arr
+        .map((e) => e.total().toDouble())
+        .removeOutliers(removeOutliers)
+        .median();
   }
 
   double minScore(Dice dice, bool removeOutliers) {
@@ -1019,6 +1045,16 @@ extension ScoresExtension on Map<String, Score> {
   }
 
   double meanScore(Dice dice, bool removeOutliers, OpModeType? type) {
+    final arr = this.diceScores(dice);
+    if (arr.length == 0) return 0;
+    var temp = arr
+        .map((e) => e.getScoreDivision(type).total())
+        .removeOutliers(removeOutliers);
+    if (temp.length != 0) return temp.mean();
+    return 0;
+  }
+
+  double medianScore(Dice dice, bool removeOutliers, OpModeType? type) {
     final arr = this.diceScores(dice);
     if (arr.length == 0) return 0;
     var temp = arr

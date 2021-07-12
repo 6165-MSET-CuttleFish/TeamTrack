@@ -568,28 +568,53 @@ class ScoreCard extends StatelessWidget {
               title: 'Average',
             ),
             BarGraph(
-                val: !matchTotal
-                    ? scoreDivisions.maxScore(dice, removeOutliers)
-                    : matches
-                            ?.where(
-                              (e) => e.dice == dice || dice == Dice.none,
-                            )
-                            .toList()
-                            .spots(team, dice, false, type: type)
-                            //.removeOutliers(removeOutliers)
-                            .map((e) => e.y)
-                            .maxValue() ??
-                        0,
-                max: !matchTotal
-                    ? event.teams.maxScore(dice, removeOutliers, type)
-                    : matches
-                            ?.where(
-                              (e) => e.dice == dice || dice == Dice.none,
-                            )
-                            .toList()
-                            .maxScore(false) ??
-                        0,
-                title: 'Best Score'),
+              val: !matchTotal
+                  ? scoreDivisions.medianScore(dice, removeOutliers)
+                  : matches
+                          ?.where(
+                            (e) => e.dice == dice || dice == Dice.none,
+                          )
+                          .toList()
+                          .spots(team, dice, false, type: type)
+                          .removeOutliers(removeOutliers)
+                          .map((e) => e.y)
+                          .median() ??
+                      0,
+              max: !matchTotal
+                  ? event.teams.maxMedianScore(dice, removeOutliers, type)
+                  : matches
+                          ?.where(
+                            (e) => e.dice == dice || dice == Dice.none,
+                          )
+                          .toList()
+                          .maxScore(false) ??
+                      0,
+              title: 'Median',
+            ),
+            BarGraph(
+              val: !matchTotal
+                  ? scoreDivisions.maxScore(dice, removeOutliers)
+                  : matches
+                          ?.where(
+                            (e) => e.dice == dice || dice == Dice.none,
+                          )
+                          .toList()
+                          .spots(team, dice, false, type: type)
+                          .removeOutliers(removeOutliers)
+                          .map((e) => e.y)
+                          .maxValue() ??
+                      0,
+              max: !matchTotal
+                  ? event.teams.maxScore(dice, removeOutliers, type)
+                  : matches
+                          ?.where(
+                            (e) => e.dice == dice || dice == Dice.none,
+                          )
+                          .toList()
+                          .maxScore(false) ??
+                      0,
+              title: 'Best',
+            ),
             BarGraph(
               val: !matchTotal
                   ? scoreDivisions.standardDeviationScore(dice, removeOutliers)

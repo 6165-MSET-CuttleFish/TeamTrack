@@ -16,14 +16,6 @@ class EventView extends StatefulWidget {
 
 class _EventView extends State<EventView> {
   final slider = SlidableStrechActionPane();
-  final secondaryActions = <Widget>[
-    IconSlideAction(
-      caption: 'Delete',
-      icon: Icons.delete,
-      color: Colors.red,
-      onTap: () {},
-    )
-  ];
   List<Widget> materialTabs() => [
         TeamList(
           event: widget.event,
