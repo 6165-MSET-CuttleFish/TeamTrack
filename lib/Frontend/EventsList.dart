@@ -33,15 +33,19 @@ class _EventsList extends State<EventsList> {
       event.authorEmail = context.read<User?>()?.email;
       event.authorName = context.read<User?>()?.displayName;
     }
-    return FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+    return FutureBuilder<DocumentSnapshot<Map<String, dynamic>>?>(
         future: firebaseFirestore
             .collection('users')
             .doc(context.read<User?>()?.uid)
             .get(),
         builder: (context, snapshot) {
-          var doc = snapshot.data;
-          doc?.data()?['events'].forEach((key, value) {
-            dataModel.sharedEvents.add(Event.fromJson(value));
+          var data = snapshot.data?.data();
+          (data?['events'] as Map?)?.keys.forEach((key) {
+            try {
+              var event = Event.fromJson(data?['events'][key]);
+              event.shared = true;
+              dataModel.sharedEvents[key] = event;
+            } catch (e) {}
           });
           return Scaffold(
             appBar: AppBar(
@@ -217,179 +221,392 @@ class _EventsList extends State<EventsList> {
     }
   }
 
-  List<Widget> localEvents() => dataModel
-      .localEvents()
-      .map(
-        (e) => Slidable(
-          actions: [
-            IconSlideAction(
-              onTap: () => _onShare(e),
-              icon: Icons.share,
-              color: Colors.blue,
-            )
-          ],
-          secondaryActions: [
-            IconSlideAction(
-              onTap: () {
-                showPlatformDialog(
-                  context: context,
-                  builder: (BuildContext context) => PlatformAlert(
-                    title: Text('Delete Event'),
-                    content: Text('Are you sure?'),
-                    actions: [
-                      PlatformDialogAction(
-                        isDefaultAction: true,
-                        child: Text('Cancel'),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                      PlatformDialogAction(
-                        isDefaultAction: false,
-                        isDestructive: true,
-                        child: Text('Confirm'),
-                        onPressed: () {
-                          setState(
-                            () {
-                              dataModel.events.remove(e);
-                            },
-                          );
-                          dataModel.saveEvents();
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                    ],
-                  ),
-                );
-              },
-              icon: Icons.delete,
-              color: Colors.red,
-            )
-          ],
-          child: ListTileTheme(
-            iconColor: Theme.of(context).primaryColor,
-            child: ListTile(
-              trailing: Icon(
-                e.shared
-                    ? CupertinoIcons.cloud_fill
-                    : CupertinoIcons.lock_shield_fill,
-                color: Theme.of(context).accentColor,
-              ),
-              leading: Icon(
-                CupertinoIcons.person_3_fill,
-                color: Theme.of(context).accentColor,
-              ),
-              title: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(e.name),
-                  Text(
-                    e.gameName.spaceBeforeCapital(),
-                    style: Theme.of(context).textTheme.caption,
-                  ),
+  List<Widget> localEvents() => [
+        ...dataModel
+            .localEvents()
+            .map(
+              (e) => Slidable(
+                actions: [
+                  IconSlideAction(
+                    onTap: () => _onShare(e),
+                    icon: Icons.share,
+                    color: Colors.blue,
+                  )
                 ],
+                secondaryActions: [
+                  IconSlideAction(
+                    onTap: () {
+                      showPlatformDialog(
+                        context: context,
+                        builder: (BuildContext context) => PlatformAlert(
+                          title: Text('Delete Event'),
+                          content: Text('Are you sure?'),
+                          actions: [
+                            PlatformDialogAction(
+                              isDefaultAction: true,
+                              child: Text('Cancel'),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                            PlatformDialogAction(
+                              isDefaultAction: false,
+                              isDestructive: true,
+                              child: Text('Confirm'),
+                              onPressed: () {
+                                setState(
+                                  () {
+                                    dataModel.events.remove(e);
+                                  },
+                                );
+                                dataModel.saveEvents();
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    icon: Icons.delete,
+                    color: Colors.red,
+                  )
+                ],
+                child: ListTileTheme(
+                  iconColor: Theme.of(context).primaryColor,
+                  child: ListTile(
+                    trailing: Icon(
+                      e.shared
+                          ? CupertinoIcons.cloud_fill
+                          : CupertinoIcons.lock_shield_fill,
+                      color: Theme.of(context).accentColor,
+                    ),
+                    leading: Icon(
+                      CupertinoIcons.person_3_fill,
+                      color: Theme.of(context).accentColor,
+                    ),
+                    title: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(e.name),
+                        Text(
+                          e.gameName.spaceBeforeCapital(),
+                          style: Theme.of(context).textTheme.caption,
+                        ),
+                      ],
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        platformPageRoute(
+                          (context) => EventView(
+                            event: e,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                actionPane: slider,
               ),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  platformPageRoute(
-                    (context) => EventView(
-                      event: e,
+            )
+            .toList(),
+        ...dataModel.sharedEvents.values
+            .where((element) => element.type == EventType.local)
+            .map((e) => Slidable(
+                  actions: [
+                    IconSlideAction(
+                      onTap: () => _onShare(e),
+                      icon: Icons.share,
+                      color: Colors.blue,
+                    )
+                  ],
+                  secondaryActions: [
+                    IconSlideAction(
+                      onTap: () {
+                        showPlatformDialog(
+                          context: context,
+                          builder: (BuildContext context) => PlatformAlert(
+                            title: Text('Delete Event'),
+                            content: Text('Are you sure?'),
+                            actions: [
+                              PlatformDialogAction(
+                                isDefaultAction: true,
+                                child: Text('Cancel'),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                              PlatformDialogAction(
+                                isDefaultAction: false,
+                                isDestructive: true,
+                                child: Text('Confirm'),
+                                onPressed: () async {
+                                  var ref = firebaseFirestore
+                                      .collection('users')
+                                      .doc(context.read<User?>()?.uid);
+                                  await firebaseFirestore
+                                      .runTransaction((transaction) async {
+                                    var snapshot = await transaction.get(ref);
+                                    if (!snapshot.exists) {
+                                      throw Exception("User does not exist!");
+                                    }
+                                    Map<String, dynamic> newEvents =
+                                        snapshot.data()?["events"]
+                                            as Map<String, dynamic>;
+                                    newEvents.remove(e.id);
+                                    return transaction.update(
+                                      ref,
+                                      {
+                                        'events': newEvents,
+                                      },
+                                    );
+                                  });
+                                  setState(
+                                    () => dataModel.sharedEvents.remove(e.id),
+                                  );
+                                  dataModel.saveEvents();
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                      icon: Icons.delete,
+                      color: Colors.red,
+                    )
+                  ],
+                  child: ListTileTheme(
+                    iconColor: Theme.of(context).primaryColor,
+                    child: ListTile(
+                      trailing: Icon(
+                        e.shared
+                            ? CupertinoIcons.cloud_fill
+                            : CupertinoIcons.lock_shield_fill,
+                        color: Theme.of(context).accentColor,
+                      ),
+                      leading: Icon(
+                        CupertinoIcons.person_3_fill,
+                        color: Theme.of(context).accentColor,
+                      ),
+                      title: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(e.name),
+                          Text(
+                            e.gameName.spaceBeforeCapital(),
+                            style: Theme.of(context).textTheme.caption,
+                          ),
+                        ],
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          platformPageRoute(
+                            (context) => EventView(
+                              event: e,
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
-                );
-              },
-            ),
-          ),
-          actionPane: slider,
-        ),
-      )
-      .toList();
+                  actionPane: slider,
+                ))
+            .toList()
+      ];
 
-  List<Widget> remoteEvents() => dataModel
-      .remoteEvents()
-      .map(
-        (e) => Slidable(
-          actions: [
-            IconSlideAction(
-              onTap: () => _onShare(e),
-              icon: Icons.share,
-              color: Colors.blue,
-            )
-          ],
-          secondaryActions: [
-            IconSlideAction(
-              onTap: () {
-                showPlatformDialog(
-                  context: context,
-                  builder: (BuildContext context) => PlatformAlert(
-                    title: Text('Delete Event'),
-                    content: Text('Are you sure?'),
-                    actions: [
-                      PlatformDialogAction(
-                        isDefaultAction: true,
-                        child: Text('Cancel'),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                      PlatformDialogAction(
-                        isDefaultAction: false,
-                        isDestructive: true,
-                        child: Text('Confirm'),
-                        onPressed: () {
-                          setState(() => dataModel.events.remove(e));
-                          dataModel.saveEvents();
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                    ],
-                  ),
-                );
-              },
-              icon: Icons.delete,
-              color: Colors.red,
-            )
-          ],
-          child: ListTileTheme(
-            iconColor: Theme.of(context).primaryColor,
-            child: ListTile(
-              trailing: Icon(
-                e.shared
-                    ? CupertinoIcons.cloud_fill
-                    : CupertinoIcons.lock_shield_fill,
-                color: Theme.of(context).accentColor,
-              ),
-              leading: Icon(
-                CupertinoIcons.rectangle_stack_person_crop_fill,
-                color: Theme.of(context).accentColor,
-              ),
-              title: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(e.name),
-                  Text(
-                    e.gameName.spaceBeforeCapital(),
-                    style: Theme.of(context).textTheme.caption,
-                  ),
+  List<Widget> remoteEvents() => [
+        ...dataModel
+            .remoteEvents()
+            .map(
+              (e) => Slidable(
+                actions: [
+                  IconSlideAction(
+                    onTap: () => _onShare(e),
+                    icon: Icons.share,
+                    color: Colors.blue,
+                  )
                 ],
-              ),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  platformPageRoute(
-                    (context) => EventView(
-                      event: e,
+                secondaryActions: [
+                  IconSlideAction(
+                    onTap: () {
+                      showPlatformDialog(
+                        context: context,
+                        builder: (BuildContext context) => PlatformAlert(
+                          title: Text('Delete Event'),
+                          content: Text('Are you sure?'),
+                          actions: [
+                            PlatformDialogAction(
+                              isDefaultAction: true,
+                              child: Text('Cancel'),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                            PlatformDialogAction(
+                              isDefaultAction: false,
+                              isDestructive: true,
+                              child: Text('Confirm'),
+                              onPressed: () {
+                                setState(() => dataModel.events.remove(e));
+                                dataModel.saveEvents();
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    icon: Icons.delete,
+                    color: Colors.red,
+                  )
+                ],
+                child: ListTileTheme(
+                  iconColor: Theme.of(context).primaryColor,
+                  child: ListTile(
+                    trailing: Icon(
+                      e.shared
+                          ? CupertinoIcons.cloud_fill
+                          : CupertinoIcons.lock_shield_fill,
+                      color: Theme.of(context).accentColor,
                     ),
+                    leading: Icon(
+                      CupertinoIcons.rectangle_stack_person_crop_fill,
+                      color: Theme.of(context).accentColor,
+                    ),
+                    title: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(e.name),
+                        Text(
+                          e.gameName.spaceBeforeCapital(),
+                          style: Theme.of(context).textTheme.caption,
+                        ),
+                      ],
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        platformPageRoute(
+                          (context) => EventView(
+                            event: e,
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
-          ),
-          actionPane: slider,
-        ),
-      )
-      .toList();
+                ),
+                actionPane: slider,
+              ),
+            )
+            .toList(),
+        ...dataModel.sharedEvents.values
+            .where((element) => element.type == EventType.remote)
+            .map(
+              (e) => Slidable(
+                actions: [
+                  IconSlideAction(
+                    onTap: () => _onShare(e),
+                    icon: Icons.share,
+                    color: Colors.blue,
+                  )
+                ],
+                secondaryActions: [
+                  IconSlideAction(
+                    onTap: () {
+                      showPlatformDialog(
+                        context: context,
+                        builder: (BuildContext context) => PlatformAlert(
+                          title: Text('Delete Event'),
+                          content: Text('Are you sure?'),
+                          actions: [
+                            PlatformDialogAction(
+                              isDefaultAction: true,
+                              child: Text('Cancel'),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                            PlatformDialogAction(
+                              isDefaultAction: false,
+                              isDestructive: true,
+                              child: Text('Confirm'),
+                              onPressed: () async {
+                                var ref = firebaseFirestore
+                                    .collection('users')
+                                    .doc(context.read<User?>()?.uid);
+                                await firebaseFirestore
+                                    .runTransaction((transaction) async {
+                                  var snapshot = await transaction.get(ref);
+                                  if (!snapshot.exists) {
+                                    throw Exception("User does not exist!");
+                                  }
+                                  Map<String, dynamic> newEvents =
+                                      snapshot.data()?["events"]
+                                          as Map<String, dynamic>;
+                                  newEvents.remove(e.id);
+                                  return transaction.update(
+                                    ref,
+                                    {
+                                      'events': newEvents,
+                                    },
+                                  );
+                                });
+                                setState(
+                                    () => dataModel.sharedEvents.remove(e.id));
+
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    icon: Icons.delete,
+                    color: Colors.red,
+                  )
+                ],
+                child: ListTileTheme(
+                  iconColor: Theme.of(context).primaryColor,
+                  child: ListTile(
+                    trailing: Icon(
+                      e.shared
+                          ? CupertinoIcons.cloud_fill
+                          : CupertinoIcons.lock_shield_fill,
+                      color: Theme.of(context).accentColor,
+                    ),
+                    leading: Icon(
+                      CupertinoIcons.rectangle_stack_person_crop_fill,
+                      color: Theme.of(context).accentColor,
+                    ),
+                    title: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(e.name),
+                        Text(
+                          e.gameName.spaceBeforeCapital(),
+                          style: Theme.of(context).textTheme.caption,
+                        ),
+                      ],
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        platformPageRoute(
+                          (context) => EventView(
+                            event: e,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                actionPane: slider,
+              ),
+            )
+            .toList()
+      ];
 
   String? _newName;
 
@@ -588,7 +805,7 @@ class _EventsList extends State<EventsList> {
                   dataModel.saveEvents();
                 }
                 if (_emailController.text.trim().isNotEmpty) {
-                  await dataModel.shareEvent(
+                  dataModel.shareEvent(
                     name: e.name,
                     authorName: e.authorName ?? '',
                     authorEmail: e.authorEmail ?? '',

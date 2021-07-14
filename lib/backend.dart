@@ -150,7 +150,7 @@ final RemoteConfig remoteConfig = RemoteConfig.instance;
 
 class DataModel {
   List<Event> events = [];
-  List<Event> sharedEvents = [];
+  Map<String, Event> sharedEvents = {};
   List<Event> localEvents() {
     return events.where((e) => e.type == EventType.local).toList();
   }
@@ -439,17 +439,19 @@ class Event {
     gameName = json?['gameName'] ?? Statics.gameName;
     type = getTypeFromString(json?['type']);
     name = json?['name'];
-    teams = (json?['teams'] as Map)
-        .map((key, value) => MapEntry(key, Team.fromJson(value, type)));
-    matches = List<Match>.from(
-      json?['matches'].map(
-        (model) => Match.fromJson(
-          model,
-          teams,
-          getTypeFromString(json['type']),
+    try {
+      teams = (json?['teams'] as Map)
+          .map((key, value) => MapEntry(key, Team.fromJson(value, type)));
+      matches = List<Match>.from(
+        json?['matches'].map(
+          (model) => Match.fromJson(
+            model,
+            teams,
+            getTypeFromString(json['type']),
+          ),
         ),
-      ),
-    );
+      );
+    } catch (e) {}
     shared = json?['shared'] ?? false;
     id = json?['id'] ?? Uuid().v4();
     try {
@@ -952,11 +954,12 @@ extension TeamsExtension on Map<String, Team> {
 
   double maxMedianScore(Dice? dice, bool removeOutliers, OpModeType? type) {
     if (this.length == 0) return 1;
-    return this
+    var x = this
         .values
         .map((e) =>
             e.scores.medianScore(dice ?? Dice.none, removeOutliers, type))
-        .reduce(max);
+        .toList();
+    return x.reduce(max);
   }
 
   double lowestStandardDeviationScore(
@@ -1076,7 +1079,7 @@ extension ScoresExtension on Map<String, Score> {
     var temp = arr
         .map((e) => e.getScoreDivision(type).total())
         .removeOutliers(removeOutliers);
-    if (temp.length != 0) return temp.mean();
+    if (temp.length != 0) return temp.median();
     return 0;
   }
 

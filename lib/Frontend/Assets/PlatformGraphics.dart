@@ -557,7 +557,7 @@ class ScoreCard extends StatelessWidget {
                           .mean() ??
                       0,
               max: !matchTotal
-                  ? event.teams.maxScore(dice, removeOutliers, type)
+                  ? event.teams.maxMeanScore(dice, removeOutliers, type)
                   : matches
                           ?.where(
                             (e) => e.dice == dice || dice == Dice.none,

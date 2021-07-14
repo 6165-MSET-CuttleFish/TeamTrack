@@ -12,7 +12,7 @@ class BarGraph extends StatelessWidget {
     this.title = 'Default',
   }) : super(key: key);
   final String title;
-  final double max;
+  double max;
   double val;
   final bool inverted;
   final double height;
@@ -24,9 +24,6 @@ class BarGraph extends StatelessWidget {
         .toInt();
     if (!inverted && val / max > 1) {
       print('oops');
-    }
-    if (val == 0 && val == max) {
-      val += 0.0001;
     }
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,

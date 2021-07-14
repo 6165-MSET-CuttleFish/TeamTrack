@@ -68,7 +68,6 @@ class _TeamTrack extends State<TeamTrack> {
   handleAsync() async {
     await notification.initialize();
     String token = await notification.getToken();
-    final uid = FirebaseAuth.instance.currentUser?.uid;
     print("Firebase token : $token");
   }
 

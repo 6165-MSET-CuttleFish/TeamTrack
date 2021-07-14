@@ -151,6 +151,7 @@ class _TeamView extends State<TeamView> {
                     onChanged: (_) => setState(
                       () {
                         removeOutliers = _ ?? false;
+                        Navigator.pop(context);
                       },
                     ),
                     checkColor: Colors.black,
@@ -164,6 +165,7 @@ class _TeamView extends State<TeamView> {
                       setState(
                         () {
                           showPenalties = _ ?? false;
+                          Navigator.pop(context);
                         },
                       );
                     },
@@ -178,6 +180,7 @@ class _TeamView extends State<TeamView> {
                       onChanged: (_) => setState(
                         () {
                           _matchIsScore = _ ?? false;
+                          Navigator.pop(context);
                         },
                       ),
                       checkColor: Colors.black,
@@ -455,8 +458,8 @@ class _TeamView extends State<TeamView> {
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
                                 colors: [
-                                  CupertinoColors.systemBlue,
-                                  CupertinoColors.systemRed
+                                  Colors.cyan,
+                                  Colors.deepPurple,
                                 ],
                               ),
                               dataSource: _team.scores
@@ -468,10 +471,35 @@ class _TeamView extends State<TeamView> {
                               yValueMapper: (List<double> cycles, _) =>
                                   cycles.length != 0 ? cycles : [0, 0, 0, 0],
                             ),
-                            SplineSeries<int, int>(
+                            LineSeries<int, int>(
+                              dashArray: [10],
+                              width: 2,
+                              color: Colors.red,
                               dataSource: _team.scores
                                   .diceScores(_dice)
                                   .map((e) => e.teleScore.misses.count)
+                                  .toList(),
+                              xValueMapper: (int misses, _) => _ + 1,
+                              yValueMapper: (int misses, _) => misses,
+                            ),
+                            LineSeries<int, int>(
+                              width: 2,
+                              color: teleColor,
+                              dataSource: _team.scores
+                                  .diceScores(_dice)
+                                  .map((e) => e.teleScore.teleCycles)
+                                  .toList(),
+                              xValueMapper: (int misses, _) => _ + 1,
+                              yValueMapper: (int misses, _) => misses,
+                            ),
+                            LineSeries<int, int>(
+                              width: 2,
+                              color: endgameColor,
+                              dataSource: _team.scores
+                                  .diceScores(_dice)
+                                  .map(
+                                    (e) => e.teleScore.endgameCycles,
+                                  )
                                   .toList(),
                               xValueMapper: (int misses, _) => _ + 1,
                               yValueMapper: (int misses, _) => misses,

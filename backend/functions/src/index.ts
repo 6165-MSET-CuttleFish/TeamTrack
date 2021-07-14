@@ -30,6 +30,7 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
     "authorName": data.authorName,
     "senderName": sender.displayName,
     "senderEmail": sender.email,
+    "senderID": sender.uid,
     "sendTime": admin.firestore.FieldValue.serverTimestamp(),
     "type": data.type,
     "gameName": data.gameName,
@@ -41,15 +42,21 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
     const newInbox = doc?.data()?.inbox;
     tokens = doc?.data()?.FCMtokens;
     const allowSend = !(doc?.data()?.blockedUsers as Array<string>)
-        .includes(sender.email ?? "");
+        .includes(meta.senderID ?? "");
     let instancesOfUser = 0;
     (doc?.data()?.blockedUsers as Array<string>).forEach((element) => {
-      if (element === sender.email) {
+      if (element === meta.senderEmail) {
         instancesOfUser++;
       }
     });
     if (allowSend && instancesOfUser < 5) {
       newInbox[data.id] = meta;
+    } else {
+      throw new functions.https.HttpsError(
+          "cancelled",
+          `Wait for ${recipient.displayName ?? "Unknown"} to 
+          accept a few events.`
+      );
     }
     t.update(ref, {inbox: newInbox});
   }).then(async () => {
