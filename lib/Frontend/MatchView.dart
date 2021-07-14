@@ -238,7 +238,15 @@ class _MatchView extends State<MatchView> {
                                   return DropdownMenuItem<Dice>(
                                     value: value,
                                     child: Text(
-                                      'Dice Roll : ' + value.toVal(),
+                                      json.decode(
+                                            remoteConfig.getString(
+                                              remoteConfig.getString(
+                                                widget.event.gameName,
+                                              ),
+                                            ),
+                                          )['Dice']['name'] +
+                                          ' : ' +
+                                          value.toVal(widget.event.gameName),
                                     ),
                                   );
                                 },

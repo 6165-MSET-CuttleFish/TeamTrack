@@ -45,9 +45,9 @@ class _TeamView extends State<TeamView> {
               child: CupertinoSlidingSegmentedControl(
                 groupValue: _dice,
                 children: <Dice, Widget>{
-                  Dice.one: Text('1'),
-                  Dice.two: Text('2'),
-                  Dice.three: Text('3'),
+                  Dice.one: Text(Dice.one.toVal(widget.event.gameName)),
+                  Dice.two: Text(Dice.one.toVal(widget.event.gameName)),
+                  Dice.three: Text(Dice.one.toVal(widget.event.gameName)),
                   Dice.none: Text('All Cases')
                 },
                 onValueChanged: (Dice? newDice) {

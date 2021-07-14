@@ -718,27 +718,22 @@ extension extOp on OpModeType {
 }
 
 extension DiceExtension on Dice {
-  String stackHeight() {
+  String toVal(String gameName) {
+    final skeleton = json.decode(
+      remoteConfig.getString(
+        remoteConfig.getString(
+          gameName,
+        ),
+      ),
+    );
+    var dice = skeleton["Dice"];
     switch (this) {
       case Dice.one:
-        return '0';
+        return dice['1'];
       case Dice.two:
-        return '1';
+        return dice['2'];
       case Dice.three:
-        return '4';
-      default:
-        return 'All Cases';
-    }
-  }
-
-  String toVal() {
-    switch (this) {
-      case Dice.one:
-        return '1';
-      case Dice.two:
-        return '2';
-      case Dice.three:
-        return '3';
+        return dice['3'];
       default:
         return 'All Cases';
     }

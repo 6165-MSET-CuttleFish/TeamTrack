@@ -299,7 +299,7 @@ class _MatchList extends State<MatchList> {
                     ),
                     Spacer(),
                     Text(
-                      'Dice : ${matches[i].dice.toVal()}',
+                      'Dice : ${matches[i].dice.toVal(widget.event.gameName)}',
                       style: Theme.of(context).textTheme.caption,
                     ),
                   ],
