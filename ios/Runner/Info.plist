@@ -9,7 +9,7 @@
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
-	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<string>MSET-CuttleFish.ScoutingApp</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -27,7 +27,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.770921195022-mi8n44p8m0c7o4hudoufgu600nuh2pre</string>
+				<string>com.googleusercontent.apps.770921195022-sqgk9it93kn16pbcqj0p2n675opb7gd3</string>
 			</array>
 		</dict>
 	</array>
