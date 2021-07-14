@@ -4,37 +4,42 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 const AndroidNotificationChannel channel = AndroidNotificationChannel(
-    'high_importance_channel', // id
-    'High Importance Notifications', // title
-    'This channel is used for important notifications.', // description
-    importance: Importance.high,
-    playSound: true);
+  'high_importance_channel', // id
+  'High Importance Notifications', // title
+  'This channel is used for important notifications.', // description
+  importance: Importance.high,
+  playSound: true,
+);
 
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
   print('A bg message just showed up :  ${message.messageId}');
 }
 
-class PushNotifications{
-  initialize() async{
+class PushNotifications {
+  initialize() async {
     await Firebase.initializeApp();
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
     await flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(channel);
 
-    await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    await FirebaseMessaging.instance
+        .setForegroundNotificationPresentationOptions(
       alert: true,
       badge: true,
       sound: true,
     );
 
-    var initializationSettingsAndroid = AndroidInitializationSettings('mipmap/ic_launcher');
-    var initializationSettings = InitializationSettings(
-        android: initializationSettingsAndroid);
+    var initializationSettingsAndroid =
+        AndroidInitializationSettings('mipmap/ic_launcher');
+    var initializationSettings =
+        InitializationSettings(android: initializationSettingsAndroid);
     flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
@@ -58,24 +63,28 @@ class PushNotifications{
       }
     });
   }
-  void showNotification() async{
+
+  void showNotification() async {
     await flutterLocalNotificationsPlugin.show(
         0,
         "aaagaawaga",
         "speech inconprehensible?",
         NotificationDetails(
-            android: AndroidNotificationDetails(channel.id, channel.name, channel.description,
-              importance: Importance.high,
-              color: Colors.blue,
-              playSound: true,)));
+            android: AndroidNotificationDetails(
+          channel.id,
+          channel.name,
+          channel.description,
+          importance: Importance.high,
+          color: Colors.blue,
+          playSound: true,
+        )));
   }
 
   Future<String> getToken() async {
-    FirebaseMessaging.instance.getToken().then((value){
+    FirebaseMessaging.instance.getToken().then((value) {
       print(value);
       return value;
     });
     return "";
   }
-
 }

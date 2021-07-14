@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
 import 'package:teamtrack/backend.dart';
 import 'package:flutter/cupertino.dart';
@@ -48,7 +49,11 @@ class _LoginView extends State<LoginView> {
                 height: 310,
                 child: PageView(
                   controller: _controller,
-                  children: <Widget>[signInList(), signInSheet()],
+                  children: <Widget>[
+                    signInList(),
+                    if (!(context.read<User?>()?.isAnonymous ?? false))
+                      signInSheet()
+                  ],
                 ),
               ),
               semanticContainer: true,
@@ -133,6 +138,16 @@ class _LoginView extends State<LoginView> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
+        if (context.read<User?>()?.isAnonymous ?? false)
+          PlatformButton(
+            color: CupertinoColors.systemBlue,
+            onPressed: () => Navigator.of(context).pop(),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [Icon(Icons.arrow_back_ios_new_sharp), Text('Back')],
+            ),
+          ),
         PlatformButton(
           color: Theme.of(context).accentColor,
           onPressed: () {
@@ -148,16 +163,18 @@ class _LoginView extends State<LoginView> {
             children: [Icon(Icons.person), Text('Sign Up')],
           ),
         ),
-        PlatformButton(
-          color: CupertinoColors.systemBlue,
-          onPressed: () async =>
-              await context.read<AuthenticationService>().signInWithAnonymous(),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [Icon(Icons.visibility_off), Text('Anonymous Sign In')],
+        if (!(context.read<User?>()?.isAnonymous ?? false))
+          PlatformButton(
+            color: CupertinoColors.systemBlue,
+            onPressed: () async => await context
+                .read<AuthenticationService>()
+                .signInWithAnonymous(),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [Icon(Icons.visibility_off), Text('Anonymous Sign In')],
+            ),
           ),
-        ),
         GoogleAuthButton(
           onPressed: () async =>
               await context.read<AuthenticationService>().signInWithGoogle(),
@@ -167,21 +184,24 @@ class _LoginView extends State<LoginView> {
               textStyle: TextStyle(fontSize: 14, color: Colors.white),
               width: size.width - 80),
         ),
-        EmailAuthButton(
-          onPressed: () {
-            setState(
-              () {
-                _controller.nextPage(
+        if (!(context.read<User?>()?.isAnonymous ?? false))
+          EmailAuthButton(
+            onPressed: () {
+              setState(
+                () {
+                  _controller.nextPage(
                     duration: Duration(milliseconds: 500),
-                    curve: Curves.linear);
-              },
-            );
-          },
-          style: AuthButtonStyle(
+                    curve: Curves.linear,
+                  );
+                },
+              );
+            },
+            style: AuthButtonStyle(
               iconSize: 20,
               textStyle: TextStyle(fontSize: 14),
-              width: size.width - 80),
-        ),
+              width: size.width - 80,
+            ),
+          ),
       ],
     );
   }
@@ -235,7 +255,7 @@ class _LoginView extends State<LoginView> {
                   String? s =
                       await context.read<AuthenticationService>().signUp(
                             email: emailController.text.trim(),
-                            password: passwordController.text.trim(),
+                            password: passwordController.text,
                             displayName: displayNameController.text.trim(),
                           );
                   if (s == "Signed up") {
@@ -245,7 +265,7 @@ class _LoginView extends State<LoginView> {
                     Navigator.of(context).pop();
                     await context.read<AuthenticationService>().signIn(
                           email: emailController.text.trim(),
-                          password: passwordController.text.trim(),
+                          password: passwordController.text,
                         );
                   } else {
                     showPlatformDialog(

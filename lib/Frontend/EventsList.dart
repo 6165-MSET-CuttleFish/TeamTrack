@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:teamtrack/Frontend/Inbox.dart';
+import 'package:teamtrack/Frontend/Login.dart';
 import 'package:teamtrack/backend.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +9,6 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
 import 'package:teamtrack/Frontend/EventView.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class EventsList extends StatefulWidget {
   EventsList({Key? key}) : super(key: key);
@@ -33,136 +33,162 @@ class _EventsList extends State<EventsList> {
       event.authorEmail = context.read<User?>()?.email;
       event.authorName = context.read<User?>()?.displayName;
     }
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).accentColor,
-        title: Builder(
-          builder: (_) {
-            switch (_tab) {
-              case 1:
-                return Text("Inbox");
-              default:
-                return Text("Events");
-            }
-          },
-        ),
-        actions: [
-          Padding(
-            padding: EdgeInsets.only(left: 30),
-          ),
-          IconButton(
-            icon: themeChange.darkTheme
-                ? Icon(CupertinoIcons.sun_max)
-                : Icon(CupertinoIcons.moon),
-            onPressed: () {
-              setState(
-                  () => themeChange.darkTheme = !themeChangeProvider.darkTheme);
-            },
-          )
-        ],
-      ),
-      drawer: Drawer(
-        elevation: 1,
-        child: Material(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              DrawerHeader(
-                decoration: BoxDecoration(color: Theme.of(context).accentColor),
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 5.0, right: 5.0),
-                  child: Row(
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          if (context.read<User?>()?.photoURL != null)
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(300),
-                              child: Image.network(
-                                context.read<User?>()!.photoURL!,
-                                height: 70,
-                              ),
-                            )
-                          else
-                            Icon(Icons.account_circle, size: 70),
-                          Text(
-                            context.read<User?>()?.displayName ?? "Guest",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          Text(
-                            context.read<User?>()?.email ?? "",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
+    return FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+        future: firebaseFirestore
+            .collection('users')
+            .doc(context.read<User?>()?.uid)
+            .get(),
+        builder: (context, snapshot) {
+          var doc = snapshot.data;
+          doc?.data()?['events'].forEach((key, value) {
+            dataModel.sharedEvents.add(Event.fromJson(value));
+          });
+          return Scaffold(
+            appBar: AppBar(
+              backgroundColor: Theme.of(context).accentColor,
+              title: Builder(
+                builder: (_) {
+                  switch (_tab) {
+                    case 1:
+                      return Text("Inbox");
+                    default:
+                      return Text("Events");
+                  }
+                },
               ),
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ListTile(
-                    leading: Icon(Icons.event_note_outlined),
-                    title: Text("Events"),
-                    onTap: () {
-                      setState(() => _tab = 0);
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                  ListTile(
-                    leading: Icon(Icons.mail_rounded),
-                    title: Text("Inbox"),
-                    onTap: () {
-                      setState(() => _tab = 1);
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                  ListTile(
-                    leading: Icon(Icons.logout),
-                    title: Text('Sign Out'),
-                    onTap: () {
-                      showPlatformDialog(
-                        context: context,
-                        builder: (context) => PlatformAlert(
-                          title: Text('Sign Out'),
-                          content: Text('Are you sure?'),
-                          actions: [
-                            PlatformDialogAction(
-                              isDefaultAction: true,
-                              child: Text('Cancel'),
-                              onPressed: () => Navigator.of(context).pop(),
-                            ),
-                            PlatformDialogAction(
-                              isDestructive: true,
-                              child: Text('Sign Out'),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                                context.read<AuthenticationService>().signOut();
-                              },
+              actions: [
+                Padding(
+                  padding: EdgeInsets.only(left: 30),
+                ),
+                IconButton(
+                  icon: themeChange.darkTheme
+                      ? Icon(CupertinoIcons.sun_max)
+                      : Icon(CupertinoIcons.moon),
+                  onPressed: () {
+                    setState(() =>
+                        themeChange.darkTheme = !themeChangeProvider.darkTheme);
+                  },
+                )
+              ],
+            ),
+            drawer: Drawer(
+              elevation: 1,
+              child: Material(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    DrawerHeader(
+                      decoration:
+                          BoxDecoration(color: Theme.of(context).accentColor),
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 5.0, right: 5.0),
+                        child: Row(
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (context.read<User?>()?.photoURL != null)
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(300),
+                                    child: Image.network(
+                                      context.read<User?>()!.photoURL!,
+                                      height: 70,
+                                    ),
+                                  )
+                                else
+                                  Icon(Icons.account_circle, size: 70),
+                                Text(
+                                  context.read<User?>()?.displayName ?? "Guest",
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                Text(
+                                  context.read<User?>()?.email ?? "",
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                      );
-                    },
-                  ),
-                ],
-              )
-            ],
-          ),
-        ),
-      ),
-      body: Builder(builder: (_) => getHome()),
-      floatingActionButton: _tab == 0
-          ? FloatingActionButton(
-              child: Icon(Icons.add),
-              onPressed: _onPressed,
-            )
-          : null,
-    );
+                      ),
+                    ),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ListTile(
+                          leading: Icon(Icons.list),
+                          title: Text("Events"),
+                          onTap: () {
+                            setState(() => _tab = 0);
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                        if (!(context.read<User?>()?.isAnonymous ?? true))
+                          ListTile(
+                            leading: Icon(Icons.mail_rounded),
+                            title: Text("Inbox"),
+                            onTap: () {
+                              setState(() => _tab = 1);
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        if (context.read<User?>()?.isAnonymous ?? false)
+                          ListTile(
+                            leading: Icon(Icons.link),
+                            title: Text("Link Account"),
+                            onTap: () => Navigator.of(context).push(
+                              platformPageRoute(
+                                (context) => LoginView(),
+                              ),
+                            ),
+                          ),
+                        ListTile(
+                          leading: Icon(Icons.logout),
+                          title: Text('Sign Out'),
+                          onTap: () {
+                            showPlatformDialog(
+                              context: context,
+                              builder: (context) => PlatformAlert(
+                                title: Text('Sign Out'),
+                                content: Text('Are you sure?'),
+                                actions: [
+                                  PlatformDialogAction(
+                                    isDefaultAction: true,
+                                    child: Text('Cancel'),
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(),
+                                  ),
+                                  PlatformDialogAction(
+                                    isDestructive: true,
+                                    child: Text('Sign Out'),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                      context
+                                          .read<AuthenticationService>()
+                                          .signOut();
+                                    },
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            ),
+            body: Builder(builder: (_) => getHome()),
+            floatingActionButton: _tab == 0
+                ? FloatingActionButton(
+                    child: Icon(Icons.add),
+                    onPressed: _onPressed,
+                  )
+                : null,
+          );
+        });
   }
 
   Widget getHome() {
@@ -365,11 +391,6 @@ class _EventsList extends State<EventsList> {
       )
       .toList();
 
-  void saveBool(String key, value) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setBool(key, value);
-  }
-
   String? _newName;
 
   void _onPressed() {
@@ -543,14 +564,8 @@ class _EventsList extends State<EventsList> {
                 if (!e.shared) {
                   e.shared = true;
                   var json = e.toJson();
-                  json['Editors'] = {};
                   var uid = context.read<User?>()?.uid;
-                  if (uid != null)
-                    json.addAll(
-                      {
-                        'Permissions': {},
-                      },
-                    );
+                  if (uid != null) json['Editors'] = {uid: true};
                   await firebaseDatabase
                       .reference()
                       .child("Events/${Statics.gameName}/${e.id}")
@@ -564,9 +579,9 @@ class _EventsList extends State<EventsList> {
                       'sendDate': Timestamp.now(),
                       'authorName': e.authorName,
                       'authorEmail': e.authorEmail,
-                      'creationDate': e.timeStamp,
                       'id': e.id,
                       'type': e.type.toString(),
+                      'gameName': e.gameName,
                     };
                     transaction.update(ref, {'events': newEvents});
                   });
@@ -580,6 +595,7 @@ class _EventsList extends State<EventsList> {
                     id: e.id,
                     type: e.type.toString(),
                     email: _emailController.text.trim(),
+                    gameName: e.gameName,
                   );
                 }
                 Navigator.of(context).pop();

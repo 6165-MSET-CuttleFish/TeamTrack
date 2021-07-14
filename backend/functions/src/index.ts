@@ -36,7 +36,7 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
   };
   const ref = admin.firestore().collection("users").doc(recipient.uid);
   let tokens:string[] = [];
-  admin.firestore().runTransaction(async (t) => {
+  return admin.firestore().runTransaction(async (t) => {
     const doc = await t.get(ref);
     const newInbox = doc?.data()?.inbox;
     tokens = doc?.data()?.FCMtokens;
