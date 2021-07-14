@@ -151,7 +151,6 @@ class _TeamView extends State<TeamView> {
                     onChanged: (_) => setState(
                       () {
                         removeOutliers = _ ?? false;
-                        Navigator.pop(context);
                       },
                     ),
                     checkColor: Colors.black,
@@ -165,7 +164,6 @@ class _TeamView extends State<TeamView> {
                       setState(
                         () {
                           showPenalties = _ ?? false;
-                          Navigator.pop(context);
                         },
                       );
                     },
@@ -180,7 +178,6 @@ class _TeamView extends State<TeamView> {
                       onChanged: (_) => setState(
                         () {
                           _matchIsScore = _ ?? false;
-                          Navigator.pop(context);
                         },
                       ),
                       checkColor: Colors.black,

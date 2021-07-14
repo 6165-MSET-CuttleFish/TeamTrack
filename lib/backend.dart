@@ -91,13 +91,25 @@ class AuthenticationService {
     required String password,
     required String displayName,
   }) async {
-    try {
-      await _firebaseAuth.createUserWithEmailAndPassword(
-          email: email, password: password);
-      _firebaseAuth.currentUser?.updateDisplayName(displayName);
-      return "Signed up";
-    } on FirebaseAuthException catch (e) {
-      return e.message;
+    if (_firebaseAuth.currentUser?.isAnonymous ?? false) {
+      AuthCredential credential =
+          EmailAuthProvider.credential(email: email, password: password);
+      try {
+        await _firebaseAuth.currentUser?.linkWithCredential(credential);
+        _firebaseAuth.currentUser?.updateDisplayName(displayName);
+        return "Signed Up";
+      } on FirebaseAuthException catch (e) {
+        return e.message;
+      }
+    } else {
+      try {
+        await _firebaseAuth.createUserWithEmailAndPassword(
+            email: email, password: password);
+        _firebaseAuth.currentUser?.updateDisplayName(displayName);
+        return "Signed up";
+      } on FirebaseAuthException catch (e) {
+        return e.message;
+      }
     }
   }
 
@@ -108,23 +120,22 @@ class AuthenticationService {
   Future<UserCredential?> signInWithGoogle() async {
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
     if (googleUser != null) {
-      // Obtain the auth details from the request
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
-
-      // Create a new credential
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
-
-      // Once signed in, return the UserCredential
+      if (_firebaseAuth.currentUser?.isAnonymous ?? false) {
+        return _firebaseAuth.currentUser?.linkWithCredential(credential);
+      }
       return await _firebaseAuth.signInWithCredential(credential);
     }
     return null;
   }
 
-  Future<UserCredential> signInWithAnonymous() async {
+  Future<UserCredential?> signInWithAnonymous() async {
+    if (_firebaseAuth.currentUser?.isAnonymous ?? false) return null;
     return _firebaseAuth.signInAnonymously();
   }
 }
@@ -138,8 +149,8 @@ final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 final RemoteConfig remoteConfig = RemoteConfig.instance;
 
 class DataModel {
-  final List<String> keys = [Statics.gameName];
   List<Event> events = [];
+  List<Event> sharedEvents = [];
   List<Event> localEvents() {
     return events.where((e) => e.type == EventType.local).toList();
   }
@@ -155,14 +166,14 @@ class DataModel {
   void saveEvents() async {
     var coded = events.map((e) => e.toJson()).toList();
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString(keys[0], jsonEncode(coded));
+    prefs.setString(Statics.gameName, jsonEncode(coded));
     print(coded);
   }
 
   Future<void> restoreEvents() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      var x = jsonDecode(prefs.getString(keys[0]) ?? '') as List;
+      var x = jsonDecode(prefs.getString(Statics.gameName) ?? '') as List;
       events = x.map((e) => Event.fromJson(e)).toList();
     } catch (e) {
       print("failed");
@@ -176,6 +187,7 @@ class DataModel {
     required String id,
     required String type,
     required String authorName,
+    required String gameName,
   }) async {
     final HttpsCallable callable = functions.httpsCallable('shareEvent');
     return callable.call(<String, dynamic>{
@@ -185,6 +197,7 @@ class DataModel {
       'authorEmail': authorEmail,
       'type': type,
       'authorName': authorName,
+      'gameName': gameName,
     });
   }
 }
@@ -422,14 +435,14 @@ class Event {
         .child(id);
   }
 
-  Event.fromJson(Map<String, dynamic> json) {
-    gameName = json['gameName'] ?? Statics.gameName;
-    type = getTypeFromString(json['type']);
-    name = json['name'];
-    teams = (json['teams'] as Map)
+  Event.fromJson(Map<String, dynamic>? json) {
+    gameName = json?['gameName'] ?? Statics.gameName;
+    type = getTypeFromString(json?['type']);
+    name = json?['name'];
+    teams = (json?['teams'] as Map)
         .map((key, value) => MapEntry(key, Team.fromJson(value, type)));
     matches = List<Match>.from(
-      json['matches'].map(
+      json?['matches'].map(
         (model) => Match.fromJson(
           model,
           teams,
@@ -437,15 +450,15 @@ class Event {
         ),
       ),
     );
-    shared = json['shared'] ?? false;
-    id = json['id'] ?? Uuid().v4();
+    shared = json?['shared'] ?? false;
+    id = json?['id'] ?? Uuid().v4();
     try {
-      timeStamp = Timestamp(json['seconds'], json['nanoSeconds']);
+      timeStamp = Timestamp(json?['seconds'], json?['nanoSeconds']);
     } catch (e) {
       timeStamp = Timestamp.now();
     }
-    authorEmail = json['authorEmail'];
-    authorName = json['authorName'];
+    authorEmail = json?['authorEmail'];
+    authorName = json?['authorName'];
     for (var match in matches) {
       match.setDice(match.dice);
     }
@@ -850,7 +863,8 @@ extension MatchExtensions on List<Match> {
     return val.reduce(max);
   }
 
-  double maxScore(bool showPenalties) => this.toList()
+  double maxScore(bool showPenalties) => this
+      .toList()
       .map((e) => e.getMaxScoreVal(showPenalties: showPenalties))
       .reduce(max)
       .toDouble();
