@@ -28,8 +28,8 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
     "name": data.name,
     "authorEmail": data.authorEmail,
     "authorName": data.authorName,
-    "senderName": sender.displayName,
-    "senderEmail": sender.email,
+    "senderName": sender.displayName ?? "Unknown",
+    "senderEmail": sender.email ?? "Unknown",
     "senderID": sender.uid,
     "sendTime": admin.firestore.FieldValue.serverTimestamp(),
     "type": data.type,
@@ -64,9 +64,10 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
       data: {name: data.name, sender: sender.displayName ?? "Unknown"},
       tokens: tokens,
     };
-    const response = await admin.messaging().sendMulticast(message);
-    console.log(response.successCount +
-      " messages were sent successfully");
+    if (tokens.length != 0) {
+      const response = await admin.messaging().sendMulticast(message);
+      console.log(response.successCount + " messages were sent successfully");
+    }
   });
 });
 
