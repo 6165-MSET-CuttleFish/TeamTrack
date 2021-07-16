@@ -92,11 +92,19 @@ class _InboxState extends State<Inbox> {
                                           snapshot.data()?["events"]
                                               as Map<String, dynamic>;
                                       newEvents[e['id']] = e;
+                                      List newTokens =
+                                          snapshot.data()?['FCMtokens'];
+                                      if (!newTokens
+                                              .contains(dataModel.token) &&
+                                          dataModel.token != null) {
+                                        newTokens.add(dataModel.token!);
+                                      }
                                       return transaction.update(
                                         docRef,
                                         {
                                           'events': newEvents,
                                           'inbox': newInbox,
+                                          'FCMtokens': newTokens,
                                         },
                                       );
                                     },
@@ -122,10 +130,18 @@ class _InboxState extends State<Inbox> {
                                               as Map<String, dynamic>;
                                       newInbox.removeWhere(
                                           (key, value) => key == e['id']);
+                                      List newTokens =
+                                          snapshot.data()?['FCMtokens'];
+                                      if (!newTokens
+                                              .contains(dataModel.token) &&
+                                          dataModel.token != null) {
+                                        newTokens.add(dataModel.token!);
+                                      }
                                       return transaction.update(
                                         docRef,
                                         {
                                           'inbox': newInbox,
+                                          'FCMtokens': newTokens,
                                         },
                                       );
                                     },

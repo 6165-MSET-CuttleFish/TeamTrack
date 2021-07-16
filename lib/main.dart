@@ -67,6 +67,9 @@ class _TeamTrack extends State<TeamTrack> {
   handleAsync() async {
     await notification.initialize();
     String token = await notification.getToken();
+    if (token != "") {
+      dataModel.token = token;
+    }
     print("Firebase token : $token");
   }
 

@@ -326,17 +326,28 @@ class Event {
 
   String? deleteTeam(Team team) {
     String? x;
-    for (Match match in matches) {
-      if ((match.red?.hasTeam(team) ?? false) ||
-          (match.blue?.hasTeam(team) ?? false)) {
-        if (type == EventType.remote)
-          match.red?.team1 == null;
-        else
-          x = 'some';
+    if (type != EventType.remote) {
+      for (Match match in matches) {
+        if ((match.red?.hasTeam(team) ?? false) ||
+            (match.blue?.hasTeam(team) ?? false)) {
+          if (type == EventType.remote)
+            match.red?.team1 == null;
+          else
+            x = 'some';
+        }
       }
-    }
-    if (x == null) {
-      teams.remove(team);
+      if (x == null) {
+        teams.remove(team.number);
+        getRef()?.runTransaction((mutableData) async {
+          var newTeams = ((mutableData.value as Map)['teams'] as Map);
+          newTeams.remove(team.number);
+          mutableData.value['teams'] = newTeams;
+          return mutableData;
+        });
+      }
+    } else {
+      matches.removeWhere((element) => element.alliance(team) != null);
+      teams.remove(team.number);
       getRef()?.runTransaction((mutableData) async {
         var newTeams = ((mutableData.value as Map)['teams'] as Map);
         newTeams.remove(team.number);
@@ -348,7 +359,7 @@ class Event {
   }
 
   void deleteMatch(Match e) {
-    if (shared) {
+    if (!shared) {
       e.red?.team1?.scores.removeWhere((f, _) => f == e.id);
       e.red?.team2?.scores.removeWhere((f, _) => f == e.id);
       e.blue?.team1?.scores.removeWhere((f, _) => f == e.id);
