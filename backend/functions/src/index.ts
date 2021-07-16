@@ -23,6 +23,12 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
         "Requested user does not exist"
     );
   }
+  if (sender.uid == recipient.uid) {
+    throw new functions.https.HttpsError(
+        "invalid-argument",
+        "You cannot send an event to yourself"
+    );
+  }
   const meta = {
     "id": data.id,
     "name": data.name,
@@ -37,45 +43,39 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
   };
   const ref = admin.firestore().collection("users").doc(recipient.uid);
   let tokens:string[] = [];
-  return admin.firestore().runTransaction(async (t) => {
+  const returnVal = await admin.firestore().runTransaction(async (t) => {
     const doc = await t.get(ref);
     const newInbox = doc?.data()?.inbox;
     tokens = doc?.data()?.FCMtokens;
-    const allowSend = !(doc?.data()?.blockedUsers as Array<string>)
-        .includes(meta.senderID ?? "");
-    let instancesOfUser = 0;
-    (doc?.data()?.blockedUsers as Array<string>).forEach((element) => {
-      if (element === meta.senderEmail) {
-        instancesOfUser++;
-      }
-    });
-    if (allowSend && instancesOfUser < 5) {
+    const blocked = doc?.data()?.blockedUsers;
+    let allowSend = true;
+    if (blocked[sender.uid] != null) allowSend = false;
+    if (allowSend) {
       newInbox[data.id] = meta;
     } else {
       throw new functions.https.HttpsError(
           "cancelled",
-          `Wait for ${recipient.displayName ?? "Unknown"} to 
-          accept a few events.`
+          `${recipient.displayName ?? "Unknown"} has blocked you.`
       );
     }
     t.update(ref, {inbox: newInbox});
-  }).then(async () => {
-    const message = {
-      data: {name: data.name, sender: sender.displayName ?? "Unknown"},
-      tokens: tokens,
-    };
-    if (tokens.length != 0) {
-      const response = await admin.messaging().sendMulticast(message);
-      console.log(response.successCount + " messages were sent successfully");
-    }
   });
+  const message = {
+    data: {name: data.name, sender: sender.displayName ?? "Unknown"},
+    tokens: tokens,
+  };
+  if (tokens.length != 0) {
+    const response = await admin.messaging().sendMulticast(message);
+    console.log(response.successCount + " messages were sent successfully");
+  }
+  return returnVal;
 });
 
 export const createUser = functions.auth.user().onCreate(async (user) => {
   return admin.firestore().collection("users").doc(user.uid).set({
     inbox: {},
     events: {},
-    blockedUsers: [],
+    blockedUsers: {},
     FCMtokens: [],
   });
 });

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:teamtrack/Frontend/BlockList.dart';
 import 'package:teamtrack/Frontend/Inbox.dart';
 import 'package:teamtrack/Frontend/Login.dart';
 import 'package:teamtrack/backend.dart';
@@ -55,6 +56,8 @@ class _EventsList extends State<EventsList> {
                   switch (_tab) {
                     case 1:
                       return Text("Inbox");
+                    case 2:
+                      return Text("Blocked Users");
                     default:
                       return Text("Events");
                   }
@@ -137,6 +140,15 @@ class _EventsList extends State<EventsList> {
                               Navigator.of(context).pop();
                             },
                           ),
+                        if (!(context.read<User?>()?.isAnonymous ?? true))
+                          ListTile(
+                            leading: Icon(Icons.people_alt),
+                            title: Text("Blocked Users"),
+                            onTap: () {
+                              setState(() => _tab = 2);
+                              Navigator.of(context).pop();
+                            },
+                          ),
                         if (context.read<User?>()?.isAnonymous ?? false)
                           ListTile(
                             leading: Icon(Icons.link),
@@ -199,6 +211,8 @@ class _EventsList extends State<EventsList> {
     switch (_tab) {
       case 1:
         return Inbox();
+      case 2:
+        return BlockList();
       default:
         return SafeArea(
           child: ListView(
