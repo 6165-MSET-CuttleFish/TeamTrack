@@ -150,12 +150,13 @@ class _LoginView extends State<LoginView> {
           ),
         PlatformButton(
           color: Theme.of(context).accentColor,
-          onPressed: () {
-            showModalBottomSheet(
+          onPressed: () async {
+            await showModalBottomSheet(
               context: context,
               builder: (context) => signUpSheet(),
               isScrollControlled: true,
             );
+            Navigator.of(context).pop();
           },
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -176,8 +177,10 @@ class _LoginView extends State<LoginView> {
             ),
           ),
         GoogleAuthButton(
-          onPressed: () async =>
-              await context.read<AuthenticationService>().signInWithGoogle(),
+          onPressed: () async {
+            await context.read<AuthenticationService>().signInWithGoogle();
+            Navigator.of(context).pop();
+          },
           darkMode: true,
           style: AuthButtonStyle(
               iconSize: 20,

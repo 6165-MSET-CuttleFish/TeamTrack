@@ -3,16 +3,17 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:teamtrack/backend.dart';
 
 class Score extends ScoreDivision implements Comparable<Score> {
-  TeleScore teleScore = TeleScore();
-  AutoScore autoScore = AutoScore();
-  EndgameScore endgameScore = EndgameScore();
+  TeleScore teleScore = TeleScore({});
+  AutoScore autoScore = AutoScore({});
+  EndgameScore endgameScore = EndgameScore({});
   Penalty penalties = Penalty();
   String id = '';
   late Dice dice;
   Score(this.id, this.dice) {
-    teleScore = TeleScore();
-    autoScore = AutoScore();
-    endgameScore = EndgameScore();
+    var ref = json.decode(remoteConfig.getValue(Statics.gameName).asString());
+    teleScore = TeleScore(ref['TeleScore']);
+    autoScore = AutoScore(ref['AutoScore']);
+    endgameScore = EndgameScore(ref['EndgameScore']);
     penalties = Penalty();
     setDice(dice, Timestamp.now());
   }
@@ -55,12 +56,14 @@ class Score extends ScoreDivision implements Comparable<Score> {
     penalties.timeStamp = time;
   }
 
-  Score.fromJson(Map<String, dynamic> json, eventType) {
-    autoScore = AutoScore.fromJson(json['AutoScore']);
-    teleScore = TeleScore.fromJson(json['TeleScore']);
-    endgameScore = EndgameScore.fromJson(json['EndgameScore']);
-    penalties = Penalty.fromJson(json['Penalty']);
-    id = json['id'];
+  Score.fromJson(Map<String, dynamic> map, String gameName) {
+    var ref = json.decode(remoteConfig.getValue(Statics.gameName).asString());
+    autoScore = AutoScore.fromJson(map['AutoScore'], ref['AutoScore']);
+    teleScore = TeleScore.fromJson(map['TeleScore'], ref['TeleScore']);
+    endgameScore =
+        EndgameScore.fromJson(map['EndgameScore'], ref['EndgameScore']);
+    penalties = Penalty.fromJson(map['Penalty']);
+    id = map['id'];
   }
   Map<String, dynamic> toJson() => {
         'AutoScore': autoScore.toJson(),
@@ -111,10 +114,10 @@ class AutoScore extends ScoreDivision {
     elements[key]?.count = n;
   }
 
-  var ref = Statics.skeleton['AutoScore'] as Map;
+  Map<String, dynamic> ref;
   List<ScoringElement> getElements() => elements.values.toList();
   Dice getDice() => dice;
-  AutoScore() {
+  AutoScore(this.ref) {
     ref.keys.forEach(
       (e) {
         elements[e] = ScoringElement(
@@ -145,7 +148,7 @@ class AutoScore extends ScoreDivision {
   }
 
   AutoScore operator +(AutoScore other) {
-    var autoScore = AutoScore();
+    var autoScore = AutoScore(ref);
     autoScore.elements.keys.forEach(
       (key) {
         autoScore.elements[key] = (elements[key] ?? ScoringElement()) +
@@ -155,7 +158,7 @@ class AutoScore extends ScoreDivision {
     return autoScore;
   }
 
-  AutoScore.fromJson(Map<String, dynamic> map) {
+  AutoScore.fromJson(Map<String, dynamic> map, this.ref) {
     ref.keys.forEach(
       (e) {
         elements[e] = ScoringElement(
@@ -184,8 +187,8 @@ class TeleScore extends ScoreDivision {
   ScoringElement misses =
       ScoringElement(name: "Misses", value: 1, key: 'Misses');
   Dice getDice() => dice;
-  var ref = Statics.skeleton['TeleScore'] as Map;
-  TeleScore() {
+  Map<String, dynamic> ref;
+  TeleScore(this.ref) {
     ref.keys.forEach(
       (e) {
         elements[e] = ScoringElement(
@@ -216,7 +219,7 @@ class TeleScore extends ScoreDivision {
   }
 
   TeleScore operator +(TeleScore other) {
-    var teleScore = TeleScore();
+    var teleScore = TeleScore(ref);
     teleScore.dice = dice;
     teleScore.elements.keys.forEach(
       (key) {
@@ -227,7 +230,7 @@ class TeleScore extends ScoreDivision {
     return teleScore;
   }
 
-  TeleScore.fromJson(Map<String, dynamic> map) {
+  TeleScore.fromJson(Map<String, dynamic> map, this.ref) {
     ref.keys.forEach(
       (e) {
         elements[e] = ScoringElement(
@@ -267,9 +270,9 @@ class EndgameScore extends ScoreDivision {
   late Dice dice;
   Map<String, ScoringElement> elements = Map();
   List<ScoringElement> getElements() => elements.values.toList();
-  var ref = Statics.skeleton['EndgameScore'] as Map;
+  Map<String, dynamic> ref;
   Dice getDice() => dice;
-  EndgameScore() {
+  EndgameScore(this.ref) {
     ref.keys.forEach(
       (e) {
         elements[e] = ScoringElement(
@@ -300,7 +303,7 @@ class EndgameScore extends ScoreDivision {
   }
 
   EndgameScore operator +(EndgameScore other) {
-    var endgameScore = EndgameScore();
+    var endgameScore = EndgameScore(ref);
     endgameScore.dice = dice;
     endgameScore.elements.keys.forEach(
       (key) {
@@ -311,7 +314,7 @@ class EndgameScore extends ScoreDivision {
     return endgameScore;
   }
 
-  EndgameScore.fromJson(Map<String, dynamic> json) {
+  EndgameScore.fromJson(Map<String, dynamic> json, this.ref) {
     ref.keys.forEach(
       (e) {
         elements[e] = ScoringElement(

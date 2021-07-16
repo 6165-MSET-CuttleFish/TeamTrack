@@ -802,7 +802,8 @@ class _EventsList extends State<EventsList> {
                     };
                     transaction.update(ref, {'events': newEvents});
                   });
-                  dataModel.saveEvents();
+                  dataModel.events.remove(e);
+                  setState(dataModel.saveEvents);
                 }
                 if (_emailController.text.trim().isNotEmpty) {
                   dataModel.shareEvent(

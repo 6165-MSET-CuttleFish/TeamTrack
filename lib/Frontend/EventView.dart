@@ -123,9 +123,7 @@ class _EventView extends State<EventView> {
               placeholder: 'Team name',
               keyboardType: TextInputType.name,
               textCapitalization: TextCapitalization.words,
-              onChanged: (String input) {
-                _newName = input;
-              },
+              onChanged: (input) => _newName = input,
             ),
           ],
         ),

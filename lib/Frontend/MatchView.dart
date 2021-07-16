@@ -157,7 +157,8 @@ class _MatchView extends State<MatchView> {
                                   width: 100,
                                   child: Text(
                                       _match
-                                              ?.redScore(showPenalties: true)
+                                              ?.redScore(
+                                                  showPenalties: _showPenalties)
                                               .toString() ??
                                           '0',
                                       style: Theme.of(context)
@@ -175,7 +176,8 @@ class _MatchView extends State<MatchView> {
                                   width: 100,
                                   child: Text(
                                       _match
-                                              ?.blueScore(showPenalties: true)
+                                              ?.blueScore(
+                                                  showPenalties: _showPenalties)
                                               .toString() ??
                                           '0',
                                       style: Theme.of(context)
@@ -240,9 +242,7 @@ class _MatchView extends State<MatchView> {
                                     child: Text(
                                       json.decode(
                                             remoteConfig.getString(
-                                              remoteConfig.getString(
-                                                widget.event.gameName,
-                                              ),
+                                              widget.event.gameName,
                                             ),
                                           )['Dice']['name'] +
                                           ' : ' +

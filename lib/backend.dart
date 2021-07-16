@@ -151,6 +151,7 @@ final RemoteConfig remoteConfig = RemoteConfig.instance;
 class DataModel {
   List<Event> events = [];
   Map<String, Event> sharedEvents = {};
+  String? token;
   List<Event> localEvents() {
     return events.where((e) => e.type == EventType.local).toList();
   }
@@ -383,13 +384,14 @@ class Event {
       name = map['name'];
       try {
         teams = (map['teams'] as Map)
-            .map((key, value) => MapEntry(key, Team.fromJson(value, type)));
+            .map((key, value) => MapEntry(key, Team.fromJson(value, gameName)));
       } catch (e) {
         try {
           var teamList = List<Team>.from(
             map['teams']
                 ?.map(
-                  (model) => model != null ? Team.fromJson(model, type) : null,
+                  (model) =>
+                      model != null ? Team.fromJson(model, gameName) : null,
                 )
                 .where((e) => e != null),
           );
@@ -441,7 +443,7 @@ class Event {
     name = json?['name'];
     try {
       teams = (json?['teams'] as Map)
-          .map((key, value) => MapEntry(key, Team.fromJson(value, type)));
+          .map((key, value) => MapEntry(key, Team.fromJson(value, gameName)));
       matches = List<Match>.from(
         json?['matches'].map(
           (model) => Match.fromJson(
@@ -546,17 +548,17 @@ class Team {
     changes.sort((a, b) => a.startDate.compareTo(b.startDate));
   }
 
-  Team.fromJson(Map<String, dynamic> json, EventType eventType) {
+  Team.fromJson(Map<String, dynamic> json, String gameName) {
     number = json['number'];
     name = json['name'];
     try {
       scores = (json['scores'] as Map)
-          .map((key, value) => MapEntry(key, Score.fromJson(value, eventType)));
+          .map((key, value) => MapEntry(key, Score.fromJson(value, gameName)));
     } catch (e) {
       scores = Map();
     }
     if (json['targetScore'] != null)
-      targetScore = Score.fromJson(json['targetScore'], eventType);
+      targetScore = Score.fromJson(json['targetScore'], gameName);
     try {
       changes = List<Change>.from(
         json['changes'].map(
@@ -721,9 +723,7 @@ extension DiceExtension on Dice {
   String toVal(String gameName) {
     final skeleton = json.decode(
       remoteConfig.getString(
-        remoteConfig.getString(
-          gameName,
-        ),
+        gameName,
       ),
     );
     var dice = skeleton["Dice"];

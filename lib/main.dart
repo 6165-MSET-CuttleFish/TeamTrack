@@ -20,7 +20,6 @@ Future<void> main() async {
   Statics.gameName = remoteConfig.getString("gameName");
   Statics.skeleton =
       json.decode(remoteConfig.getValue(Statics.gameName).asString());
-
   await dataModel.restoreEvents();
   runApp(MyApp());
 }

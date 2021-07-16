@@ -68,7 +68,7 @@ class _TeamView extends State<TeamView> {
                   disabledBorderColor: Theme.of(context).accentColor,
                   color:
                       _dice == Dice.one ? Theme.of(context).accentColor : null,
-                  child: Text('1'),
+                  child: Text(Dice.one.toVal(widget.event.gameName)),
                   onPressed: _dice != Dice.one
                       ? () {
                           setState(
@@ -85,7 +85,7 @@ class _TeamView extends State<TeamView> {
                   disabledBorderColor: Theme.of(context).accentColor,
                   color:
                       _dice == Dice.two ? Theme.of(context).accentColor : null,
-                  child: Text('2'),
+                  child: Text(Dice.two.toVal(widget.event.gameName)),
                   onPressed: _dice != Dice.two
                       ? () {
                           setState(
@@ -103,7 +103,7 @@ class _TeamView extends State<TeamView> {
                   color: _dice == Dice.three
                       ? Theme.of(context).accentColor
                       : null,
-                  child: Text('3'),
+                  child: Text(Dice.three.toVal(widget.event.gameName)),
                   onPressed: _dice != Dice.three
                       ? () {
                           setState(
