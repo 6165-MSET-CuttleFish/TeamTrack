@@ -143,7 +143,7 @@ class _EventsList extends State<EventsList> {
                             title: Text("Link Account"),
                             onTap: () => Navigator.of(context).push(
                               platformPageRoute(
-                                (context) => LoginView(),
+                                (context) => LoginView(returnBack: true),
                               ),
                             ),
                           ),

@@ -7,8 +7,8 @@ import 'package:auth_buttons/auth_buttons.dart';
 import 'package:provider/provider.dart';
 
 class LoginView extends StatefulWidget {
-  LoginView({Key? key}) : super(key: key);
-
+  LoginView({Key? key, this.returnBack}) : super(key: key);
+  final bool? returnBack;
   @override
   _LoginView createState() => _LoginView();
 }
@@ -156,7 +156,7 @@ class _LoginView extends State<LoginView> {
               builder: (context) => signUpSheet(),
               isScrollControlled: true,
             );
-            Navigator.of(context).pop();
+            if (widget.returnBack ?? false) Navigator.of(context).pop();
           },
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -179,7 +179,7 @@ class _LoginView extends State<LoginView> {
         GoogleAuthButton(
           onPressed: () async {
             await context.read<AuthenticationService>().signInWithGoogle();
-            Navigator.of(context).pop();
+            if (widget.returnBack ?? false) Navigator.of(context).pop();
           },
           darkMode: true,
           style: AuthButtonStyle(
