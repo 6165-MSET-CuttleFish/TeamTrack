@@ -9,8 +9,8 @@ class Score extends ScoreDivision implements Comparable<Score> {
   Penalty penalties = Penalty();
   String id = '';
   late Dice dice;
-  Score(this.id, this.dice) {
-    var ref = json.decode(remoteConfig.getValue(Statics.gameName).asString());
+  Score(this.id, this.dice, String gameName) {
+    var ref = json.decode(remoteConfig.getValue(gameName).asString());
     teleScore = TeleScore(ref['TeleScore']);
     autoScore = AutoScore(ref['AutoScore']);
     endgameScore = EndgameScore(ref['EndgameScore']);
@@ -57,7 +57,7 @@ class Score extends ScoreDivision implements Comparable<Score> {
   }
 
   Score.fromJson(Map<String, dynamic> map, String gameName) {
-    var ref = json.decode(remoteConfig.getValue(Statics.gameName).asString());
+    var ref = json.decode(remoteConfig.getValue(gameName).asString());
     autoScore = AutoScore.fromJson(map['AutoScore'], ref['AutoScore']);
     teleScore = TeleScore.fromJson(map['TeleScore'], ref['TeleScore']);
     endgameScore =
@@ -73,7 +73,7 @@ class Score extends ScoreDivision implements Comparable<Score> {
         'id': id.toString(),
       };
   Score operator +(Score other) {
-    var score = Score('', dice);
+    var score = Score('', dice, Statics.gameName);
     score.autoScore = autoScore + other.autoScore;
     score.teleScore = teleScore + other.teleScore;
     score.endgameScore = endgameScore + other.endgameScore;

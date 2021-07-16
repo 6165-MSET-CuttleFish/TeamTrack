@@ -208,7 +208,7 @@ class _TeamView extends State<TeamView> {
         ],
       ),
       body: StreamBuilder<Database.Event>(
-        stream: DatabaseServices(id: widget.event.id).getEventChanges,
+        stream: DatabaseServices(id: widget.event.id, gameName: widget.event.gameName).getEventChanges,
         builder: (context, eventHandler) {
           if (eventHandler.hasData && !eventHandler.hasError) {
             widget.event.updateLocal(
@@ -686,16 +686,15 @@ class _TeamView extends State<TeamView> {
         child: PlatformButton(
           onPressed: () async {
             if (_team.targetScore == null) {
-              _team.targetScore = Score(
-                Uuid().v4(),
-                Dice.none,
-              );
+              _team.targetScore =
+                  Score(Uuid().v4(), Dice.none, widget.event.gameName);
               widget.event
                   .getRef()
                   ?.child('teams/${widget.team.number}')
                   .runTransaction((mutableData) async {
                 mutableData.value['targetScore'] =
-                    Score(Uuid().v4(), Dice.none).toJson();
+                    Score(Uuid().v4(), Dice.none, widget.event.gameName)
+                        .toJson();
                 return mutableData;
               });
               dataModel.saveEvents();

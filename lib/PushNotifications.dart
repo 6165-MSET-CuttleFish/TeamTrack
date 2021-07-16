@@ -80,11 +80,7 @@ class PushNotifications {
         )));
   }
 
-  Future<String> getToken() async {
-    FirebaseMessaging.instance.getToken().then((value) {
-      print(value);
-      return value;
-    });
-    return "";
+  Future<String?> getToken() async {
+    return FirebaseMessaging.instance.getToken();
   }
 }

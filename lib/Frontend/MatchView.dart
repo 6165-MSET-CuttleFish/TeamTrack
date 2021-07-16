@@ -52,7 +52,7 @@ class _MatchView extends State<MatchView> {
 
   @override
   Widget build(BuildContext context) => StreamBuilder<Database.Event>(
-        stream: DatabaseServices(id: widget.event.id).getEventChanges,
+        stream: DatabaseServices(id: widget.event.id, gameName: widget.event.gameName).getEventChanges,
         builder: (context, eventHandler) {
           if (eventHandler.hasData && !eventHandler.hasError) {
             widget.event.updateLocal(

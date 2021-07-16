@@ -27,8 +27,6 @@ save(String key, value) async {
 
 class Statics {
   static String gameName = remoteConfig.getString("gameName");
-  static Map<String, dynamic> skeleton =
-      json.decode(remoteConfig.getString(remoteConfig.getString("gameName")));
 }
 
 class DarkThemeProvider with ChangeNotifier {
@@ -60,12 +58,10 @@ class DarkThemePreference {
 
 class DatabaseServices {
   String? id;
-  DatabaseServices({this.id});
+  String? gameName;
+  DatabaseServices({this.id, required this.gameName});
   Stream<Database.Event>? get getEventChanges => id != null
-      ? firebaseDatabase
-          .reference()
-          .child('Events/${Statics.gameName}/$id')
-          .onValue
+      ? firebaseDatabase.reference().child('Events/$gameName/$id').onValue
       : null;
 }
 
@@ -287,7 +283,7 @@ class Event {
           }
           var ref =
               mutableData.value['teams'][teamIndex]['scores'] as Map? ?? {};
-          ref.putIfAbsent(e.id, () => Score(e.id, e.dice).toJson());
+          ref.putIfAbsent(e.id, () => Score(e.id, e.dice, gameName).toJson());
           mutableData.value['teams'][teamIndex]['scores'] = ref;
         }
       }
@@ -296,29 +292,17 @@ class Event {
     if (!shared) {
       matches.add(e);
       e.red?.team1?.scores.addScore(
-        Score(
-          e.id,
-          e.dice,
-        ),
+        Score(e.id, e.dice, gameName),
       );
       if (type != EventType.remote) {
         e.red?.team2?.scores.addScore(
-          Score(
-            e.id,
-            e.dice,
-          ),
+          Score(e.id, e.dice, gameName),
         );
         e.blue?.team1?.scores.addScore(
-          Score(
-            e.id,
-            e.dice,
-          ),
+          Score(e.id, e.dice, gameName),
         );
         e.blue?.team2?.scores.addScore(
-          Score(
-            e.id,
-            e.dice,
-          ),
+          Score(e.id, e.dice, gameName),
         );
       }
     }
@@ -442,10 +426,7 @@ class Event {
 
   Database.DatabaseReference? getRef() {
     if (!shared) return null;
-    return firebaseDatabase
-        .reference()
-        .child('Events/${Statics.gameName}')
-        .child(id);
+    return firebaseDatabase.reference().child('Events/$gameName').child(id);
   }
 
   Event.fromJson(Map<String, dynamic>? json) {
@@ -479,7 +460,7 @@ class Event {
     }
   }
   Map<String, dynamic> toJson() => {
-        'gameName': Statics.gameName,
+        'gameName': gameName,
         'name': name,
         'teams': teams
             .map<String, dynamic>((num, team) => MapEntry(num, team.toJson())),
@@ -524,8 +505,8 @@ class Alliance {
                   : 0))
           .clamp(0, 999);
   Score total() =>
-      (team1?.scores[id] ?? Score('', Dice.none)) +
-      (team2?.scores[id] ?? Score('', Dice.none));
+      (team1?.scores[id] ?? Score('', Dice.none, Statics.gameName)) +
+      (team2?.scores[id] ?? Score('', Dice.none, Statics.gameName));
 
   Alliance.fromJson(
     Map<String, dynamic> json,

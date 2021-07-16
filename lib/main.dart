@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
@@ -18,9 +16,13 @@ Future<void> main() async {
   await Firebase.initializeApp();
   await remoteConfig.fetchAndActivate();
   Statics.gameName = remoteConfig.getString("gameName");
-  Statics.skeleton =
-      json.decode(remoteConfig.getValue(Statics.gameName).asString());
   await dataModel.restoreEvents();
+  var notification = PushNotifications();
+  await notification.initialize();
+  String? token = await notification.getToken();
+  if (token != "") {
+    dataModel.token = token;
+  }
   runApp(MyApp());
 }
 
@@ -64,21 +66,10 @@ class _TeamTrack extends State<TeamTrack> {
         await themeChangeProvider.darkThemePreference.getTheme();
   }
 
-  handleAsync() async {
-    await notification.initialize();
-    String token = await notification.getToken();
-    if (token != "") {
-      dataModel.token = token;
-    }
-    print("Firebase token : $token");
-  }
-
   @override
   void initState() {
     super.initState();
     getCurrentAppTheme();
-    notification = PushNotifications();
-    handleAsync();
   }
 
   @override
