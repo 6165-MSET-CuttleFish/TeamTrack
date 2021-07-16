@@ -29,6 +29,9 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
         "You cannot send an event to yourself"
     );
   }
+  await admin.database().ref().child("Events")
+      .child(data.gameName).child(data.id)
+      .child("Editors").child(recipient.uid).set(true);
   const meta = {
     "id": data.id,
     "name": data.name,
