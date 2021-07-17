@@ -32,8 +32,6 @@ class TeamTrack extends StatefulWidget {
 }
 
 class _TeamTrack extends State<TeamTrack> {
-  late PushNotifications notification;
-
   final lightTheme = ThemeData(
     primarySwatch: Colors.deepPurple,
     splashColor: NewPlatform.isAndroid() ? Colors.cyan : Colors.transparent,
