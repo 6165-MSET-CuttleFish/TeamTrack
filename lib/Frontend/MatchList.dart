@@ -20,7 +20,9 @@ class _MatchList extends State<MatchList> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<Database.Event>(
-      stream: DatabaseServices(id: widget.event.id, gameName: widget.event.gameName).getEventChanges,
+      stream:
+          DatabaseServices(id: widget.event.id, gameName: widget.event.gameName)
+              .getEventChanges,
       builder: (context, eventHandler) {
         if (eventHandler.hasData && !eventHandler.hasError) {
           widget.event.updateLocal(
@@ -299,7 +301,11 @@ class _MatchList extends State<MatchList> {
                     ),
                     Spacer(),
                     Text(
-                      'Dice : ${matches[i].dice.toVal(widget.event.gameName)}',
+                      '${json.decode(
+                        remoteConfig.getString(
+                          widget.event.gameName,
+                        ),
+                      )['Dice']['name']} : ${matches[i].dice.toVal(widget.event.gameName)}',
                       style: Theme.of(context).textTheme.caption,
                     ),
                   ],

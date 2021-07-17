@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
 import 'package:teamtrack/backend.dart';
 import 'package:flutter/cupertino.dart';
@@ -31,6 +32,26 @@ class _Verify extends State<Verify> {
                       style: TextStyle(
                         fontSize: 20,
                       ),
+                    ),
+                    PlatformButton(
+                      color: Colors.blue,
+                      child: Text("Send Email Again"),
+                      onPressed: () async {
+                        await context.read<User?>()?.sendEmailVerification();
+                        showPlatformDialog(
+                          context: context,
+                          builder: (_) => PlatformAlert(
+                            title: Text("Verification Email Sent"),
+                            actions: [
+                              PlatformDialogAction(
+                                child: Text("Okay"),
+                                onPressed: () => Navigator.pop(context),
+                                isDefaultAction: true,
+                              )
+                            ],
+                          ),
+                        );
+                      },
                     ),
                     PlatformButton(
                       color: CupertinoColors.systemRed,

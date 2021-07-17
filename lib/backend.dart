@@ -122,6 +122,7 @@ class AuthenticationService {
       try {
         await _firebaseAuth.currentUser?.linkWithCredential(credential);
         _firebaseAuth.currentUser?.updateDisplayName(displayName);
+        _firebaseAuth.currentUser?.sendEmailVerification();
         return "Signed Up";
       } on FirebaseAuthException catch (e) {
         return e.message;
@@ -131,6 +132,7 @@ class AuthenticationService {
         await _firebaseAuth.createUserWithEmailAndPassword(
             email: email, password: password);
         _firebaseAuth.currentUser?.updateDisplayName(displayName);
+        _firebaseAuth.currentUser?.sendEmailVerification();
         return "Signed up";
       } on FirebaseAuthException catch (e) {
         return e.message;
@@ -227,6 +229,7 @@ class DataModel {
       'type': type,
       'authorName': authorName,
       'gameName': gameName,
+      'role': "editor",
     });
   }
 }

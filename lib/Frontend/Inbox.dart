@@ -103,11 +103,11 @@ class _InboxState extends State<Inbox> {
                             ),
                           ),
                           child: ListTile(
-                            leading: Row(
+                            leading: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Padding(
-                                  padding: const EdgeInsets.only(right: 5),
+                                  padding: const EdgeInsets.all(5),
                                   child: Icon(
                                     getTypeFromString(e['type']) ==
                                             EventType.remote
@@ -117,13 +117,15 @@ class _InboxState extends State<Inbox> {
                                     color: Theme.of(context).accentColor,
                                   ),
                                 ),
-                                Text(
-                                  e['name'] ?? "Unnamed Event",
-                                ),
+                                Text((e['gameName'] as String)
+                                    .spaceBeforeCapital())
                               ],
                             ),
                             title: Column(
                               children: [
+                                Text(
+                                  e['name'] ?? "Unnamed Event",
+                                ),
                                 Text(
                                   e['senderName'] ?? "Guest",
                                 ),

@@ -46,8 +46,8 @@ class _TeamView extends State<TeamView> {
                 groupValue: _dice,
                 children: <Dice, Widget>{
                   Dice.one: Text(Dice.one.toVal(widget.event.gameName)),
-                  Dice.two: Text(Dice.one.toVal(widget.event.gameName)),
-                  Dice.three: Text(Dice.one.toVal(widget.event.gameName)),
+                  Dice.two: Text(Dice.two.toVal(widget.event.gameName)),
+                  Dice.three: Text(Dice.three.toVal(widget.event.gameName)),
                   Dice.none: Text('All Cases')
                 },
                 onValueChanged: (Dice? newDice) {

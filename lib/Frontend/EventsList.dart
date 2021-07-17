@@ -30,6 +30,7 @@ class _EventsList extends State<EventsList> {
   @override
   Widget build(BuildContext context) {
     final themeChange = Provider.of<DarkThemeProvider>(context);
+    final TextEditingController controller = new TextEditingController();
     for (var event in dataModel.events.where((e) => !e.shared)) {
       event.authorEmail = context.read<User?>()?.email;
       event.authorName = context.read<User?>()?.displayName;
@@ -87,37 +88,101 @@ class _EventsList extends State<EventsList> {
                     DrawerHeader(
                       decoration:
                           BoxDecoration(color: Theme.of(context).accentColor),
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 5.0, right: 5.0),
-                        child: Row(
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              mainAxisSize: MainAxisSize.min,
+                      child: Row(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 5.0),
+                            child: Row(
                               children: [
-                                if (context.read<User?>()?.photoURL != null)
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(300),
-                                    child: Image.network(
-                                      context.read<User?>()!.photoURL!,
-                                      height: 70,
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    if (context.read<User?>()?.photoURL != null)
+                                      ClipRRect(
+                                        borderRadius:
+                                            BorderRadius.circular(300),
+                                        child: Image.network(
+                                          context.read<User?>()!.photoURL!,
+                                          height: 70,
+                                        ),
+                                      )
+                                    else
+                                      Icon(Icons.account_circle, size: 70),
+                                    Text(
+                                      context.read<User?>()?.displayName ??
+                                          "Guest",
+                                      style: TextStyle(color: Colors.white),
                                     ),
-                                  )
-                                else
-                                  Icon(Icons.account_circle, size: 70),
-                                Text(
-                                  context.read<User?>()?.displayName ?? "Guest",
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                                Text(
-                                  context.read<User?>()?.email ?? "",
-                                  style: TextStyle(color: Colors.white),
+                                    Text(
+                                      context.read<User?>()?.email ?? "",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
-                          ],
-                        ),
+                          ),
+                          Spacer(),
+                          Column(
+                            children: [
+                              IconButton(
+                                icon: Icon(Icons.edit),
+                                onPressed: () {
+                                  showPlatformDialog(
+                                    context: context,
+                                    builder: (_) => PlatformAlert(
+                                      title: Text("Change Display Name"),
+                                      content: PlatformTextField(
+                                        placeholder: "Display Name",
+                                        keyboardType: TextInputType.name,
+                                        controller: controller,
+                                      ),
+                                      actions: [
+                                        PlatformDialogAction(
+                                          child: Text("Cancel"),
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                        ),
+                                        PlatformDialogAction(
+                                          child: Text("Confirm"),
+                                          onPressed: () async {
+                                            if (controller.text.isNotEmpty)
+                                              await context
+                                                  .read<User?>()
+                                                  ?.updateDisplayName(
+                                                      controller.text);
+                                            Navigator.pop(context);
+                                            showPlatformDialog(
+                                              context: context,
+                                              builder: (_) => PlatformAlert(
+                                                title: Text("Success"),
+                                                content: Text("Reload the App"),
+                                                actions: [
+                                                  PlatformDialogAction(
+                                                    child: Text("Okay"),
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                    },
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                                highlightColor: Colors.red,
+                              ),
+                              Spacer(),
+                            ],
+                          )
+                        ],
                       ),
                     ),
                     Column(
@@ -336,56 +401,7 @@ class _EventsList extends State<EventsList> {
                   ],
                   secondaryActions: [
                     IconSlideAction(
-                      onTap: () {
-                        showPlatformDialog(
-                          context: context,
-                          builder: (BuildContext context) => PlatformAlert(
-                            title: Text('Delete Event'),
-                            content: Text('Are you sure?'),
-                            actions: [
-                              PlatformDialogAction(
-                                isDefaultAction: true,
-                                child: Text('Cancel'),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                              PlatformDialogAction(
-                                isDefaultAction: false,
-                                isDestructive: true,
-                                child: Text('Confirm'),
-                                onPressed: () async {
-                                  var ref = firebaseFirestore
-                                      .collection('users')
-                                      .doc(context.read<User?>()?.uid);
-                                  await firebaseFirestore
-                                      .runTransaction((transaction) async {
-                                    var snapshot = await transaction.get(ref);
-                                    if (!snapshot.exists) {
-                                      throw Exception("User does not exist!");
-                                    }
-                                    Map<String, dynamic> newEvents =
-                                        snapshot.data()?["events"]
-                                            as Map<String, dynamic>;
-                                    newEvents.remove(e.id);
-                                    return transaction.update(
-                                      ref,
-                                      {
-                                        'events': newEvents,
-                                      },
-                                    );
-                                  });
-                                  setState(
-                                    () => dataModel.sharedEvents.remove(e.id),
-                                  );
-                                  dataModel.saveEvents();
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                            ],
-                          ),
-                        );
-                      },
+                      onTap: () => onDelete(e),
                       icon: Icons.delete,
                       color: Colors.red,
                     )
@@ -528,55 +544,7 @@ class _EventsList extends State<EventsList> {
                 ],
                 secondaryActions: [
                   IconSlideAction(
-                    onTap: () {
-                      showPlatformDialog(
-                        context: context,
-                        builder: (BuildContext context) => PlatformAlert(
-                          title: Text('Delete Event'),
-                          content: Text('Are you sure?'),
-                          actions: [
-                            PlatformDialogAction(
-                              isDefaultAction: true,
-                              child: Text('Cancel'),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                            PlatformDialogAction(
-                              isDefaultAction: false,
-                              isDestructive: true,
-                              child: Text('Confirm'),
-                              onPressed: () async {
-                                var ref = firebaseFirestore
-                                    .collection('users')
-                                    .doc(context.read<User?>()?.uid);
-                                await firebaseFirestore
-                                    .runTransaction((transaction) async {
-                                  var snapshot = await transaction.get(ref);
-                                  if (!snapshot.exists) {
-                                    throw Exception("User does not exist!");
-                                  }
-                                  Map<String, dynamic> newEvents =
-                                      snapshot.data()?["events"]
-                                          as Map<String, dynamic>;
-                                  newEvents.remove(e.id);
-                                  return transaction.update(
-                                    ref,
-                                    {
-                                      'events': newEvents,
-                                    },
-                                  );
-                                });
-                                setState(
-                                    () => dataModel.sharedEvents.remove(e.id));
-
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ],
-                        ),
-                      );
-                    },
+                    onTap: () => onDelete(e),
                     icon: Icons.delete,
                     color: Colors.red,
                   )
@@ -792,17 +760,30 @@ class _EventsList extends State<EventsList> {
             PlatformDialogAction(
               child: Text('Share'),
               onPressed: () async {
+                showPlatformDialog(
+                  context: context,
+                  builder: (_) => PlatformAlert(
+                    content: Center(child: PlatformProgressIndicator()),
+                    actions: [
+                      PlatformDialogAction(
+                        child: Text('Back'),
+                        isDefaultAction: true,
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                    ],
+                  ),
+                );
                 if (!e.shared) {
-                  e.shared = true;
                   var json = e.toJson();
+                  json['shared'] = true;
                   var uid = context.read<User?>()?.uid;
-                  if (uid != null) json['Editors'] = {uid: true};
+                  if (uid != null) json['Permissions'] = {uid: "editor"};
                   await firebaseDatabase
                       .reference()
                       .child("Events/${Statics.gameName}/${e.id}")
                       .set(json);
                   var ref = firebaseFirestore.collection('users').doc(uid);
-                  firebaseFirestore.runTransaction((transaction) async {
+                  await firebaseFirestore.runTransaction((transaction) async {
                     var doc = await transaction.get(ref);
                     var newEvents = doc.data()?['events'] as Map;
                     newEvents[e.id] = {
@@ -817,10 +798,10 @@ class _EventsList extends State<EventsList> {
                     transaction.update(ref, {'events': newEvents});
                   });
                   dataModel.events.remove(e);
-                  setState(dataModel.saveEvents);
+                  setState(() => dataModel.saveEvents);
                 }
                 if (_emailController.text.trim().isNotEmpty) {
-                  dataModel.shareEvent(
+                  await dataModel.shareEvent(
                     name: e.name,
                     authorName: e.authorName ?? '',
                     authorEmail: e.authorEmail ?? '',
@@ -830,6 +811,7 @@ class _EventsList extends State<EventsList> {
                     gameName: e.gameName,
                   );
                 }
+                _emailController.clear();
                 Navigator.of(context).pop();
               },
             ),
@@ -853,5 +835,56 @@ class _EventsList extends State<EventsList> {
           ],
         ),
       );
+  }
+
+  void onDelete(Event e) {
+    showPlatformDialog(
+      context: context,
+      builder: (BuildContext context) => PlatformAlert(
+        title: Text('Delete Event'),
+        content: Text('Are you sure?'),
+        actions: [
+          PlatformDialogAction(
+            isDefaultAction: true,
+            child: Text('Cancel'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          PlatformDialogAction(
+            isDefaultAction: false,
+            isDestructive: true,
+            child: Text('Confirm'),
+            onPressed: () async {
+              var ref = firebaseFirestore
+                  .collection('users')
+                  .doc(context.read<User?>()?.uid);
+              await firebaseFirestore.runTransaction((transaction) async {
+                var snapshot = await transaction.get(ref);
+                if (!snapshot.exists) {
+                  throw Exception("User does not exist!");
+                }
+                Map<String, dynamic> newEvents =
+                    snapshot.data()?["events"] as Map<String, dynamic>;
+                newEvents.remove(e.id);
+                return transaction.update(
+                  ref,
+                  {
+                    'events': newEvents,
+                  },
+                );
+              });
+              setState(
+                () => dataModel.sharedEvents.remove(e.id),
+              );
+              dataModel.saveEvents();
+              if (e.authorEmail == context.read<User?>()?.email)
+                e.getRef()?.remove();
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
+    );
   }
 }
