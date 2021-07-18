@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart' as Database;
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -177,10 +178,10 @@ final Database.FirebaseDatabase firebaseDatabase =
 final FirebaseFunctions functions = FirebaseFunctions.instance;
 final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 final RemoteConfig remoteConfig = RemoteConfig.instance;
+final FirebaseMessaging messaging = FirebaseMessaging.instance;
 
 class DataModel {
   List<Event> events = [];
-  Map<String, Event> sharedEvents = {};
   String? token;
   List<Event> localEvents() {
     return events.where((e) => e.type == EventType.local).toList();
@@ -197,14 +198,14 @@ class DataModel {
   void saveEvents() async {
     var coded = events.map((e) => e.toJson()).toList();
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString(Statics.gameName, jsonEncode(coded));
+    prefs.setString("Events", jsonEncode(coded));
     print(coded);
   }
 
   Future<void> restoreEvents() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      var x = jsonDecode(prefs.getString(Statics.gameName) ?? '') as List;
+      var x = jsonDecode(prefs.getString("Events") ?? '') as List;
       events = x.map((e) => Event.fromJson(e)).toList();
     } catch (e) {
       print("failed");

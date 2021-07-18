@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/services.dart';
 import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
 import 'package:teamtrack/Frontend/EventsList.dart';
@@ -18,6 +19,15 @@ Future<void> main() async {
   Statics.gameName = remoteConfig.getString("gameName");
   await dataModel.restoreEvents();
   var notification = PushNotifications();
+  NotificationSettings settings = await messaging.requestPermission(
+  alert: true,
+  announcement: false,
+  badge: true,
+  carPlay: false,
+  criticalAlert: false,
+  provisional: false,
+  sound: true,
+);
   await notification.initialize();
   String? token = await notification.getToken();
   if (token != "") {

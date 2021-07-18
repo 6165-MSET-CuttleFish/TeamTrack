@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:teamtrack/backend.dart';
 
 const AndroidNotificationChannel channel = AndroidNotificationChannel(
   'high_importance_channel', // id
@@ -16,7 +17,7 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  print('A bg message just showed up :  ${message.messageId}');
+  print('A background message just showed up :  ${message.messageId}');
 }
 
 class PushNotifications {
@@ -29,8 +30,7 @@ class PushNotifications {
             AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(channel);
 
-    await FirebaseMessaging.instance
-        .setForegroundNotificationPresentationOptions(
+    await messaging.setForegroundNotificationPresentationOptions(
       alert: true,
       badge: true,
       sound: true,
@@ -66,21 +66,23 @@ class PushNotifications {
 
   void showNotification() async {
     await flutterLocalNotificationsPlugin.show(
-        0,
-        "aaagaawaga",
-        "speech inconprehensible?",
-        NotificationDetails(
-            android: AndroidNotificationDetails(
+      0,
+      "aaagaawaga",
+      "speech inconprehensible?",
+      NotificationDetails(
+        android: AndroidNotificationDetails(
           channel.id,
           channel.name,
           channel.description,
           importance: Importance.high,
           color: Colors.blue,
           playSound: true,
-        )));
+        ),
+      ),
+    );
   }
 
   Future<String?> getToken() async {
-    return FirebaseMessaging.instance.getToken();
+    return messaging.getToken();
   }
 }

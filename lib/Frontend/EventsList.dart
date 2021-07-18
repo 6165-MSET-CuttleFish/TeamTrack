@@ -18,6 +18,7 @@ class EventsList extends StatefulWidget {
 }
 
 class _EventsList extends State<EventsList> {
+  Map<String, Event> sharedEvents = {};
   final slider = SlidableStrechActionPane();
   final secondaryActions = <Widget>[
     IconSlideAction(
@@ -46,7 +47,7 @@ class _EventsList extends State<EventsList> {
             try {
               var event = Event.fromJson(data?['events'][key]);
               event.shared = true;
-              dataModel.sharedEvents[key] = event;
+              sharedEvents[key] = event;
             } catch (e) {}
           });
           return Scaffold(
@@ -389,7 +390,7 @@ class _EventsList extends State<EventsList> {
               ),
             )
             .toList(),
-        ...dataModel.sharedEvents.values
+        ...sharedEvents.values
             .where((element) => element.type == EventType.local)
             .map((e) => Slidable(
                   actions: [
@@ -531,7 +532,7 @@ class _EventsList extends State<EventsList> {
               ),
             )
             .toList(),
-        ...dataModel.sharedEvents.values
+        ...sharedEvents.values
             .where((element) => element.type == EventType.remote)
             .map(
               (e) => Slidable(
@@ -875,7 +876,7 @@ class _EventsList extends State<EventsList> {
                 );
               });
               setState(
-                () => dataModel.sharedEvents.remove(e.id),
+                () => sharedEvents.remove(e.id),
               );
               dataModel.saveEvents();
               if (e.authorEmail == context.read<User?>()?.email)
