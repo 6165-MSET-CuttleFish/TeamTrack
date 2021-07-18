@@ -540,10 +540,6 @@ class Alliance {
                       : -getPenalty())
                   : 0))
           .clamp(0, 999);
-  Score total() =>
-      (team1?.scores[id] ?? Score('', Dice.none, Statics.gameName)) +
-      (team2?.scores[id] ?? Score('', Dice.none, Statics.gameName));
-
   Alliance.fromJson(
     Map<String, dynamic> json,
     Map<String, Team> teamList,

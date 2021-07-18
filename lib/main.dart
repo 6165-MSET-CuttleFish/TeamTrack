@@ -20,14 +20,14 @@ Future<void> main() async {
   await dataModel.restoreEvents();
   var notification = PushNotifications();
   NotificationSettings settings = await messaging.requestPermission(
-  alert: true,
-  announcement: false,
-  badge: true,
-  carPlay: false,
-  criticalAlert: false,
-  provisional: false,
-  sound: true,
-);
+    alert: true,
+    announcement: false,
+    badge: true,
+    carPlay: false,
+    criticalAlert: false,
+    provisional: false,
+    sound: true,
+  );
   await notification.initialize();
   String? token = await notification.getToken();
   if (token != "") {

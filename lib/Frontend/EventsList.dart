@@ -611,7 +611,7 @@ class _EventsList extends State<EventsList> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Icon(CupertinoIcons.person_3_fill),
-                  Text('Local Event'),
+                  Text('In-Person Event'),
                   Text(''),
                 ],
               ),
@@ -663,7 +663,7 @@ class _EventsList extends State<EventsList> {
                     _chosen();
                   },
                   leading: Icon(CupertinoIcons.person_3_fill),
-                  title: Text('Local Event'),
+                  title: Text('In-Person Event'),
                 ),
               ),
             ),
@@ -781,7 +781,7 @@ class _EventsList extends State<EventsList> {
                   if (uid != null) json['Permissions'] = {uid: "editor"};
                   await firebaseDatabase
                       .reference()
-                      .child("Events/${Statics.gameName}/${e.id}")
+                      .child("Events/${e.gameName}/${e.id}")
                       .set(json);
                   var ref = firebaseFirestore.collection('users').doc(uid);
                   await firebaseFirestore.runTransaction((transaction) async {

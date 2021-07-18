@@ -72,14 +72,6 @@ class Score extends ScoreDivision implements Comparable<Score> {
         'Penalty': penalties.toJson(),
         'id': id.toString(),
       };
-  Score operator +(Score other) {
-    var score = Score('', dice, Statics.gameName);
-    score.autoScore = autoScore + other.autoScore;
-    score.teleScore = teleScore + other.teleScore;
-    score.endgameScore = endgameScore + other.endgameScore;
-    score.penalties = penalties + other.penalties;
-    return score;
-  }
 
   @override
   int compareTo(Score other) => total().compareTo(other.total());
