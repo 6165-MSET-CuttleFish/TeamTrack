@@ -18,21 +18,7 @@ Future<void> main() async {
   await remoteConfig.fetchAndActivate();
   Statics.gameName = remoteConfig.getString("gameName");
   await dataModel.restoreEvents();
-  var notification = PushNotifications();
-  NotificationSettings settings = await messaging.requestPermission(
-    alert: true,
-    announcement: false,
-    badge: true,
-    carPlay: false,
-    criticalAlert: false,
-    provisional: false,
-    sound: true,
-  );
-  await notification.initialize();
-  String? token = await notification.getToken();
-  if (token != "") {
-    dataModel.token = token;
-  }
+
   runApp(MyApp());
 }
 
@@ -74,9 +60,28 @@ class _TeamTrack extends State<TeamTrack> {
         await themeChangeProvider.darkThemePreference.getTheme();
   }
 
+  void pushNotif() async{
+    var notification = PushNotifications();
+    NotificationSettings settings = await messaging.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+    );
+    await notification.initialize();
+    String? token = await notification.getToken();
+    if (token != "") {
+      dataModel.token = token;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+    pushNotif();
     getCurrentAppTheme();
   }
 

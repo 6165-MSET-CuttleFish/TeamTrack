@@ -16,7 +16,7 @@ const AndroidNotificationChannel channel = AndroidNotificationChannel(
 );
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
+FlutterLocalNotificationsPlugin();
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
@@ -30,7 +30,7 @@ class PushNotifications {
 
     await flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
+        AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(channel);
 
     await messaging.setForegroundNotificationPresentationOptions(
@@ -40,40 +40,42 @@ class PushNotifications {
     );
 
     var initializationSettingsAndroid =
-        AndroidInitializationSettings('mipmap/ic_launcher');
+    AndroidInitializationSettings('mipmap/ic_launcher');
     var initializationSettings =
-        InitializationSettings(android: initializationSettingsAndroid);
+    InitializationSettings(android: initializationSettingsAndroid);
     flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
     FirebaseMessaging.onMessage.listen(
-      (RemoteMessage message) {
-        RemoteNotification? notification = message.notification;
-        AndroidNotification? android = message.notification?.android;
-        AppleNotification? ios = message.notification?.apple;
-        if (notification != null) {
-          flutterLocalNotificationsPlugin.show(
-            notification.hashCode,
-            notification.title,
-            notification.body,
-            NotificationDetails(
-              android: AndroidNotificationDetails(
-                channel.id,
-                channel.name,
-                channel.description,
-                color: Colors.blue,
-                playSound: true,
-                icon: android?.smallIcon,
-              ),
-              iOS: IOSNotificationDetails(
-                presentSound: true,
-                presentBadge: true,
-                presentAlert: true,
-              )
-            ),
-          );
-        }
-      },
+        onMessage
     );
+  }
+
+  void onMessage(RemoteMessage message) {
+    RemoteNotification? notification = message.notification;
+    AndroidNotification? android = message.notification?.android;
+    AppleNotification? ios = message.notification?.apple;
+    if (notification != null) {
+      flutterLocalNotificationsPlugin.show(
+        notification.hashCode,
+        notification.title,
+        notification.body,
+        NotificationDetails(
+            android: AndroidNotificationDetails(
+              channel.id,
+              channel.name,
+              channel.description,
+              color: Colors.blue,
+              playSound: true,
+              icon: android?.smallIcon,
+            ),
+            iOS: IOSNotificationDetails(
+              presentSound: true,
+              presentBadge: true,
+              presentAlert: true,
+            )
+        ),
+      );
+    }
   }
 
   Future<String?> getToken() async {
