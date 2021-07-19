@@ -33,6 +33,12 @@ class _Verify extends State<Verify> {
                         fontSize: 20,
                       ),
                     ),
+                    Text(
+                      "Once verified, you will need to sign out and sign back in using these credentials",
+                      style: TextStyle(
+                        fontSize: 20,
+                      ),
+                    ),
                     PlatformButton(
                       color: Colors.blue,
                       child: Text("Send Email Again"),
