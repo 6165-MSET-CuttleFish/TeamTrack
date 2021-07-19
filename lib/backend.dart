@@ -368,10 +368,8 @@ class Event {
     } else {
       matches.removeWhere((element) => element.alliance(team) != null);
       teams.remove(team.number);
-      getRef()?.runTransaction((mutableData) async {
-        var newTeams = ((mutableData.value as Map)['teams'] as Map);
-        newTeams.remove(team.number);
-        mutableData.value['teams'] = newTeams;
+      getRef()?.child('teams').runTransaction((mutableData) async {
+        mutableData.value[team.number] = null;
         return mutableData;
       });
     }
