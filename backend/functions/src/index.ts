@@ -46,12 +46,12 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
   };
   const ref = admin.firestore().collection("users").doc(recipient.uid);
   let tokens:string[] = [];
+  let allowSend = true;
   const returnVal = await admin.firestore().runTransaction(async (t) => {
     const doc = await t.get(ref);
     const newInbox = doc?.data()?.inbox;
     tokens = doc?.data()?.FCMtokens;
     const blocked = doc?.data()?.blockedUsers;
-    let allowSend = true;
     if (blocked[sender.uid] != null) allowSend = false;
     if (allowSend) {
       newInbox[data.id] = meta;
@@ -63,13 +63,16 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
     }
     t.update(ref, {inbox: newInbox});
   });
-  const message = {
-    data: {name: data.name, sender: sender.displayName ?? "Unknown"},
-    tokens: tokens,
+  const notification = {
+    title: `New Event: ${meta.name ?? "Unknown"} `,
+    body: `${sender.displayName ?? "Unknown"} has shared an event with you`,
   };
-  if (tokens.length != 0) {
-    const response = await admin.messaging().sendMulticast(message);
-    console.log(response.successCount + " messages were sent successfully");
+  const message = {
+    tokens: tokens,
+    notification: notification,
+  };
+  if (tokens.length != 0 && allowSend) {
+    await admin.messaging().sendMulticast(message);
   }
   return returnVal;
 });
