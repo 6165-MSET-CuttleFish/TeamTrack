@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
 import 'package:teamtrack/backend.dart';
 
 const AndroidNotificationChannel channel = AndroidNotificationChannel(
@@ -46,7 +49,8 @@ class PushNotifications {
       (RemoteMessage message) {
         RemoteNotification? notification = message.notification;
         AndroidNotification? android = message.notification?.android;
-        if (notification != null && android != null) {
+        AppleNotification? ios = message.notification?.apple;
+        if (notification != null) {
           flutterLocalNotificationsPlugin.show(
             notification.hashCode,
             notification.title,
@@ -58,30 +62,17 @@ class PushNotifications {
                 channel.description,
                 color: Colors.blue,
                 playSound: true,
-                icon: android.smallIcon,
+                icon: android?.smallIcon,
               ),
+              iOS: IOSNotificationDetails(
+                presentSound: true,
+                presentBadge: true,
+                presentAlert: true,
+              )
             ),
           );
         }
       },
-    );
-  }
-
-  void showNotification() async {
-    await flutterLocalNotificationsPlugin.show(
-      0,
-      "aaagaawaga",
-      "speech inconprehensible?",
-      NotificationDetails(
-        android: AndroidNotificationDetails(
-          channel.id,
-          channel.name,
-          channel.description,
-          importance: Importance.high,
-          color: Colors.blue,
-          playSound: true,
-        ),
-      ),
     );
   }
 
