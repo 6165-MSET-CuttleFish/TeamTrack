@@ -52,7 +52,9 @@ class _MatchView extends State<MatchView> {
 
   @override
   Widget build(BuildContext context) => StreamBuilder<Database.Event>(
-        stream: DatabaseServices(id: widget.event.id, gameName: widget.event.gameName).getEventChanges,
+        stream: DatabaseServices(
+                id: widget.event.id, gameName: widget.event.gameName)
+            .getEventChanges,
         builder: (context, eventHandler) {
           if (eventHandler.hasData && !eventHandler.hasError) {
             widget.event.updateLocal(
@@ -61,12 +63,7 @@ class _MatchView extends State<MatchView> {
               ),
             );
             if (widget.team == null) {
-              _match = widget.event.matches.firstWhere(
-                (element) => element.id == _match?.id,
-                orElse: () {
-                  return Match.defaultMatch(EventType.remote);
-                },
-              );
+              _match = widget.event.matches[_match?.id];
             }
             _selectedTeam = widget.event.teams[_selectedTeam?.number];
             _selectedAlliance = _match?.red;

@@ -101,7 +101,7 @@ class _MatchList extends State<MatchList> {
     if (widget.event.type != EventType.remote) {
       return ListView(
         children: widget.team == null
-            ? widget.event.matches.map((e) {
+            ? widget.event.getSortedMatches().map((e) {
                 i++;
                 return Slidable(
                   actionPane: slider,
@@ -220,7 +220,7 @@ class _MatchList extends State<MatchList> {
       );
     } else {
       var arr = <Slidable>[];
-      var matches = widget.event.matches
+      var matches = widget.event.getSortedMatches()
           .where((e) =>
               e.alliance(
                 widget.event.teams[widget.team?.number],
@@ -338,7 +338,7 @@ class _MatchList extends State<MatchList> {
 
   List<Widget> _teamSpecMatches() {
     int i = 0;
-    return widget.event.matches
+    return widget.event.getSortedMatches()
         .where((e) =>
             e.alliance(
               widget.event.teams[widget.team?.number],

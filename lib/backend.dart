@@ -244,7 +244,7 @@ class Event {
   bool shared = false;
   EventType type = EventType.remote;
   Map<String, Team> teams = Map<String, Team>();
-  List<Match> matches = [];
+  Map<String, Match> matches = {};
   late String name;
   Timestamp timeStamp = Timestamp.now();
   void addTeam(Team newTeam) async {
@@ -259,9 +259,15 @@ class Event {
     teams[newTeam.number] = newTeam;
   }
 
+  List<Match> getSortedMatches() {
+    var arr = matches.values.toList();
+    arr.sort((a, b) => a.timeStamp.compareTo(b.timeStamp));
+    return arr;
+  }
+
   List<Match> getMatches(Team team) {
     var arr = <Match>[];
-    for (var match in matches) {
+    for (var match in matches.values) {
       if (team.scores[match.id] != null) {
         arr.add(match);
       }
@@ -273,7 +279,7 @@ class Event {
     var bigArr = <Tuple2<Team, List<Match>>>[];
     for (var team in teams.values) {
       var smallArr = <Match>[];
-      for (var match in matches) {
+      for (var match in matches.values) {
         if (match.alliance(team) != null) {
           smallArr.add(match);
         }
@@ -285,10 +291,9 @@ class Event {
 
   void addMatch(Match e) async {
     await getRef()?.runTransaction((mutableData) async {
-      mutableData.value['matches'] = [
-        ...mutableData.value['matches'] ?? [],
-        e.toJson()
-      ];
+      var newMatches = mutableData.value['matches'] ?? {};
+      newMatches[e.id] = e.toJson();
+      mutableData.value['matches'] = newMatches;
       for (var team in e.getTeams()) {
         if (team != null) {
           try {
@@ -326,7 +331,7 @@ class Event {
       return mutableData;
     });
     if (!shared) {
-      matches.add(e);
+      matches[e.id] = e;
       e.red?.team1?.scores.addScore(
         Score(e.id, e.dice, gameName),
       );
@@ -347,7 +352,7 @@ class Event {
   String? deleteTeam(Team team) {
     String? x;
     if (type != EventType.remote) {
-      for (Match match in matches) {
+      for (Match match in matches.values) {
         if ((match.red?.hasTeam(team) ?? false) ||
             (match.blue?.hasTeam(team) ?? false)) {
           if (type == EventType.remote)
@@ -366,7 +371,7 @@ class Event {
         });
       }
     } else {
-      matches.removeWhere((element) => element.alliance(team) != null);
+      matches.removeWhere((key, element) => element.alliance(team) != null);
       teams.remove(team.number);
       getRef()?.child('teams').runTransaction((mutableData) async {
         mutableData.value[team.number] = null;
@@ -431,17 +436,18 @@ class Event {
         }
       }
       try {
-        matches = List<Match>.from(
-          map['matches']?.map(
-            (model) => Match.fromJson(
+        matches = (map['matches'] as Map).map(
+          (key, model) => MapEntry(
+            key,
+            Match.fromJson(
               model,
               teams,
-              getTypeFromString(map['type']),
+              type,
             ),
           ),
         );
       } catch (e) {
-        matches = [];
+        matches = {};
       }
       shared = map['shared'] ?? true;
       id = map['id'] ?? Uuid().v4();
@@ -452,7 +458,7 @@ class Event {
       }
       authorEmail = map['authorEmail'];
       authorName = map['authorName'];
-      for (var match in matches) {
+      for (var match in matches.values) {
         match.setDice(match.dice);
       }
     }
@@ -470,15 +476,16 @@ class Event {
     try {
       teams = (json?['teams'] as Map)
           .map((key, value) => MapEntry(key, Team.fromJson(value, gameName)));
-      matches = List<Match>.from(
-        json?['matches'].map(
-          (model) => Match.fromJson(
-            model,
-            teams,
-            getTypeFromString(json['type']),
+      matches = (json?['matches'] as Map).map(
+          (key, model) => MapEntry(
+            key,
+            Match.fromJson(
+              model,
+              teams,
+              type,
+            ),
           ),
-        ),
-      );
+        );
     } catch (e) {}
     shared = json?['shared'] ?? false;
     id = json?['id'] ?? Uuid().v4();
@@ -489,7 +496,7 @@ class Event {
     }
     authorEmail = json?['authorEmail'];
     authorName = json?['authorName'];
-    for (var match in matches) {
+    for (var match in matches.values) {
       match.setDice(match.dice);
     }
   }
@@ -498,7 +505,7 @@ class Event {
         'name': name,
         'teams': teams
             .map<String, dynamic>((num, team) => MapEntry(num, team.toJson())),
-        'matches': matches.map((e) => e.toJson()).toList(),
+        'matches': matches.map((key, e) => MapEntry(key, e.toJson())),
         'type': type.toString(),
         'shared': shared,
         'id': id,

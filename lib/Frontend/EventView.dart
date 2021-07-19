@@ -46,7 +46,7 @@ class _EventView extends State<EventView> {
                           event: widget.event,
                         )
                       : MatchSearch(
-                          matches: widget.event.matches,
+                          matches: widget.event.getSortedMatches(),
                           event: widget.event,
                         ),
                 );
