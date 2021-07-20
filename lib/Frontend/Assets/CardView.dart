@@ -64,11 +64,8 @@ class _CardView extends State<CardView> {
         child: Container(
           decoration: BoxDecoration(
             color: Theme.of(context).canvasColor,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(10),
-              topRight: Radius.circular(10),
-              bottomLeft: Radius.circular(10),
-              bottomRight: Radius.circular(10),
+            borderRadius: BorderRadius.all(
+              Radius.circular(10),
             ),
             boxShadow: [
               BoxShadow(

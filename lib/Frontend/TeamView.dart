@@ -208,7 +208,7 @@ class _TeamView extends State<TeamView> {
         ],
       ),
       body: StreamBuilder<Database.Event>(
-        stream: DatabaseServices(id: widget.event.id, gameName: widget.event.gameName).getEventChanges,
+        stream: widget.event.getRef()?.onValue,
         builder: (context, eventHandler) {
           if (eventHandler.hasData && !eventHandler.hasError) {
             widget.event.updateLocal(
@@ -310,7 +310,8 @@ class _TeamView extends State<TeamView> {
                             minX: 0,
                             minY: 0,
                             maxY: [
-                              widget.event.getSortedMatches()
+                              widget.event
+                                  .getSortedMatches()
                                   .maxAllianceScore(_team)
                                   .toDouble(),
                               _team.targetScore?.total().toDouble() ?? 0.0
@@ -344,7 +345,8 @@ class _TeamView extends State<TeamView> {
                                     : null,
                                 show: _selections[0] &&
                                     widget.event.type != EventType.remote,
-                                spots: widget.event.getSortedMatches()
+                                spots: widget.event
+                                    .getSortedMatches()
                                     .where((e) =>
                                         e.dice == _dice || _dice == Dice.none)
                                     .toList()
@@ -457,10 +459,7 @@ class _TeamView extends State<TeamView> {
                               gradient: LinearGradient(
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
-                                colors: [
-                                  Colors.cyan,
-                                  Colors.deepPurple,
-                                ],
+                                colors: [Colors.deepPurple, Colors.green],
                               ),
                               dataSource: _team.scores
                                   .diceScores(_dice)
@@ -729,8 +728,9 @@ class _TeamView extends State<TeamView> {
         scoreDivisions: _team.scores.values.toList(),
         dice: _dice,
         removeOutliers: removeOutliers,
-        matches:
-            widget.event.type == EventType.remote ? null : widget.event.getSortedMatches(),
+        matches: widget.event.type == EventType.remote
+            ? null
+            : widget.event.getSortedMatches(),
       ),
       Padding(
         padding: const EdgeInsets.only(top: 20, bottom: 10),
@@ -747,8 +747,9 @@ class _TeamView extends State<TeamView> {
         scoreDivisions: _team.scores.values.map((e) => e.autoScore).toList(),
         dice: _dice,
         removeOutliers: removeOutliers,
-        matches:
-            widget.event.type == EventType.remote ? null : widget.event.getSortedMatches(),
+        matches: widget.event.type == EventType.remote
+            ? null
+            : widget.event.getSortedMatches(),
       ),
       Padding(
         padding: const EdgeInsets.only(top: 20, bottom: 10),
@@ -765,8 +766,9 @@ class _TeamView extends State<TeamView> {
         scoreDivisions: _team.scores.values.map((e) => e.teleScore).toList(),
         dice: _dice,
         removeOutliers: removeOutliers,
-        matches:
-            widget.event.type == EventType.remote ? null : widget.event.getSortedMatches(),
+        matches: widget.event.type == EventType.remote
+            ? null
+            : widget.event.getSortedMatches(),
       ),
       Padding(
         padding: const EdgeInsets.only(top: 20, bottom: 10),
@@ -783,8 +785,9 @@ class _TeamView extends State<TeamView> {
         scoreDivisions: _team.scores.values.map((e) => e.endgameScore).toList(),
         dice: _dice,
         removeOutliers: removeOutliers,
-        matches:
-            widget.event.type == EventType.remote ? null : widget.event.getSortedMatches(),
+        matches: widget.event.type == EventType.remote
+            ? null
+            : widget.event.getSortedMatches(),
       ),
       Padding(
         padding: EdgeInsets.all(130),

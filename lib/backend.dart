@@ -57,15 +57,6 @@ class DarkThemePreference {
   }
 }
 
-class DatabaseServices {
-  String? id;
-  String? gameName;
-  DatabaseServices({this.id, required this.gameName});
-  Stream<Database.Event>? get getEventChanges => id != null
-      ? firebaseDatabase.reference().child('Events/$gameName/$id').onValue
-      : null;
-}
-
 class AuthenticationService {
   final FirebaseAuth _firebaseAuth;
   AuthenticationService(this._firebaseAuth);
@@ -107,6 +98,15 @@ class AuthenticationService {
           email: email, password: password);
       addToken();
       return "Signed in";
+    } on FirebaseAuthException catch (e) {
+      return e.message;
+    }
+  }
+
+  Future<String?> forgotPassword({required String email}) async {
+    try {
+      await _firebaseAuth.sendPasswordResetEmail(email: email);
+      return "sent";
     } on FirebaseAuthException catch (e) {
       return e.message;
     }
@@ -250,12 +250,7 @@ class Event {
   void addTeam(Team newTeam) async {
     await getRef()
         ?.child('teams/${newTeam.number}')
-        .runTransaction((mutableData) async {
-      if (mutableData.value == null) {
-        mutableData.value = newTeam.toJson();
-      }
-      return mutableData;
-    });
+        .update({"name": newTeam.name, "number": newTeam.number});
     teams[newTeam.number] = newTeam;
   }
 
@@ -363,18 +358,74 @@ class Event {
       }
       if (x == null) {
         teams.remove(team.number);
-        getRef()?.runTransaction((mutableData) async {
-          var newTeams = ((mutableData.value as Map)['teams'] as Map);
-          newTeams.remove(team.number);
-          mutableData.value['teams'] = newTeams;
-          return mutableData;
-        });
+        getRef()?.runTransaction(
+          (mutableData) async {
+            bool allowRemove = true;
+            List<String> ids;
+            try {
+              var newTeams = ((mutableData.value as Map)['teams'] as Map?);
+              ids = (newTeams?[team.number]?['scores'] as Map<String, dynamic>?)
+                      ?.keys
+                      .toList() ??
+                  [];
+            } catch (e) {
+              var newTeams = ((mutableData.value as Map)['teams'] as List?);
+              ids = (newTeams?.firstWhere(
+                              (element) => element?['number'] == team.number,
+                              orElse: () => null)?['scores']
+                          as Map<String, dynamic>?)
+                      ?.keys
+                      .toList() ??
+                  [];
+            }
+            for (final id in ids) {
+              if (matches.containsKey(id)) {
+                allowRemove = false;
+              }
+            }
+            try {
+              var newTeams = ((mutableData.value as Map)['teams'] as Map?);
+              newTeams?.remove(team.number);
+              mutableData.value['teams'] = newTeams;
+            } catch (e) {
+              var newTeams = allowRemove
+                  ? ((mutableData.value as Map)['teams'] as List?)
+                      ?.where((element) => element?['number'] != team.number)
+                      .toList()
+                  : (mutableData.value as Map)['teams'] as List?;
+              mutableData.value['teams'] = newTeams;
+            }
+            return mutableData;
+          },
+        );
       }
     } else {
       matches.removeWhere((key, element) => element.alliance(team) != null);
       teams.remove(team.number);
-      getRef()?.child('teams').runTransaction((mutableData) async {
-        mutableData.value[team.number] = null;
+      getRef()?.runTransaction((mutableData) async {
+        List<dynamic> ids = [];
+        try {
+          var newTeams = ((mutableData.value as Map)['teams'] as Map?);
+          ids =
+              (newTeams?[team.number]?['scores'] as Map?)?.keys.toList() ?? [];
+          newTeams?.remove(team.number);
+          mutableData.value['teams'] = newTeams;
+        } catch (e) {
+          var newTeams = ((mutableData.value as Map)['teams'] as List?);
+          ids = (newTeams?.firstWhere((element) =>
+                          element['number'] == team.number)?['scores']
+                      as Map<String, dynamic>?)
+                  ?.keys
+                  .toList() ??
+              [];
+          newTeams?.removeWhere((element) => element['number'] == team.number);
+          mutableData.value['teams'] = newTeams;
+        }
+        var newMatches = ((mutableData.value as Map)['matches'] as Map?);
+        for (var id in ids) {
+          newMatches?[id] = null;
+        }
+        mutableData.value['matches'] = newMatches;
         return mutableData;
       });
     }
@@ -390,9 +441,8 @@ class Event {
       matches.remove(e);
     }
     getRef()?.runTransaction((mutableData) async {
-      final newMatches = ((mutableData.value as Map)['matches'] as List)
-          .where((element) => element['id'] != e.id)
-          .toList();
+      final newMatches = ((mutableData.value as Map)['matches'] as Map);
+      newMatches.removeWhere((key, value) => key == e.id);
       mutableData.value['matches'] = newMatches;
       for (var team in e.getTeams()) {
         var teamIndex;
@@ -477,15 +527,15 @@ class Event {
       teams = (json?['teams'] as Map)
           .map((key, value) => MapEntry(key, Team.fromJson(value, gameName)));
       matches = (json?['matches'] as Map).map(
-          (key, model) => MapEntry(
-            key,
-            Match.fromJson(
-              model,
-              teams,
-              type,
-            ),
+        (key, model) => MapEntry(
+          key,
+          Match.fromJson(
+            model,
+            teams,
+            type,
           ),
-        );
+        ),
+      );
     } catch (e) {}
     shared = json?['shared'] ?? false;
     id = json?['id'] ?? Uuid().v4();

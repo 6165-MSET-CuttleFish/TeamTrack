@@ -52,9 +52,7 @@ class _MatchView extends State<MatchView> {
 
   @override
   Widget build(BuildContext context) => StreamBuilder<Database.Event>(
-        stream: DatabaseServices(
-                id: widget.event.id, gameName: widget.event.gameName)
-            .getEventChanges,
+        stream: widget.event.getRef()?.onValue,
         builder: (context, eventHandler) {
           if (eventHandler.hasData && !eventHandler.hasError) {
             widget.event.updateLocal(
@@ -221,11 +219,7 @@ class _MatchView extends State<MatchView> {
                                 widget.event
                                     .getRef()
                                     ?.runTransaction((mutableData) async {
-                                  final matchIndex = (mutableData
-                                          .value['matches'] as List)
-                                      .indexWhere((element) =>
-                                          element['id'] == (_match?.id ?? ''));
-                                  mutableData.value['matches'][matchIndex]
+                                  mutableData.value['matches'][_match?.id]
                                       ['dice'] = newValue.toString();
                                   return mutableData;
                                 });

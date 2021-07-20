@@ -36,11 +36,11 @@ class _EventsList extends State<EventsList> {
       event.authorEmail = context.read<User?>()?.email;
       event.authorName = context.read<User?>()?.displayName;
     }
-    return FutureBuilder<DocumentSnapshot<Map<String, dynamic>>?>(
-        future: firebaseFirestore
+    return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>?>(
+        stream: firebaseFirestore
             .collection('users')
             .doc(context.read<User?>()?.uid)
-            .get(),
+            .snapshots(),
         builder: (context, snapshot) {
           var data = snapshot.data?.data();
           (data?['events'] as Map?)?.keys.forEach((key) {
@@ -603,7 +603,6 @@ class _EventsList extends State<EventsList> {
             CupertinoActionSheetAction(
               onPressed: () {
                 _newType = EventType.local;
-                setState(() {});
                 Navigator.pop(context);
                 _chosen();
               },
@@ -619,7 +618,6 @@ class _EventsList extends State<EventsList> {
             CupertinoActionSheetAction(
               onPressed: () {
                 _newType = EventType.remote;
-                setState(() {});
                 Navigator.pop(context);
                 _chosen();
               },
@@ -658,7 +656,6 @@ class _EventsList extends State<EventsList> {
                 child: ListTile(
                   onTap: () {
                     _newType = EventType.local;
-                    setState(() {});
                     Navigator.pop(context);
                     _chosen();
                   },
@@ -679,7 +676,6 @@ class _EventsList extends State<EventsList> {
                 child: ListTile(
                   onTap: () {
                     _newType = EventType.remote;
-                    setState(() {});
                     Navigator.pop(context);
                     _chosen();
                   },
@@ -724,7 +720,7 @@ class _EventsList extends State<EventsList> {
                   () {
                     if (_newName!.isNotEmpty)
                       dataModel.events.add(Event(
-                        name: _newName ?? '',
+                        name: _newName ?? Statics.gameName,
                         type: _newType ?? EventType.remote,
                         gameName: Statics.gameName,
                       ));
@@ -744,9 +740,9 @@ class _EventsList extends State<EventsList> {
       showPlatformDialog(
         context: context,
         builder: (context) => PlatformAlert(
-          title: Text('Share Event'),
+          title: Text(e.shared ? 'Share Event' : 'Upload Event'),
           content: PlatformTextField(
-            placeholder: 'Email',
+            placeholder: e.shared ? 'Email' : '(Optional) Email',
             keyboardType: TextInputType.emailAddress,
             controller: _emailController,
           ),
@@ -759,7 +755,7 @@ class _EventsList extends State<EventsList> {
               },
             ),
             PlatformDialogAction(
-              child: Text('Share'),
+              child: Text(e.shared ? 'Share' : 'Upload'),
               onPressed: () async {
                 showPlatformDialog(
                   context: context,
@@ -777,7 +773,7 @@ class _EventsList extends State<EventsList> {
                 if (!e.shared) {
                   var json = e.toJson();
                   json['shared'] = true;
-                  var uid = context.read<User?>()?.uid;
+                  final uid = context.read<User?>()?.uid;
                   if (uid != null) json['Permissions'] = {uid: "editor"};
                   await firebaseDatabase
                       .reference()
