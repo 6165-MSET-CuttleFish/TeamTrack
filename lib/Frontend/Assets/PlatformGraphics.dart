@@ -280,6 +280,79 @@ class PlatformProgressIndicator extends PlatformWidget<
       CircularProgressIndicator();
 }
 
+class PlatformForm extends PlatformWidget<CupertinoFormSection, Form> {
+  PlatformForm({Key? key, required this.children, this.header})
+      : super(key: key);
+  final List<Widget> children;
+  final Widget? header;
+  @override
+  CupertinoFormSection buildCupertinoWidget(BuildContext context) {
+    return CupertinoFormSection(
+      children: children,
+      key: key,
+      header: header,
+    );
+  }
+
+  @override
+  Form buildMaterialWidget(BuildContext context) {
+    return Form(
+      key: key,
+      child: Column(
+        children: [if (header != null) header!, ...children],
+      ),
+    );
+  }
+}
+
+class PlatformFormField
+    extends PlatformWidget<CupertinoTextFormFieldRow, TextFormField> {
+  PlatformFormField(
+      {Key? key,
+      required this.controller,
+      this.validator,
+      this.placeholder,
+      this.keyboardType,
+      this.prefix,
+      this.obscureText = false})
+      : super(key: key);
+  final TextEditingController controller;
+  final String? Function(String?)? validator;
+  final String? placeholder;
+  final TextInputType? keyboardType;
+  final Widget? prefix;
+  final bool obscureText;
+  @override
+  CupertinoTextFormFieldRow buildCupertinoWidget(BuildContext context) {
+    return CupertinoTextFormFieldRow(
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Theme.of(context).textTheme.bodyText2?.color ??
+                Colors.deepPurple,
+            width: 1,
+          ),
+        ),
+        controller: controller,
+        validator: validator,
+        placeholder: placeholder,
+        keyboardType: keyboardType,
+        prefix: prefix,
+        obscureText: obscureText,
+        style: TextStyle(color: Theme.of(context).textTheme.bodyText2?.color));
+  }
+
+  @override
+  TextFormField buildMaterialWidget(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      validator: validator,
+      decoration: InputDecoration(labelText: placeholder),
+      keyboardType: keyboardType,
+      obscureText: obscureText,
+    );
+  }
+}
+
 class PlatformDatePicker
     extends PlatformWidget<CupertinoDatePicker, CalendarDatePicker> {
   PlatformDatePicker(

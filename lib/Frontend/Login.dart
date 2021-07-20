@@ -73,12 +73,76 @@ class _LoginView extends State<LoginView> {
 
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  TextEditingController passwordConfirmController = TextEditingController();
   TextEditingController displayNameController = TextEditingController();
   Widget signInSheet() {
     return Padding(
       padding: EdgeInsets.all(20),
       child: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: Row(
+              children: [
+                Spacer(),
+                PlatformButton(
+                  child: Text(
+                    "Forgot Password",
+                    style: TextStyle(fontSize: 14),
+                  ),
+                  color: Colors.purple,
+                  onPressed: () async {
+                    String? s = await context
+                        .read<AuthenticationService>()
+                        .forgotPassword(email: emailController.text.trim());
+                    emailController.clear();
+                    passwordController.clear();
+                    if (s != "sent") {
+                      showPlatformDialog(
+                        context: context,
+                        builder: (BuildContext context) => PlatformAlert(
+                          title: Text('Error'),
+                          content: Text(
+                            s ?? 'Something went wrong',
+                            style: Theme.of(context).textTheme.bodyText1,
+                          ),
+                          actions: [
+                            PlatformDialogAction(
+                              isDefaultAction: true,
+                              child: Text('Okay'),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    } else {
+                      showPlatformDialog(
+                        context: context,
+                        builder: (BuildContext context) => PlatformAlert(
+                          title: Text('Success'),
+                          content: Text(
+                            'Reset email sent',
+                            style: Theme.of(context).textTheme.bodyText1,
+                          ),
+                          actions: [
+                            PlatformDialogAction(
+                              isDefaultAction: true,
+                              child: Text('Okay'),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
           PlatformTextField(
             controller: emailController,
             keyboardType: TextInputType.emailAddress,
@@ -102,7 +166,7 @@ class _LoginView extends State<LoginView> {
             onPressed: () async {
               String? s = await context.read<AuthenticationService>().signIn(
                     email: emailController.text.trim(),
-                    password: passwordController.text.trim(),
+                    password: passwordController.text,
                   );
               emailController.clear();
               passwordController.clear();
@@ -173,7 +237,10 @@ class _LoginView extends State<LoginView> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [Icon(Icons.visibility_off), Text('Anonymous Sign In')],
+              children: [
+                Icon(Icons.visibility_off),
+                Text('Sign In Anonymously')
+              ],
             ),
           ),
         GoogleAuthButton(
@@ -193,7 +260,7 @@ class _LoginView extends State<LoginView> {
               setState(
                 () {
                   _controller.nextPage(
-                    duration: Duration(milliseconds: 500),
+                    duration: Duration(milliseconds: 200),
                     curve: Curves.linear,
                   );
                 },
@@ -209,101 +276,126 @@ class _LoginView extends State<LoginView> {
     );
   }
 
+  final _formKey = GlobalKey<FormState>();
   Widget signUpSheet() {
     return Padding(
-      padding: EdgeInsets.all(10),
-      child: Stack(
-        alignment: Alignment.topLeft,
-        children: [
-          Column(
+      padding: EdgeInsets.only(top: 30),
+      child: Container(
+        color: Colors.black,
+        child: Form(
+          key: _formKey,
+          child: Column(
             children: [
-              Padding(
-                padding: EdgeInsets.all(20),
+              Row(
+                children: [
+                  Spacer(),
+                  RawMaterialButton(
+                    onPressed: () {
+                      emailController.clear();
+                      passwordController.clear();
+                      passwordConfirmController.clear();
+                      displayNameController.clear();
+                      Navigator.pop(context);
+                    },
+                    child: Icon(
+                      Icons.cancel,
+                      size: 30,
+                    ),
+                    shape: CircleBorder(),
+                  ),
+                ],
               ),
-              PlatformTextField(
+              PlatformFormField(
                 controller: displayNameController,
-                keyboardType: TextInputType.emailAddress,
-                placeholder: "Display Name",
+                validator: (val) {
+                  if (val?.trim().isEmpty ?? true) {
+                    return "Please enter your name";
+                  }
+                },
+                placeholder: "Enter name",
+                keyboardType: TextInputType.name,
               ),
-              PlatformTextField(
+              PlatformFormField(
                 controller: emailController,
                 keyboardType: TextInputType.emailAddress,
-                placeholder: "Email",
+                placeholder: "Enter email",
+                validator: (val) {
+                  if (val?.trim().isEmpty ?? true) {
+                    return "Please enter your email";
+                  }
+                },
               ),
-              Padding(
-                padding: EdgeInsets.all(5),
-              ),
-              Padding(
-                padding: EdgeInsets.all(5),
-              ),
-              PlatformTextField(
+              PlatformFormField(
                 controller: passwordController,
                 keyboardType: TextInputType.visiblePassword,
-                placeholder: "Password",
+                placeholder: "Enter password",
+                validator: (val) {
+                  if (val?.trim().isEmpty ?? true) {
+                    return "Please enter your password";
+                  }
+                },
                 obscureText: true,
               ),
-              PlatformTextField(
-                controller: passwordController,
+              PlatformFormField(
+                controller: passwordConfirmController,
                 keyboardType: TextInputType.visiblePassword,
-                placeholder: "Confirm Password",
+                validator: (val) {
+                  if (val?.trim().isEmpty ?? true) {
+                    return "Please confirm your password";
+                  } else if (val != passwordController.text) {
+                    return "Passwords don't match";
+                  }
+                },
+                placeholder: "Confirm password",
                 obscureText: true,
-              ),
-              Padding(
-                padding: EdgeInsets.all(5),
               ),
               PlatformButton(
                 child: Text("Sign Up"),
                 color: Colors.green,
                 onPressed: () async {
-                  String? s =
-                      await context.read<AuthenticationService>().signUp(
+                  if (_formKey.currentState?.validate() ?? false) {
+                    String? s =
+                        await context.read<AuthenticationService>().signUp(
+                              email: emailController.text.trim(),
+                              password: passwordController.text,
+                              displayName: displayNameController.text.trim(),
+                            );
+                    if (s == "Signed up") {
+                      emailController.clear();
+                      passwordController.clear();
+                      displayNameController.clear();
+                      Navigator.of(context).pop();
+                      await context.read<AuthenticationService>().signIn(
                             email: emailController.text.trim(),
                             password: passwordController.text,
-                            displayName: displayNameController.text.trim(),
                           );
-                  if (s == "Signed up") {
-                    emailController.clear();
-                    passwordController.clear();
-                    displayNameController.clear();
-                    Navigator.of(context).pop();
-                    await context.read<AuthenticationService>().signIn(
-                          email: emailController.text.trim(),
-                          password: passwordController.text,
-                        );
-                  } else {
-                    showPlatformDialog(
-                      context: context,
-                      builder: (context) => PlatformAlert(
-                        title: Text('Error'),
-                        content: Text(
-                          s ?? 'Something went wrong',
-                          style: Theme.of(context).textTheme.bodyText1,
-                        ),
-                        actions: [
-                          PlatformDialogAction(
-                            isDefaultAction: true,
-                            child: Text('Okay'),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
+                    } else {
+                      showPlatformDialog(
+                        context: context,
+                        builder: (context) => PlatformAlert(
+                          title: Text('Error'),
+                          content: Text(
+                            s ?? 'Something went wrong',
+                            style: Theme.of(context).textTheme.bodyText1,
                           ),
-                        ],
-                      ),
-                    );
+                          actions: [
+                            PlatformDialogAction(
+                              isDefaultAction: true,
+                              child: Text('Okay'),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    }
                   }
                 },
               ),
             ],
           ),
-          RawMaterialButton(
-            shape: CircleBorder(),
-            fillColor: Colors.grey.withOpacity(0.4),
-            child: Icon(Icons.clear),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
+        ),
       ),
     );
   }
