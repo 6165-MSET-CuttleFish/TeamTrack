@@ -1,10 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
+import 'package:teamtrack/SignUpScreen.dart';
 import 'package:teamtrack/backend.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:auth_buttons/auth_buttons.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LoginView extends StatefulWidget {
   LoginView({Key? key, this.returnBack}) : super(key: key);
@@ -217,7 +219,7 @@ class _LoginView extends State<LoginView> {
           onPressed: () async {
             await showModalBottomSheet(
               context: context,
-              builder: (context) => signUpSheet(),
+              builder: (context) => SignUpScreen(),
               isScrollControlled: true,
             );
             if (widget.returnBack ?? false) Navigator.of(context).pop();
@@ -273,130 +275,6 @@ class _LoginView extends State<LoginView> {
             ),
           ),
       ],
-    );
-  }
-
-  final _formKey = GlobalKey<FormState>();
-  Widget signUpSheet() {
-    return Padding(
-      padding: EdgeInsets.only(top: 30),
-      child: Container(
-        color: Colors.black,
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Spacer(),
-                  RawMaterialButton(
-                    onPressed: () {
-                      emailController.clear();
-                      passwordController.clear();
-                      passwordConfirmController.clear();
-                      displayNameController.clear();
-                      Navigator.pop(context);
-                    },
-                    child: Icon(
-                      Icons.cancel,
-                      size: 30,
-                    ),
-                    shape: CircleBorder(),
-                  ),
-                ],
-              ),
-              PlatformFormField(
-                controller: displayNameController,
-                validator: (val) {
-                  if (val?.trim().isEmpty ?? true) {
-                    return "Please enter your name";
-                  }
-                },
-                placeholder: "Enter name",
-                keyboardType: TextInputType.name,
-              ),
-              PlatformFormField(
-                controller: emailController,
-                keyboardType: TextInputType.emailAddress,
-                placeholder: "Enter email",
-                validator: (val) {
-                  if (val?.trim().isEmpty ?? true) {
-                    return "Please enter your email";
-                  }
-                },
-              ),
-              PlatformFormField(
-                controller: passwordController,
-                keyboardType: TextInputType.visiblePassword,
-                placeholder: "Enter password",
-                validator: (val) {
-                  if (val?.trim().isEmpty ?? true) {
-                    return "Please enter your password";
-                  }
-                },
-                obscureText: true,
-              ),
-              PlatformFormField(
-                controller: passwordConfirmController,
-                keyboardType: TextInputType.visiblePassword,
-                validator: (val) {
-                  if (val?.trim().isEmpty ?? true) {
-                    return "Please confirm your password";
-                  } else if (val != passwordController.text) {
-                    return "Passwords don't match";
-                  }
-                },
-                placeholder: "Confirm password",
-                obscureText: true,
-              ),
-              PlatformButton(
-                child: Text("Sign Up"),
-                color: Colors.green,
-                onPressed: () async {
-                  if (_formKey.currentState?.validate() ?? false) {
-                    String? s =
-                        await context.read<AuthenticationService>().signUp(
-                              email: emailController.text.trim(),
-                              password: passwordController.text,
-                              displayName: displayNameController.text.trim(),
-                            );
-                    if (s == "Signed up") {
-                      emailController.clear();
-                      passwordController.clear();
-                      displayNameController.clear();
-                      Navigator.of(context).pop();
-                      await context.read<AuthenticationService>().signIn(
-                            email: emailController.text.trim(),
-                            password: passwordController.text,
-                          );
-                    } else {
-                      showPlatformDialog(
-                        context: context,
-                        builder: (context) => PlatformAlert(
-                          title: Text('Error'),
-                          content: Text(
-                            s ?? 'Something went wrong',
-                            style: Theme.of(context).textTheme.bodyText1,
-                          ),
-                          actions: [
-                            PlatformDialogAction(
-                              isDefaultAction: true,
-                              child: Text('Okay'),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ],
-                        ),
-                      );
-                    }
-                  }
-                },
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }
