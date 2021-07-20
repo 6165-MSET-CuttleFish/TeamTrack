@@ -55,9 +55,9 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 flutter_icons:
-  android: "ic_launcher"
-  ios: true
-  image_path: "icon.jpg"
+  image_path_android: "lib/icon.jpg"
+  image_path_ios: "lib/icon.jpg"
+  ios: true 
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
