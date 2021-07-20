@@ -6,7 +6,6 @@ import 'package:teamtrack/backend.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:teamtrack/score.dart';
 
 class BlockList extends StatefulWidget {
   const BlockList({Key? key}) : super(key: key);

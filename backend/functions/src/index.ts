@@ -53,13 +53,10 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
     tokens = doc?.data()?.FCMtokens;
     const blocked = doc?.data()?.blockedUsers;
     if (blocked[sender.uid] != null) allowSend = false;
+    if (newInbox[data.id] != null ||
+      doc?.data()?.events[data.id] != null) allowSend = false;
     if (allowSend) {
       newInbox[data.id] = meta;
-    } else {
-      throw new functions.https.HttpsError(
-          "cancelled",
-          `${recipient.displayName ?? "Unknown"} has blocked you.`
-      );
     }
     t.update(ref, {inbox: newInbox});
   });

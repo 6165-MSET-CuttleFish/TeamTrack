@@ -201,6 +201,17 @@ class _EventsList extends State<EventsList> {
                           ListTile(
                             leading: Icon(Icons.mail_rounded),
                             title: Text("Inbox"),
+                            trailing: Container(
+                                decoration: ShapeDecoration(
+                                    color: Colors.red, shape: CircleBorder()),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text((data?['inbox'] as Map?)
+                                          ?.entries
+                                          .length
+                                          .toString() ??
+                                      "0"),
+                                )),
                             onTap: () {
                               setState(() => _tab = 1);
                               Navigator.of(context).pop();
@@ -286,7 +297,7 @@ class _EventsList extends State<EventsList> {
               ExpansionTile(
                 leading: Icon(CupertinoIcons.person_3),
                 initiallyExpanded: true,
-                title: Text('Local Events'),
+                title: Text('In-Person Events'),
                 children: localEvents(),
               ),
               ExpansionTile(
