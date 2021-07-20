@@ -55,13 +55,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     return "Please enter your name";
                   }
                 },
-                placeholder: "Enter name",
+                placeholder: "Name",
                 keyboardType: TextInputType.name,
               ),
               PlatformFormField(
                 controller: emailController,
                 keyboardType: TextInputType.emailAddress,
-                placeholder: "Enter email",
+                placeholder: "Email",
                 validator: (val) {
                   if (val?.trim().isEmpty ?? true) {
                     return "Please enter your email";
@@ -71,7 +71,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               PlatformFormField(
                 controller: passwordController,
                 keyboardType: TextInputType.visiblePassword,
-                placeholder: "Enter password",
+                placeholder: "Password",
                 validator: (val) {
                   if (val?.trim().isEmpty ?? true) {
                     return "Please enter your password";
