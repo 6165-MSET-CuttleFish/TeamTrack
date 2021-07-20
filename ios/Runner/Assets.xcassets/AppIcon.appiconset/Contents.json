@@ -2,150 +2,175 @@
   "images" : [
     {
       "filename" : "40.png",
+      "folder":"Assets.xcassets/AppIcon.appiconset/",
       "idiom" : "iphone",
       "scale" : "2x",
       "size" : "20x20"
     },
     {
       "filename" : "60.png",
+      "folder":"Assets.xcassets/AppIcon.appiconset/",
       "idiom" : "iphone",
       "scale" : "3x",
       "size" : "20x20"
     },
     {
       "filename" : "29.png",
+      "folder":"Assets.xcassets/AppIcon.appiconset/",
       "idiom" : "iphone",
       "scale" : "1x",
       "size" : "29x29"
     },
     {
       "filename" : "58.png",
+      "folder":"Assets.xcassets/AppIcon.appiconset/",
       "idiom" : "iphone",
       "scale" : "2x",
       "size" : "29x29"
     },
     {
       "filename" : "87.png",
+      "folder":"Assets.xcassets/AppIcon.appiconset/",
       "idiom" : "iphone",
       "scale" : "3x",
       "size" : "29x29"
     },
     {
       "filename" : "80.png",
+      "folder":"Assets.xcassets/AppIcon.appiconset/",
       "idiom" : "iphone",
       "scale" : "2x",
       "size" : "40x40"
     },
     {
       "filename" : "120.png",
+      "folder":"Assets.xcassets/AppIcon.appiconset/",
       "idiom" : "iphone",
       "scale" : "3x",
       "size" : "40x40"
     },
     {
       "filename" : "57.png",
+      "folder":"Assets.xcassets/AppIcon.appiconset/",
       "idiom" : "iphone",
       "scale" : "1x",
       "size" : "57x57"
     },
     {
       "filename" : "114.png",
+      "folder":"Assets.xcassets/AppIcon.appiconset/",
       "idiom" : "iphone",
       "scale" : "2x",
       "size" : "57x57"
     },
     {
       "filename" : "120.png",
+      "folder":"Assets.xcassets/AppIcon.appiconset/",
       "idiom" : "iphone",
       "scale" : "2x",
       "size" : "60x60"
     },
     {
       "filename" : "180.png",
+      "folder":"Assets.xcassets/AppIcon.appiconset/",
       "idiom" : "iphone",
       "scale" : "3x",
       "size" : "60x60"
     },
     {
       "filename" : "20.png",
+      "folder":"Assets.xcassets/AppIcon.appiconset/",
       "idiom" : "ipad",
       "scale" : "1x",
       "size" : "20x20"
     },
     {
       "filename" : "40.png",
+      "folder":"Assets.xcassets/AppIcon.appiconset/",
       "idiom" : "ipad",
       "scale" : "2x",
       "size" : "20x20"
     },
     {
       "filename" : "29.png",
+      "folder":"Assets.xcassets/AppIcon.appiconset/",
       "idiom" : "ipad",
       "scale" : "1x",
       "size" : "29x29"
     },
     {
       "filename" : "58.png",
+      "folder":"Assets.xcassets/AppIcon.appiconset/",
       "idiom" : "ipad",
       "scale" : "2x",
       "size" : "29x29"
     },
     {
       "filename" : "40.png",
+      "folder":"Assets.xcassets/AppIcon.appiconset/",
       "idiom" : "ipad",
       "scale" : "1x",
       "size" : "40x40"
     },
     {
       "filename" : "80.png",
+      "folder":"Assets.xcassets/AppIcon.appiconset/",
       "idiom" : "ipad",
       "scale" : "2x",
       "size" : "40x40"
     },
     {
       "filename" : "50.png",
+      "folder":"Assets.xcassets/AppIcon.appiconset/",
       "idiom" : "ipad",
       "scale" : "1x",
       "size" : "50x50"
     },
     {
       "filename" : "100.png",
+      "folder":"Assets.xcassets/AppIcon.appiconset/",
       "idiom" : "ipad",
       "scale" : "2x",
       "size" : "50x50"
     },
     {
       "filename" : "72.png",
+      "folder":"Assets.xcassets/AppIcon.appiconset/",
       "idiom" : "ipad",
       "scale" : "1x",
       "size" : "72x72"
     },
     {
       "filename" : "144.png",
+      "folder":"Assets.xcassets/AppIcon.appiconset/",
       "idiom" : "ipad",
       "scale" : "2x",
       "size" : "72x72"
     },
     {
       "filename" : "76.png",
+      "folder":"Assets.xcassets/AppIcon.appiconset/",
       "idiom" : "ipad",
       "scale" : "1x",
       "size" : "76x76"
     },
     {
       "filename" : "152.png",
+      "folder":"Assets.xcassets/AppIcon.appiconset/",
       "idiom" : "ipad",
       "scale" : "2x",
       "size" : "76x76"
     },
     {
       "filename" : "167.png",
+      "folder":"Assets.xcassets/AppIcon.appiconset/",
       "idiom" : "ipad",
       "scale" : "2x",
       "size" : "83.5x83.5"
     },
     {
       "filename" : "1024.png",
+      "folder":"Assets.xcassets/AppIcon.appiconset/",
       "idiom" : "ios-marketing",
       "scale" : "1x",
       "size" : "1024x1024"
