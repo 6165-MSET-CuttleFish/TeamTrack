@@ -438,7 +438,7 @@ class Event {
       e.red?.team2?.scores.removeWhere((f, _) => f == e.id);
       e.blue?.team1?.scores.removeWhere((f, _) => f == e.id);
       e.blue?.team2?.scores.removeWhere((f, _) => f == e.id);
-      matches.remove(e);
+      matches.remove(e.id);
     }
     getRef()?.runTransaction((mutableData) async {
       final newMatches = ((mutableData.value as Map)['matches'] as Map);
@@ -452,10 +452,12 @@ class Event {
         } catch (e) {
           teamIndex = int.parse(team?.number ?? '');
         }
-        var tempScores =
-            (mutableData.value['teams'][teamIndex]['scores'] as Map);
-        tempScores.remove(e.id);
-        mutableData.value['teams'][teamIndex]['scores'] = tempScores;
+        try {
+          var tempScores =
+              (mutableData.value['teams'][teamIndex]['scores'] as Map);
+          tempScores.remove(e.id);
+          mutableData.value['teams'][teamIndex]['scores'] = tempScores;
+        } catch (e) {}
       }
       return mutableData;
     });
