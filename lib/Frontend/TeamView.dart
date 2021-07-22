@@ -311,7 +311,7 @@ class _TeamView extends State<TeamView> {
                             minY: 0,
                             maxY: [
                               widget.event
-                                  .getSortedMatches()
+                                  .getSortedMatches(true)
                                   .maxAllianceScore(_team)
                                   .toDouble(),
                               _team.targetScore?.total().toDouble() ?? 0.0
@@ -346,7 +346,7 @@ class _TeamView extends State<TeamView> {
                                 show: _selections[0] &&
                                     widget.event.type != EventType.remote,
                                 spots: widget.event
-                                    .getSortedMatches()
+                                    .getSortedMatches(true)
                                     .where((e) =>
                                         e.dice == _dice || _dice == Dice.none)
                                     .toList()
@@ -667,6 +667,7 @@ class _TeamView extends State<TeamView> {
                 (context) => MatchList(
                   event: widget.event,
                   team: _team,
+                  ascending: true,
                 ),
               ),
             );
@@ -730,7 +731,7 @@ class _TeamView extends State<TeamView> {
         removeOutliers: removeOutliers,
         matches: widget.event.type == EventType.remote
             ? null
-            : widget.event.getSortedMatches(),
+            : widget.event.getSortedMatches(true),
       ),
       Padding(
         padding: const EdgeInsets.only(top: 20, bottom: 10),
@@ -749,7 +750,7 @@ class _TeamView extends State<TeamView> {
         removeOutliers: removeOutliers,
         matches: widget.event.type == EventType.remote
             ? null
-            : widget.event.getSortedMatches(),
+            : widget.event.getSortedMatches(true),
       ),
       Padding(
         padding: const EdgeInsets.only(top: 20, bottom: 10),
@@ -768,7 +769,7 @@ class _TeamView extends State<TeamView> {
         removeOutliers: removeOutliers,
         matches: widget.event.type == EventType.remote
             ? null
-            : widget.event.getSortedMatches(),
+            : widget.event.getSortedMatches(true),
       ),
       Padding(
         padding: const EdgeInsets.only(top: 20, bottom: 10),
@@ -787,7 +788,7 @@ class _TeamView extends State<TeamView> {
         removeOutliers: removeOutliers,
         matches: widget.event.type == EventType.remote
             ? null
-            : widget.event.getSortedMatches(),
+            : widget.event.getSortedMatches(true),
       ),
       Padding(
         padding: EdgeInsets.all(130),

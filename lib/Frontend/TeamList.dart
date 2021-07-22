@@ -8,8 +8,9 @@ import 'package:firebase_database/firebase_database.dart' as Database;
 import 'dart:convert';
 
 class TeamList extends StatefulWidget {
-  TeamList({Key? key, required this.event}) : super(key: key);
+  TeamList({Key? key, required this.event, required this.sortMode}) : super(key: key);
   final Event event;
+  final OpModeType? sortMode;
   @override
   State<StatefulWidget> createState() => _TeamList();
 }
@@ -33,7 +34,7 @@ class _TeamList extends State<TeamList> {
           }
           return ListView(
             children: widget.event.teams
-                .sortedTeams()
+                .sortedTeams(widget.sortMode)
                 .map(
                   (e) => Slidable(
                     actionPane: slider,

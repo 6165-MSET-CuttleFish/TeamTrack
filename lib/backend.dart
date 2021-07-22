@@ -254,9 +254,12 @@ class Event {
     teams[newTeam.number] = newTeam;
   }
 
-  List<Match> getSortedMatches() {
+  List<Match> getSortedMatches(bool ascending) {
     var arr = matches.values.toList();
-    arr.sort((a, b) => a.timeStamp.compareTo(b.timeStamp));
+    if (ascending)
+      arr.sort((a, b) => a.timeStamp.compareTo(b.timeStamp));
+    else
+      arr.sort((a, b) => b.timeStamp.compareTo(a.timeStamp));
     return arr;
   }
 
@@ -798,6 +801,19 @@ extension extOp on OpModeType {
         return 'Penalty';
     }
   }
+
+  String toVal() {
+    switch (this) {
+      case OpModeType.auto:
+        return 'Autonomous';
+      case OpModeType.tele:
+        return 'Tele-Op';
+      case OpModeType.endgame:
+        return 'Endgame';
+      default:
+        return 'Penalty';
+    }
+  }
 }
 
 extension DiceExtension on Dice {
@@ -1003,12 +1019,27 @@ extension TeamsExtension on Map<String, Team> {
     }
   }
 
-  List<Team> sortedTeams() {
+  List<Team> sortedTeams(OpModeType? type) {
     List<Team> val = [];
     for (Team team in this.values) {
       val.add(team);
     }
-    val.sort((a, b) => int.parse(a.number).compareTo(int.parse(b.number)));
+    val.sort(
+      (a, b) => b.scores.values
+          .map(
+            ((score) => score.getScoreDivision(type)),
+          )
+          .toList()
+          .meanScore(Dice.none, true)
+          .compareTo(
+            a.scores.values
+                .map(
+                  ((score) => score.getScoreDivision(type)),
+                )
+                .toList()
+                .meanScore(Dice.none, true),
+          ),
+    );
     return val;
   }
 

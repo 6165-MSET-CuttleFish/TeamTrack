@@ -1,4 +1,5 @@
 import 'package:firebase_database/firebase_database.dart' as Database;
+import 'package:teamtrack/Frontend/MatchConfig.dart';
 import 'package:teamtrack/Frontend/MatchView.dart';
 import 'package:teamtrack/backend.dart';
 import 'package:flutter/cupertino.dart';
@@ -8,9 +9,11 @@ import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
 import 'dart:convert';
 
 class MatchList extends StatefulWidget {
-  MatchList({Key? key, required this.event, this.team}) : super(key: key);
+  MatchList({Key? key, required this.event, this.team, required this.ascending})
+      : super(key: key);
   final Event event;
   final Team? team;
+  final bool ascending;
   @override
   State<StatefulWidget> createState() => _MatchList();
 }
@@ -38,69 +41,79 @@ class _MatchList extends State<MatchList> {
             backgroundColor: Theme.of(context).accentColor,
           ),
           body: _matches(),
-          floatingActionButton: widget.event.type == EventType.remote
-              ? FloatingActionButton(
-                  onPressed: () {
-                    showPlatformDialog(
-                      context: context,
-                      builder: (context) => PlatformAlert(
-                        title: Text('New Match'),
-                        actions: [
-                          PlatformDialogAction(
-                            child: Text('Cancel'),
-                            onPressed: () {
-                              setState(
-                                () {
-                                  Navigator.pop(context);
-                                },
-                              );
+          floatingActionButton: FloatingActionButton(
+            onPressed: () async {
+              if (widget.event.type == EventType.remote)
+                showPlatformDialog(
+                  context: context,
+                  builder: (context) => PlatformAlert(
+                    title: Text('New Match'),
+                    actions: [
+                      PlatformDialogAction(
+                        child: Text('Cancel'),
+                        onPressed: () {
+                          setState(
+                            () {
+                              Navigator.pop(context);
                             },
-                          ),
-                          PlatformDialogAction(
-                            child: Text('Add'),
-                            onPressed: () {
-                              setState(
-                                () {
-                                  widget.event.addMatch(
-                                    Match(
-                                      Alliance(
-                                        widget.event.teams[widget.team?.number],
-                                        null,
-                                        widget.event.type,
-                                      ),
-                                      Alliance(
-                                        null,
-                                        null,
-                                        widget.event.type,
-                                      ),
-                                      EventType.remote,
-                                    ),
-                                  );
-                                  dataModel.saveEvents();
-                                  Navigator.pop(context);
-                                },
-                              );
-                            },
-                          ),
-                        ],
+                          );
+                        },
                       ),
-                    );
-                  },
-                  child: Icon(Icons.add),
-                )
-              : null,
+                      PlatformDialogAction(
+                        child: Text('Add'),
+                        onPressed: () {
+                          setState(
+                            () {
+                              widget.event.addMatch(
+                                Match(
+                                  Alliance(
+                                    widget.event.teams[widget.team?.number],
+                                    null,
+                                    widget.event.type,
+                                  ),
+                                  Alliance(
+                                    null,
+                                    null,
+                                    widget.event.type,
+                                  ),
+                                  EventType.remote,
+                                ),
+                              );
+                              dataModel.saveEvents();
+                              Navigator.pop(context);
+                            },
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              else {
+                await Navigator.of(context).push(
+                  platformPageRoute(
+                    (_) => MatchConfig(
+                      event: widget.event,
+                    ),
+                  ),
+                );
+                setState(() {});
+              }
+            },
+            child: Icon(Icons.add),
+          ),
         );
       },
     );
   }
 
   Widget _matches() {
-    int i = 0;
+    int i = widget.event.matches.length + 1;
+    if (widget.ascending) i = 0;
     if (widget.event.type != EventType.remote) {
       return ListView(
         children: widget.team == null
-            ? widget.event.getSortedMatches().map((e) {
-                i++;
+            ? widget.event.getSortedMatches(widget.ascending).map((e) {
+                widget.ascending ? i++ : i--;
                 return Slidable(
                   actionPane: slider,
                   secondaryActions: [
@@ -218,7 +231,8 @@ class _MatchList extends State<MatchList> {
       );
     } else {
       var arr = <Slidable>[];
-      var matches = widget.event.getSortedMatches()
+      var matches = widget.event
+          .getSortedMatches(widget.ascending)
           .where((e) =>
               e.alliance(
                 widget.event.teams[widget.team?.number],
@@ -336,7 +350,8 @@ class _MatchList extends State<MatchList> {
 
   List<Widget> _teamSpecMatches() {
     int i = 0;
-    return widget.event.getSortedMatches()
+    return widget.event
+        .getSortedMatches(widget.ascending)
         .where((e) =>
             e.alliance(
               widget.event.teams[widget.team?.number],
