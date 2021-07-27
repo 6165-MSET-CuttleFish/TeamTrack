@@ -45,6 +45,7 @@ class Score extends ScoreDivision implements Comparable<Score> {
     teleScore.reset();
     autoScore.reset();
     endgameScore.reset();
+    penalties.reset();
   }
 
   @override
