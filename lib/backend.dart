@@ -220,6 +220,7 @@ class DataModel {
     required String type,
     required String authorName,
     required String gameName,
+    required String role,
   }) async {
     final HttpsCallable callable = functions.httpsCallable('shareEvent');
     return callable.call(<String, dynamic>{
@@ -230,7 +231,7 @@ class DataModel {
       'type': type,
       'authorName': authorName,
       'gameName': gameName,
-      'role': "editor",
+      'role': role,
     });
   }
 }
@@ -787,6 +788,42 @@ class Match {
 enum EventType { live, local, remote }
 enum Dice { one, two, three, none }
 enum OpModeType { auto, tele, endgame, penalty }
+enum UserType { admin, editor, viewer }
+
+UserType? getUserTypeFromString(String userType) {
+  switch (userType) {
+    case 'editor':
+      return UserType.admin;
+    case 'temp':
+      return UserType.editor;
+    case 'viewer':
+      return UserType.viewer;
+  }
+}
+
+extension usExt on UserType {
+  String toBackend() {
+    switch (this) {
+      case UserType.admin:
+        return 'editor';
+      case UserType.editor:
+        return 'temp';
+      case UserType.viewer:
+        return 'viewer';
+    }
+  }
+
+  String toRep() {
+    switch (this) {
+      case UserType.admin:
+        return 'Admin';
+      case UserType.editor:
+        return 'Editor';
+      case UserType.viewer:
+        return 'Viewer';
+    }
+  }
+}
 
 extension extOp on OpModeType {
   String toRep() {

@@ -24,7 +24,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return Padding(
       padding: EdgeInsets.only(top: 30),
       child: Container(
-        color: Colors.black,
+        color: Theme.of(context).canvasColor,
         child: Form(
           key: _formKey,
           child: Column(

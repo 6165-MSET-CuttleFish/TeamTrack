@@ -9,6 +9,8 @@ import 'package:teamtrack/score.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
 
+import 'package:uuid/uuid.dart';
+
 class MatchView extends StatefulWidget {
   MatchView({Key? key, this.match, this.team, required this.event})
       : super(key: key);
@@ -98,6 +100,56 @@ class _MatchView extends State<MatchView> {
                     elevation: 0,
                     actions: widget.team == null
                         ? [
+                            IconButton(
+                                icon: Icon(
+                                  Icons.restore,
+                                ),
+                                onPressed: () => showPlatformDialog(
+                                    context: context,
+                                    builder: (_) => PlatformAlert(
+                                            title: Text('Reset Score'),
+                                            content: Text('Are you sure?'),
+                                            actions: [
+                                              PlatformDialogAction(
+                                                  child: Text('Cancel'),
+                                                  isDefaultAction: true,
+                                                  onPressed: () =>
+                                                      Navigator.of(context)
+                                                          .pop()),
+                                              PlatformDialogAction(
+                                                child: Text('Confirm'),
+                                                isDestructive: true,
+                                                onPressed: () => setState(
+                                                  () {
+                                                    if (widget.event.shared) {
+                                                      if (_match != null) {
+                                                        widget.event
+                                                            .getRef()
+                                                            ?.child(
+                                                                'teams/${_selectedTeam?.number}/scores/${_score?.id}')
+                                                            .runTransaction(
+                                                                (transaction) async {
+                                                          transaction.value =
+                                                              Score(
+                                                            _match?.id ??
+                                                                Uuid().v4(),
+                                                            _match?.dice ??
+                                                                Dice.one,
+                                                            widget
+                                                                .event.gameName,
+                                                          ).toJson();
+                                                          return transaction;
+                                                        });
+                                                      }
+                                                    } else {
+                                                      _score?.reset();
+                                                    }
+                                                    dataModel.saveEvents();
+                                                    Navigator.pop(context);
+                                                  },
+                                                ),
+                                              )
+                                            ]))),
                             Center(
                               child: Text(
                                 _time.roundToDouble().toString(),

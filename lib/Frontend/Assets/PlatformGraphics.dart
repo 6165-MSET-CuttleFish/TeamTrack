@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:firebase_database/firebase_database.dart' as Db;
+import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -146,7 +147,8 @@ class PlatformTextField
       this.textCapitalization = TextCapitalization.none,
       this.placeholder,
       this.obscureText = false,
-      this.controller})
+      this.controller,
+      this.autoCorrect = true})
       : super(key: key);
   final ValueChanged<String>? onChanged;
   final TextInputType? keyboardType;
@@ -154,6 +156,7 @@ class PlatformTextField
   final String? placeholder;
   final bool obscureText;
   final TextEditingController? controller;
+  final bool autoCorrect;
   @override
   CupertinoTextField buildCupertinoWidget(BuildContext context) {
     return CupertinoTextField(
@@ -164,6 +167,7 @@ class PlatformTextField
       textCapitalization: textCapitalization,
       placeholder: placeholder,
       obscureText: obscureText,
+      autocorrect: autoCorrect,
     );
   }
 
@@ -177,6 +181,7 @@ class PlatformTextField
       textCapitalization: textCapitalization,
       decoration: InputDecoration(labelText: placeholder),
       obscureText: obscureText,
+      autocorrect: autoCorrect,
     );
   }
 }

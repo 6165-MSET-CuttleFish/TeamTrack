@@ -201,17 +201,22 @@ class _EventsList extends State<EventsList> {
                           ListTile(
                             leading: Icon(Icons.mail_rounded),
                             title: Text("Inbox"),
-                            trailing: Container(
-                                decoration: ShapeDecoration(
-                                    color: Colors.red, shape: CircleBorder()),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text((data?['inbox'] as Map?)
-                                          ?.entries
-                                          .length
-                                          .toString() ??
-                                      "0"),
-                                )),
+                            trailing:
+                                (data?['inbox'] as Map?)?.entries.length == 0
+                                    ? null
+                                    : Container(
+                                        decoration: ShapeDecoration(
+                                          color: Colors.red,
+                                          shape: CircleBorder(),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text((data?['inbox'] as Map?)
+                                                  ?.entries
+                                                  .length
+                                                  .toString() ??
+                                              "0"),
+                                        )),
                             onTap: () {
                               setState(() => _tab = 1);
                               Navigator.of(context).pop();
@@ -756,6 +761,7 @@ class _EventsList extends State<EventsList> {
             placeholder: e.shared ? 'Email' : '(Optional) Email',
             keyboardType: TextInputType.emailAddress,
             controller: _emailController,
+            autoCorrect: false,
           ),
           actions: [
             PlatformDialogAction(
@@ -817,6 +823,7 @@ class _EventsList extends State<EventsList> {
                     type: e.type.toString(),
                     email: _emailController.text.trim(),
                     gameName: e.gameName,
+                    role: "editor",
                   );
                 }
                 _emailController.clear();

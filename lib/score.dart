@@ -41,6 +41,12 @@ class Score extends ScoreDivision implements Comparable<Score> {
     }
   }
 
+  void reset() {
+    teleScore.reset();
+    autoScore.reset();
+    endgameScore.reset();
+  }
+
   @override
   Dice getDice() => dice;
   void setDice(Dice value, Timestamp time) {
@@ -99,6 +105,12 @@ extension scoreList on Map<String, Score> {
 }
 
 class AutoScore extends ScoreDivision {
+  void reset() {
+    for (final element in this.getElements()) {
+      element.count = 0;
+    }
+  }
+
   late Dice dice;
   Set keys = {};
   Map<String, ScoringElement> elements = Map();
@@ -170,6 +182,16 @@ class AutoScore extends ScoreDivision {
 }
 
 class TeleScore extends ScoreDivision {
+  void reset() {
+    for (final element in this.getElements()) {
+      element.count = 0;
+    }
+    teleCycles = 0;
+    endgameCycles = 0;
+    cycleTimes = [];
+    misses.count = 0;
+  }
+
   late Dice dice;
   Map<String, ScoringElement> elements = Map();
   List<ScoringElement> getElements() => elements.values.toList();
@@ -259,6 +281,12 @@ class TeleScore extends ScoreDivision {
 }
 
 class EndgameScore extends ScoreDivision {
+  void reset() {
+    for (final element in this.getElements()) {
+      element.count = 0;
+    }
+  }
+
   late Dice dice;
   Map<String, ScoringElement> elements = Map();
   List<ScoringElement> getElements() => elements.values.toList();
@@ -326,6 +354,12 @@ class EndgameScore extends ScoreDivision {
 }
 
 class Penalty extends ScoreDivision {
+  void reset() {
+    for (final element in this.getElements()) {
+      element.count = 0;
+    }
+  }
+
   late ScoringElement majorPenalty;
   late ScoringElement minorPenalty;
   late Dice dice;
