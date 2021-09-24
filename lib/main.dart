@@ -15,23 +15,23 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await remoteConfig.fetchAndActivate();
-  Statics.gameName = remoteConfig.getString("gameName");
+  Statics.gameName = "FreightFrenzy"; //remoteConfig.getString("gameName");
   await dataModel.restoreEvents();
   var notification = PushNotifications();
-    await messaging.requestPermission(
-      alert: true,
-      announcement: false,
-      badge: true,
-      carPlay: false,
-      criticalAlert: false,
-      provisional: false,
-      sound: true,
-    );
-    await notification.initialize();
-    String? token = await notification.getToken();
-    if (token != "") {
-      dataModel.token = token;
-    }
+  await messaging.requestPermission(
+    alert: true,
+    announcement: false,
+    badge: true,
+    carPlay: false,
+    criticalAlert: false,
+    provisional: false,
+    sound: true,
+  );
+  await notification.initialize();
+  String? token = await notification.getToken();
+  if (token != "") {
+    dataModel.token = token;
+  }
   runApp(MyApp());
 }
 

@@ -9,8 +9,11 @@ class Score extends ScoreDivision implements Comparable<Score> {
   Penalty penalties = Penalty();
   String id = '';
   late Dice dice;
-  Score(this.id, this.dice, String gameName) {
-    var ref = json.decode(remoteConfig.getValue(gameName).asString());
+  bool isAllianceScore;
+  Score(this.id, this.dice, String gameName, {this.isAllianceScore = false}) {
+    var ref = isAllianceScore
+        ? json.decode(remoteConfig.getValue(gameName).asString())['Alliance']
+        : json.decode(remoteConfig.getValue(gameName).asString());
     teleScore = TeleScore(ref['TeleScore']);
     autoScore = AutoScore(ref['AutoScore']);
     endgameScore = EndgameScore(ref['EndgameScore']);
@@ -24,10 +27,14 @@ class Score extends ScoreDivision implements Comparable<Score> {
         ...((showPenalties ?? false) ? penalties.getElements() : [])
       ];
   @override
-  int total({bool? showPenalties}) => getElements(showPenalties: showPenalties)
-      .map((e) => e.scoreValue())
-      .reduce((value, element) => value + element)
-      .clamp(0, 999);
+  int total({bool? showPenalties}) {
+    final list = getElements(showPenalties: showPenalties)
+        .map((e) => e.scoreValue())
+        .toList();
+    if (list.length == 0) return 0;
+    return list.reduce((value, element) => value + element).clamp(0, 999);
+  }
+
   ScoreDivision getScoreDivision(OpModeType? type) {
     switch (type) {
       case OpModeType.auto:
@@ -63,8 +70,11 @@ class Score extends ScoreDivision implements Comparable<Score> {
     penalties.timeStamp = time;
   }
 
-  Score.fromJson(Map<String, dynamic> map, String gameName) {
-    var ref = json.decode(remoteConfig.getValue(gameName).asString());
+  Score.fromJson(Map<String, dynamic> map, String gameName,
+      {this.isAllianceScore = false}) {
+    var ref = isAllianceScore
+        ? json.decode(remoteConfig.getValue(gameName).asString())['Alliance']
+        : json.decode(remoteConfig.getValue(gameName).asString());
     autoScore = AutoScore.fromJson(map['AutoScore'], ref['AutoScore']);
     teleScore = TeleScore.fromJson(map['TeleScore'], ref['TeleScore']);
     endgameScore =

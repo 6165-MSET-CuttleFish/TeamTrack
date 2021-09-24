@@ -18,7 +18,7 @@ class EventView extends StatefulWidget {
 
 class _EventView extends State<EventView> {
   final slider = SlidableStrechActionPane();
-  OpModeType? sortingModifier = OpModeType.auto;
+  OpModeType? sortingModifier;
   bool ascending = true;
   List<Widget> materialTabs() => [
         TeamList(

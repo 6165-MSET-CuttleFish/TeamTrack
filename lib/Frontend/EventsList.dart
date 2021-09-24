@@ -37,256 +37,255 @@ class _EventsList extends State<EventsList> {
       event.authorName = context.read<User?>()?.displayName;
     }
     return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>?>(
-        stream: firebaseFirestore
-            .collection('users')
-            .doc(context.read<User?>()?.uid)
-            .snapshots(),
-        builder: (context, snapshot) {
-          var data = snapshot.data?.data();
-          (data?['events'] as Map?)?.keys.forEach((key) {
-            try {
-              var event = Event.fromJson(data?['events'][key]);
-              event.shared = true;
-              sharedEvents[key] = event;
-            } catch (e) {}
-          });
-          return Scaffold(
-            appBar: AppBar(
-              backgroundColor: Theme.of(context).accentColor,
-              title: Builder(
-                builder: (_) {
-                  switch (_tab) {
-                    case 1:
-                      return Text("Inbox");
-                    case 2:
-                      return Text("Blocked Users");
-                    default:
-                      return Text("Events");
-                  }
-                },
-              ),
-              actions: [
-                Padding(
-                  padding: EdgeInsets.only(left: 30),
-                ),
-                IconButton(
-                  icon: themeChange.darkTheme
-                      ? Icon(CupertinoIcons.sun_max)
-                      : Icon(CupertinoIcons.moon),
-                  onPressed: () {
-                    setState(() =>
-                        themeChange.darkTheme = !themeChangeProvider.darkTheme);
-                  },
-                )
-              ],
+      stream: firebaseFirestore
+          .collection('users')
+          .doc(context.read<User?>()?.uid)
+          .snapshots(),
+      builder: (context, snapshot) {
+        var data = snapshot.data?.data();
+        (data?['events'] as Map?)?.keys.forEach((key) {
+          try {
+            var event = Event.fromJson(data?['events'][key]);
+            event.shared = true;
+            sharedEvents[key] = event;
+          } catch (e) {}
+        });
+        return Scaffold(
+          appBar: AppBar(
+            backgroundColor: Theme.of(context).accentColor,
+            title: Builder(
+              builder: (_) {
+                switch (_tab) {
+                  case 1:
+                    return Text("Inbox");
+                  case 2:
+                    return Text("Blocked Users");
+                  default:
+                    return Text("Events");
+                }
+              },
             ),
-            drawer: Drawer(
-              elevation: 1,
-              child: Material(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    DrawerHeader(
-                      decoration:
-                          BoxDecoration(color: Theme.of(context).accentColor),
-                      child: Row(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(left: 5.0),
-                            child: Row(
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    if (context.read<User?>()?.photoURL != null)
-                                      ClipRRect(
-                                        borderRadius:
-                                            BorderRadius.circular(300),
-                                        child: Image.network(
-                                          context.read<User?>()!.photoURL!,
-                                          height: 70,
-                                        ),
-                                      )
-                                    else
-                                      Icon(Icons.account_circle, size: 70),
-                                    Text(
-                                      context.read<User?>()?.displayName ??
-                                          "Guest",
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                    Text(
-                                      context.read<User?>()?.email ?? "",
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          Spacer(),
-                          Column(
-                            children: [
-                              IconButton(
-                                icon: Icon(Icons.edit),
-                                onPressed: () {
-                                  showPlatformDialog(
-                                    context: context,
-                                    builder: (_) => PlatformAlert(
-                                      title: Text("Change Display Name"),
-                                      content: PlatformTextField(
-                                        placeholder: "Display Name",
-                                        keyboardType: TextInputType.name,
-                                        controller: controller,
-                                      ),
-                                      actions: [
-                                        PlatformDialogAction(
-                                          child: Text("Cancel"),
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                          },
-                                        ),
-                                        PlatformDialogAction(
-                                          child: Text("Confirm"),
-                                          onPressed: () async {
-                                            if (controller.text.isNotEmpty)
-                                              await context
-                                                  .read<User?>()
-                                                  ?.updateDisplayName(
-                                                      controller.text);
-                                            Navigator.pop(context);
-                                            showPlatformDialog(
-                                              context: context,
-                                              builder: (_) => PlatformAlert(
-                                                title: Text("Success"),
-                                                content: Text("Reload the App"),
-                                                actions: [
-                                                  PlatformDialogAction(
-                                                    child: Text("Okay"),
-                                                    onPressed: () {
-                                                      Navigator.pop(context);
-                                                    },
-                                                  ),
-                                                ],
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                                highlightColor: Colors.red,
-                              ),
-                              Spacer(),
-                            ],
-                          )
-                        ],
-                      ),
-                    ),
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
+            actions: [
+              Padding(
+                padding: EdgeInsets.only(left: 30),
+              ),
+              IconButton(
+                icon: themeChange.darkTheme
+                    ? Icon(CupertinoIcons.sun_max)
+                    : Icon(CupertinoIcons.moon),
+                onPressed: () {
+                  setState(() =>
+                      themeChange.darkTheme = !themeChangeProvider.darkTheme);
+                },
+              )
+            ],
+          ),
+          drawer: Drawer(
+            elevation: 1,
+            child: Material(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  DrawerHeader(
+                    decoration:
+                        BoxDecoration(color: Theme.of(context).accentColor),
+                    child: Row(
                       children: [
-                        ListTile(
-                          leading: Icon(Icons.list),
-                          title: Text("Events"),
-                          onTap: () {
-                            setState(() => _tab = 0);
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                        if (!(context.read<User?>()?.isAnonymous ?? true))
-                          ListTile(
-                            leading: Icon(Icons.mail_rounded),
-                            title: Text("Inbox"),
-                            trailing:
-                                (data?['inbox'] as Map?)?.entries.length == 0
-                                    ? null
-                                    : Container(
-                                        decoration: ShapeDecoration(
-                                          color: Colors.red,
-                                          shape: CircleBorder(),
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Text((data?['inbox'] as Map?)
-                                                  ?.entries
-                                                  .length
-                                                  .toString() ??
-                                              "0"),
-                                        )),
-                            onTap: () {
-                              setState(() => _tab = 1);
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        if (!(context.read<User?>()?.isAnonymous ?? true))
-                          ListTile(
-                            leading: Icon(Icons.people_alt),
-                            title: Text("Blocked Users"),
-                            onTap: () {
-                              setState(() => _tab = 2);
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        if (context.read<User?>()?.isAnonymous ?? false)
-                          ListTile(
-                            leading: Icon(Icons.link),
-                            title: Text("Link Account"),
-                            onTap: () => Navigator.of(context).push(
-                              platformPageRoute(
-                                (context) => LoginView(returnBack: true),
-                              ),
-                            ),
-                          ),
-                        ListTile(
-                          leading: Icon(Icons.logout),
-                          title: Text('Sign Out'),
-                          onTap: () {
-                            showPlatformDialog(
-                              context: context,
-                              builder: (context) => PlatformAlert(
-                                title: Text('Sign Out'),
-                                content: Text('Are you sure?'),
-                                actions: [
-                                  PlatformDialogAction(
-                                    isDefaultAction: true,
-                                    child: Text('Cancel'),
-                                    onPressed: () =>
-                                        Navigator.of(context).pop(),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 5.0),
+                          child: Row(
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (context.read<User?>()?.photoURL != null)
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(300),
+                                      child: Image.network(
+                                        context.read<User?>()!.photoURL!,
+                                        height: 70,
+                                      ),
+                                    )
+                                  else
+                                    Icon(Icons.account_circle, size: 70),
+                                  Text(
+                                    context.read<User?>()?.displayName ??
+                                        "Guest",
+                                    style: TextStyle(color: Colors.white),
                                   ),
-                                  PlatformDialogAction(
-                                    isDestructive: true,
-                                    child: Text('Sign Out'),
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                      context
-                                          .read<AuthenticationService>()
-                                          .signOut();
-                                    },
+                                  Text(
+                                    context.read<User?>()?.email ?? "",
+                                    style: TextStyle(color: Colors.white),
                                   ),
                                 ],
                               ),
-                            );
+                            ],
+                          ),
+                        ),
+                        Spacer(),
+                        Column(
+                          children: [
+                            IconButton(
+                              icon: Icon(Icons.edit),
+                              onPressed: () {
+                                showPlatformDialog(
+                                  context: context,
+                                  builder: (_) => PlatformAlert(
+                                    title: Text("Change Display Name"),
+                                    content: PlatformTextField(
+                                      placeholder: "Display Name",
+                                      keyboardType: TextInputType.name,
+                                      controller: controller,
+                                    ),
+                                    actions: [
+                                      PlatformDialogAction(
+                                        child: Text("Cancel"),
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                      PlatformDialogAction(
+                                        child: Text("Confirm"),
+                                        onPressed: () async {
+                                          if (controller.text.isNotEmpty)
+                                            await context
+                                                .read<User?>()
+                                                ?.updateDisplayName(
+                                                    controller.text);
+                                          Navigator.pop(context);
+                                          showPlatformDialog(
+                                            context: context,
+                                            builder: (_) => PlatformAlert(
+                                              title: Text("Success"),
+                                              content: Text("Reload the App"),
+                                              actions: [
+                                                PlatformDialogAction(
+                                                  child: Text("Okay"),
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                              highlightColor: Colors.red,
+                            ),
+                            Spacer(),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ListTile(
+                        leading: Icon(Icons.list),
+                        title: Text("Events"),
+                        onTap: () {
+                          setState(() => _tab = 0);
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                      if (!(context.read<User?>()?.isAnonymous ?? true))
+                        ListTile(
+                          leading: Icon(Icons.mail_rounded),
+                          title: Text("Inbox"),
+                          trailing:
+                              (data?['inbox'] as Map?)?.entries.length == 0
+                                  ? null
+                                  : Container(
+                                      decoration: ShapeDecoration(
+                                        color: Colors.red,
+                                        shape: CircleBorder(),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text((data?['inbox'] as Map?)
+                                                ?.entries
+                                                .length
+                                                .toString() ??
+                                            "0"),
+                                      )),
+                          onTap: () {
+                            setState(() => _tab = 1);
+                            Navigator.of(context).pop();
                           },
                         ),
-                      ],
-                    )
-                  ],
-                ),
+                      if (!(context.read<User?>()?.isAnonymous ?? true))
+                        ListTile(
+                          leading: Icon(Icons.people_alt),
+                          title: Text("Blocked Users"),
+                          onTap: () {
+                            setState(() => _tab = 2);
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      if (context.read<User?>()?.isAnonymous ?? false)
+                        ListTile(
+                          leading: Icon(Icons.link),
+                          title: Text("Link Account"),
+                          onTap: () => Navigator.of(context).push(
+                            platformPageRoute(
+                              (context) => LoginView(returnBack: true),
+                            ),
+                          ),
+                        ),
+                      ListTile(
+                        leading: Icon(Icons.logout),
+                        title: Text('Sign Out'),
+                        onTap: () {
+                          showPlatformDialog(
+                            context: context,
+                            builder: (context) => PlatformAlert(
+                              title: Text('Sign Out'),
+                              content: Text('Are you sure?'),
+                              actions: [
+                                PlatformDialogAction(
+                                  isDefaultAction: true,
+                                  child: Text('Cancel'),
+                                  onPressed: () => Navigator.of(context).pop(),
+                                ),
+                                PlatformDialogAction(
+                                  isDestructive: true,
+                                  child: Text('Sign Out'),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                    context
+                                        .read<AuthenticationService>()
+                                        .signOut();
+                                  },
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  )
+                ],
               ),
             ),
-            body: Builder(builder: (_) => getHome()),
-            floatingActionButton: _tab == 0
-                ? FloatingActionButton(
-                    child: Icon(Icons.add),
-                    onPressed: _onPressed,
-                  )
-                : null,
-          );
-        });
+          ),
+          body: Builder(builder: (_) => getHome()),
+          floatingActionButton: _tab == 0
+              ? FloatingActionButton(
+                  child: Icon(Icons.add),
+                  onPressed: _onPressed,
+                )
+              : null,
+        );
+      },
+    );
   }
 
   Widget getHome() {

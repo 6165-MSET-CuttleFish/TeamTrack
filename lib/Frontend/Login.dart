@@ -37,7 +37,7 @@ class _LoginView extends State<LoginView> {
           Column(
             children: [
               Image.asset(
-                "LoadingScreen2.png",
+                "assets/images/LoadingScreen2.png",
               ),
               Spacer(),
             ],

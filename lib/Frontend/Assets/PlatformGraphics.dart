@@ -87,7 +87,7 @@ class PlatformSwitch extends PlatformWidget<CupertinoSwitch, Switch> {
       this.highlightColor})
       : super(key: key);
   final bool value;
-  final ValueChanged<bool> onChanged;
+  final ValueChanged<bool>? onChanged;
   final Color? highlightColor;
   @override
   CupertinoSwitch buildCupertinoWidget(BuildContext context) {
@@ -393,13 +393,13 @@ class Incrementor extends StatefulWidget {
     this.onIncrement,
     this.onDecrement,
     this.backgroundColor,
-    this.team,
     this.event,
     this.score,
     this.opModeType,
     this.isTargetScore = false,
     this.mutableIncrement,
     this.mutableDecrement,
+    this.path,
   }) : super(key: key);
   final ScoringElement element;
   final void Function() onPressed;
@@ -408,11 +408,11 @@ class Incrementor extends StatefulWidget {
   final Db.MutableData Function(Db.MutableData)? mutableIncrement;
   final Db.MutableData Function(Db.MutableData)? mutableDecrement;
   final Color? backgroundColor;
-  final Team? team;
   final Event? event;
   final Score? score;
   final OpModeType? opModeType;
   final bool isTargetScore;
+  final String? path;
   @override
   State<StatefulWidget> createState() => _Incrementor();
 }
@@ -440,36 +440,41 @@ class _Incrementor extends State<Incrementor> {
                                 widget.onDecrement!();
                             }
                             widget.onPressed();
-                            await widget.event
-                                ?.getRef()
-                                ?.child('teams/${widget.team?.number}')
-                                .runTransaction((mutableData) async {
-                              if (widget.mutableDecrement != null) {
-                                return widget.mutableDecrement!(mutableData);
-                              }
-                              if (widget.isTargetScore) {
-                                var ref = mutableData.value['targetScore']
-                                        [widget.opModeType?.toRep()]
-                                    [widget.element.key];
-                                if (ref > widget.element.min!())
-                                  mutableData.value['targetScore']
-                                              [widget.opModeType?.toRep()]
-                                          [widget.element.key] =
-                                      (ref ?? 0) -
-                                          widget.element.decrementValue;
-                                return mutableData;
-                              }
-                              final scoreIndex = widget.score?.id;
-                              var ref = mutableData.value['scores'][scoreIndex]
-                                      [widget.opModeType?.toRep()]
-                                  [widget.element.key];
-                              if (ref > widget.element.min!())
-                                mutableData.value['scores'][scoreIndex]
+                            if (widget.path != null)
+                              await widget.event?.getRef()?.child(widget.path!)
+                                  // ?.child('teams/${widget.team?.number}')
+                                  .runTransaction(
+                                (mutableData) async {
+                                  if (widget.mutableDecrement != null) {
+                                    return widget
+                                        .mutableDecrement!(mutableData);
+                                  }
+                                  if (widget.isTargetScore) {
+                                    var ref = mutableData.value['targetScore']
                                             [widget.opModeType?.toRep()]
-                                        [widget.element.key] =
-                                    (ref ?? 0) - widget.element.decrementValue;
-                              return mutableData;
-                            });
+                                        [widget.element.key];
+                                    if (ref > widget.element.min!())
+                                      mutableData.value['targetScore']
+                                                  [widget.opModeType?.toRep()]
+                                              [widget.element.key] =
+                                          (ref ?? 0) -
+                                              widget.element.decrementValue;
+                                    return mutableData;
+                                  }
+                                  final scoreIndex = widget.score?.id;
+                                  var ref = mutableData.value['scores']
+                                              [scoreIndex]
+                                          [widget.opModeType?.toRep()]
+                                      [widget.element.key];
+                                  if (ref > widget.element.min!())
+                                    mutableData.value['scores'][scoreIndex]
+                                                [widget.opModeType?.toRep()]
+                                            [widget.element.key] =
+                                        (ref ?? 0) -
+                                            widget.element.decrementValue;
+                                  return mutableData;
+                                },
+                              );
                           }
                         : null,
                     elevation: 2.0,
@@ -496,36 +501,41 @@ class _Incrementor extends State<Incrementor> {
                                 widget.onIncrement!();
                             }
                             widget.onPressed();
-                            await widget.event
-                                ?.getRef()
-                                ?.child('teams/${widget.team?.number}')
-                                .runTransaction((mutableData) async {
-                              if (widget.mutableIncrement != null) {
-                                return widget.mutableIncrement!(mutableData);
-                              }
-                              if (widget.isTargetScore) {
-                                var ref = mutableData.value['targetScore']
-                                        [widget.opModeType?.toRep()]
-                                    [widget.element.key];
-                                if (ref < widget.element.max!())
-                                  mutableData.value['targetScore']
-                                              [widget.opModeType?.toRep()]
-                                          [widget.element.key] =
-                                      (ref ?? 0) +
-                                          widget.element.incrementValue;
-                                return mutableData;
-                              }
-                              final scoreIndex = widget.score?.id;
-                              var ref = mutableData.value['scores'][scoreIndex]
-                                      [widget.opModeType?.toRep()]
-                                  [widget.element.key];
-                              if (ref < widget.element.max!())
-                                mutableData.value['scores'][scoreIndex]
+                            if (widget.path != null)
+                              await widget.event?.getRef()?.child(widget.path!)
+                                  // ?.child('teams/${widget.team?.number}')
+                                  .runTransaction(
+                                (mutableData) async {
+                                  if (widget.mutableIncrement != null) {
+                                    return widget
+                                        .mutableIncrement!(mutableData);
+                                  }
+                                  if (widget.isTargetScore) {
+                                    var ref = mutableData.value['targetScore']
                                             [widget.opModeType?.toRep()]
-                                        [widget.element.key] =
-                                    (ref ?? 0) + widget.element.incrementValue;
-                              return mutableData;
-                            });
+                                        [widget.element.key];
+                                    if (ref < widget.element.max!())
+                                      mutableData.value['targetScore']
+                                                  [widget.opModeType?.toRep()]
+                                              [widget.element.key] =
+                                          (ref ?? 0) +
+                                              widget.element.incrementValue;
+                                    return mutableData;
+                                  }
+                                  final scoreIndex = widget.score?.id;
+                                  var ref = mutableData.value['scores']
+                                              [scoreIndex]
+                                          [widget.opModeType?.toRep()]
+                                      [widget.element.key];
+                                  if (ref < widget.element.max!())
+                                    mutableData.value['scores'][scoreIndex]
+                                                [widget.opModeType?.toRep()]
+                                            [widget.element.key] =
+                                        (ref ?? 0) +
+                                            widget.element.incrementValue;
+                                  return mutableData;
+                                },
+                              );
                           }
                         : null,
                     elevation: 2.0,
@@ -539,28 +549,41 @@ class _Incrementor extends State<Incrementor> {
                     value: widget.element.asBool(),
                     onChanged: (val) async {
                       if (!(widget.event?.shared ?? false)) {
-                        if (val)
+                        if (val && widget.element.count < widget.element.max!())
                           widget.element.count = 1;
                         else
                           widget.element.count = 0;
                       }
                       widget.onPressed();
-                      await widget.event
-                          ?.getRef()
-                          ?.child('teams/${widget.team?.number}')
-                          .runTransaction((mutableData) async {
-                        if (widget.isTargetScore) {
-                          mutableData.value['targetScore']
-                                  [widget.opModeType?.toRep()]
-                              [widget.element.key] = val ? 1 : 0;
+                      if (widget.path != null)
+                        await widget.event?.getRef()?.child(widget.path!)
+                            // ?.child('teams/${widget.team?.number}')
+                            .runTransaction((mutableData) async {
+                          if (widget.isTargetScore) {
+                            if (widget.element.count < widget.element.max!()) {}
+                            mutableData.value['targetScore']
+                                        [widget.opModeType?.toRep()]
+                                    [widget.element.key] =
+                                val
+                                    ? (widget.element.count <
+                                            widget.element.max!()
+                                        ? 1
+                                        : 0)
+                                    : 0;
+                            return mutableData;
+                          }
+                          final scoreIndex = widget.score?.id;
+                          mutableData.value['scores'][scoreIndex]
+                                      [widget.opModeType?.toRep()]
+                                  [widget.element.key] =
+                              val
+                                  ? (widget.element.count <
+                                          widget.element.max!()
+                                      ? 1
+                                      : 0)
+                                  : 0;
                           return mutableData;
-                        }
-                        final scoreIndex = widget.score?.id;
-                        mutableData.value['scores'][scoreIndex]
-                                [widget.opModeType?.toRep()]
-                            [widget.element.key] = val ? 1 : 0;
-                        return mutableData;
-                      });
+                        });
                     },
                   )
               ],

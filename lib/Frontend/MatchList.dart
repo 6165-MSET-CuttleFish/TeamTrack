@@ -70,11 +70,13 @@ class _MatchList extends State<MatchList> {
                                     widget.event.teams[widget.team?.number],
                                     null,
                                     widget.event.type,
+                                    widget.event.gameName,
                                   ),
                                   Alliance(
                                     null,
                                     null,
                                     widget.event.type,
+                                    widget.event.gameName,
                                   ),
                                   EventType.remote,
                                 ),

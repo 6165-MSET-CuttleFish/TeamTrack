@@ -19,29 +19,29 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
   print('A background message just showed up :  ${message.messageId}');
   RemoteNotification? notification = message.notification;
-    AndroidNotification? android = message.notification?.android;
-    AppleNotification? ios = message.notification?.apple;
-    if (notification != null) {
-      flutterLocalNotificationsPlugin.show(
-        notification.hashCode,
-        notification.title,
-        notification.body,
-        NotificationDetails(
-            android: AndroidNotificationDetails(
-              channel.id,
-              channel.name,
-              channel.description,
-              color: Colors.blue,
-              playSound: true,
-              icon: android?.smallIcon,
-            ),
-            iOS: IOSNotificationDetails(
-              presentSound: true,
-              presentBadge: true,
-              presentAlert: true,
-            )),
-      );
-    }
+  AndroidNotification? android = message.notification?.android;
+  AppleNotification? ios = message.notification?.apple;
+  if (notification != null) {
+    flutterLocalNotificationsPlugin.show(
+      notification.hashCode,
+      notification.title,
+      notification.body,
+      NotificationDetails(
+          android: AndroidNotificationDetails(
+            channel.id,
+            channel.name,
+            channel.description,
+            color: Colors.blue,
+            playSound: true,
+            icon: android?.smallIcon,
+          ),
+          iOS: IOSNotificationDetails(
+            presentSound: true,
+            presentBadge: true,
+            presentAlert: true,
+          )),
+    );
+  }
 }
 
 class PushNotifications {

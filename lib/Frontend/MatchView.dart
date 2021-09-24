@@ -101,55 +101,53 @@ class _MatchView extends State<MatchView> {
                     actions: widget.team == null
                         ? [
                             IconButton(
-                                icon: Icon(
-                                  Icons.restore,
+                              icon: Icon(
+                                Icons.restore,
+                              ),
+                              onPressed: () => showPlatformDialog(
+                                context: context,
+                                builder: (_) => PlatformAlert(
+                                  title: Text('Reset Score'),
+                                  content: Text('Are you sure?'),
+                                  actions: [
+                                    PlatformDialogAction(
+                                        child: Text('Cancel'),
+                                        isDefaultAction: true,
+                                        onPressed: () =>
+                                            Navigator.of(context).pop()),
+                                    PlatformDialogAction(
+                                      child: Text('Confirm'),
+                                      isDestructive: true,
+                                      onPressed: () => setState(
+                                        () {
+                                          if (widget.event.shared) {
+                                            if (_match != null) {
+                                              widget.event
+                                                  .getRef()
+                                                  ?.child(
+                                                      'teams/${_selectedTeam?.number}/scores/${_score?.id}')
+                                                  .runTransaction(
+                                                      (transaction) async {
+                                                transaction.value = Score(
+                                                  _match?.id ?? Uuid().v4(),
+                                                  _match?.dice ?? Dice.one,
+                                                  widget.event.gameName,
+                                                ).toJson();
+                                                return transaction;
+                                              });
+                                            }
+                                          } else {
+                                            _score?.reset();
+                                          }
+                                          dataModel.saveEvents();
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                    )
+                                  ],
                                 ),
-                                onPressed: () => showPlatformDialog(
-                                    context: context,
-                                    builder: (_) => PlatformAlert(
-                                            title: Text('Reset Score'),
-                                            content: Text('Are you sure?'),
-                                            actions: [
-                                              PlatformDialogAction(
-                                                  child: Text('Cancel'),
-                                                  isDefaultAction: true,
-                                                  onPressed: () =>
-                                                      Navigator.of(context)
-                                                          .pop()),
-                                              PlatformDialogAction(
-                                                child: Text('Confirm'),
-                                                isDestructive: true,
-                                                onPressed: () => setState(
-                                                  () {
-                                                    if (widget.event.shared) {
-                                                      if (_match != null) {
-                                                        widget.event
-                                                            .getRef()
-                                                            ?.child(
-                                                                'teams/${_selectedTeam?.number}/scores/${_score?.id}')
-                                                            .runTransaction(
-                                                                (transaction) async {
-                                                          transaction.value =
-                                                              Score(
-                                                            _match?.id ??
-                                                                Uuid().v4(),
-                                                            _match?.dice ??
-                                                                Dice.one,
-                                                            widget
-                                                                .event.gameName,
-                                                          ).toJson();
-                                                          return transaction;
-                                                        });
-                                                      }
-                                                    } else {
-                                                      _score?.reset();
-                                                    }
-                                                    dataModel.saveEvents();
-                                                    Navigator.pop(context);
-                                                  },
-                                                ),
-                                              )
-                                            ]))),
+                              ),
+                            ),
                             Center(
                               child: Text(
                                 _time.roundToDouble().toString(),
@@ -316,7 +314,8 @@ class _MatchView extends State<MatchView> {
                                             element: e,
                                             onPressed: stateSetter,
                                             event: widget.event,
-                                            team: _selectedTeam,
+                                            path:
+                                                'teams/${_selectedTeam?.number}',
                                             score: _score,
                                             opModeType: OpModeType.penalty,
                                             isTargetScore: widget.team != null,
@@ -447,28 +446,6 @@ class _MatchView extends State<MatchView> {
     if (_selectedAlliance == _match?.blue) return _match?.red;
   }
 
-  void onIncrement() {
-    lapses.add(
-      (_time -
-              (lapses.length != 0
-                  ? lapses.reduce((value, element) => value + element)
-                  : 0))
-          .toPrecision(3),
-    );
-    _score?.teleScore.cycleTimes = lapses;
-    if (widget.team != null) {
-      widget.event
-          .getRef()
-          ?.child('teams/${_selectedTeam?.number}')
-          .runTransaction((mutableData) async {
-        final scoreIndex = _score?.id;
-        mutableData.value['scores'][scoreIndex]['TeleScore']['CycleTimes'] =
-            lapses;
-        return mutableData;
-      });
-    }
-  }
-
   ListView viewSelect() {
     switch (_view) {
       case 0:
@@ -487,21 +464,39 @@ class _MatchView extends State<MatchView> {
   }
 
   List<Widget> endView() => !_paused || _allowView
-      ? _score?.endgameScore
-              .getElements()
-              .map(
-                (e) => Incrementor(
-                  element: e,
-                  onPressed: stateSetter,
-                  opModeType: OpModeType.endgame,
-                  event: widget.event,
-                  team: _selectedTeam,
-                  score: _score,
-                  isTargetScore: widget.team != null,
-                ),
-              )
-              .toList() ??
-          []
+      ? [
+          ..._score?.endgameScore
+                  .getElements()
+                  .map(
+                    (e) => Incrementor(
+                      element: e,
+                      onPressed: stateSetter,
+                      opModeType: OpModeType.endgame,
+                      event: widget.event,
+                      path: 'teams/${_selectedTeam?.number}',
+                      score: _score,
+                      isTargetScore: widget.team != null,
+                    ),
+                  )
+                  .toList() ??
+              [],
+          Padding(padding: EdgeInsets.all(5)),
+          if (widget.team == null)
+            ..._selectedAlliance?.sharedScore.endgameScore.getElements().map(
+                      (e) => Incrementor(
+                        element: e,
+                        onPressed: stateSetter,
+                        onDecrement:
+                            widget.team == null ? increaseMisses : null,
+                        opModeType: OpModeType.tele,
+                        event: widget.event,
+                        path: 'matches/${widget.match?.id}/${allianceColor()}}',
+                        score: _score,
+                        backgroundColor: Colors.green.withOpacity(0.3),
+                      ),
+                    ) ??
+                []
+        ]
       : [
           Material(
             child: IconButton(
@@ -564,7 +559,7 @@ class _MatchView extends State<MatchView> {
             onPressed: stateSetter,
             opModeType: OpModeType.tele,
             event: widget.event,
-            team: _selectedTeam,
+            path: 'teams/${_selectedTeam?.number}',
             score: _score,
             isTargetScore: widget.team != null,
           ),
@@ -575,11 +570,10 @@ class _MatchView extends State<MatchView> {
                     (e) => Incrementor(
                       element: e,
                       onPressed: stateSetter,
-                      onIncrement: onIncrement,
                       onDecrement: widget.team == null ? increaseMisses : null,
                       opModeType: OpModeType.tele,
                       event: widget.event,
-                      team: _selectedTeam,
+                      path: 'teams/${_selectedTeam?.number}',
                       score: _score,
                       isTargetScore: widget.team != null,
                       mutableIncrement: (mutableData) {
@@ -645,7 +639,22 @@ class _MatchView extends State<MatchView> {
                     ),
                   )
                   .toList() ??
-              []
+              [],
+          if (widget.team == null)
+            ..._selectedAlliance?.sharedScore.teleScore.getElements().map(
+                      (e) => Incrementor(
+                        element: e,
+                        onPressed: stateSetter,
+                        onDecrement:
+                            widget.team == null ? increaseMisses : null,
+                        opModeType: OpModeType.tele,
+                        event: widget.event,
+                        path: 'matches/${widget.match?.id}/${allianceColor()}}',
+                        score: _score,
+                        backgroundColor: Colors.green,
+                      ),
+                    ) ??
+                []
         ]
       : [
           Material(
@@ -666,6 +675,13 @@ class _MatchView extends State<MatchView> {
             ),
           ),
         ];
+  String allianceColor() {
+    if (_selectedAlliance == widget.match?.blue) {
+      return 'blue';
+    } else {
+      return 'red';
+    }
+  }
 
   List<Widget> autoView() =>
       _score?.autoScore
@@ -676,7 +692,7 @@ class _MatchView extends State<MatchView> {
               onPressed: stateSetter,
               opModeType: OpModeType.auto,
               event: widget.event,
-              team: _selectedTeam,
+              path: 'teams/${_selectedTeam?.number}',
               score: _score,
               isTargetScore: widget.team != null,
             ),

@@ -160,6 +160,7 @@ class _MatchConfigState extends State<MatchConfig> {
                       widget.event.teams
                           .findAdd(names[1], controllers[1].text, widget.event),
                       widget.event.type,
+                      widget.event.gameName,
                     ),
                     Alliance(
                       widget.event.teams
@@ -167,6 +168,7 @@ class _MatchConfigState extends State<MatchConfig> {
                       widget.event.teams
                           .findAdd(names[3], controllers[3].text, widget.event),
                       widget.event.type,
+                      widget.event.gameName,
                     ),
                     widget.event.type,
                   ),
