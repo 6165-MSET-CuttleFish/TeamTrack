@@ -74,6 +74,54 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
   return returnVal;
 });
 
+export const nativizeEvent = functions.database
+    .ref("/Events/{gameName}/{event}")
+    .onCreate((snap, context) => {
+      const event = snap.val();
+      const ref = admin.firestore().collection("users")
+          .doc(context.auth?.uid ?? "");
+      return admin.firestore().runTransaction(async (t) => {
+        const doc = await t.get(ref);
+        const events = doc.data()?.events;
+        events[event.id] = {
+          "name": event.name,
+          "sendDate": admin.database.ServerValue.TIMESTAMP,
+          "authorName": event.authorName,
+          "authorEmail": event.authorEmail,
+          "id": event.id,
+          "type": event.type,
+          "gameName": event.gameName,
+        };
+        t.update(doc.ref, {events: events});
+      });
+    });
+
+export const deleteEvent = functions.database
+    .ref("/Events/{gameName}/{event}")
+    .onDelete((snap) => {
+      const event = snap.val();
+      const users: Array<string> = [];
+      for (const [key] of Object.entries(event.Permissions)) {
+        users.push(key);
+      }
+      return admin.firestore().runTransaction(async (t) => {
+        const refs = users.map((user) => {
+          return admin.firestore().collection("users").doc(user);
+        });
+        const allDocs = new Map<FirebaseFirestore.DocumentSnapshot<
+        FirebaseFirestore.DocumentData>, unknown>();
+        for (const ref of refs) {
+          const doc = await t.get(ref);
+          const events = doc.data()?.events;
+          delete events[event.id];
+          allDocs.set(doc, events);
+        }
+        for (const doc of allDocs.keys()) {
+          t.update(doc.ref, {events: allDocs.get(doc)});
+        }
+      });
+    });
+
 export const createUser = functions.auth.user().onCreate(async (user) => {
   return admin.firestore().collection("users").doc(user.uid).set({
     inbox: {},

@@ -75,10 +75,15 @@ class Score extends ScoreDivision implements Comparable<Score> {
     var ref = isAllianceScore
         ? json.decode(remoteConfig.getValue(gameName).asString())['Alliance']
         : json.decode(remoteConfig.getValue(gameName).asString());
-    autoScore = AutoScore.fromJson(map['AutoScore'], ref['AutoScore']);
-    teleScore = TeleScore.fromJson(map['TeleScore'], ref['TeleScore']);
-    endgameScore =
-        EndgameScore.fromJson(map['EndgameScore'], ref['EndgameScore']);
+    autoScore = map['AutoScore'] != null
+        ? AutoScore.fromJson(map['AutoScore'], ref['AutoScore'])
+        : AutoScore(ref['AutoScore']);
+    teleScore = map['TeleScore'] != null
+        ? TeleScore.fromJson(map['TeleScore'], ref['TeleScore'])
+        : TeleScore(ref['TeleScore']);
+    endgameScore = map['EndgameScore'] != null
+        ? EndgameScore.fromJson(map['EndgameScore'], ref['EndgameScore'])
+        : EndgameScore(ref['EndgameScore']);
     penalties = Penalty.fromJson(map['Penalty']);
     id = map['id'];
   }

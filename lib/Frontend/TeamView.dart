@@ -445,15 +445,17 @@ class _TeamView extends State<TeamView> {
                           ),
                         )
                       : SfCartesianChart(
+                          tooltipBehavior: TooltipBehavior(enable: true),
                           title: ChartTitle(
-                              text: 'Cycle Times and Misses',
-                              borderWidth: 2,
-                              // Aligns the chart title to left
-                              alignment: ChartAlignment.near,
-                              textStyle: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                              )),
+                            text: 'Cycle Times and Misses',
+                            borderWidth: 2,
+                            // Aligns the chart title to left
+                            alignment: ChartAlignment.near,
+                            textStyle: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                            ),
+                          ),
                           series: <ChartSeries>[
                             BoxAndWhiskerSeries<List<double>, int>(
                               gradient: LinearGradient(

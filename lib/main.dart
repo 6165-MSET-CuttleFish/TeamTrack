@@ -15,7 +15,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await remoteConfig.fetchAndActivate();
-  Statics.gameName = "FreightFrenzy"; //remoteConfig.getString("gameName");
+  Statics.gameName = remoteConfig.getString("gameName");
   await dataModel.restoreEvents();
   var notification = PushNotifications();
   await messaging.requestPermission(

@@ -478,10 +478,11 @@ class MatchSearch extends SearchDelegate<String?> {
   Event event;
   @override
   List<Widget> buildActions(BuildContext context) => [
-        IconButton(
-          icon: Icon(Icons.clear),
-          onPressed: () => query = '',
-        )
+        if (query.isNotEmpty)
+          IconButton(
+            icon: Icon(Icons.clear),
+            onPressed: () => query = '',
+          )
       ];
   @override
   Widget buildLeading(context) {

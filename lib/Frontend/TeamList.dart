@@ -8,7 +8,8 @@ import 'package:firebase_database/firebase_database.dart' as Database;
 import 'dart:convert';
 
 class TeamList extends StatefulWidget {
-  TeamList({Key? key, required this.event, required this.sortMode}) : super(key: key);
+  TeamList({Key? key, required this.event, required this.sortMode})
+      : super(key: key);
   final Event event;
   final OpModeType? sortMode;
   @override
@@ -131,10 +132,11 @@ class TeamSearch extends SearchDelegate<String?> {
   Event event;
   @override
   List<Widget> buildActions(BuildContext context) => [
-        IconButton(
-          icon: Icon(Icons.clear),
-          onPressed: () => query = '',
-        ),
+        if (query.isNotEmpty)
+          IconButton(
+            icon: Icon(Icons.clear),
+            onPressed: () => query = '',
+          ),
       ];
   @override
   Widget buildLeading(BuildContext context) {

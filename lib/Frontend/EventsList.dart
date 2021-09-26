@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 import 'package:teamtrack/Frontend/BlockList.dart';
 import 'package:teamtrack/Frontend/Inbox.dart';
 import 'package:teamtrack/Frontend/Login.dart';
@@ -43,6 +44,7 @@ class _EventsList extends State<EventsList> {
           .snapshots(),
       builder: (context, snapshot) {
         var data = snapshot.data?.data();
+        sharedEvents.clear();
         (data?['events'] as Map?)?.keys.forEach((key) {
           try {
             var event = Event.fromJson(data?['events'][key]);
@@ -750,17 +752,37 @@ class _EventsList extends State<EventsList> {
         ),
       );
   TextEditingController _emailController = TextEditingController();
+  Role role = Role.editor;
+  final arr = [Role.editor, Role.viewer];
   void _onShare(Event e) {
     if (!(context.read<User?>()?.isAnonymous ?? true))
       showPlatformDialog(
         context: context,
         builder: (context) => PlatformAlert(
           title: Text(e.shared ? 'Share Event' : 'Upload Event'),
-          content: PlatformTextField(
-            placeholder: e.shared ? 'Email' : '(Optional) Email',
-            keyboardType: TextInputType.emailAddress,
-            controller: _emailController,
-            autoCorrect: false,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              PlatformPicker<Role>(
+                value: role,
+                onSelectedItemChanged: (newValue) {
+                  HapticFeedback.lightImpact();
+                  try {
+                    setState(() => role = newValue ?? Role.editor);
+                  } catch (e) {
+                    setState(() => role = arr[newValue]);
+                  }
+                },
+                items: arr.map((e) => Text(e.name())).toList(),
+                arr: arr,
+              ),
+              PlatformTextField(
+                placeholder: e.shared ? 'Email' : '(Optional) Email',
+                keyboardType: TextInputType.emailAddress,
+                controller: _emailController,
+                autoCorrect: false,
+              ),
+            ],
           ),
           actions: [
             PlatformDialogAction(
@@ -790,26 +812,11 @@ class _EventsList extends State<EventsList> {
                   var json = e.toJson();
                   json['shared'] = true;
                   final uid = context.read<User?>()?.uid;
-                  if (uid != null) json['Permissions'] = {uid: "editor"};
+                  if (uid != null) json['Permissions'] = {uid: "admin"};
                   await firebaseDatabase
                       .reference()
                       .child("Events/${e.gameName}/${e.id}")
                       .set(json);
-                  var ref = firebaseFirestore.collection('users').doc(uid);
-                  await firebaseFirestore.runTransaction((transaction) async {
-                    var doc = await transaction.get(ref);
-                    var newEvents = doc.data()?['events'] as Map;
-                    newEvents[e.id] = {
-                      'name': e.name,
-                      'sendDate': Timestamp.now(),
-                      'authorName': e.authorName,
-                      'authorEmail': e.authorEmail,
-                      'id': e.id,
-                      'type': e.type.toString(),
-                      'gameName': e.gameName,
-                    };
-                    transaction.update(ref, {'events': newEvents});
-                  });
                   dataModel.events.remove(e);
                   setState(() => dataModel.saveEvents);
                 }
@@ -822,7 +829,7 @@ class _EventsList extends State<EventsList> {
                     type: e.type.toString(),
                     email: _emailController.text.trim(),
                     gameName: e.gameName,
-                    role: "editor",
+                    role: role,
                   );
                 }
                 _emailController.clear();

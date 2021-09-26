@@ -101,6 +101,7 @@ class _MatchView extends State<MatchView> {
                     actions: widget.team == null
                         ? [
                             IconButton(
+                              tooltip: "Reset Score",
                               icon: Icon(
                                 Icons.restore,
                               ),
@@ -154,6 +155,7 @@ class _MatchView extends State<MatchView> {
                               ),
                             ),
                             IconButton(
+                              tooltip: "Driver Control",
                               icon: Icon(
                                   _paused ? Icons.play_arrow : Icons.pause),
                               onPressed: () => setState(() {
@@ -165,6 +167,7 @@ class _MatchView extends State<MatchView> {
                               icon: Icon(Icons.stop),
                               onPressed: () => setState(
                                 () {
+                                  lapses.clear();
                                   _paused = true;
                                   _time = 0;
                                 },
@@ -482,7 +485,7 @@ class _MatchView extends State<MatchView> {
               [],
           Padding(padding: EdgeInsets.all(5)),
           if (widget.team == null)
-            ..._selectedAlliance?.sharedScore.endgameScore.getElements().map(
+            ..._selectedAlliance?.sharedScore?.endgameScore.getElements().map(
                       (e) => Incrementor(
                         element: e,
                         onPressed: stateSetter,
@@ -500,6 +503,7 @@ class _MatchView extends State<MatchView> {
       : [
           Material(
             child: IconButton(
+              tooltip: 'Driver Control Play',
               icon: Icon(Icons.play_arrow),
               onPressed: () {
                 _paused = false;
@@ -510,6 +514,7 @@ class _MatchView extends State<MatchView> {
           Material(
             child: IconButton(
               icon: Icon(Icons.visibility),
+              tooltip: 'View',
               onPressed: () {
                 _allowView = true;
               },
@@ -537,6 +542,28 @@ class _MatchView extends State<MatchView> {
         return mutableData;
       },
     );
+  }
+
+  void onIncrement() {
+    lapses.add(
+      (_time -
+              (lapses.length != 0
+                  ? lapses.reduce((value, element) => value + element)
+                  : 0))
+          .toPrecision(3),
+    );
+    _score?.teleScore.cycleTimes = lapses;
+    if (widget.team != null) {
+      widget.event
+          .getRef()
+          ?.child('teams/${_selectedTeam?.number}')
+          .runTransaction((mutableData) async {
+        final scoreIndex = _score?.id;
+        mutableData.value['scores'][scoreIndex]['TeleScore']['CycleTimes'] =
+            lapses;
+        return mutableData;
+      });
+    }
   }
 
   List<Widget> teleView() => !_paused || _allowView
@@ -571,6 +598,7 @@ class _MatchView extends State<MatchView> {
                       element: e,
                       onPressed: stateSetter,
                       onDecrement: widget.team == null ? increaseMisses : null,
+                      onIncrement: _paused ? null : onIncrement,
                       opModeType: OpModeType.tele,
                       event: widget.event,
                       path: 'teams/${_selectedTeam?.number}',
@@ -641,7 +669,7 @@ class _MatchView extends State<MatchView> {
                   .toList() ??
               [],
           if (widget.team == null)
-            ..._selectedAlliance?.sharedScore.teleScore.getElements().map(
+            ..._selectedAlliance?.sharedScore?.teleScore.getElements().map(
                       (e) => Incrementor(
                         element: e,
                         onPressed: stateSetter,
@@ -660,6 +688,7 @@ class _MatchView extends State<MatchView> {
           Material(
             child: IconButton(
               icon: Icon(Icons.play_arrow),
+              tooltip: 'Driver Control Play',
               onPressed: () {
                 _paused = false;
                 _allowView = true;
@@ -669,6 +698,7 @@ class _MatchView extends State<MatchView> {
           Material(
             child: IconButton(
               icon: Icon(Icons.visibility),
+              tooltip: 'View',
               onPressed: () {
                 _allowView = true;
               },

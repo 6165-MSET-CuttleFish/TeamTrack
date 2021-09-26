@@ -27,8 +27,7 @@ save(String key, value) async {
 }
 
 class Statics {
-  static String gameName =
-      "FreightFrenzy"; //remoteConfig.getString("gameName");
+  static String gameName = remoteConfig.getString("gameName");
 }
 
 class DarkThemeProvider with ChangeNotifier {
@@ -55,6 +54,31 @@ class DarkThemePreference {
   Future<bool> getTheme() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getBool(THEME_STATUS) ?? false;
+  }
+}
+
+enum Role {
+  viewer,
+  editor,
+}
+
+extension RoleExtension on Role {
+  String name() {
+    switch (this) {
+      case Role.viewer:
+        return 'Viewer';
+      case Role.editor:
+        return 'Editor';
+    }
+  }
+
+  String toRep() {
+    switch (this) {
+      case Role.viewer:
+        return 'viewer';
+      case Role.editor:
+        return 'editor';
+    }
   }
 }
 
@@ -222,7 +246,7 @@ class DataModel {
     required String type,
     required String authorName,
     required String gameName,
-    required String role,
+    required Role role,
   }) async {
     final HttpsCallable callable = functions.httpsCallable('shareEvent');
     return callable.call(
@@ -234,7 +258,7 @@ class DataModel {
         'type': type,
         'authorName': authorName,
         'gameName': gameName,
-        'role': role,
+        'role': role.toRep(),
       },
     );
   }
@@ -580,7 +604,7 @@ class Alliance {
   Team? team2;
   EventType eventType;
   Alliance? opposingAlliance;
-  late Score sharedScore;
+  late Score? sharedScore;
   String? id;
   Alliance(this.team1, this.team2, this.eventType, String gameName) {
     sharedScore =
@@ -607,15 +631,15 @@ class Alliance {
                           ? getPenalty()
                           : -getPenalty())
                       : 0)) +
-              sharedScore.total())
+              (sharedScore?.total() ?? 0))
           .clamp(0, 999);
   Alliance.fromJson(
     Map<String, dynamic> json,
     Map<String, Team> teamList,
     this.eventType,
     String gameName,
-  )   : team1 = teamList[json['team1']],
-        team2 = teamList[json['team2']],
+  )   : team1 = json['team1'] != null ? teamList[json['team1']] : null,
+        team2 = json['team2'] != null ? teamList[json['team2']] : null,
         sharedScore = json['sharedScore'] != null
             ? Score.fromJson(json['sharedScore'], gameName,
                 isAllianceScore: true)
@@ -623,7 +647,7 @@ class Alliance {
   Map<String, dynamic> toJson() => {
         'team1': team1?.number,
         'team2': team2?.number,
-        'sharedScore': sharedScore.toJson(),
+        'sharedScore': sharedScore?.toJson(),
       };
 }
 
@@ -1007,6 +1031,7 @@ extension MatchExtensions on List<Match> {
         val.add(allianceTotal2);
       }
     }
+    if (val.isEmpty) return 0;
     return val.reduce(max);
   }
 

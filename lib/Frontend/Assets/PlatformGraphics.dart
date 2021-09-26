@@ -1,6 +1,6 @@
+import 'dart:ffi';
 import 'dart:math';
 import 'package:firebase_database/firebase_database.dart' as Db;
-import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -283,6 +283,47 @@ class PlatformProgressIndicator extends PlatformWidget<
   @override
   CircularProgressIndicator buildMaterialWidget(BuildContext context) =>
       CircularProgressIndicator();
+}
+
+class PlatformPicker<T>
+    extends PlatformWidget<CupertinoPicker, DropdownButton> {
+  PlatformPicker({
+    Key? key,
+    required this.items,
+    this.onSelectedItemChanged,
+    required this.value,
+    required this.arr,
+  }) : super(key: key) {
+    for (int i = 0; i < arr.length; i++) {
+      dropdownItems.add(DropdownMenuItem<T>(
+        child: items[i],
+        value: arr[i],
+      ));
+    }
+  }
+  final void Function(dynamic)? onSelectedItemChanged;
+  final List<Widget> items;
+  final List<T> arr;
+  final T value;
+  final List<DropdownMenuItem<T>> dropdownItems = [];
+
+  @override
+  CupertinoPicker buildCupertinoWidget(BuildContext context) {
+    return CupertinoPicker(
+      itemExtent: 50,
+      onSelectedItemChanged: onSelectedItemChanged,
+      children: items,
+    );
+  }
+
+  @override
+  DropdownButton buildMaterialWidget(BuildContext context) {
+    return DropdownButton<T>(
+      items: dropdownItems,
+      onChanged: onSelectedItemChanged,
+      value: value,
+    );
+  }
 }
 
 class PlatformForm extends PlatformWidget<CupertinoFormSection, Form> {

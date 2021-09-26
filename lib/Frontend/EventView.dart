@@ -40,6 +40,7 @@ class _EventView extends State<EventView> {
         actions: [
           _tab != 0
               ? IconButton(
+                  tooltip: "Sort",
                   icon: Icon(
                     ascending
                         ? CupertinoIcons.sort_up
