@@ -693,7 +693,7 @@ class _TeamView extends State<TeamView> {
               widget.event
                   .getRef()
                   ?.child('teams/${widget.team.number}')
-                  .runTransaction((mutableData) async {
+                  .runTransaction((mutableData) {
                 mutableData.value['targetScore'] =
                     Score(Uuid().v4(), Dice.none, widget.event.gameName)
                         .toJson();

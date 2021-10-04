@@ -317,7 +317,7 @@ class Event {
   }
 
   void addMatch(Match e) async {
-    await getRef()?.runTransaction((mutableData) async {
+    await getRef()?.runTransaction((mutableData) {
       var newMatches = mutableData.value['matches'] ?? {};
       newMatches[e.id] = e.toJson();
       mutableData.value['matches'] = newMatches;
@@ -391,7 +391,7 @@ class Event {
       if (x == null) {
         teams.remove(team.number);
         getRef()?.runTransaction(
-          (mutableData) async {
+          (mutableData) {
             bool allowRemove = true;
             List<String> ids;
             try {
@@ -434,7 +434,7 @@ class Event {
     } else {
       matches.removeWhere((key, element) => element.alliance(team) != null);
       teams.remove(team.number);
-      getRef()?.runTransaction((mutableData) async {
+      getRef()?.runTransaction((mutableData) {
         List<dynamic> ids = [];
         try {
           var newTeams = ((mutableData.value as Map)['teams'] as Map?);
@@ -473,7 +473,7 @@ class Event {
       matches.remove(e.id);
     }
     getRef()?.runTransaction(
-      (mutableData) async {
+      (mutableData) {
         final newMatches = ((mutableData.value as Map)['matches'] as Map);
         newMatches.removeWhere((key, value) => key == e.id);
         mutableData.value['matches'] = newMatches;

@@ -485,7 +485,7 @@ class _Incrementor extends State<Incrementor> {
                               await widget.event?.getRef()?.child(widget.path!)
                                   // ?.child('teams/${widget.team?.number}')
                                   .runTransaction(
-                                (mutableData) async {
+                                (mutableData) {
                                   if (widget.mutableDecrement != null) {
                                     return widget
                                         .mutableDecrement!(mutableData);
@@ -546,7 +546,7 @@ class _Incrementor extends State<Incrementor> {
                               await widget.event?.getRef()?.child(widget.path!)
                                   // ?.child('teams/${widget.team?.number}')
                                   .runTransaction(
-                                (mutableData) async {
+                                (mutableData) {
                                   if (widget.mutableIncrement != null) {
                                     return widget
                                         .mutableIncrement!(mutableData);
@@ -599,7 +599,7 @@ class _Incrementor extends State<Incrementor> {
                       if (widget.path != null)
                         await widget.event?.getRef()?.child(widget.path!)
                             // ?.child('teams/${widget.team?.number}')
-                            .runTransaction((mutableData) async {
+                            .runTransaction((mutableData) {
                           if (widget.isTargetScore) {
                             if (widget.element.count < widget.element.max!()) {}
                             mutableData.value['targetScore']

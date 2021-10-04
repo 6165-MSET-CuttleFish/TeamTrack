@@ -128,7 +128,7 @@ class _MatchView extends State<MatchView> {
                                                   ?.child(
                                                       'teams/${_selectedTeam?.number}/scores/${_score?.id}')
                                                   .runTransaction(
-                                                      (transaction) async {
+                                                      (transaction) {
                                                 transaction.value = Score(
                                                   _match?.id ?? Uuid().v4(),
                                                   _match?.dice ?? Dice.one,
@@ -271,7 +271,7 @@ class _MatchView extends State<MatchView> {
                                 );
                                 widget.event
                                     .getRef()
-                                    ?.runTransaction((mutableData) async {
+                                    ?.runTransaction((mutableData) {
                                   mutableData.value['matches'][_match?.id]
                                       ['dice'] = newValue.toString();
                                   return mutableData;
@@ -526,7 +526,7 @@ class _MatchView extends State<MatchView> {
   void increaseMisses() async {
     if (!widget.event.shared) _score?.teleScore.misses.count++;
     widget.event.getRef()?.runTransaction(
-      (mutableData) async {
+      (mutableData) {
         var teamIndex;
         try {
           mutableData.value['teams'] as Map;
@@ -557,7 +557,7 @@ class _MatchView extends State<MatchView> {
       widget.event
           .getRef()
           ?.child('teams/${_selectedTeam?.number}')
-          .runTransaction((mutableData) async {
+          .runTransaction((mutableData) {
         final scoreIndex = _score?.id;
         mutableData.value['scores'][scoreIndex]['TeleScore']['CycleTimes'] =
             lapses;
