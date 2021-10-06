@@ -96,7 +96,17 @@ class _MatchView extends State<MatchView> {
                 child: Scaffold(
                   appBar: AppBar(
                     backgroundColor: _color,
-                    title: Text('Match Stats'),
+                    title: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 500),
+                      child: (widget.match?.activeUsers.isNotEmpty ?? true) ? Text("Match Stats") : Row(
+                            children: widget.match?.activeUsers.values
+                                    .map(
+                                      (e) => Image.network(e),
+                                    )
+                                    .toList() ??
+                                [],
+                          ),
+                    ),
                     elevation: 0,
                     actions: widget.team == null
                         ? [

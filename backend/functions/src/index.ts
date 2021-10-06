@@ -31,7 +31,11 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
   }
   await admin.database().ref().child("Events")
       .child(data.gameName).child(data.id)
-      .child("Permissions").child(recipient.uid).set(data.role);
+      .child("Permissions").child(recipient.uid).set({
+        "role": data.role,
+        "name": recipient.displayName,
+        "email": recipient.displayName,
+      });
   const meta = {
     "id": data.id,
     "name": data.name,

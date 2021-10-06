@@ -812,7 +812,14 @@ class _EventsList extends State<EventsList> {
                   var json = e.toJson();
                   json['shared'] = true;
                   final uid = context.read<User?>()?.uid;
-                  if (uid != null) json['Permissions'] = {uid: "admin"};
+                  if (uid != null)
+                    json['Permissions'] = {
+                      uid: {
+                        "role": Role.admin.toRep(),
+                        "name": e.authorName,
+                        "email": e.authorEmail,
+                      },
+                    };
                   await firebaseDatabase
                       .reference()
                       .child("Events/${e.gameName}/${e.id}")

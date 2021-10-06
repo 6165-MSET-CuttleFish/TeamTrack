@@ -60,6 +60,7 @@ class DarkThemePreference {
 enum Role {
   viewer,
   editor,
+  admin,
 }
 
 extension RoleExtension on Role {
@@ -69,6 +70,8 @@ extension RoleExtension on Role {
         return 'Viewer';
       case Role.editor:
         return 'Editor';
+      case Role.admin:
+        return 'Admin';
     }
   }
 
@@ -78,6 +81,8 @@ extension RoleExtension on Role {
         return 'viewer';
       case Role.editor:
         return 'editor';
+      case Role.admin:
+        return 'Admin';
     }
   }
 }
@@ -264,6 +269,13 @@ class DataModel {
   }
 }
 
+class TeamTrackUser {
+  TeamTrackUser({required this.role, this.displayName, this.email});
+  Role role;
+  String? email;
+  String? displayName;
+}
+
 class Event {
   Event({required this.name, required this.type, required this.gameName});
   String id = Uuid().v4();
@@ -276,6 +288,8 @@ class Event {
   Map<String, Match> matches = {};
   late String name;
   Timestamp timeStamp = Timestamp.now();
+  Map<String, TeamTrackUser> permissions = {};
+
   void addTeam(Team newTeam) async {
     await getRef()
         ?.child('teams/${newTeam.number}')
@@ -707,6 +721,7 @@ class Match {
   Alliance? red;
   Alliance? blue;
   String id = '';
+  Map<String, String> activeUsers = Map();
   Timestamp timeStamp = Timestamp.now();
   Match(this.red, this.blue, this.type) {
     id = Uuid().v4();
