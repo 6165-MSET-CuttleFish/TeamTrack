@@ -80,6 +80,17 @@ class _MatchView extends State<MatchView> {
               });
             }
           }
+          Widget title = Text("Match Stats");
+          if (_match?.activeUsers.isNotEmpty ?? false) {
+            title = Row(
+              children: widget.match?.activeUsers.values
+                      .map(
+                        (e) => Image.network(e),
+                      )
+                      .toList() ??
+                  [],
+            );
+          }
           return StreamBuilder<int>(
             stream: _periodicStream,
             builder: (context, snapshot) {
@@ -98,14 +109,7 @@ class _MatchView extends State<MatchView> {
                     backgroundColor: _color,
                     title: AnimatedSwitcher(
                       duration: const Duration(milliseconds: 500),
-                      child: (widget.match?.activeUsers.isNotEmpty ?? true) ? Text("Match Stats") : Row(
-                            children: widget.match?.activeUsers.values
-                                    .map(
-                                      (e) => Image.network(e),
-                                    )
-                                    .toList() ??
-                                [],
-                          ),
+                      child: title,
                     ),
                     elevation: 0,
                     actions: widget.team == null
