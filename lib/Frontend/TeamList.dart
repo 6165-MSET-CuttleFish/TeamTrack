@@ -31,7 +31,13 @@ class _TeamList extends State<TeamList> {
         builder: (context, eventHandler) {
           if (eventHandler.hasData && !eventHandler.hasError) {
             widget.event.updateLocal(
-                json.decode(json.encode(eventHandler.data?.snapshot.value)));
+              json.decode(
+                json.encode(
+                  eventHandler.data?.snapshot.value,
+                ),
+              ),
+              context,
+            );
           }
           return ListView(
             children: widget.event.teams

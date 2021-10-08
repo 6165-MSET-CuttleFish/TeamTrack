@@ -15,6 +15,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
+import 'package:provider/provider.dart';
 
 read(String key) async {
   final prefs = await SharedPreferences.getInstance();
@@ -63,6 +64,19 @@ enum Role {
   admin,
 }
 
+Role getRoleFromString(String role) {
+  switch (role) {
+    case "viewer":
+      return Role.viewer;
+    case "editor":
+      return Role.editor;
+    case "admin":
+      return Role.admin;
+    default:
+      return Role.viewer;
+  }
+}
+
 extension RoleExtension on Role {
   String name() {
     switch (this) {
@@ -82,7 +96,7 @@ extension RoleExtension on Role {
       case Role.editor:
         return 'editor';
       case Role.admin:
-        return 'Admin';
+        return 'admin';
     }
   }
 }
@@ -270,18 +284,36 @@ class DataModel {
 }
 
 class TeamTrackUser {
-  TeamTrackUser({required this.role, this.displayName, this.email});
+  TeamTrackUser(
+      {required this.role, this.displayName, this.email, this.photoURL});
   Role role;
   String? email;
   String? displayName;
+  String? photoURL;
+  TeamTrackUser.fromJson(Map<String, dynamic> json)
+      : role = getRoleFromString(json['role']),
+        email = json['email'],
+        displayName = json['displayName'],
+        photoURL = json['photoURL'];
+  Map<String, dynamic> toJson() => {
+        'role': role.toRep(),
+        'email': email,
+        'displayName': displayName,
+        'photoURL': photoURL,
+      };
 }
 
 class Event {
-  Event({required this.name, required this.type, required this.gameName});
+  Event(
+      {required this.name,
+      required this.type,
+      required this.gameName,
+      this.role = Role.editor});
   String id = Uuid().v4();
   String? authorName;
   String? authorEmail;
   String gameName = Statics.gameName;
+  late Role role;
   bool shared = false;
   EventType type = EventType.remote;
   Map<String, Team> teams = Map<String, Team>();
@@ -304,6 +336,15 @@ class Event {
     else
       arr.sort((a, b) => b.timeStamp.compareTo(a.timeStamp));
     return arr;
+  }
+
+  TeamTrackUser getTTUserFromUser(User? user) {
+    return TeamTrackUser(
+      displayName: user?.displayName,
+      email: user?.email,
+      photoURL: user?.photoURL,
+      role: role,
+    );
   }
 
   List<Match> getMatches(Team team) {
@@ -511,7 +552,7 @@ class Event {
     );
   }
 
-  void updateLocal(dynamic map) {
+  void updateLocal(dynamic map, BuildContext context) {
     if (map != null) {
       gameName = map['gameName'] ?? Statics.gameName;
       type = getTypeFromString(map['type']);
@@ -562,6 +603,11 @@ class Event {
       for (var match in matches.values) {
         match.setDice(match.dice);
       }
+      try {
+        permissions = (map['Permissions'] as Map<String, dynamic>)
+            .map((key, value) => MapEntry(key, TeamTrackUser.fromJson(value)));
+      } catch (e) {}
+      role = permissions[context.read<User?>()?.uid]?.role ?? Role.editor;
     }
   }
 
@@ -571,6 +617,7 @@ class Event {
   }
 
   Event.fromJson(Map<String, dynamic>? json) {
+    role = Role.editor;
     gameName = json?['gameName'] ?? Statics.gameName;
     type = getTypeFromString(json?['type']);
     name = json?['name'];
@@ -721,7 +768,7 @@ class Match {
   Alliance? red;
   Alliance? blue;
   String id = '';
-  Map<String, String> activeUsers = Map();
+  Map<String, TeamTrackUser>? activeUsers;
   Timestamp timeStamp = Timestamp.now();
   Match(this.red, this.blue, this.type) {
     id = Uuid().v4();
@@ -730,6 +777,7 @@ class Match {
     blue?.opposingAlliance = red;
     red?.id = id;
     blue?.id = id;
+    activeUsers = {};
   }
   static Match defaultMatch(EventType type) {
     return Match(
@@ -816,6 +864,8 @@ class Match {
     } catch (e) {
       timeStamp = Timestamp.now();
     }
+    activeUsers = (json['activeUsers'] as Map<String, dynamic>?)
+        ?.map((key, value) => MapEntry(key, TeamTrackUser.fromJson(value)));
   }
   Map<String, dynamic> toJson() => {
         'red': red?.toJson(),

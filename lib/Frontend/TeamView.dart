@@ -215,6 +215,7 @@ class _TeamView extends State<TeamView> {
               json.decode(
                 json.encode(eventHandler.data?.snapshot.value),
               ),
+              context,
             );
             _team = widget.event.teams[widget.team.number] ?? Team.nullTeam();
           }

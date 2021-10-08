@@ -61,6 +61,7 @@ class _MatchView extends State<MatchView> {
               json.decode(
                 json.encode(eventHandler.data?.snapshot.value),
               ),
+              context,
             );
             if (widget.team == null) {
               _match = widget.event.matches[_match?.id];
@@ -81,11 +82,19 @@ class _MatchView extends State<MatchView> {
             }
           }
           Widget title = Text("Match Stats");
-          if (_match?.activeUsers.isNotEmpty ?? false) {
+          if (_match?.activeUsers?.isNotEmpty ?? false) {
             title = Row(
-              children: widget.match?.activeUsers.values
+              children: _match?.activeUsers?.values
                       .map(
-                        (e) => Image.network(e),
+                        (e) => e.photoURL != null
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(300),
+                                child: Image.network(
+                                  e.photoURL!,
+                                  height: 40,
+                                ),
+                              )
+                            : Icon(Icons.person),
                       )
                       .toList() ??
                   [],

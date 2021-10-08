@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
 import 'dart:convert';
+import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class MatchList extends StatefulWidget {
   MatchList({Key? key, required this.event, this.team, required this.ascending})
@@ -30,6 +32,7 @@ class _MatchList extends State<MatchList> {
             json.decode(
               json.encode(eventHandler.data?.snapshot.value),
             ),
+            context,
           );
         }
         if (widget.team == null) {
@@ -214,6 +217,12 @@ class _MatchList extends State<MatchList> {
                         ],
                       ),
                       onTap: () async {
+                        final user = context.read<User?>();
+                        final ttuser = widget.event.getTTUserFromUser(user);
+                        widget.event
+                            .getRef()
+                            ?.child('matches/${e.id}/activeUsers/${user?.uid}')
+                            .set(ttuser.toJson());
                         await Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -223,6 +232,10 @@ class _MatchList extends State<MatchList> {
                             ),
                           ),
                         );
+                        widget.event
+                            .getRef()
+                            ?.child('matches/${e.id}//activeUsers/${user?.uid}')
+                            .remove();
                         setState(() {});
                       },
                     ),
