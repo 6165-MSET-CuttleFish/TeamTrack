@@ -1,15 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
-import 'package:teamtrack/Frontend/BlockList.dart';
-import 'package:teamtrack/Frontend/Inbox.dart';
-import 'package:teamtrack/Frontend/Login.dart';
-import 'package:teamtrack/backend.dart';
+import 'package:teamtrack/views/BlockList.dart';
+import 'package:teamtrack/views/Inbox.dart';
+import 'package:teamtrack/views/Login.dart';
+import 'package:teamtrack/logic/backend.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
-import 'package:teamtrack/Frontend/EventView.dart';
+import 'package:teamtrack/components/PlatformGraphics.dart';
+import 'package:teamtrack/views/EventView.dart';
 import 'package:provider/provider.dart';
 
 class EventsList extends StatefulWidget {

@@ -1,9 +1,9 @@
-import 'package:teamtrack/Frontend/TeamView.dart';
-import 'package:teamtrack/backend.dart';
+import 'package:teamtrack/views/TeamView.dart';
+import 'package:teamtrack/logic/backend.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
+import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:firebase_database/firebase_database.dart' as Database;
 import 'dart:convert';
 

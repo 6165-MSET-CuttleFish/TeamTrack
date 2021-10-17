@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:teamtrack/backend.dart';
+import 'package:teamtrack/logic/backend.dart';
 
 class Score extends ScoreDivision implements Comparable<Score> {
   TeleScore teleScore = TeleScore({});

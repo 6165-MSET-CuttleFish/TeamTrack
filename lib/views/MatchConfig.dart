@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
-import 'package:teamtrack/backend.dart';
+import 'package:teamtrack/components/PlatformGraphics.dart';
+import 'package:teamtrack/logic/backend.dart';
 
 class MatchConfig extends StatefulWidget {
   const MatchConfig({Key? key, required this.event}) : super(key: key);

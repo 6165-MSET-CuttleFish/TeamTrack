@@ -1,11 +1,11 @@
 import 'package:firebase_database/firebase_database.dart' as Database;
-import 'package:teamtrack/Frontend/MatchConfig.dart';
-import 'package:teamtrack/Frontend/MatchView.dart';
-import 'package:teamtrack/backend.dart';
+import 'package:teamtrack/views/MatchConfig.dart';
+import 'package:teamtrack/views/MatchView.dart';
+import 'package:teamtrack/logic/backend.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
+import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'dart:convert';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';

@@ -1,11 +1,11 @@
 import 'package:firebase_database/firebase_database.dart' as Database;
 import 'package:flutter/foundation.dart';
-import 'package:teamtrack/Frontend/Assets/PlatformGraphics.dart';
+import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:teamtrack/backend.dart';
-import 'package:teamtrack/score.dart';
+import 'package:teamtrack/logic/backend.dart';
+import 'package:teamtrack/logic/score.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
 
