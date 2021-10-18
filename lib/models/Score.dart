@@ -101,21 +101,6 @@ class Score extends ScoreDivision implements Comparable<Score> {
   int compareTo(Score other) => total().compareTo(other.total());
 }
 
-Dice getDiceFromString(String statusAsString) {
-  for (Dice element in Dice.values) {
-    if (element.toString() == statusAsString) {
-      return element;
-    }
-  }
-  return Dice.none;
-}
-
-EventType getTypeFromString(String statusAsString) {
-  for (EventType element in EventType.values)
-    if (element.toString() == statusAsString) return element;
-  return EventType.remote;
-}
-
 extension scoreList on Map<String, Score> {
   void addScore(Score value) {
     this[value.id] = value;

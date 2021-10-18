@@ -10,6 +10,8 @@ import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/components/BarGraph.dart';
 import 'package:teamtrack/components/CardView.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:teamtrack/functions/Statistics.dart';
+import 'package:teamtrack/functions/Extensions.dart';
 import 'dart:io' show Platform;
 
 class NewPlatform {

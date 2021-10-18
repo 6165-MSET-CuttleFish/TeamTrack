@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/models/GameModel.dart';
+import 'package:teamtrack/functions/Statistics.dart';
 
 class MatchConfig extends StatefulWidget {
   const MatchConfig({Key? key, required this.event}) : super(key: key);

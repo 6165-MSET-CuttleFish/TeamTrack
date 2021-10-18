@@ -10,6 +10,7 @@ import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'dart:convert';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:teamtrack/functions/Extensions.dart';
 
 class MatchList extends StatefulWidget {
   MatchList({Key? key, required this.event, this.team, required this.ascending})

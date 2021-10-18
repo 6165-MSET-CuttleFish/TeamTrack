@@ -13,7 +13,9 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:uuid/uuid.dart';
 import 'package:firebase_database/firebase_database.dart' as Database;
 import 'dart:convert';
+import 'package:teamtrack/functions/Statistics.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:teamtrack/functions/Extensions.dart';
 
 class TeamView extends StatefulWidget {
   TeamView({Key? key, required this.team, required this.event})

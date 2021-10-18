@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart' as Database;
 import 'package:flutter/cupertino.dart';
+import 'package:teamtrack/functions/Functions.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/models/Change.dart';
 import 'package:tuple/tuple.dart';
@@ -10,6 +11,7 @@ import 'Score.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:teamtrack/functions/Extensions.dart';
 
 class Statics {
   static String gameName = remoteConfig.getString("gameName");

@@ -9,8 +9,9 @@ import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/models/Score.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
-
+import 'package:teamtrack/functions/Statistics.dart';
 import 'package:uuid/uuid.dart';
+import 'package:teamtrack/functions/Extensions.dart';
 
 class MatchView extends StatefulWidget {
   MatchView({Key? key, this.match, this.team, required this.event})

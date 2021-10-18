@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:firebase_database/firebase_database.dart' as Database;
+import 'package:teamtrack/functions/Statistics.dart';
 import 'dart:convert';
 
 class TeamList extends StatefulWidget {

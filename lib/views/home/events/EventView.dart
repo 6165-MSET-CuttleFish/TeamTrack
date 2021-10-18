@@ -3,6 +3,8 @@ import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/views/home/match/MatchConfig.dart';
 import 'package:teamtrack/views/home/match/MatchList.dart';
 import 'package:teamtrack/views/home/team/TeamList.dart';
+import 'package:teamtrack/functions/Statistics.dart';
+import 'package:teamtrack/functions/Extensions.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
