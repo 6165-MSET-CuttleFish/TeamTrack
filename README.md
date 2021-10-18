@@ -1,7 +1,12 @@
-# TeamTrack
-## FTC Scouting
+# TeamTrack: FTC Scouting
+## Description
 
 A mobile scouting app made for the FIRST Tech Challenge with the goal of making collaborative match scouting as simple as possible for every season.
+
+## Setup
+Download and add the firebase config files to your respective platform: iOS, Android, or Web.
+
+
 # Features
 - Create and share cloud events
 - Live editing
