@@ -1,5 +1,6 @@
-import 'package:teamtrack/views/TeamView.dart';
-import 'package:teamtrack/logic/backend.dart';
+import 'package:teamtrack/models/GameModel.dart';
+import 'package:teamtrack/views/home/team/TeamView.dart';
+import 'package:teamtrack/models/AppModel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';

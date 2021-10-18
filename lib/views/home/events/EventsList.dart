@@ -1,16 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
-import 'package:teamtrack/views/BlockList.dart';
-import 'package:teamtrack/views/Inbox.dart';
-import 'package:teamtrack/views/Login.dart';
-import 'package:teamtrack/logic/backend.dart';
+import 'package:teamtrack/providers/Auth.dart';
+import 'package:teamtrack/models/GameModel.dart';
+import 'package:teamtrack/logic/provider/Theme.dart';
+import 'package:teamtrack/views/inbox/BlockList.dart';
+import 'package:teamtrack/views/home/inbox/Inbox.dart';
+import 'package:teamtrack/views/auth/Login.dart';
+import 'package:teamtrack/models/AppModel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
-import 'package:teamtrack/views/EventView.dart';
+import 'package:teamtrack/views/home/events/EventView.dart';
 import 'package:provider/provider.dart';
+import 'package:teamtrack/functions/Extensions.dart';
 
 class EventsList extends StatefulWidget {
   EventsList({Key? key}) : super(key: key);

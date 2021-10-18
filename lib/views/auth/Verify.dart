@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
-import 'package:teamtrack/logic/backend.dart';
+import 'package:teamtrack/providers/Auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -18,7 +18,7 @@ class _Verify extends State<Verify> {
       body: Stack(
         children: [
           Image.asset(
-            "LoadingScreen2.png",
+            "LoadingScreen.png",
           ),
           Center(
             child: Card(

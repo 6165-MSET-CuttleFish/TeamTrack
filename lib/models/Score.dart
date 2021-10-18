@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:teamtrack/logic/backend.dart';
+import 'package:teamtrack/models/AppModel.dart';
+import 'package:teamtrack/models/GameModel.dart';
 
+/// This class is used to represent the scoring structure of traditional and remote FTC events.
 class Score extends ScoreDivision implements Comparable<Score> {
   TeleScore teleScore = TeleScore({});
   AutoScore autoScore = AutoScore({});
@@ -120,6 +122,8 @@ extension scoreList on Map<String, Score> {
   }
 }
 
+/// This class is used to represent the autonomous score structure of traditional and remote FTC events.
+/// Remote config capable, so to change the structure of autonomous, do so in the Firebase Remote Config console
 class AutoScore extends ScoreDivision {
   void reset() {
     for (final element in this.getElements()) {
@@ -197,6 +201,8 @@ class AutoScore extends ScoreDivision {
       elements.map((key, value) => MapEntry(key, value.count));
 }
 
+/// This class is used to represent the teleop score structure of traditional and remote FTC events.
+/// Remote config capable, so to change the structure of teleop, do so in the Firebase Remote Config console
 class TeleScore extends ScoreDivision {
   void reset() {
     for (final element in this.getElements()) {
@@ -296,6 +302,8 @@ class TeleScore extends ScoreDivision {
       };
 }
 
+/// This class is used to represent the endgame score structure of traditional and remote FTC events.
+/// Remote config capable, so to change the structure of endgame, do so in the Firebase Remote Config console
 class EndgameScore extends ScoreDivision {
   void reset() {
     for (final element in this.getElements()) {
@@ -369,6 +377,7 @@ class EndgameScore extends ScoreDivision {
       elements.map((key, value) => MapEntry(key, value.count));
 }
 
+/// This class is used to represent the penalty structure of traditional and remote FTC events.
 class Penalty extends ScoreDivision {
   void reset() {
     for (final element in this.getElements()) {
@@ -424,36 +433,7 @@ class Penalty extends ScoreDivision {
       };
 }
 
-class Change {
-  String title;
-  String? description;
-  Timestamp startDate;
-  Timestamp? endDate;
-  String id;
-  Change({
-    required this.title,
-    this.description,
-    required this.startDate,
-    this.endDate,
-    required this.id,
-  });
-  Change.fromJson(Map<String, dynamic> json)
-      : title = json['title'],
-        description = json['description'],
-        startDate = Timestamp(json['startSeconds'], json['startNanoSeconds']),
-        endDate = Timestamp(json['endSeconds'], json['endNanoSeconds']),
-        id = json['id'];
-  Map<String, dynamic> toJson() => {
-        'title': title,
-        'description': description,
-        'startSeconds': startDate.seconds,
-        'startNanoSeconds': startDate.nanoseconds,
-        'endSeconds': endDate?.seconds,
-        'endNanoSeconds': endDate?.nanoseconds,
-        'id': id,
-      };
-}
-
+/// This class is used to represent a Scoring Element of FTC events.
 class ScoringElement {
   ScoringElement(
       {this.name = '',

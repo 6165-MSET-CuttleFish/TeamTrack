@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:teamtrack/logic/backend.dart';
+import 'package:teamtrack/models/AppModel.dart';
+import 'package:teamtrack/models/GameModel.dart';
 
 class Permissions extends StatefulWidget {
   const Permissions({Key? key, required this.event}) : super(key: key);

@@ -1,13 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:teamtrack/logic/backend.dart';
+import 'package:teamtrack/models/AppModel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:firebase_database/firebase_database.dart' as Database;
+import 'package:teamtrack/models/Change.dart';
+import 'package:teamtrack/models/GameModel.dart';
 import 'dart:convert';
-
-import 'package:teamtrack/logic/score.dart';
 import 'package:uuid/uuid.dart';
 
 class ChangeList extends StatefulWidget {

@@ -4,8 +4,9 @@ import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:teamtrack/logic/backend.dart';
-import 'package:teamtrack/logic/score.dart';
+import 'package:teamtrack/models/AppModel.dart';
+import 'package:teamtrack/models/GameModel.dart';
+import 'package:teamtrack/models/Score.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
 
@@ -83,21 +84,25 @@ class _MatchView extends State<MatchView> {
           }
           Widget title = Text("Match Stats");
           if (_match?.activeUsers?.isNotEmpty ?? false) {
-            title = Row(
-              children: _match?.activeUsers?.values
-                      .map(
-                        (e) => e.photoURL != null
-                            ? ClipRRect(
-                                borderRadius: BorderRadius.circular(300),
-                                child: Image.network(
-                                  e.photoURL!,
-                                  height: 40,
-                                ),
-                              )
-                            : Icon(Icons.person),
-                      )
-                      .toList() ??
-                  [],
+            title = RawMaterialButton(
+              onPressed: () {},
+              splashColor: Colors.transparent,
+              child: Row(
+                children: _match?.activeUsers?.values
+                        .map(
+                          (e) => e.photoURL != null
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(300),
+                                  child: Image.network(
+                                    e.photoURL!,
+                                    height: 25,
+                                  ),
+                                )
+                              : Icon(Icons.person),
+                        )
+                        .toList() ??
+                    [],
+              ),
             );
           }
           return StreamBuilder<int>(

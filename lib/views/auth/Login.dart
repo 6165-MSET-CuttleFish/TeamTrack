@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
-import 'package:teamtrack/views/SignUpScreen.dart';
-import 'package:teamtrack/logic/backend.dart';
+import 'package:teamtrack/views/auth/SignUpScreen.dart';
+import 'package:teamtrack/providers/Auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:auth_buttons/auth_buttons.dart';

@@ -1,10 +1,11 @@
 import 'dart:math';
 import 'package:teamtrack/components/Collapsible.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
-import 'package:teamtrack/views/MatchList.dart';
-import 'package:teamtrack/views/MatchView.dart';
-import 'package:teamtrack/logic/backend.dart';
-import 'package:teamtrack/logic/score.dart';
+import 'package:teamtrack/models/GameModel.dart';
+import 'package:teamtrack/views/home/match/MatchList.dart';
+import 'package:teamtrack/views/home/match/MatchView.dart';
+import 'package:teamtrack/models/AppModel.dart';
+import 'package:teamtrack/models/Score.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
