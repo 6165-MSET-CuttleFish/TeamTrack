@@ -4,9 +4,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/models/GameModel.dart';
+import 'package:teamtrack/models/ScoreModel.dart';
 
 extension RoleExtension on Role {
-  String name() { // getter for showing to the user
+  String name() {
+    // getter for showing to the user
     switch (this) {
       case Role.viewer:
         return 'Viewer';
@@ -17,7 +19,8 @@ extension RoleExtension on Role {
     }
   }
 
-  String toRep() { // for firebase
+  String toRep() {
+    // for firebase
     switch (this) {
       case Role.viewer:
         return 'viewer';
@@ -33,7 +36,34 @@ extension ExTeam on Team? {
   bool equals(Team? other) => this?.number == other?.number;
 }
 
-
+extension MergeExt on List<ScoringElement> {
+  List<ScoringElement> parse() {
+    List<ScoringElement> newList = [];
+    Map<String, ScoringElement> conglomerates = {};
+    for (ScoringElement element in this) {
+      if (element.id == null) {
+        newList.add(element);
+      } else {
+        if (conglomerates[element.id] == null) {
+          conglomerates[element.id!] = ScoringElement(
+            id: element.id,
+            name: element.id ?? "",
+          );
+          conglomerates[element.id]?.nestedElements = [];
+          final conglomerate = conglomerates[element.id]?.nestedElements;
+          conglomerate?[0] = ScoringElement(
+            name: "None",
+          );
+        }
+        conglomerates[element.id!]?.nestedElements?.add(element);
+      }
+    }
+    for (ScoringElement element in conglomerates.values) {
+      newList.add(element);
+    }
+    return newList;
+  }
+}
 
 extension colorExt on OpModeType? {
   Color getColor() {
@@ -51,6 +81,7 @@ extension colorExt on OpModeType? {
     }
   }
 }
+
 extension StrExt on String {
   // return new string with spaces added before capital letters
   String spaceBeforeCapital() {

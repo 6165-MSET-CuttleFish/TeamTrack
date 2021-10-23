@@ -50,12 +50,14 @@ class Score extends ScoreDivision implements Comparable<Score> {
     }
   }
 
-  void reset() {
-    teleScore.reset();
-    autoScore.reset();
-    endgameScore.reset();
-    penalties.reset();
-  }
+  void reset() => [
+        teleScore,
+        autoScore,
+        endgameScore,
+        penalties,
+      ].forEach(
+        (e) => e.reset(),
+      );
 
   @override
   Dice getDice() => dice;
@@ -135,6 +137,7 @@ class AutoScore extends ScoreDivision {
           value: ref[e]['value'] ?? 1,
           isBool: ref[e]['isBool'] ?? false,
           key: e,
+          id: ref[e]['id'],
         );
       },
     );
@@ -145,10 +148,9 @@ class AutoScore extends ScoreDivision {
     ref.keys.forEach(
       (e) {
         if (ref[e]['maxIsReference'] ?? false) {
+          final reference = elements[ref[e]['max']['reference']];
           int ceil = ref[e]['max']['total'];
-          elements[e]?.max = () =>
-              (ceil - (elements[ref[e]['max']['reference']]?.count ?? 0))
-                  .toInt();
+          elements[e]?.max = () => (ceil - (reference?.count ?? 0)).toInt();
         } else {
           elements[e]?.max = () => ref[e]['max'];
         }
@@ -177,6 +179,7 @@ class AutoScore extends ScoreDivision {
           value: ref[e]['value'] ?? 1,
           isBool: ref[e]['isBool'] ?? false,
           key: e,
+          id: ref[e]['id'],
         );
       },
     );
@@ -218,6 +221,7 @@ class TeleScore extends ScoreDivision {
           value: ref[e]['value'] ?? 1,
           isBool: ref[e]['isBool'] ?? false,
           key: e,
+          id: ref[e]['id'],
         );
       },
     );
@@ -261,6 +265,7 @@ class TeleScore extends ScoreDivision {
           value: ref[e]['value'] ?? 1,
           isBool: ref[e]['isBool'] ?? false,
           key: e,
+          id: ref[e]['id'],
         );
       },
     );
@@ -310,6 +315,7 @@ class EndgameScore extends ScoreDivision {
           value: ref[e]['value'] ?? 1,
           isBool: ref[e]['isBool'] ?? false,
           key: e,
+          id: ref[e]['id'],
         );
       },
     );
@@ -353,6 +359,7 @@ class EndgameScore extends ScoreDivision {
           value: ref[e]['value'] ?? 1,
           isBool: ref[e]['isBool'] ?? false,
           key: e,
+          id: ref[e]['id'],
         );
       },
     );
@@ -420,20 +427,24 @@ class Penalty extends ScoreDivision {
 
 /// This class is used to represent a Scoring Element of FTC events.
 class ScoringElement {
-  ScoringElement(
-      {this.name = '',
-      this.count = 0,
-      this.value = 1,
-      this.min,
-      this.max,
-      this.isBool = false,
-      this.key}) {
+  ScoringElement({
+    this.name = '',
+    this.count = 0,
+    this.value = 1,
+    this.min,
+    this.max,
+    this.isBool = false,
+    this.key,
+    this.id,
+  }) {
     setStuff();
   }
   String name;
   String? key;
   int count;
   int value;
+  String? id;
+  List<ScoringElement>? nestedElements;
   bool isBool;
   late int Function()? min = () => 0;
   late int Function()? max = () => 999;
@@ -465,13 +476,14 @@ class ScoringElement {
 
   ScoringElement operator +(ScoringElement other) {
     return ScoringElement(
-        count: other.count + count,
-        value: value,
-        key: other.key,
-        name: name,
-        isBool: isBool,
-        min: min,
-        max: max);
+      count: other.count + count,
+      value: value,
+      key: other.key,
+      name: name,
+      isBool: isBool,
+      min: min,
+      max: max,
+    );
   }
 }
 
@@ -483,4 +495,5 @@ abstract class ScoreDivision {
   Dice getDice();
   List<ScoringElement> getElements();
   late Timestamp timeStamp;
+  void reset();
 }

@@ -7,7 +7,7 @@ import 'package:teamtrack/functions/Functions.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/models/Change.dart';
 import 'package:tuple/tuple.dart';
-import 'Score.dart';
+import 'ScoreModel.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

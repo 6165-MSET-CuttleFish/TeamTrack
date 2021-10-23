@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:teamtrack/models/GameModel.dart';
-import 'package:teamtrack/models/Score.dart';
+import 'package:teamtrack/models/ScoreModel.dart';
 
 extension Ex on double {
   double toPrecision(int n) => double.parse(toStringAsFixed(n));

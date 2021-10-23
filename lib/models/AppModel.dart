@@ -5,10 +5,10 @@ import 'package:firebase_database/firebase_database.dart' as Database;
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:teamtrack/functions/Functions.dart';
-import 'package:teamtrack/models/GameModel.dart';
-import 'package:teamtrack/logic/provider/Theme.dart';
+import 'GameModel.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
+import '../providers/Theme.dart';
 import '../functions/Extensions.dart';
 
 class DataModel {

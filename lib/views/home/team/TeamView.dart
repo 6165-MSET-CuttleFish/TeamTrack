@@ -5,7 +5,7 @@ import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/views/home/match/MatchList.dart';
 import 'package:teamtrack/views/home/match/MatchView.dart';
 import 'package:teamtrack/models/AppModel.dart';
-import 'package:teamtrack/models/Score.dart';
+import 'package:teamtrack/models/ScoreModel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';

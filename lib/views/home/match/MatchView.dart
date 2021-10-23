@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/models/GameModel.dart';
-import 'package:teamtrack/models/Score.dart';
+import 'package:teamtrack/models/ScoreModel.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'package:teamtrack/functions/Statistics.dart';
@@ -499,6 +499,7 @@ class _MatchView extends State<MatchView> {
       ? [
           ..._score?.endgameScore
                   .getElements()
+                  .parse()
                   .map(
                     (e) => Incrementor(
                       element: e,
@@ -514,7 +515,7 @@ class _MatchView extends State<MatchView> {
               [],
           Padding(padding: EdgeInsets.all(5)),
           if (widget.team == null)
-            ..._selectedAlliance?.sharedScore?.endgameScore.getElements().map(
+            ..._selectedAlliance?.sharedScore?.endgameScore.getElements().parse().map(
                       (e) => Incrementor(
                         element: e,
                         onPressed: stateSetter,
@@ -622,6 +623,7 @@ class _MatchView extends State<MatchView> {
           Padding(padding: EdgeInsets.all(5)),
           ..._score?.teleScore
                   .getElements()
+                  .parse()
                   .map(
                     (e) => Incrementor(
                       element: e,
@@ -698,7 +700,7 @@ class _MatchView extends State<MatchView> {
                   .toList() ??
               [],
           if (widget.team == null)
-            ..._selectedAlliance?.sharedScore?.teleScore.getElements().map(
+            ..._selectedAlliance?.sharedScore?.teleScore.getElements().parse().map(
                       (e) => Incrementor(
                         element: e,
                         onPressed: stateSetter,
@@ -745,6 +747,7 @@ class _MatchView extends State<MatchView> {
   List<Widget> autoView() =>
       _score?.autoScore
           .getElements()
+          .parse()
           .map(
             (e) => Incrementor(
               element: e,

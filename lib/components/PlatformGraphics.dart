@@ -5,8 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:teamtrack/models/GameModel.dart';
-import 'package:teamtrack/models/Score.dart';
-import 'package:teamtrack/models/AppModel.dart';
+import 'package:teamtrack/models/ScoreModel.dart';
 import 'package:teamtrack/components/BarGraph.dart';
 import 'package:teamtrack/components/CardView.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -446,10 +445,9 @@ class Incrementor extends StatefulWidget {
   }) : super(key: key);
   final ScoringElement element;
   final void Function() onPressed;
-  final void Function()? onIncrement;
-  final void Function()? onDecrement;
-  final Db.MutableData Function(Db.MutableData)? mutableIncrement;
-  final Db.MutableData Function(Db.MutableData)? mutableDecrement;
+  final void Function()? onIncrement, onDecrement;
+  final Db.MutableData Function(Db.MutableData)? mutableIncrement,
+      mutableDecrement;
   final Color? backgroundColor;
   final Event? event;
   final Score? score;
@@ -461,6 +459,196 @@ class Incrementor extends StatefulWidget {
 }
 
 class _Incrementor extends State<Incrementor> {
+  CupertinoSegmentedControl buildPicker() => CupertinoSegmentedControl<int>(
+        children: widget.element.nestedElements?.asMap().map(
+                  (key, value) => MapEntry(
+                    key,
+                    Text(
+                      value.name,
+                    ),
+                  ),
+                ) ??
+            {},
+        onValueChanged: (val) async {
+          if (!(widget.event?.shared ?? false)) {
+            for (int i = 0;
+                i < (widget.element.nestedElements?.length ?? 0);
+                i++) {
+              widget.element.nestedElements?[i].count = 0;
+            }
+            widget.element.nestedElements?[val].count = 1;
+          }
+          widget.onPressed();
+          if (widget.path != null)
+            await widget.event
+                ?.getRef()
+                ?.child(widget.path!)
+                .runTransaction((mutableData) {
+              if (widget.isTargetScore) {
+                for (int i = 0;
+                    i < (widget.element.nestedElements?.length ?? 0);
+                    i++) {
+                  mutableData.value['targetScore'][widget.opModeType?.toRep()]
+                      [widget.element.nestedElements?[i].key] = 0;
+                }
+                mutableData.value['targetScore'][widget.opModeType?.toRep()]
+                    [widget.element.nestedElements?[val].key] = 1;
+                return mutableData;
+              }
+              final scoreIndex = widget.score?.id;
+              for (int i = 0;
+                  i < (widget.element.nestedElements?.length ?? 0);
+                  i++) {
+                mutableData.value['scores'][scoreIndex]
+                        [widget.opModeType?.toRep()]
+                    [widget.element.nestedElements?[i].key] = 0;
+              }
+              mutableData.value['scores'][scoreIndex]
+                      [widget.opModeType?.toRep()]
+                  [widget.element.nestedElements?[val].key] = 1;
+              return mutableData;
+            });
+        },
+      );
+  PlatformSwitch buildSwitch() => PlatformSwitch(
+        value: widget.element.asBool(),
+        onChanged: (val) async {
+          if (!(widget.event?.shared ?? false)) {
+            if (val && widget.element.count < widget.element.max!())
+              widget.element.count = 1;
+            else
+              widget.element.count = 0;
+          }
+          widget.onPressed();
+          if (widget.path != null)
+            await widget.event
+                ?.getRef()
+                ?.child(widget.path!)
+                .runTransaction((mutableData) {
+              if (widget.isTargetScore) {
+                mutableData.value['targetScore'][widget.opModeType?.toRep()]
+                        [widget.element.key] =
+                    val
+                        ? (widget.element.count < widget.element.max!() ? 1 : 0)
+                        : 0;
+                return mutableData;
+              }
+              final scoreIndex = widget.score?.id;
+              mutableData.value['scores'][scoreIndex]
+                      [widget.opModeType?.toRep()][widget.element.key] =
+                  val
+                      ? (widget.element.count < widget.element.max!() ? 1 : 0)
+                      : 0;
+              return mutableData;
+            });
+        },
+      );
+  Row buildIncrementor() => Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          RawMaterialButton(
+            onPressed: widget.element.count > widget.element.min!()
+                ? () async {
+                    if (!(widget.event?.shared ?? false)) {
+                      setState(widget.element.decrement);
+                      if (widget.onDecrement != null) widget.onDecrement!();
+                    }
+                    widget.onPressed();
+                    if (widget.path != null)
+                      await widget.event
+                          ?.getRef()
+                          ?.child(widget.path!)
+                          .runTransaction(
+                        (mutableData) {
+                          if (widget.mutableDecrement != null) {
+                            return widget.mutableDecrement!(mutableData);
+                          }
+                          if (widget.isTargetScore) {
+                            var ref = mutableData.value['targetScore']
+                                    [widget.opModeType?.toRep()]
+                                [widget.element.key];
+                            if (ref > widget.element.min!())
+                              mutableData.value['targetScore']
+                                          [widget.opModeType?.toRep()]
+                                      [widget.element.key] =
+                                  (ref ?? 0) - widget.element.decrementValue;
+                            return mutableData;
+                          }
+                          final scoreIndex = widget.score?.id;
+                          var ref = mutableData.value['scores'][scoreIndex]
+                              [widget.opModeType?.toRep()][widget.element.key];
+                          if (ref > widget.element.min!())
+                            mutableData.value['scores'][scoreIndex]
+                                        [widget.opModeType?.toRep()]
+                                    [widget.element.key] =
+                                (ref ?? 0) - widget.element.decrementValue;
+                          return mutableData;
+                        },
+                      );
+                  }
+                : null,
+            elevation: 2.0,
+            fillColor: Theme.of(context).canvasColor,
+            splashColor: Colors.red,
+            child: Icon(Icons.remove_circle_outline_rounded),
+            shape: CircleBorder(),
+          ),
+          SizedBox(
+            width: 20,
+            child: Text(
+              widget.element.count.toString(),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          RawMaterialButton(
+            onPressed: widget.element.count < widget.element.max!()
+                ? () async {
+                    if (!(widget.event?.shared ?? false)) {
+                      widget.element.increment();
+                      if (widget.onIncrement != null) widget.onIncrement!();
+                    }
+                    widget.onPressed();
+                    if (widget.path != null)
+                      await widget.event
+                          ?.getRef()
+                          ?.child(widget.path!)
+                          .runTransaction(
+                        (mutableData) {
+                          if (widget.mutableIncrement != null) {
+                            return widget.mutableIncrement!(mutableData);
+                          }
+                          if (widget.isTargetScore) {
+                            var ref = mutableData.value['targetScore']
+                                    [widget.opModeType?.toRep()]
+                                [widget.element.key];
+                            if (ref < widget.element.max!())
+                              mutableData.value['targetScore']
+                                          [widget.opModeType?.toRep()]
+                                      [widget.element.key] =
+                                  (ref ?? 0) + widget.element.incrementValue;
+                            return mutableData;
+                          }
+                          final scoreIndex = widget.score?.id;
+                          var ref = mutableData.value['scores'][scoreIndex]
+                              [widget.opModeType?.toRep()][widget.element.key];
+                          if (ref < widget.element.max!())
+                            mutableData.value['scores'][scoreIndex]
+                                        [widget.opModeType?.toRep()]
+                                    [widget.element.key] =
+                                (ref ?? 0) + widget.element.incrementValue;
+                          return mutableData;
+                        },
+                      );
+                  }
+                : null,
+            elevation: 2.0,
+            fillColor: Theme.of(context).canvasColor,
+            splashColor: Colors.green,
+            child: Icon(Icons.add_circle_outline_rounded),
+            shape: CircleBorder(),
+          ),
+        ],
+      );
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -474,161 +662,11 @@ class _Incrementor extends State<Incrementor> {
                 Text(widget.element.name),
                 Spacer(),
                 if (!widget.element.isBool)
-                  RawMaterialButton(
-                    onPressed: widget.element.count > widget.element.min!()
-                        ? () async {
-                            if (!(widget.event?.shared ?? false)) {
-                              setState(widget.element.decrement);
-                              if (widget.onDecrement != null)
-                                widget.onDecrement!();
-                            }
-                            widget.onPressed();
-                            if (widget.path != null)
-                              await widget.event?.getRef()?.child(widget.path!)
-                                  // ?.child('teams/${widget.team?.number}')
-                                  .runTransaction(
-                                (mutableData) {
-                                  if (widget.mutableDecrement != null) {
-                                    return widget
-                                        .mutableDecrement!(mutableData);
-                                  }
-                                  if (widget.isTargetScore) {
-                                    var ref = mutableData.value['targetScore']
-                                            [widget.opModeType?.toRep()]
-                                        [widget.element.key];
-                                    if (ref > widget.element.min!())
-                                      mutableData.value['targetScore']
-                                                  [widget.opModeType?.toRep()]
-                                              [widget.element.key] =
-                                          (ref ?? 0) -
-                                              widget.element.decrementValue;
-                                    return mutableData;
-                                  }
-                                  final scoreIndex = widget.score?.id;
-                                  var ref = mutableData.value['scores']
-                                              [scoreIndex]
-                                          [widget.opModeType?.toRep()]
-                                      [widget.element.key];
-                                  if (ref > widget.element.min!())
-                                    mutableData.value['scores'][scoreIndex]
-                                                [widget.opModeType?.toRep()]
-                                            [widget.element.key] =
-                                        (ref ?? 0) -
-                                            widget.element.decrementValue;
-                                  return mutableData;
-                                },
-                              );
-                          }
-                        : null,
-                    elevation: 2.0,
-                    fillColor: Theme.of(context).canvasColor,
-                    splashColor: Colors.red,
-                    child: Icon(Icons.remove_circle_outline_rounded),
-                    shape: CircleBorder(),
-                  ),
-                if (!widget.element.isBool)
-                  SizedBox(
-                    width: 20,
-                    child: Text(
-                      widget.element.count.toString(),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                if (!widget.element.isBool)
-                  RawMaterialButton(
-                    onPressed: widget.element.count < widget.element.max!()
-                        ? () async {
-                            if (!(widget.event?.shared ?? false)) {
-                              widget.element.increment();
-                              if (widget.onIncrement != null)
-                                widget.onIncrement!();
-                            }
-                            widget.onPressed();
-                            if (widget.path != null)
-                              await widget.event?.getRef()?.child(widget.path!)
-                                  // ?.child('teams/${widget.team?.number}')
-                                  .runTransaction(
-                                (mutableData) {
-                                  if (widget.mutableIncrement != null) {
-                                    return widget
-                                        .mutableIncrement!(mutableData);
-                                  }
-                                  if (widget.isTargetScore) {
-                                    var ref = mutableData.value['targetScore']
-                                            [widget.opModeType?.toRep()]
-                                        [widget.element.key];
-                                    if (ref < widget.element.max!())
-                                      mutableData.value['targetScore']
-                                                  [widget.opModeType?.toRep()]
-                                              [widget.element.key] =
-                                          (ref ?? 0) +
-                                              widget.element.incrementValue;
-                                    return mutableData;
-                                  }
-                                  final scoreIndex = widget.score?.id;
-                                  var ref = mutableData.value['scores']
-                                              [scoreIndex]
-                                          [widget.opModeType?.toRep()]
-                                      [widget.element.key];
-                                  if (ref < widget.element.max!())
-                                    mutableData.value['scores'][scoreIndex]
-                                                [widget.opModeType?.toRep()]
-                                            [widget.element.key] =
-                                        (ref ?? 0) +
-                                            widget.element.incrementValue;
-                                  return mutableData;
-                                },
-                              );
-                          }
-                        : null,
-                    elevation: 2.0,
-                    fillColor: Theme.of(context).canvasColor,
-                    splashColor: Colors.green,
-                    child: Icon(Icons.add_circle_outline_rounded),
-                    shape: CircleBorder(),
-                  )
+                  buildIncrementor()
+                else if (widget.element.id != null)
+                  buildSwitch()
                 else
-                  PlatformSwitch(
-                    value: widget.element.asBool(),
-                    onChanged: (val) async {
-                      if (!(widget.event?.shared ?? false)) {
-                        if (val && widget.element.count < widget.element.max!())
-                          widget.element.count = 1;
-                        else
-                          widget.element.count = 0;
-                      }
-                      widget.onPressed();
-                      if (widget.path != null)
-                        await widget.event?.getRef()?.child(widget.path!)
-                            // ?.child('teams/${widget.team?.number}')
-                            .runTransaction((mutableData) {
-                          if (widget.isTargetScore) {
-                            if (widget.element.count < widget.element.max!()) {}
-                            mutableData.value['targetScore']
-                                        [widget.opModeType?.toRep()]
-                                    [widget.element.key] =
-                                val
-                                    ? (widget.element.count <
-                                            widget.element.max!()
-                                        ? 1
-                                        : 0)
-                                    : 0;
-                            return mutableData;
-                          }
-                          final scoreIndex = widget.score?.id;
-                          mutableData.value['scores'][scoreIndex]
-                                      [widget.opModeType?.toRep()]
-                                  [widget.element.key] =
-                              val
-                                  ? (widget.element.count <
-                                          widget.element.max!()
-                                      ? 1
-                                      : 0)
-                                  : 0;
-                          return mutableData;
-                        });
-                    },
-                  )
+                  buildSwitch(),
               ],
             ),
           ),

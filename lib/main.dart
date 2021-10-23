@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:teamtrack/providers/Auth.dart';
 import 'package:teamtrack/models/GameModel.dart';
-import 'package:teamtrack/logic/provider/Theme.dart';
+import 'package:teamtrack/providers/Theme.dart';
 import 'package:teamtrack/views/home/events/EventsList.dart';
 import 'package:teamtrack/views/auth/Login.dart';
 import 'package:teamtrack/views/auth/Verify.dart';

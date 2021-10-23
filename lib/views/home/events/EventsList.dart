@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:teamtrack/providers/Auth.dart';
 import 'package:teamtrack/models/GameModel.dart';
-import 'package:teamtrack/logic/provider/Theme.dart';
+import 'package:teamtrack/providers/Theme.dart';
 import 'package:teamtrack/views/inbox/BlockList.dart';
 import 'package:teamtrack/views/home/inbox/Inbox.dart';
 import 'package:teamtrack/views/auth/Login.dart';
