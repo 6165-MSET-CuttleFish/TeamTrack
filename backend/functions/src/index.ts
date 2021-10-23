@@ -1,5 +1,6 @@
 import admin = require("firebase-admin");
 import * as functions from "firebase-functions";
+import {ftcAPIKey} from "./api/ftcAPIKey";
 // Start writing Firebase Functions
 // https://firebase.google.com/docs/functions/typescript
 admin.initializeApp();
@@ -26,7 +27,7 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
   if (sender.uid == recipient.uid) {
     throw new functions.https.HttpsError(
         "invalid-argument",
-        "You cannot send an event to yourself"
+        "Cannot send an event to yourself"
     );
   }
   await admin.database().ref().child("Events")
@@ -137,4 +138,15 @@ export const createUser = functions.auth.user().onCreate(async (user) => {
 
 export const deleteUser = functions.auth.user().onDelete(async (user) => {
   return admin.firestore().collection("users").doc(user.uid).delete();
+});
+interface User {
+  name: string
+  age: string
+}
+
+export const fetchAPI = functions.https.onCall((data, context) => {
+  const url = new URL("https://ftc-events.firstinspires.org");
+  return fetch(url.toString(), {
+    headers: {Authorization: `Basic ${ftcAPIKey}`},
+  });
 });
