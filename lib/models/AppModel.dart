@@ -70,9 +70,9 @@ class DataModel {
 }
 
 enum Role {
-  viewer,
-  editor,
   admin,
+  editor,
+  viewer,
 }
 
 class TeamTrackUser {

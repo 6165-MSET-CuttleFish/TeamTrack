@@ -460,6 +460,7 @@ class Incrementor extends StatefulWidget {
 
 class _Incrementor extends State<Incrementor> {
   CupertinoSegmentedControl buildPicker() => CupertinoSegmentedControl<int>(
+        groupValue: widget.element.count,
         children: widget.element.nestedElements?.asMap().map(
                   (key, value) => MapEntry(
                     key,
@@ -496,16 +497,17 @@ class _Incrementor extends State<Incrementor> {
                 return mutableData;
               }
               final scoreIndex = widget.score?.id;
-              for (int i = 0;
+              for (int i = 1;
                   i < (widget.element.nestedElements?.length ?? 0);
                   i++) {
                 mutableData.value['scores'][scoreIndex]
                         [widget.opModeType?.toRep()]
                     [widget.element.nestedElements?[i].key] = 0;
               }
-              mutableData.value['scores'][scoreIndex]
-                      [widget.opModeType?.toRep()]
-                  [widget.element.nestedElements?[val].key] = 1;
+              if (val != 0)
+                mutableData.value['scores'][scoreIndex]
+                        [widget.opModeType?.toRep()]
+                    [widget.element.nestedElements?[val].key] = 1;
               return mutableData;
             });
         },
@@ -657,18 +659,32 @@ class _Incrementor extends State<Incrementor> {
         children: [
           Padding(
             padding: const EdgeInsets.only(left: 5),
-            child: Row(
-              children: [
-                Text(widget.element.name),
-                Spacer(),
-                if (!widget.element.isBool)
-                  buildIncrementor()
-                else if (widget.element.id != null)
-                  buildSwitch()
-                else
-                  buildSwitch(),
-              ],
-            ),
+            child: widget.element.id == null
+                ? Row(
+                    children: [
+                      Text(widget.element.name),
+                      Spacer(),
+                      if (!widget.element.isBool)
+                        buildIncrementor()
+                      else
+                        buildSwitch()
+                    ],
+                  )
+                : Padding(
+                    padding: const EdgeInsets.only(bottom: 10.0),
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(5.0),
+                          child: Text(widget.element.name),
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width,
+                          child: buildPicker(),
+                        )
+                      ],
+                    ),
+                  ),
           ),
           Divider(
             height: 3,

@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:teamtrack/providers/Auth.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/providers/Theme.dart';
+import 'package:teamtrack/views/home/events/EventShare.dart';
 import 'package:teamtrack/views/inbox/BlockList.dart';
 import 'package:teamtrack/views/home/inbox/Inbox.dart';
 import 'package:teamtrack/views/auth/Login.dart';
@@ -756,37 +757,15 @@ class _EventsList extends State<EventsList> {
         ),
       );
   TextEditingController _emailController = TextEditingController();
-  Role role = Role.editor;
-  final arr = [Role.editor, Role.viewer];
   void _onShare(Event e) {
     if (!(context.read<User?>()?.isAnonymous ?? true))
       showPlatformDialog(
         context: context,
         builder: (context) => PlatformAlert(
           title: Text(e.shared ? 'Share Event' : 'Upload Event'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              PlatformPicker<Role>(
-                value: role,
-                onSelectedItemChanged: (newValue) {
-                  HapticFeedback.lightImpact();
-                  try {
-                    setState(() => role = newValue ?? Role.editor);
-                  } catch (e) {
-                    setState(() => role = arr[newValue]);
-                  }
-                },
-                items: arr.map((e) => Text(e.name())).toList(),
-                arr: arr,
-              ),
-              PlatformTextField(
-                placeholder: e.shared ? 'Email' : '(Optional) Email',
-                keyboardType: TextInputType.emailAddress,
-                controller: _emailController,
-                autoCorrect: false,
-              ),
-            ],
+          content: EventShare(
+            emailController: _emailController,
+            event: e,
           ),
           actions: [
             PlatformDialogAction(
@@ -840,7 +819,7 @@ class _EventsList extends State<EventsList> {
                     type: e.type.toString(),
                     email: _emailController.text.trim(),
                     gameName: e.gameName,
-                    role: role,
+                    role: shareRole,
                   );
                 }
                 _emailController.clear();

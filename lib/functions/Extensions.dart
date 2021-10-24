@@ -51,14 +51,19 @@ extension MergeExt on List<ScoringElement> {
           );
           conglomerates[element.id]?.nestedElements = [];
           final conglomerate = conglomerates[element.id]?.nestedElements;
-          conglomerate?[0] = ScoringElement(
+          conglomerate?.add(ScoringElement(
             name: "None",
-          );
+          ));
         }
         conglomerates[element.id!]?.nestedElements?.add(element);
       }
     }
     for (ScoringElement element in conglomerates.values) {
+      for (int i = 0; i < (element.nestedElements?.length ?? 0); i++) {
+        if (element.nestedElements?[i].count == 1) {
+          element.count = i;
+        }
+      }
       newList.add(element);
     }
     return newList;
