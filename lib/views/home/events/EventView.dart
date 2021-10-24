@@ -109,10 +109,10 @@ class _EventView extends State<EventView> {
         bottomNavigationBar: widget.event.type != EventType.remote
             ? CurvedNavigationBar(
                 buttonBackgroundColor: Theme.of(context).colorScheme.secondary,
-                color: Theme.of(context).canvasColor,
-                index: _tab,
-                backgroundColor: Theme.of(context).textTheme.bodyText1?.color ??
+                color: Theme.of(context).textTheme.bodyText1?.color ??
                     Colors.black,
+                index: _tab,
+                backgroundColor: Theme.of(context).canvasColor,
                 onTap: (index) {
                   setState(
                     () {
@@ -127,10 +127,15 @@ class _EventView extends State<EventView> {
                       Icon(
                         CupertinoIcons.person_3_fill,
                         size: 20,
+                        color: _tab == 1 ? Theme.of(context).canvasColor : null,
                       ),
                       Text(
                         'Teams',
-                        style: TextStyle(fontSize: 10),
+                        style: TextStyle(
+                          fontSize: 10,
+                          color:
+                              _tab == 1 ? Theme.of(context).canvasColor : null,
+                        ),
                       ),
                     ],
                   ),
@@ -140,10 +145,15 @@ class _EventView extends State<EventView> {
                       Icon(
                         CupertinoIcons.sportscourt_fill,
                         size: 20,
+                        color: _tab != 1 ? Theme.of(context).canvasColor : null,
                       ),
                       Text(
                         'Matches',
-                        style: TextStyle(fontSize: 10),
+                        style: TextStyle(
+                          fontSize: 10,
+                          color:
+                              _tab != 1 ? Theme.of(context).canvasColor : null,
+                        ),
                       ),
                     ],
                   )

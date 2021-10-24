@@ -49,7 +49,7 @@ class _TeamTrack extends State<TeamTrack> {
     visualDensity: VisualDensity.adaptivePlatformDensity,
     colorScheme: ColorScheme.light(
       primary: Colors.deepPurple,
-      secondary: NewPlatform.isAndroid() ? Colors.cyan : Colors.transparent,
+      secondary: Colors.cyan,
     ),
   );
 

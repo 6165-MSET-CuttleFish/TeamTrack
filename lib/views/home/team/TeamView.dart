@@ -134,9 +134,9 @@ class _TeamView extends State<TeamView> {
                 ? CrossAxisAlignment.start
                 : CrossAxisAlignment.center,
             children: [
-              Text(_team.name),
+              Text(widget.team.name),
               Text(
-                _team.number,
+                widget.team.number,
                 style: Theme.of(context).textTheme.caption,
               ),
             ],
