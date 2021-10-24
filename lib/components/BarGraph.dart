@@ -11,72 +11,70 @@ class BarGraph extends StatelessWidget {
     this.height = 120,
     this.width = 30,
     this.title = 'Default',
-  }) : super(key: key);
+    this.percentage = 0,
+  }) : super(key: key) {
+    percentage = (inverted
+            ? (val != 0 ? (max / val).clamp(0, 1) : 1) * 100.0
+            : (max != 0 ? val / max : 0) * 100.0)
+        .toInt();
+  }
   final String title;
   double max;
   final double width;
   double val;
   final bool inverted;
   final double height;
+  int percentage;
   @override
-  Widget build(BuildContext context) {
-    var percentage = (inverted
-            ? (val != 0 ? (max / val).clamp(0, 1) : 1) * 100.0
-            : (max != 0 ? val / max : 0) * 100.0)
-        .toInt();
-    if (!inverted && val / max > 1) {
-      print('oops');
-    }
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(title, style: Theme.of(context).textTheme.caption),
-        Padding(
-          padding: EdgeInsets.all(2),
-        ),
-        Stack(
-          alignment: AlignmentDirectional.bottomStart,
-          children: [
-            Container(
-              width: width,
-              height: height,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(60),
-                color: Theme.of(context).canvasColor.inverseColor(1),
+  Widget build(BuildContext context) => Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(title, style: Theme.of(context).textTheme.caption),
+          Padding(
+            padding: EdgeInsets.all(2),
+          ),
+          Stack(
+            alignment: AlignmentDirectional.bottomStart,
+            children: [
+              Container(
+                width: width,
+                height: height,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(60),
+                  color: Theme.of(context).canvasColor.inverseColor(1),
+                ),
               ),
-            ),
-            AnimatedContainer(
-              curve: Curves.fastLinearToSlowEaseIn,
-              duration: Duration(milliseconds: 600),
-              width: width,
-              height: inverted
-                  ? (val != 0 ? (max / val).clamp(0, 1) : 1) * height
-                  : (max != 0 ? (val / max).clamp(0, 1) : 0) * height,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(60),
-                color: _colorSelect(val, max),
-              ),
-              child: Center(
-                child: Text(
-                  percentage != 0 ? percentage.toString() + '%' : '',
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: Colors.black,
+              AnimatedContainer(
+                curve: Curves.fastLinearToSlowEaseIn,
+                duration: Duration(milliseconds: 600),
+                width: width,
+                height: inverted
+                    ? (val != 0 ? (max / val).clamp(0, 1) : 1) * height
+                    : (max != 0 ? (val / max).clamp(0, 1) : 0) * height,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(60),
+                  color: _colorSelect(val, max),
+                ),
+                child: Center(
+                  child: Text(
+                    percentage != 0 ? percentage.toString() + '%' : '',
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: Colors.black,
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
-        ),
-        Padding(
-          padding: EdgeInsets.all(2),
-        ),
-        Text(val.toInt().toString(),
-            style: Theme.of(context).textTheme.caption),
-      ],
-    );
-  }
+            ],
+          ),
+          Padding(
+            padding: EdgeInsets.all(2),
+          ),
+          Text(val.toInt().toString(),
+              style: Theme.of(context).textTheme.caption),
+        ],
+      );
 
   Color _colorSelect(double val, double max) {
     if (!inverted) {

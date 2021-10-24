@@ -13,27 +13,25 @@ class MatchConfig extends StatefulWidget {
 
 class _MatchConfigState extends State<MatchConfig> {
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Add Match'),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-      ),
-      body: SafeArea(
-        child: Center(
-          child: Form(
-            key: _formKey,
-            child: Padding(
-              padding: EdgeInsets.only(left: 5, right: 5),
-              child: ListView(
-                children: _textFields(),
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(
+          title: Text('Add Match'),
+          backgroundColor: Theme.of(context).colorScheme.primary,
+        ),
+        body: SafeArea(
+          child: Center(
+            child: Form(
+              key: _formKey,
+              child: Padding(
+                padding: EdgeInsets.only(left: 5, right: 5),
+                child: ListView(
+                  children: _textFields(),
+                ),
               ),
             ),
           ),
         ),
-      ),
-    );
-  }
+      );
 
   final List<TextEditingController> controllers = [
     TextEditingController(),

@@ -36,134 +36,133 @@ class _EventView extends State<EventView> {
       ];
   int _tab = 0;
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: _tab == 0 ? Text('Teams') : Text('Matches'),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        actions: [
-          _tab != 0
-              ? IconButton(
-                  tooltip: "Sort",
-                  icon: Icon(
-                    ascending
-                        ? CupertinoIcons.sort_up
-                        : CupertinoIcons.sort_down,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      ascending = !ascending;
-                    });
-                  },
-                )
-              : Center(
-                  child: DropdownButton<OpModeType?>(
-                    value: sortingModifier,
-                    icon: Icon(Icons.sort),
-                    iconSize: 24,
-                    elevation: 16,
-                    underline: Container(
-                      height: 0.5,
-                      color: Colors.deepPurple,
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(
+          title: _tab == 0 ? Text('Teams') : Text('Matches'),
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          actions: [
+            _tab != 0
+                ? IconButton(
+                    tooltip: "Sort",
+                    icon: Icon(
+                      ascending
+                          ? CupertinoIcons.sort_up
+                          : CupertinoIcons.sort_down,
                     ),
-                    onChanged: (newValue) {
-                      HapticFeedback.lightImpact();
-                      setState(() => sortingModifier = newValue);
+                    onPressed: () {
+                      setState(() {
+                        ascending = !ascending;
+                      });
                     },
-                    items: [
-                      null,
-                      OpModeType.auto,
-                      OpModeType.tele,
-                      OpModeType.endgame,
-                    ].map<DropdownMenuItem<OpModeType?>>(
-                      (value) {
-                        return DropdownMenuItem<OpModeType?>(
-                          value: value,
-                          child: Text((value?.toVal() ?? "Subtotal") + " "),
-                        );
-                      },
-                    ).toList(),
-                  ),
-                ),
-          IconButton(
-            icon: Icon(
-              Icons.search,
-            ),
-            onPressed: () {
-              showSearch(
-                context: context,
-                delegate: _tab == 0
-                    ? TeamSearch(
-                        teams: widget.event.teams.sortedTeams(sortingModifier),
-                        event: widget.event,
-                      )
-                    : MatchSearch(
-                        matches: widget.event.getSortedMatches(ascending),
-                        event: widget.event,
+                  )
+                : Center(
+                    child: DropdownButton<OpModeType?>(
+                      value: sortingModifier,
+                      icon: Icon(Icons.sort),
+                      iconSize: 24,
+                      elevation: 16,
+                      underline: Container(
+                        height: 0.5,
+                        color: Colors.deepPurple,
                       ),
-              );
-            },
-          ),
-        ],
-      ),
-      bottomNavigationBar: widget.event.type != EventType.remote
-          ? CurvedNavigationBar(
-              buttonBackgroundColor: Theme.of(context).colorScheme.secondary,
-              color: Theme.of(context).canvasColor,
-              index: _tab,
-              backgroundColor:
-                  Theme.of(context).textTheme.bodyText1?.color ?? Colors.black,
-              onTap: (index) {
-                setState(
-                  () {
-                    _tab = index;
-                  },
+                      onChanged: (newValue) {
+                        HapticFeedback.lightImpact();
+                        setState(() => sortingModifier = newValue);
+                      },
+                      items: [
+                        null,
+                        OpModeType.auto,
+                        OpModeType.tele,
+                        OpModeType.endgame,
+                      ].map<DropdownMenuItem<OpModeType?>>(
+                        (value) {
+                          return DropdownMenuItem<OpModeType?>(
+                            value: value,
+                            child: Text((value?.toVal() ?? "Subtotal") + " "),
+                          );
+                        },
+                      ).toList(),
+                    ),
+                  ),
+            IconButton(
+              icon: Icon(
+                Icons.search,
+              ),
+              onPressed: () {
+                showSearch(
+                  context: context,
+                  delegate: _tab == 0
+                      ? TeamSearch(
+                          teams:
+                              widget.event.teams.sortedTeams(sortingModifier),
+                          event: widget.event,
+                        )
+                      : MatchSearch(
+                          matches: widget.event.getSortedMatches(ascending),
+                          event: widget.event,
+                        ),
                 );
               },
-              items: [
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      CupertinoIcons.person_3_fill,
-                      size: 20,
-                    ),
-                    Text(
-                      'Teams',
-                      style: TextStyle(fontSize: 10),
-                    ),
-                  ],
-                ),
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      CupertinoIcons.sportscourt_fill,
-                      size: 20,
-                    ),
-                    Text(
-                      'Matches',
-                      style: TextStyle(fontSize: 10),
-                    ),
-                  ],
-                )
-              ],
-            )
-          : null,
-      body: materialTabs()[_tab],
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        tooltip: _tab == 0 ? 'Add Team' : 'Add Match',
-        child: Icon(Icons.add),
-        onPressed: () async {
-          if (_tab == 0)
-            _teamConfig();
-          else
-            _matchConfig();
-        },
-      ),
-    );
-  }
+            ),
+          ],
+        ),
+        bottomNavigationBar: widget.event.type != EventType.remote
+            ? CurvedNavigationBar(
+                buttonBackgroundColor: Theme.of(context).colorScheme.secondary,
+                color: Theme.of(context).canvasColor,
+                index: _tab,
+                backgroundColor: Theme.of(context).textTheme.bodyText1?.color ??
+                    Colors.black,
+                onTap: (index) {
+                  setState(
+                    () {
+                      _tab = index;
+                    },
+                  );
+                },
+                items: [
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        CupertinoIcons.person_3_fill,
+                        size: 20,
+                      ),
+                      Text(
+                        'Teams',
+                        style: TextStyle(fontSize: 10),
+                      ),
+                    ],
+                  ),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        CupertinoIcons.sportscourt_fill,
+                        size: 20,
+                      ),
+                      Text(
+                        'Matches',
+                        style: TextStyle(fontSize: 10),
+                      ),
+                    ],
+                  )
+                ],
+              )
+            : null,
+        body: materialTabs()[_tab],
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          tooltip: _tab == 0 ? 'Add Team' : 'Add Match',
+          child: Icon(Icons.add),
+          onPressed: () async {
+            if (_tab == 0)
+              _teamConfig();
+            else
+              _matchConfig();
+          },
+        ),
+      );
 
   void _matchConfig() async {
     await Navigator.push(

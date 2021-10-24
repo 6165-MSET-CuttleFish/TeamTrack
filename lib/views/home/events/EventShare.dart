@@ -16,33 +16,33 @@ class EventShare extends StatefulWidget {
   @override
   _EventShareState createState() => _EventShareState();
 }
+
 Role shareRole = Role.editor;
+
 class _EventShareState extends State<EventShare> {
   @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        PlatformPicker<Role>(
-          value: shareRole,
-          onSelectedItemChanged: (newValue) {
-            HapticFeedback.lightImpact();
-            try {
-              setState(() => shareRole = newValue ?? Role.editor);
-            } catch (e) {
-              setState(() => shareRole = Role.values[newValue]);
-            }
-          },
-          items: Role.values.map((e) => Text(e.name())).toList(),
-          arr: Role.values,
-        ),
-        PlatformTextField(
-          placeholder: widget.event.shared ? 'Email' : '(Optional) Email',
-          keyboardType: TextInputType.emailAddress,
-          controller: widget.emailController,
-          autoCorrect: false,
-        ),
-      ],
-    );
-  }
+  Widget build(BuildContext context) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          PlatformPicker<Role>(
+            value: shareRole,
+            onSelectedItemChanged: (newValue) {
+              HapticFeedback.lightImpact();
+              try {
+                setState(() => shareRole = newValue ?? Role.editor);
+              } catch (e) {
+                setState(() => shareRole = Role.values[newValue]);
+              }
+            },
+            items: Role.values.map((e) => Text(e.name())).toList(),
+            arr: Role.values,
+          ),
+          PlatformTextField(
+            placeholder: widget.event.shared ? 'Email' : '(Optional) Email',
+            keyboardType: TextInputType.emailAddress,
+            controller: widget.emailController,
+            autoCorrect: false,
+          ),
+        ],
+      );
 }

@@ -12,27 +12,25 @@ class Permissions extends StatefulWidget {
 
 class _PermissionsState extends State<Permissions> {
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: ListView(
-        children: widget.event.permissions.keys
-            .map(
-              (user) => ListTile(
-                leading: getIcon(
-                  widget.event.permissions[user]?.role ?? Role.viewer,
+  Widget build(BuildContext context) => Container(
+        child: ListView(
+          children: widget.event.permissions.keys
+              .map(
+                (user) => ListTile(
+                  leading: getIcon(
+                    widget.event.permissions[user]?.role ?? Role.viewer,
+                  ),
+                  title: Text(
+                    widget.event.permissions[user]?.displayName ?? "Unknown",
+                  ),
+                  subtitle: Text(
+                    widget.event.permissions[user]?.email ?? "Unknown",
+                  ),
                 ),
-                title: Text(
-                  widget.event.permissions[user]?.displayName ?? "Unknown",
-                ),
-                subtitle: Text(
-                  widget.event.permissions[user]?.email ?? "Unknown",
-                ),
-              ),
-            )
-            .toList(),
-      ),
-    );
-  }
+              )
+              .toList(),
+        ),
+      );
 
   Icon getIcon(Role role) {
     switch (role) {

@@ -746,12 +746,12 @@ class ScoreCard extends StatelessWidget {
                   ? scoreDivisions.meanScore(dice, removeOutliers)
                   : matches
                           ?.where(
-                            (e) => e.dice == dice || dice == Dice.none,
+                            (match) => match.dice == dice || dice == Dice.none,
                           )
                           .toList()
                           .spots(team, dice, false, type: type)
                           .removeOutliers(removeOutliers)
-                          .map((e) => e.y)
+                          .map((spot) => spot.y)
                           .mean() ??
                       0,
               max: !matchTotal
@@ -770,12 +770,12 @@ class ScoreCard extends StatelessWidget {
                   ? scoreDivisions.medianScore(dice, removeOutliers)
                   : matches
                           ?.where(
-                            (e) => e.dice == dice || dice == Dice.none,
+                            (match) => match.dice == dice || dice == Dice.none,
                           )
                           .toList()
                           .spots(team, dice, false, type: type)
                           .removeOutliers(removeOutliers)
-                          .map((e) => e.y)
+                          .map((spot) => spot.y)
                           .median() ??
                       0,
               max: !matchTotal
@@ -818,12 +818,12 @@ class ScoreCard extends StatelessWidget {
                   ? scoreDivisions.standardDeviationScore(dice, removeOutliers)
                   : matches
                           ?.where(
-                            (e) => e.dice == dice || dice == Dice.none,
+                            (match) => match.dice == dice || dice == Dice.none,
                           )
                           .toList()
                           .spots(team, dice, false, type: type)
                           .removeOutliers(removeOutliers)
-                          .map((e) => e.y)
+                          .map((spot) => spot.y)
                           .standardDeviation() ??
                       0,
               max: !matchTotal
@@ -834,12 +834,12 @@ class ScoreCard extends StatelessWidget {
                       .map(
                         (matches) => matches.item2
                             .where(
-                              (e) => e.dice == dice || dice == Dice.none,
+                              (match) => match.dice == dice || dice == Dice.none,
                             )
                             .toList()
                             .spots(matches.item1, dice, false, type: type)
                             .removeOutliers(removeOutliers)
-                            .map((e) => e.y)
+                            .map((spot) => spot.y)
                             .standardDeviation(),
                       )
                       .minValue(),
@@ -851,7 +851,7 @@ class ScoreCard extends StatelessWidget {
       ),
       collapsed: scoreDivisions
                   .diceScores(dice)
-                  .map((e) => e.total())
+                  .map((score) => score.total())
                   .removeOutliers(removeOutliers)
                   .length >=
               1

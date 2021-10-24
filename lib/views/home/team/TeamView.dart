@@ -40,207 +40,205 @@ class _TeamView extends State<TeamView> {
   bool _showCycles = false;
   bool _matchIsScore = false;
   @override
-  Widget build(BuildContext context) {
-    _team = widget.team;
-    return Scaffold(
-      bottomNavigationBar: NewPlatform.isIOS()
-          ? SafeArea(
-              child: CupertinoSlidingSegmentedControl(
-                groupValue: _dice,
-                children: <Dice, Widget>{
-                  Dice.one: Text(Dice.one.toVal(widget.event.gameName)),
-                  Dice.two: Text(Dice.two.toVal(widget.event.gameName)),
-                  Dice.three: Text(Dice.three.toVal(widget.event.gameName)),
-                  Dice.none: Text('All Cases')
-                },
-                onValueChanged: (Dice? newDice) {
-                  setState(
-                    () {
-                      _dice = newDice ?? Dice.none;
-                    },
-                  );
-                },
-              ),
-            )
-          : ButtonBar(
-              alignment: MainAxisAlignment.center,
-              children: [
-                OutlineButton(
-                  disabledTextColor: Theme.of(context).colorScheme.primary,
-                  highlightedBorderColor: Theme.of(context).splashColor,
-                  disabledBorderColor: Theme.of(context).colorScheme.primary,
-                  color: _dice == Dice.one
-                      ? Theme.of(context).colorScheme.primary
-                      : null,
-                  child: Text(Dice.one.toVal(widget.event.gameName)),
-                  onPressed: _dice != Dice.one
-                      ? () {
-                          setState(
-                            () {
-                              _dice = Dice.one;
-                            },
-                          );
-                        }
-                      : null,
-                ),
-                OutlineButton(
-                  disabledTextColor: Theme.of(context).colorScheme.primary,
-                  highlightedBorderColor: Theme.of(context).splashColor,
-                  disabledBorderColor: Theme.of(context).colorScheme.primary,
-                  color: _dice == Dice.two
-                      ? Theme.of(context).colorScheme.primary
-                      : null,
-                  child: Text(Dice.two.toVal(widget.event.gameName)),
-                  onPressed: _dice != Dice.two
-                      ? () {
-                          setState(
-                            () {
-                              _dice = Dice.two;
-                            },
-                          );
-                        }
-                      : null,
-                ),
-                OutlineButton(
-                  disabledTextColor: Theme.of(context).colorScheme.primary,
-                  highlightedBorderColor: Theme.of(context).splashColor,
-                  disabledBorderColor: Theme.of(context).colorScheme.primary,
-                  color: _dice == Dice.three
-                      ? Theme.of(context).colorScheme.primary
-                      : null,
-                  child: Text(Dice.three.toVal(widget.event.gameName)),
-                  onPressed: _dice != Dice.three
-                      ? () {
-                          setState(
-                            () {
-                              _dice = Dice.three;
-                            },
-                          );
-                        }
-                      : null,
-                ),
-                MaterialButton(
-                  color: _dice == Dice.none
-                      ? Theme.of(context).colorScheme.primary
-                      : null,
-                  child: Text('All Cases'),
-                  onPressed: () => setState(
-                    () => _dice = Dice.none,
-                  ),
-                ),
-              ],
-            ),
-      appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: NewPlatform.isAndroid()
-              ? CrossAxisAlignment.start
-              : CrossAxisAlignment.center,
-          children: [
-            Text(_team.name),
-            Text(
-              _team.number,
-              style: Theme.of(context).textTheme.caption,
-            ),
-          ],
-        ),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.settings),
-            onPressed: () => showModalBottomSheet(
-              context: context,
-              builder: (context) => Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CheckboxListTile(
-                    value: removeOutliers,
-                    onChanged: (_) => setState(
+  Widget build(BuildContext context) => Scaffold(
+        bottomNavigationBar: NewPlatform.isIOS()
+            ? SafeArea(
+                child: CupertinoSlidingSegmentedControl(
+                  groupValue: _dice,
+                  children: <Dice, Widget>{
+                    Dice.one: Text(Dice.one.toVal(widget.event.gameName)),
+                    Dice.two: Text(Dice.two.toVal(widget.event.gameName)),
+                    Dice.three: Text(Dice.three.toVal(widget.event.gameName)),
+                    Dice.none: Text('All Cases')
+                  },
+                  onValueChanged: (Dice? newDice) {
+                    setState(
                       () {
-                        removeOutliers = _ ?? false;
-                        Navigator.pop(context);
+                        _dice = newDice ?? Dice.none;
                       },
+                    );
+                  },
+                ),
+              )
+            : ButtonBar(
+                alignment: MainAxisAlignment.center,
+                children: [
+                  OutlineButton(
+                    disabledTextColor: Theme.of(context).colorScheme.primary,
+                    highlightedBorderColor: Theme.of(context).splashColor,
+                    disabledBorderColor: Theme.of(context).colorScheme.primary,
+                    color: _dice == Dice.one
+                        ? Theme.of(context).colorScheme.primary
+                        : null,
+                    child: Text(Dice.one.toVal(widget.event.gameName)),
+                    onPressed: _dice != Dice.one
+                        ? () {
+                            setState(
+                              () {
+                                _dice = Dice.one;
+                              },
+                            );
+                          }
+                        : null,
+                  ),
+                  OutlineButton(
+                    disabledTextColor: Theme.of(context).colorScheme.primary,
+                    highlightedBorderColor: Theme.of(context).splashColor,
+                    disabledBorderColor: Theme.of(context).colorScheme.primary,
+                    color: _dice == Dice.two
+                        ? Theme.of(context).colorScheme.primary
+                        : null,
+                    child: Text(Dice.two.toVal(widget.event.gameName)),
+                    onPressed: _dice != Dice.two
+                        ? () {
+                            setState(
+                              () {
+                                _dice = Dice.two;
+                              },
+                            );
+                          }
+                        : null,
+                  ),
+                  OutlineButton(
+                    disabledTextColor: Theme.of(context).colorScheme.primary,
+                    highlightedBorderColor: Theme.of(context).splashColor,
+                    disabledBorderColor: Theme.of(context).colorScheme.primary,
+                    color: _dice == Dice.three
+                        ? Theme.of(context).colorScheme.primary
+                        : null,
+                    child: Text(Dice.three.toVal(widget.event.gameName)),
+                    onPressed: _dice != Dice.three
+                        ? () {
+                            setState(
+                              () {
+                                _dice = Dice.three;
+                              },
+                            );
+                          }
+                        : null,
+                  ),
+                  MaterialButton(
+                    color: _dice == Dice.none
+                        ? Theme.of(context).colorScheme.primary
+                        : null,
+                    child: Text('All Cases'),
+                    onPressed: () => setState(
+                      () => _dice = Dice.none,
                     ),
-                    checkColor: Colors.black,
-                    tileColor: Colors.green,
-                    title: Text('Remove Outliers'),
-                    secondary: Icon(CupertinoIcons.arrow_branch),
                   ),
-                  CheckboxListTile(
-                    value: showPenalties,
-                    onChanged: (_) {
-                      setState(
-                        () {
-                          showPenalties = _ ?? false;
-                          Navigator.pop(context);
-                        },
-                      );
-                    },
-                    checkColor: Colors.black,
-                    tileColor: Colors.red,
-                    title: Text('Count Penalties'),
-                    secondary: Icon(CupertinoIcons.xmark_seal_fill),
-                  ),
-                  if (widget.event.type != EventType.remote)
+                ],
+              ),
+        appBar: AppBar(
+          title: Column(
+            crossAxisAlignment: NewPlatform.isAndroid()
+                ? CrossAxisAlignment.start
+                : CrossAxisAlignment.center,
+            children: [
+              Text(_team.name),
+              Text(
+                _team.number,
+                style: Theme.of(context).textTheme.caption,
+              ),
+            ],
+          ),
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          actions: [
+            IconButton(
+              icon: Icon(Icons.settings),
+              onPressed: () => showModalBottomSheet(
+                context: context,
+                builder: (context) => Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
                     CheckboxListTile(
-                      value: _matchIsScore,
+                      value: removeOutliers,
                       onChanged: (_) => setState(
                         () {
-                          _matchIsScore = _ ?? false;
+                          removeOutliers = _ ?? false;
                           Navigator.pop(context);
                         },
                       ),
                       checkColor: Colors.black,
-                      tileColor: Colors.blue,
-                      title: Text('Match Total'),
-                      subtitle: Text('Consider match total as score total'),
-                      secondary: Icon(CupertinoIcons.square_stack),
+                      tileColor: Colors.green,
+                      title: Text('Remove Outliers'),
+                      secondary: Icon(CupertinoIcons.arrow_branch),
                     ),
-                ],
+                    CheckboxListTile(
+                      value: showPenalties,
+                      onChanged: (_) {
+                        setState(
+                          () {
+                            showPenalties = _ ?? false;
+                            Navigator.pop(context);
+                          },
+                        );
+                      },
+                      checkColor: Colors.black,
+                      tileColor: Colors.red,
+                      title: Text('Count Penalties'),
+                      secondary: Icon(CupertinoIcons.xmark_seal_fill),
+                    ),
+                    if (widget.event.type != EventType.remote)
+                      CheckboxListTile(
+                        value: _matchIsScore,
+                        onChanged: (_) => setState(
+                          () {
+                            _matchIsScore = _ ?? false;
+                            Navigator.pop(context);
+                          },
+                        ),
+                        checkColor: Colors.black,
+                        tileColor: Colors.blue,
+                        title: Text('Match Total'),
+                        subtitle: Text('Consider match total as score total'),
+                        secondary: Icon(CupertinoIcons.square_stack),
+                      ),
+                  ],
+                ),
               ),
             ),
-          ),
-          // IconButton(
-          //   icon: Icon(Icons.list),
-          //   tooltip: 'Changelist',
-          //   onPressed: () => Navigator.of(context).push(
-          //     platformPageRoute(
-          //       (context) => ChangeList(
-          //         team: _team,
-          //         event: widget.event,
-          //       ),
-          //     ),
-          //   ),
-          // ),
-        ],
-      ),
-      body: StreamBuilder<Database.Event>(
-        stream: widget.event.getRef()?.onValue,
-        builder: (context, eventHandler) {
-          if (eventHandler.hasData && !eventHandler.hasError) {
-            widget.event.updateLocal(
-              json.decode(
-                json.encode(eventHandler.data?.snapshot.value),
-              ),
-              context,
-            );
-            _team = widget.event.teams[widget.team.number] ?? Team.nullTeam();
-          }
-          return ListView(
-            children: [
-              Padding(
-                padding: EdgeInsets.only(left: 5, right: 5),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: body(),
+            // IconButton(
+            //   icon: Icon(Icons.list),
+            //   tooltip: 'Changelist',
+            //   onPressed: () => Navigator.of(context).push(
+            //     platformPageRoute(
+            //       (context) => ChangeList(
+            //         team: _team,
+            //         event: widget.event,
+            //       ),
+            //     ),
+            //   ),
+            // ),
+          ],
+        ),
+        body: StreamBuilder<Database.Event>(
+          stream: widget.event.getRef()?.onValue,
+          builder: (context, eventHandler) {
+            _team = widget.team;
+            if (eventHandler.hasData && !eventHandler.hasError) {
+              widget.event.updateLocal(
+                json.decode(
+                  json.encode(eventHandler.data?.snapshot.value),
                 ),
-              )
-            ],
-          );
-        },
-      ),
-    );
-  }
+                context,
+              );
+              _team = widget.event.teams[widget.team.number] ?? Team.nullTeam();
+            }
+            return ListView(
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(left: 5, right: 5),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: body(),
+                  ),
+                )
+              ],
+            );
+          },
+        ),
+      );
 
   Widget _lineChart() => _team.scores.diceScores(_dice).length >= 1
       ? Stack(

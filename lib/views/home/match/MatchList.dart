@@ -25,93 +25,91 @@ class MatchList extends StatefulWidget {
 class _MatchList extends State<MatchList> {
   final slider = SlidableStrechActionPane();
   @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<Database.Event>(
-      stream: widget.event.getRef()?.onValue,
-      builder: (context, eventHandler) {
-        if (eventHandler.hasData && !eventHandler.hasError) {
-          widget.event.updateLocal(
-            json.decode(
-              json.encode(eventHandler.data?.snapshot.value),
+  Widget build(BuildContext context) => StreamBuilder<Database.Event>(
+        stream: widget.event.getRef()?.onValue,
+        builder: (context, eventHandler) {
+          if (eventHandler.hasData && !eventHandler.hasError) {
+            widget.event.updateLocal(
+              json.decode(
+                json.encode(eventHandler.data?.snapshot.value),
+              ),
+              context,
+            );
+          }
+          if (widget.team == null) {
+            return _matches();
+          }
+          return Scaffold(
+            appBar: AppBar(
+              title: Text('Matches'),
+              backgroundColor: Theme.of(context).colorScheme.primary,
             ),
-            context,
-          );
-        }
-        if (widget.team == null) {
-          return _matches();
-        }
-        return Scaffold(
-          appBar: AppBar(
-            title: Text('Matches'),
-            backgroundColor: Theme.of(context).colorScheme.primary,
-          ),
-          body: _matches(),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () async {
-              if (widget.event.type == EventType.remote)
-                showPlatformDialog(
-                  context: context,
-                  builder: (context) => PlatformAlert(
-                    title: Text('New Match'),
-                    actions: [
-                      PlatformDialogAction(
-                        child: Text('Cancel'),
-                        onPressed: () {
-                          setState(
-                            () {
-                              Navigator.pop(context);
-                            },
-                          );
-                        },
-                      ),
-                      PlatformDialogAction(
-                        child: Text('Add'),
-                        onPressed: () {
-                          setState(
-                            () {
-                              widget.event.addMatch(
-                                Match(
-                                  Alliance(
-                                    widget.event.teams[widget.team?.number],
-                                    null,
-                                    widget.event.type,
-                                    widget.event.gameName,
+            body: _matches(),
+            floatingActionButton: FloatingActionButton(
+              onPressed: () async {
+                if (widget.event.type == EventType.remote)
+                  showPlatformDialog(
+                    context: context,
+                    builder: (context) => PlatformAlert(
+                      title: Text('New Match'),
+                      actions: [
+                        PlatformDialogAction(
+                          child: Text('Cancel'),
+                          onPressed: () {
+                            setState(
+                              () {
+                                Navigator.pop(context);
+                              },
+                            );
+                          },
+                        ),
+                        PlatformDialogAction(
+                          child: Text('Add'),
+                          onPressed: () {
+                            setState(
+                              () {
+                                widget.event.addMatch(
+                                  Match(
+                                    Alliance(
+                                      widget.event.teams[widget.team?.number],
+                                      null,
+                                      widget.event.type,
+                                      widget.event.gameName,
+                                    ),
+                                    Alliance(
+                                      null,
+                                      null,
+                                      widget.event.type,
+                                      widget.event.gameName,
+                                    ),
+                                    EventType.remote,
                                   ),
-                                  Alliance(
-                                    null,
-                                    null,
-                                    widget.event.type,
-                                    widget.event.gameName,
-                                  ),
-                                  EventType.remote,
-                                ),
-                              );
-                              dataModel.saveEvents();
-                              Navigator.pop(context);
-                            },
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                );
-              else {
-                await Navigator.of(context).push(
-                  platformPageRoute(
-                    (_) => MatchConfig(
-                      event: widget.event,
+                                );
+                                dataModel.saveEvents();
+                                Navigator.pop(context);
+                              },
+                            );
+                          },
+                        ),
+                      ],
                     ),
-                  ),
-                );
-                setState(() {});
-              }
-            },
-            child: Icon(Icons.add),
-          ),
-        );
-      },
-    );
-  }
+                  );
+                else {
+                  await Navigator.of(context).push(
+                    platformPageRoute(
+                      (_) => MatchConfig(
+                        event: widget.event,
+                      ),
+                    ),
+                  );
+                  setState(() {});
+                }
+              },
+              child: Icon(Icons.add),
+            ),
+          );
+        },
+      );
 
   Widget _matches() {
     int i = widget.event.matches.length + 1;
