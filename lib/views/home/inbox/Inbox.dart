@@ -9,7 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/functions/Extensions.dart';
 import 'package:teamtrack/functions/Functions.dart';
-import 'package:teamtrack/views/util/EmptyList.dart';
+import 'package:teamtrack/components/EmptyList.dart';
 
 class Inbox extends StatefulWidget {
   const Inbox({Key? key}) : super(key: key);

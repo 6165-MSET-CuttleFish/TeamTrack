@@ -1,6 +1,5 @@
-import 'dart:math';
-
 import 'package:teamtrack/components/BarGraph.dart';
+import 'package:teamtrack/components/PercentIncrease.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/views/home/team/TeamView.dart';
 import 'package:teamtrack/models/AppModel.dart';
@@ -44,102 +43,119 @@ class _TeamList extends State<TeamList> {
               context,
             );
           }
+          final max =
+              widget.event.teams.maxMeanScore(Dice.none, true, widget.sortMode);
           return ListView(
-            children: widget.event.teams
-                .sortedTeams(widget.sortMode)
-                .map(
-                  (e) => Slidable(
-                    actionPane: slider,
-                    secondaryActions: [
-                      IconSlideAction(
-                        icon: Icons.delete,
-                        color: Colors.red,
-                        onTap: () {
-                          showPlatformDialog(
-                            context: context,
-                            builder: (BuildContext context) => PlatformAlert(
-                              title: Text('Delete Team'),
-                              content: Text('Are you sure?'),
-                              actions: [
-                                PlatformDialogAction(
-                                  isDefaultAction: true,
-                                  child: Text('Cancel'),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                                PlatformDialogAction(
-                                  isDefaultAction: false,
-                                  isDestructive: true,
-                                  child: Text('Confirm'),
-                                  onPressed: () {
-                                    String? s;
-                                    setState(() {
-                                      s = widget.event.deleteTeam(e);
-                                    });
-                                    dataModel.saveEvents();
-                                    Navigator.of(context).pop();
-                                    if (s != null)
-                                      showPlatformDialog(
-                                        context: context,
-                                        builder: (context) => PlatformAlert(
-                                          title: Text('Error'),
-                                          content: Text(
-                                              'Team is present in matches'),
-                                          actions: [
-                                            PlatformDialogAction(
-                                              child: Text('Okay'),
-                                              isDefaultAction: true,
-                                              onPressed: () =>
-                                                  Navigator.of(context).pop(),
-                                            )
-                                          ],
-                                        ),
-                                      );
-                                  },
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      )
-                    ],
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Colors.grey,
-                          width: 1,
-                        ),
-                      ),
-                      child: ListTile(
-                        title: Text(e.name),
-                        leading: Text(e.number,
-                            style: Theme.of(context).textTheme.caption),
-                        trailing: RotatedBox(
-                          quarterTurns: 1,
-                          child: BarGraph(
-                            height: 90,
-                            width: 25,
-                            title: 'Median',
-                          ),
-                        ),
-                        onTap: () async {
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => TeamView(
-                                team: e,
-                                event: widget.event,
+            children: widget.event.teams.sortedTeams(widget.sortMode).map(
+              (team) {
+                final percentIncrease = team.scores.percentIncrease();
+                return Slidable(
+                  actionPane: slider,
+                  secondaryActions: [
+                    IconSlideAction(
+                      icon: Icons.delete,
+                      color: Colors.red,
+                      onTap: () {
+                        showPlatformDialog(
+                          context: context,
+                          builder: (BuildContext context) => PlatformAlert(
+                            title: Text('Delete Team'),
+                            content: Text('Are you sure?'),
+                            actions: [
+                              PlatformDialogAction(
+                                isDefaultAction: true,
+                                child: Text('Cancel'),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
                               ),
-                            ),
-                          );
-                          setState(() {});
-                        },
+                              PlatformDialogAction(
+                                isDefaultAction: false,
+                                isDestructive: true,
+                                child: Text('Confirm'),
+                                onPressed: () {
+                                  String? s;
+                                  setState(() {
+                                    s = widget.event.deleteTeam(team);
+                                  });
+                                  dataModel.saveEvents();
+                                  Navigator.of(context).pop();
+                                  if (s != null)
+                                    showPlatformDialog(
+                                      context: context,
+                                      builder: (context) => PlatformAlert(
+                                        title: Text('Error'),
+                                        content:
+                                            Text('Team is present in matches'),
+                                        actions: [
+                                          PlatformDialogAction(
+                                            child: Text('Okay'),
+                                            isDefaultAction: true,
+                                            onPressed: () =>
+                                                Navigator.of(context).pop(),
+                                          )
+                                        ],
+                                      ),
+                                    );
+                                },
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    )
+                  ],
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.grey,
+                        width: 1,
                       ),
                     ),
+                    child: ListTile(
+                      title: Text(team.name),
+                      leading: Text(team.number,
+                          style: Theme.of(context).textTheme.caption),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (percentIncrease != null)
+                            PercentIncrease(percentIncrease: percentIncrease),
+                          Padding(
+                            padding: EdgeInsets.all(
+                              10,
+                            ),
+                          ),
+                          RotatedBox(
+                            quarterTurns: 1,
+                            child: BarGraph(
+                              height: 60,
+                              width: 25,
+                              val: team.scores
+                                  .meanScore(Dice.none, true, widget.sortMode),
+                              max: max,
+                              title: 'Mean',
+                            ),
+                          ),
+                        ],
+                      ),
+                      onTap: () async {
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TeamView(
+                              team: team,
+                              event: widget.event,
+                            ),
+                          ),
+                        );
+                        setState(() {});
+                      },
+                    ),
                   ),
-                )
-                .toList(),
+                );
+              },
+            ).toList(),
           );
         },
       );

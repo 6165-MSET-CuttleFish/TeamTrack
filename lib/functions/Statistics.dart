@@ -85,6 +85,7 @@ extension moreArithmetic on num {
   bool isOutlier(Iterable<num?> list) =>
       this < list.q1() - 1.5 * list.iqr() ||
       this > list.q3() + 1.5 * list.iqr();
+  double percentIncrease(num previous) => (this - previous) / previous * 100;
 }
 
 extension MatchExtensions on List<Match> {
@@ -349,12 +350,26 @@ extension ScoresExtension on Map<String, Score> {
   }
 
   List<Score> diceScores(Dice? dice) {
-    var returnList = (dice != Dice.none
+    var returnList = ((dice != Dice.none && dice != null)
             ? this.values.where((e) => e.getDice() == dice)
             : this.values)
         .toList();
     returnList
         .sort((a, b) => a.timeStamp.toDate().compareTo(b.timeStamp.toDate()));
     return returnList;
+  }
+
+  double? percentIncrease() {
+    this
+        .values
+        .toList()
+        .sort((a, b) => a.timeStamp.toDate().compareTo(b.timeStamp.toDate()));
+    if (this.values.length < 2 ||
+        this.values.toList()[this.values.length - 2].total() == 0) return null;
+    return this
+        .values
+        .last
+        .total()
+        .percentIncrease(this.values.toList()[this.values.length - 2].total());
   }
 }

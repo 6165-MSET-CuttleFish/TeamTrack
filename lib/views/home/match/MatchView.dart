@@ -254,18 +254,19 @@ class _MatchView extends State<MatchView> {
                               _match != null)
                             buttonRow(),
                           Text(
-                              (_selectedTeam?.name ?? '') +
-                                  ' : ' +
-                                  (_score
-                                          ?.total(
-                                            showPenalties: widget.event.type ==
-                                                    EventType.remote
-                                                ? _showPenalties
-                                                : false,
-                                          )
-                                          .toString() ??
-                                      ''),
-                              style: Theme.of(context).textTheme.headline6),
+                            (_selectedTeam?.name ?? '') +
+                                ' : ' +
+                                (_score
+                                        ?.total(
+                                          showPenalties: widget.event.type ==
+                                                  EventType.remote
+                                              ? _showPenalties
+                                              : false,
+                                        )
+                                        .toString() ??
+                                    ''),
+                            style: Theme.of(context).textTheme.headline6,
+                          ),
                           if (widget.team == null)
                             DropdownButton<Dice>(
                               value: _match?.dice,
@@ -402,7 +403,8 @@ class _MatchView extends State<MatchView> {
                             SizedBox(
                               height: 50,
                               child: TabBar(
-                                labelColor: Theme.of(context).colorScheme.primary,
+                                labelColor:
+                                    Theme.of(context).colorScheme.primary,
                                 unselectedLabelColor: Colors.grey,
                                 labelStyle:
                                     TextStyle(fontFamily: '.SF UI Display'),
@@ -482,109 +484,23 @@ class _MatchView extends State<MatchView> {
     }
   }
 
-  List<Widget> endView() => !_paused || _allowView
-      ? [
-          ..._score?.endgameScore
-                  .getElements()
-                  .parse()
-                  .map(
-                    (e) => Incrementor(
-                      element: e,
-                      onPressed: stateSetter,
-                      opModeType: OpModeType.endgame,
-                      event: widget.event,
-                      path: 'teams/${_selectedTeam?.number}',
-                      score: _score,
-                      isTargetScore: widget.team != null,
-                    ),
-                  )
-                  .toList() ??
-              [],
-          Padding(padding: EdgeInsets.all(5)),
-          if (widget.team == null)
-            ..._selectedAlliance?.sharedScore?.endgameScore
-                    .getElements()
-                    .parse()
-                    .map(
-                      (e) => Incrementor(
-                        element: e,
-                        onPressed: stateSetter,
-                        onDecrement:
-                            widget.team == null ? increaseMisses : null,
-                        opModeType: OpModeType.tele,
-                        event: widget.event,
-                        path: 'matches/${widget.match?.id}/${allianceColor()}}',
-                        score: _score,
-                        backgroundColor: Colors.green.withOpacity(0.3),
-                      ),
-                    ) ??
-                []
-        ]
-      : [
-          Material(
-            child: IconButton(
-              tooltip: 'Driver Control Play',
-              icon: Icon(Icons.play_arrow),
-              onPressed: () {
-                _paused = false;
-                _allowView = true;
-              },
+  List<Widget> autoView() =>
+      _score?.autoScore
+          .getElements()
+          .parse()
+          .map(
+            (e) => Incrementor(
+              element: e,
+              onPressed: stateSetter,
+              opModeType: OpModeType.auto,
+              event: widget.event,
+              path: 'teams/${_selectedTeam?.number}',
+              score: _score,
+              isTargetScore: widget.team != null,
             ),
-          ),
-          Material(
-            child: IconButton(
-              icon: Icon(Icons.visibility),
-              tooltip: 'View',
-              onPressed: () {
-                _allowView = true;
-              },
-            ),
-          ),
-        ];
-  ScoringElement incrementValue = ScoringElement(
-      name: 'Increment Value', min: () => 1, count: 1, key: null);
-  void increaseMisses() async {
-    if (!widget.event.shared) _score?.teleScore.misses.count++;
-    widget.event.getRef()?.runTransaction(
-      (mutableData) {
-        var teamIndex;
-        try {
-          mutableData.value['teams'] as Map;
-          teamIndex = _selectedTeam?.number;
-        } catch (e) {
-          teamIndex = int.parse(_selectedTeam?.number ?? '');
-        }
-        final scoreIndex = _score?.id;
-        var ref = mutableData.value['teams'][teamIndex]['scores'][scoreIndex]
-            ['TeleScore']['Misses'];
-        mutableData.value['teams'][teamIndex]['scores'][scoreIndex]['TeleScore']
-            ['Misses'] = (ref ?? 0) + 1;
-        return mutableData;
-      },
-    );
-  }
-
-  void onIncrement() {
-    lapses.add(
-      (_time -
-              (lapses.length != 0
-                  ? lapses.reduce((value, element) => value + element)
-                  : 0))
-          .toPrecision(3),
-    );
-    _score?.teleScore.cycleTimes = lapses;
-    if (widget.team != null) {
-      widget.event
-          .getRef()
-          ?.child('teams/${_selectedTeam?.number}')
-          .runTransaction((mutableData) {
-        final scoreIndex = _score?.id;
-        mutableData.value['scores'][scoreIndex]['TeleScore']['CycleTimes'] =
-            lapses;
-        return mutableData;
-      });
-    }
-  }
+          )
+          .toList() ??
+      [];
 
   List<Widget> teleView() => !_paused || _allowView
       ? [
@@ -729,6 +645,111 @@ class _MatchView extends State<MatchView> {
             ),
           ),
         ];
+
+  List<Widget> endView() => !_paused || _allowView
+      ? [
+          ..._score?.endgameScore
+                  .getElements()
+                  .parse()
+                  .map(
+                    (e) => Incrementor(
+                      element: e,
+                      onPressed: stateSetter,
+                      opModeType: OpModeType.endgame,
+                      event: widget.event,
+                      path: 'teams/${_selectedTeam?.number}',
+                      score: _score,
+                      isTargetScore: widget.team != null,
+                    ),
+                  )
+                  .toList() ??
+              [],
+          Padding(padding: EdgeInsets.all(5)),
+          if (widget.team == null)
+            ..._selectedAlliance?.sharedScore?.endgameScore
+                    .getElements()
+                    .parse()
+                    .map(
+                      (e) => Incrementor(
+                        element: e,
+                        onPressed: stateSetter,
+                        onDecrement:
+                            widget.team == null ? increaseMisses : null,
+                        opModeType: OpModeType.tele,
+                        event: widget.event,
+                        path: 'matches/${widget.match?.id}/${allianceColor()}}',
+                        score: _score,
+                        backgroundColor: Colors.green.withOpacity(0.3),
+                      ),
+                    ) ??
+                []
+        ]
+      : [
+          Material(
+            child: IconButton(
+              tooltip: 'Driver Control Play',
+              icon: Icon(Icons.play_arrow),
+              onPressed: () {
+                _paused = false;
+                _allowView = true;
+              },
+            ),
+          ),
+          Material(
+            child: IconButton(
+              icon: Icon(Icons.visibility),
+              tooltip: 'View',
+              onPressed: () {
+                _allowView = true;
+              },
+            ),
+          ),
+        ];
+  ScoringElement incrementValue = ScoringElement(
+      name: 'Increment Value', min: () => 1, count: 1, key: null);
+  void increaseMisses() async {
+    if (!widget.event.shared) _score?.teleScore.misses.count++;
+    widget.event.getRef()?.runTransaction(
+      (mutableData) {
+        var teamIndex;
+        try {
+          mutableData.value['teams'] as Map;
+          teamIndex = _selectedTeam?.number;
+        } catch (e) {
+          teamIndex = int.parse(_selectedTeam?.number ?? '');
+        }
+        final scoreIndex = _score?.id;
+        var ref = mutableData.value['teams'][teamIndex]['scores'][scoreIndex]
+            ['TeleScore']['Misses'];
+        mutableData.value['teams'][teamIndex]['scores'][scoreIndex]['TeleScore']
+            ['Misses'] = (ref ?? 0) + 1;
+        return mutableData;
+      },
+    );
+  }
+
+  void onIncrement() {
+    lapses.add(
+      (_time -
+              (lapses.length != 0
+                  ? lapses.reduce((value, element) => value + element)
+                  : 0))
+          .toPrecision(3),
+    );
+    _score?.teleScore.cycleTimes = lapses;
+    if (widget.team != null) {
+      widget.event
+          .getRef()
+          ?.child('teams/${_selectedTeam?.number}')
+          .runTransaction((mutableData) {
+        final scoreIndex = _score?.id;
+        mutableData.value['scores'][scoreIndex]['TeleScore']['CycleTimes'] =
+            lapses;
+        return mutableData;
+      });
+    }
+  }
+
   String allianceColor() {
     if (_selectedAlliance == widget.match?.blue) {
       return 'blue';
@@ -736,24 +757,6 @@ class _MatchView extends State<MatchView> {
       return 'red';
     }
   }
-
-  List<Widget> autoView() =>
-      _score?.autoScore
-          .getElements()
-          .parse()
-          .map(
-            (e) => Incrementor(
-              element: e,
-              onPressed: stateSetter,
-              opModeType: OpModeType.auto,
-              event: widget.event,
-              path: 'teams/${_selectedTeam?.number}',
-              score: _score,
-              isTargetScore: widget.team != null,
-            ),
-          )
-          .toList() ??
-      [];
 
   Row buttonRow() {
     return Row(

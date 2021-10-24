@@ -23,21 +23,22 @@ enum OpModeType { auto, tele, endgame, penalty }
 enum UserType { admin, editor, viewer }
 
 class Event {
-  Event(
-      {required this.name,
-      required this.type,
-      required this.gameName,
-      this.role = Role.editor});
+  Event({
+    required this.name,
+    required this.type,
+    required this.gameName,
+    this.role = Role.editor,
+  });
   String id = Uuid().v4();
   String? authorName;
   String? authorEmail;
   String gameName = Statics.gameName;
-  late Role role;
+  Role role = Role.editor;
   bool shared = false;
   EventType type = EventType.remote;
   Map<String, Team> teams = Map<String, Team>();
   Map<String, Match> matches = {};
-  late String name;
+  String name = "";
   Timestamp timeStamp = Timestamp.now();
   Map<String, TeamTrackUser> permissions = {};
 
@@ -281,16 +282,19 @@ class Event {
             .map((key, value) => MapEntry(key, Team.fromJson(value, gameName)));
       } catch (e) {
         try {
-          var teamList = List<Team>.from(
+          teams = List<Team>.from(
             map['teams']
                 ?.map(
                   (model) =>
                       model != null ? Team.fromJson(model, gameName) : null,
                 )
-                .where((e) => e != null),
-          );
-          teams = Map.fromIterable(teamList,
-              key: (item) => item.number, value: (item) => item);
+                .where((team) => team != null),
+          ).asMap().map(
+                (key, value) => MapEntry(
+                  key.toString(),
+                  value,
+                ),
+              );
         } catch (e) {
           teams = {};
         }
@@ -605,6 +609,6 @@ class Team {
         'number': number,
         'scores': scores.map((key, value) => MapEntry(key, value.toJson())),
         'targetScore': targetScore?.toJson(),
-        'changes': changes.map((e) => e.toJson()).toList(),
+        'changes': changes.map((change) => change.toJson()).toList(),
       };
 }

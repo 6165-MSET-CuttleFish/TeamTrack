@@ -6,7 +6,7 @@ import 'package:teamtrack/models/AppModel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:teamtrack/views/util/EmptyList.dart';
+import 'package:teamtrack/components/EmptyList.dart';
 
 class BlockList extends StatefulWidget {
   const BlockList({Key? key}) : super(key: key);

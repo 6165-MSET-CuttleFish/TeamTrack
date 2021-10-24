@@ -44,17 +44,18 @@ extension MergeExt on List<ScoringElement> {
       if (element.id == null) {
         newList.add(element);
       } else {
-        if (conglomerates[element.id] == null) {
-          conglomerates[element.id!] = ScoringElement(
+        conglomerates.putIfAbsent(
+          element.id!,
+          () => ScoringElement(
             id: element.id,
             name: element.id ?? "",
-          );
-          conglomerates[element.id]?.nestedElements = [];
-          final conglomerate = conglomerates[element.id]?.nestedElements;
-          conglomerate?.add(ScoringElement(
-            name: "None",
-          ));
-        }
+            nestedElements: [
+              ScoringElement(
+                name: "None",
+              ),
+            ],
+          ),
+        );
         conglomerates[element.id!]?.nestedElements?.add(element);
       }
     }

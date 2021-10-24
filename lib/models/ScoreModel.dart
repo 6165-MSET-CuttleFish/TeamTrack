@@ -436,6 +436,7 @@ class ScoringElement {
     this.isBool = false,
     this.key,
     this.id,
+    this.nestedElements
   }) {
     setStuff();
   }
@@ -489,11 +490,11 @@ class ScoringElement {
 
 abstract class ScoreDivision {
   int total({bool? showPenalties}) => getElements()
-      .map((e) => e.scoreValue())
-      .reduce((value, element) => value + element)
-      .clamp(0, 999);
-  Dice getDice();
-  List<ScoringElement> getElements();
-  late Timestamp timeStamp;
-  void reset();
+      .map((e) => e.scoreValue()) // map scoring elements to an array of their score values
+      .reduce((value, element) => value + element) // sum the array
+      .clamp(0, 999); // clamp the sum to a min of 0 and a max of 999
+  Dice getDice(); // get the dice object
+  List<ScoringElement> getElements(); // get the scoring elements
+  late Timestamp timeStamp; // the time stamp of the Score object
+  void reset(); // reset the scoring elements
 }
