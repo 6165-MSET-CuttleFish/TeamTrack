@@ -95,7 +95,7 @@ class PlatformSwitch extends PlatformWidget<CupertinoSwitch, Switch> {
     return CupertinoSwitch(
       value: value,
       onChanged: onChanged,
-      activeColor: highlightColor ?? Theme.of(context).accentColor,
+      activeColor: highlightColor ?? Theme.of(context).colorScheme.primary,
     );
   }
 
@@ -105,7 +105,7 @@ class PlatformSwitch extends PlatformWidget<CupertinoSwitch, Switch> {
       value: value,
       onChanged: onChanged,
       activeColor: Colors.white,
-      activeTrackColor: highlightColor ?? Theme.of(context).accentColor,
+      activeTrackColor: highlightColor ?? Theme.of(context).colorScheme.primary,
     );
   }
 }

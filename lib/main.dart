@@ -45,9 +45,12 @@ class TeamTrack extends StatefulWidget {
 
 class _TeamTrack extends State<TeamTrack> {
   final lightTheme = ThemeData(
-    primarySwatch: Colors.deepPurple,
     splashColor: NewPlatform.isAndroid() ? Colors.cyan : Colors.transparent,
     visualDensity: VisualDensity.adaptivePlatformDensity,
+    colorScheme: ColorScheme.light(
+      primary: Colors.deepPurple,
+      secondary: NewPlatform.isAndroid() ? Colors.cyan : Colors.transparent,
+    ),
   );
 
   final darkTheme = ThemeData(
@@ -60,8 +63,11 @@ class _TeamTrack extends State<TeamTrack> {
     shadowColor: Colors.white,
     brightness: Brightness.dark,
     canvasColor: Colors.black,
-    buttonColor: Colors.grey,
-    accentColor: Colors.cyan,
+    colorScheme: ColorScheme.dark(
+      primary: Colors.cyan,
+      primaryVariant: Colors.blue,
+      secondary: Colors.deepPurple,
+    ),
     floatingActionButtonTheme: FloatingActionButtonThemeData(
       focusElevation: 0,
       backgroundColor: Colors.cyan,
@@ -118,17 +124,6 @@ class MyApp extends StatelessWidget {
     visualDensity: VisualDensity.adaptivePlatformDensity,
   );
 
-  final darkTheme = ThemeData(
-    backgroundColor: Colors.black,
-    splashColor: Colors.deepPurple,
-    shadowColor: Colors.white,
-    brightness: Brightness.dark,
-    canvasColor: Colors.black,
-    buttonColor: Colors.grey,
-    accentColor: Colors.cyan,
-    primarySwatch: Colors.cyan,
-    visualDensity: VisualDensity.adaptivePlatformDensity,
-  );
   @override
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);

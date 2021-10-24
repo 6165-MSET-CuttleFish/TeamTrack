@@ -59,7 +59,7 @@ class _EventsList extends State<EventsList> {
         });
         return Scaffold(
           appBar: AppBar(
-            backgroundColor: Theme.of(context).accentColor,
+            backgroundColor: Theme.of(context).colorScheme.primary,
             title: Builder(
               builder: (_) {
                 switch (_tab) {
@@ -94,8 +94,9 @@ class _EventsList extends State<EventsList> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   DrawerHeader(
-                    decoration:
-                        BoxDecoration(color: Theme.of(context).accentColor),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                     child: Row(
                       children: [
                         Padding(
@@ -286,6 +287,9 @@ class _EventsList extends State<EventsList> {
           body: Builder(builder: (_) => getHome()),
           floatingActionButton: _tab == 0
               ? FloatingActionButton(
+                  tooltip: "Add Event",
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  splashColor: Theme.of(context).colorScheme.secondary,
                   child: Icon(Icons.add),
                   onPressed: _onPressed,
                 )
@@ -380,11 +384,11 @@ class _EventsList extends State<EventsList> {
                       e.shared
                           ? CupertinoIcons.cloud_fill
                           : CupertinoIcons.lock_shield_fill,
-                      color: Theme.of(context).accentColor,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                     leading: Icon(
                       CupertinoIcons.person_3_fill,
-                      color: Theme.of(context).accentColor,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                     title: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -436,11 +440,11 @@ class _EventsList extends State<EventsList> {
                         e.shared
                             ? CupertinoIcons.cloud_fill
                             : CupertinoIcons.lock_shield_fill,
-                        color: Theme.of(context).accentColor,
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                       leading: Icon(
                         CupertinoIcons.person_3_fill,
-                        color: Theme.of(context).accentColor,
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                       title: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -522,11 +526,11 @@ class _EventsList extends State<EventsList> {
                       e.shared
                           ? CupertinoIcons.cloud_fill
                           : CupertinoIcons.lock_shield_fill,
-                      color: Theme.of(context).accentColor,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                     leading: Icon(
                       CupertinoIcons.rectangle_stack_person_crop_fill,
-                      color: Theme.of(context).accentColor,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                     title: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -579,11 +583,11 @@ class _EventsList extends State<EventsList> {
                       e.shared
                           ? CupertinoIcons.cloud_fill
                           : CupertinoIcons.lock_shield_fill,
-                      color: Theme.of(context).accentColor,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                     leading: Icon(
                       CupertinoIcons.rectangle_stack_person_crop_fill,
-                      color: Theme.of(context).accentColor,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                     title: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -674,7 +678,7 @@ class _EventsList extends State<EventsList> {
                 ),
               ),
               child: ListTileTheme(
-                iconColor: Theme.of(context).accentColor,
+                iconColor: Theme.of(context).colorScheme.primary,
                 child: ListTile(
                   onTap: () {
                     _newType = EventType.local;
@@ -694,7 +698,7 @@ class _EventsList extends State<EventsList> {
                 ),
               ),
               child: ListTileTheme(
-                iconColor: Theme.of(context).accentColor,
+                iconColor: Theme.of(context).colorScheme.primary,
                 child: ListTile(
                   onTap: () {
                     _newType = EventType.remote;

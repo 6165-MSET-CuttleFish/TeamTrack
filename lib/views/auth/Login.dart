@@ -217,7 +217,7 @@ class _LoginView extends State<LoginView> {
             ),
           ),
         PlatformButton(
-          color: Theme.of(context).accentColor,
+          color: Theme.of(context).colorScheme.primary,
           onPressed: () async {
             await showModalBottomSheet(
               context: context,

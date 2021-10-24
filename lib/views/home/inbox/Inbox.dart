@@ -9,6 +9,8 @@ import 'package:provider/provider.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/functions/Extensions.dart';
 import 'package:teamtrack/functions/Functions.dart';
+import 'package:teamtrack/views/util/EmptyList.dart';
+
 class Inbox extends StatefulWidget {
   const Inbox({Key? key}) : super(key: key);
   @override
@@ -29,6 +31,9 @@ class _InboxState extends State<Inbox> {
               (query.data?['inbox'] as Map<String, dynamic>?)?.values.toList();
           queryResult?.sort(
               (a, b) => (a['sendTime'] as Timestamp).compareTo(b['sendTime']));
+          if (queryResult?.length == 0) {
+            return EmptyList();
+          }
           return ListView(
             children: queryResult
                     ?.map(
@@ -115,7 +120,8 @@ class _InboxState extends State<Inbox> {
                                         ? CupertinoIcons
                                             .rectangle_stack_person_crop_fill
                                         : CupertinoIcons.person_3_fill,
-                                    color: Theme.of(context).accentColor,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
                                   ),
                                 ),
                                 Text((e['gameName'] as String)

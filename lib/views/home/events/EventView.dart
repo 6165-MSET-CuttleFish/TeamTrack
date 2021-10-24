@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 
 class EventView extends StatefulWidget {
   EventView({Key? key, required this.event}) : super(key: key);
@@ -39,7 +40,7 @@ class _EventView extends State<EventView> {
     return Scaffold(
       appBar: AppBar(
         title: _tab == 0 ? Text('Teams') : Text('Matches'),
-        backgroundColor: Theme.of(context).accentColor,
+        backgroundColor: Theme.of(context).colorScheme.primary,
         actions: [
           _tab != 0
               ? IconButton(
@@ -106,8 +107,12 @@ class _EventView extends State<EventView> {
         ],
       ),
       bottomNavigationBar: widget.event.type != EventType.remote
-          ? BottomNavigationBar(
-              currentIndex: _tab,
+          ? CurvedNavigationBar(
+              buttonBackgroundColor: Theme.of(context).colorScheme.secondary,
+              color: Theme.of(context).canvasColor,
+              index: _tab,
+              backgroundColor:
+                  Theme.of(context).textTheme.bodyText1?.color ?? Colors.black,
               onTap: (index) {
                 setState(
                   () {
@@ -116,19 +121,38 @@ class _EventView extends State<EventView> {
                 );
               },
               items: [
-                BottomNavigationBarItem(
-                  icon: Icon(CupertinoIcons.person_3_fill),
-                  label: 'Teams',
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      CupertinoIcons.person_3_fill,
+                      size: 20,
+                    ),
+                    Text(
+                      'Teams',
+                      style: TextStyle(fontSize: 10),
+                    ),
+                  ],
                 ),
-                BottomNavigationBarItem(
-                  icon: Icon(CupertinoIcons.sportscourt_fill),
-                  label: 'Matches',
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      CupertinoIcons.sportscourt_fill,
+                      size: 20,
+                    ),
+                    Text(
+                      'Matches',
+                      style: TextStyle(fontSize: 10),
+                    ),
+                  ],
                 )
               ],
             )
           : null,
       body: materialTabs()[_tab],
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Theme.of(context).colorScheme.primary,
         tooltip: _tab == 0 ? 'Add Team' : 'Add Match',
         child: Icon(Icons.add),
         onPressed: () async {

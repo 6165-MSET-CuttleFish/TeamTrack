@@ -17,7 +17,7 @@ class _MatchConfigState extends State<MatchConfig> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Add Match'),
-        backgroundColor: Theme.of(context).accentColor,
+        backgroundColor: Theme.of(context).colorScheme.primary,
       ),
       body: SafeArea(
         child: Center(

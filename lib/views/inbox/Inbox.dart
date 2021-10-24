@@ -116,7 +116,7 @@ class _InboxState extends State<Inbox> {
                                         ? CupertinoIcons
                                             .rectangle_stack_person_crop_fill
                                         : CupertinoIcons.person_3_fill,
-                                    color: Theme.of(context).accentColor,
+                                    color: Theme.of(context).colorScheme.primary,
                                   ),
                                 ),
                                 Text((e['gameName'] as String)

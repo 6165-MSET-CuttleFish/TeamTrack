@@ -15,21 +15,22 @@ class _PermissionsState extends State<Permissions> {
   Widget build(BuildContext context) {
     return Container(
       child: ListView(
-          children: widget.event.permissions.keys
-              .map(
-                (user) => ListTile(
-                  leading: getIcon(
-                    widget.event.permissions[user]?.role ?? Role.viewer,
-                  ),
-                  title: Text(
-                    widget.event.permissions[user]?.displayName ?? "Unknown",
-                  ),
-                  subtitle: Text(
-                    widget.event.permissions[user]?.email ?? "Unknown",
-                  ),
+        children: widget.event.permissions.keys
+            .map(
+              (user) => ListTile(
+                leading: getIcon(
+                  widget.event.permissions[user]?.role ?? Role.viewer,
                 ),
-              )
-              .toList()),
+                title: Text(
+                  widget.event.permissions[user]?.displayName ?? "Unknown",
+                ),
+                subtitle: Text(
+                  widget.event.permissions[user]?.email ?? "Unknown",
+                ),
+              ),
+            )
+            .toList(),
+      ),
     );
   }
 

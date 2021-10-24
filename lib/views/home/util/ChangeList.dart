@@ -29,7 +29,7 @@ class _ChangeList extends State<ChangeList> {
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
           title: Text('Changes'),
-          backgroundColor: Theme.of(context).accentColor,
+          backgroundColor: Theme.of(context).colorScheme.primary,
         ),
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.add),
@@ -39,7 +39,7 @@ class _ChangeList extends State<ChangeList> {
                   (context) => Scaffold(
                     appBar: AppBar(
                       title: Text('New Change'),
-                      backgroundColor: Theme.of(context).accentColor,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
                     ),
                     body: ListView(
                       children: [

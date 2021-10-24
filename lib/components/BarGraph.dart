@@ -9,10 +9,12 @@ class BarGraph extends StatelessWidget {
     this.val = 9,
     this.inverted = false,
     this.height = 120,
+    this.width = 30,
     this.title = 'Default',
   }) : super(key: key);
   final String title;
   double max;
+  final double width;
   double val;
   final bool inverted;
   final double height;
@@ -27,6 +29,7 @@ class BarGraph extends StatelessWidget {
     }
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
       children: [
         Text(title, style: Theme.of(context).textTheme.caption),
         Padding(
@@ -36,7 +39,7 @@ class BarGraph extends StatelessWidget {
           alignment: AlignmentDirectional.bottomStart,
           children: [
             Container(
-              width: 30,
+              width: width,
               height: height,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(60),
@@ -46,7 +49,7 @@ class BarGraph extends StatelessWidget {
             AnimatedContainer(
               curve: Curves.fastLinearToSlowEaseIn,
               duration: Duration(milliseconds: 600),
-              width: 30,
+              width: width,
               height: inverted
                   ? (val != 0 ? (max / val).clamp(0, 1) : 1) * height
                   : (max != 0 ? (val / max).clamp(0, 1) : 0) * height,

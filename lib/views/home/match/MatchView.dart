@@ -10,6 +10,7 @@ import 'package:teamtrack/models/ScoreModel.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'package:teamtrack/functions/Statistics.dart';
+import 'package:teamtrack/views/home/match/UsersRow.dart';
 import 'package:uuid/uuid.dart';
 import 'package:teamtrack/functions/Extensions.dart';
 
@@ -83,29 +84,6 @@ class _MatchView extends State<MatchView> {
               });
             }
           }
-          Widget title = Text("Match Stats");
-          if (_match?.activeUsers?.isNotEmpty ?? false) {
-            title = RawMaterialButton(
-              onPressed: () {},
-              splashColor: Colors.transparent,
-              child: Row(
-                children: _match?.activeUsers?.values
-                        .map(
-                          (e) => e.photoURL != null
-                              ? ClipRRect(
-                                  borderRadius: BorderRadius.circular(300),
-                                  child: Image.network(
-                                    e.photoURL!,
-                                    height: 25,
-                                  ),
-                                )
-                              : Icon(Icons.person),
-                        )
-                        .toList() ??
-                    [],
-              ),
-            );
-          }
           return StreamBuilder<int>(
             stream: _periodicStream,
             builder: (context, snapshot) {
@@ -124,7 +102,16 @@ class _MatchView extends State<MatchView> {
                     backgroundColor: _color,
                     title: AnimatedSwitcher(
                       duration: const Duration(milliseconds: 500),
-                      child: title,
+                      child: (_match?.activeUsers?.isNotEmpty ?? false)
+                          ? RawMaterialButton(
+                              onPressed: () {},
+                              splashColor: Colors.transparent,
+                              child: UsersRow(
+                                users:
+                                    _match?.activeUsers?.values.toList() ?? [],
+                              ),
+                            )
+                          : Text("Match Stats"),
                     ),
                     elevation: 0,
                     actions: widget.team == null
@@ -286,7 +273,7 @@ class _MatchView extends State<MatchView> {
                               iconSize: 24,
                               elevation: 16,
                               style: TextStyle(
-                                  color: Theme.of(context).accentColor),
+                                  color: Theme.of(context).colorScheme.primary),
                               underline: Container(
                                 height: 0.5,
                                 color: Colors.deepPurple,
@@ -415,7 +402,7 @@ class _MatchView extends State<MatchView> {
                             SizedBox(
                               height: 50,
                               child: TabBar(
-                                labelColor: Theme.of(context).accentColor,
+                                labelColor: Theme.of(context).colorScheme.primary,
                                 unselectedLabelColor: Colors.grey,
                                 labelStyle:
                                     TextStyle(fontFamily: '.SF UI Display'),
@@ -515,7 +502,10 @@ class _MatchView extends State<MatchView> {
               [],
           Padding(padding: EdgeInsets.all(5)),
           if (widget.team == null)
-            ..._selectedAlliance?.sharedScore?.endgameScore.getElements().parse().map(
+            ..._selectedAlliance?.sharedScore?.endgameScore
+                    .getElements()
+                    .parse()
+                    .map(
                       (e) => Incrementor(
                         element: e,
                         onPressed: stateSetter,
@@ -700,7 +690,10 @@ class _MatchView extends State<MatchView> {
                   .toList() ??
               [],
           if (widget.team == null)
-            ..._selectedAlliance?.sharedScore?.teleScore.getElements().parse().map(
+            ..._selectedAlliance?.sharedScore?.teleScore
+                    .getElements()
+                    .parse()
+                    .map(
                       (e) => Incrementor(
                         element: e,
                         onPressed: stateSetter,

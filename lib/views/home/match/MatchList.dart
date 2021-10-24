@@ -43,7 +43,7 @@ class _MatchList extends State<MatchList> {
         return Scaffold(
           appBar: AppBar(
             title: Text('Matches'),
-            backgroundColor: Theme.of(context).accentColor,
+            backgroundColor: Theme.of(context).colorScheme.primary,
           ),
           body: _matches(),
           floatingActionButton: FloatingActionButton(
@@ -343,6 +343,13 @@ class _MatchList extends State<MatchList> {
                   matches[i].score(showPenalties: true),
                 ),
                 onTap: () async {
+                  final user = context.read<User?>();
+                  final ttuser = widget.event.getTTUserFromUser(user);
+                  widget.event
+                      .getRef()
+                      ?.child(
+                          'matches/${matches[i].id}/activeUsers/${user?.uid}')
+                      .set(ttuser.toJson());
                   await Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -352,6 +359,11 @@ class _MatchList extends State<MatchList> {
                       ),
                     ),
                   );
+                  widget.event
+                      .getRef()
+                      ?.child(
+                          'matches/${matches[i].id}//activeUsers/${user?.uid}')
+                      .remove();
                   setState(() {});
                 },
               ),
@@ -469,6 +481,12 @@ class _MatchList extends State<MatchList> {
               ],
             ),
             onTap: () async {
+              final user = context.read<User?>();
+              final ttuser = widget.event.getTTUserFromUser(user);
+              widget.event
+                  .getRef()
+                  ?.child('matches/${e.id}/activeUsers/${user?.uid}')
+                  .set(ttuser.toJson());
               await Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -478,6 +496,10 @@ class _MatchList extends State<MatchList> {
                   ),
                 ),
               );
+              widget.event
+                  .getRef()
+                  ?.child('matches/${e.id}//activeUsers/${user?.uid}')
+                  .remove();
               setState(() {});
             },
           ),
@@ -596,9 +618,16 @@ class MatchSearch extends SearchDelegate<String?> {
                   ),
                 ],
               ),
-              onTap: () {
+              onTap: () async {
                 close(context, null);
-                Navigator.push(
+                final user = context.read<User?>();
+                final ttuser = event.getTTUserFromUser(user);
+                event
+                    .getRef()
+                    ?.child(
+                        'matches/${suggestionList[index].id}/activeUsers/${user?.uid}')
+                    .set(ttuser.toJson());
+                await Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => MatchView(
@@ -607,6 +636,11 @@ class MatchSearch extends SearchDelegate<String?> {
                     ),
                   ),
                 );
+                event
+                    .getRef()
+                    ?.child(
+                        'matches/${suggestionList[index].id}//activeUsers/${user?.uid}')
+                    .remove();
               },
             ),
           );

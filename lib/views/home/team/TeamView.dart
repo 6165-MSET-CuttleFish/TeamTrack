@@ -66,11 +66,12 @@ class _TeamView extends State<TeamView> {
               alignment: MainAxisAlignment.center,
               children: [
                 OutlineButton(
-                  disabledTextColor: Theme.of(context).accentColor,
+                  disabledTextColor: Theme.of(context).colorScheme.primary,
                   highlightedBorderColor: Theme.of(context).splashColor,
-                  disabledBorderColor: Theme.of(context).accentColor,
-                  color:
-                      _dice == Dice.one ? Theme.of(context).accentColor : null,
+                  disabledBorderColor: Theme.of(context).colorScheme.primary,
+                  color: _dice == Dice.one
+                      ? Theme.of(context).colorScheme.primary
+                      : null,
                   child: Text(Dice.one.toVal(widget.event.gameName)),
                   onPressed: _dice != Dice.one
                       ? () {
@@ -83,11 +84,12 @@ class _TeamView extends State<TeamView> {
                       : null,
                 ),
                 OutlineButton(
-                  disabledTextColor: Theme.of(context).accentColor,
+                  disabledTextColor: Theme.of(context).colorScheme.primary,
                   highlightedBorderColor: Theme.of(context).splashColor,
-                  disabledBorderColor: Theme.of(context).accentColor,
-                  color:
-                      _dice == Dice.two ? Theme.of(context).accentColor : null,
+                  disabledBorderColor: Theme.of(context).colorScheme.primary,
+                  color: _dice == Dice.two
+                      ? Theme.of(context).colorScheme.primary
+                      : null,
                   child: Text(Dice.two.toVal(widget.event.gameName)),
                   onPressed: _dice != Dice.two
                       ? () {
@@ -100,11 +102,11 @@ class _TeamView extends State<TeamView> {
                       : null,
                 ),
                 OutlineButton(
-                  disabledTextColor: Theme.of(context).accentColor,
+                  disabledTextColor: Theme.of(context).colorScheme.primary,
                   highlightedBorderColor: Theme.of(context).splashColor,
-                  disabledBorderColor: Theme.of(context).accentColor,
+                  disabledBorderColor: Theme.of(context).colorScheme.primary,
                   color: _dice == Dice.three
-                      ? Theme.of(context).accentColor
+                      ? Theme.of(context).colorScheme.primary
                       : null,
                   child: Text(Dice.three.toVal(widget.event.gameName)),
                   onPressed: _dice != Dice.three
@@ -118,8 +120,9 @@ class _TeamView extends State<TeamView> {
                       : null,
                 ),
                 MaterialButton(
-                  color:
-                      _dice == Dice.none ? Theme.of(context).accentColor : null,
+                  color: _dice == Dice.none
+                      ? Theme.of(context).colorScheme.primary
+                      : null,
                   child: Text('All Cases'),
                   onPressed: () => setState(
                     () => _dice = Dice.none,
@@ -140,7 +143,7 @@ class _TeamView extends State<TeamView> {
             ),
           ],
         ),
-        backgroundColor: Theme.of(context).accentColor,
+        backgroundColor: Theme.of(context).colorScheme.primary,
         actions: [
           IconButton(
             icon: Icon(Icons.settings),

@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:teamtrack/components/BarGraph.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/views/home/team/TeamView.dart';
 import 'package:teamtrack/models/AppModel.dart';
@@ -112,6 +115,14 @@ class _TeamList extends State<TeamList> {
                         title: Text(e.name),
                         leading: Text(e.number,
                             style: Theme.of(context).textTheme.caption),
+                        trailing: RotatedBox(
+                          quarterTurns: 1,
+                          child: BarGraph(
+                            height: 90,
+                            width: 25,
+                            title: 'Median',
+                          ),
+                        ),
                         onTap: () async {
                           await Navigator.push(
                             context,
