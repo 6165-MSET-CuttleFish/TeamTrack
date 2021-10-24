@@ -147,7 +147,7 @@ export const fetchAPI = functions.https.onCall((data, context) => {
         "User not logged in"
     );
   }
-  const url = new URL("https://ftc-events.firstinspires.org");
+  const url = new URL("https://ftc-api.firstinspires.org/v2.0/");
   return fetch(url.toString(), {
     headers: {Authorization: `Basic ${ftcAPIKey}`},
   });
