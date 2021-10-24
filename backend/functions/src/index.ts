@@ -35,7 +35,7 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
       .child("Permissions").child(recipient.uid).set({
         "role": data.role,
         "name": recipient.displayName,
-        "email": recipient.displayName,
+        "email": recipient.email,
       });
   const meta = {
     "id": data.id,
@@ -139,12 +139,14 @@ export const createUser = functions.auth.user().onCreate(async (user) => {
 export const deleteUser = functions.auth.user().onDelete(async (user) => {
   return admin.firestore().collection("users").doc(user.uid).delete();
 });
-interface User {
-  name: string
-  age: string
-}
 
 export const fetchAPI = functions.https.onCall((data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError(
+        "unauthenticated",
+        "User not logged in"
+    );
+  }
   const url = new URL("https://ftc-events.firstinspires.org");
   return fetch(url.toString(), {
     headers: {Authorization: `Basic ${ftcAPIKey}`},
