@@ -549,6 +549,62 @@ class _Incrementor extends State<Incrementor> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           RawMaterialButton(
+            onLongPress: widget.element.count > widget.element.min!()
+                ? () {
+                    showPlatformDialog(
+                      context: context,
+                      builder: (context) => PlatformAlert(
+                        title: Text("Reset Field"),
+                        content: Text("Are you sure?"),
+                        actions: [
+                          PlatformDialogAction(
+                            child: Text("Cancel"),
+                            onPressed: () => Navigator.pop(context),
+                          ),
+                          PlatformDialogAction(
+                            child: Text("Confirm"),
+                            isDestructive: true,
+                            onPressed: () async {
+                              if (!(widget.event?.shared ?? false)) {
+                                setState(() => widget.element.count =
+                                    widget.element.min!());
+                                if (widget.onDecrement != null)
+                                  widget.onDecrement!();
+                              }
+                              widget.onPressed();
+                              if (widget.path != null)
+                                await widget.event
+                                    ?.getRef()
+                                    ?.child(widget.path!)
+                                    .runTransaction(
+                                  (mutableData) {
+                                    if (widget.mutableDecrement != null) {
+                                      return widget
+                                          .mutableDecrement!(mutableData);
+                                    }
+                                    if (widget.isTargetScore) {
+                                      mutableData.value['targetScore']
+                                                  [widget.opModeType?.toRep()]
+                                              [widget.element.key] =
+                                          widget.element.min!();
+                                      return mutableData;
+                                    }
+                                    final scoreIndex = widget.score?.id;
+                                    mutableData.value['scores'][scoreIndex]
+                                                [widget.opModeType?.toRep()]
+                                            [widget.element.key] =
+                                        widget.element.min!();
+                                    return mutableData;
+                                  },
+                                );
+                              Navigator.pop(context);
+                            },
+                          )
+                        ],
+                      ),
+                    );
+                  }
+                : null,
             onPressed: widget.element.count > widget.element.min!()
                 ? () async {
                     if (!(widget.event?.shared ?? false)) {
@@ -834,7 +890,8 @@ class ScoreCard extends StatelessWidget {
                       .map(
                         (matches) => matches.item2
                             .where(
-                              (match) => match.dice == dice || dice == Dice.none,
+                              (match) =>
+                                  match.dice == dice || dice == Dice.none,
                             )
                             .toList()
                             .spots(matches.item1, dice, false, type: type)
