@@ -36,8 +36,11 @@ class _LoginView extends State<LoginView> {
           ),
           Column(
             children: [
-              Image.asset(
-                "assets/images/LoadingScreen2.png",
+              SizedBox(
+                child: Image.asset(
+                  "assets/images/LoadingScreen.png",
+                ),
+                height: MediaQuery.of(context).size.height,
               ),
               Spacer(),
             ],
