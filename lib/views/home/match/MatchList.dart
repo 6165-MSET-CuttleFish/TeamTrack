@@ -13,8 +13,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:teamtrack/functions/Extensions.dart';
 
 class MatchList extends StatefulWidget {
-  MatchList({Key? key, required this.event, this.team, required this.ascending})
-      : super(key: key);
+  MatchList({
+    Key? key,
+    required this.event,
+    this.team,
+    required this.ascending,
+  }) : super(key: key);
   final Event event;
   final Team? team;
   final bool ascending;
@@ -45,6 +49,8 @@ class _MatchList extends State<MatchList> {
               backgroundColor: Theme.of(context).colorScheme.primary,
             ),
             body: _matches(),
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.centerFloat,
             floatingActionButton: FloatingActionButton(
               onPressed: () async {
                 if (widget.event.type == EventType.remote)

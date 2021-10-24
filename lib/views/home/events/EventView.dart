@@ -3,7 +3,6 @@ import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/views/home/match/MatchConfig.dart';
 import 'package:teamtrack/views/home/match/MatchList.dart';
 import 'package:teamtrack/views/home/team/TeamList.dart';
-import 'package:teamtrack/functions/Statistics.dart';
 import 'package:teamtrack/functions/Extensions.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:flutter/cupertino.dart';
@@ -23,7 +22,7 @@ class EventView extends StatefulWidget {
 class _EventView extends State<EventView> {
   final slider = SlidableStrechActionPane();
   OpModeType? sortingModifier;
-  bool ascending = true;
+  bool ascending = false;
   List<Widget> materialTabs() => [
         TeamList(
           event: widget.event,
@@ -35,6 +34,7 @@ class _EventView extends State<EventView> {
         ),
       ];
   int _tab = 0;
+
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
@@ -93,12 +93,11 @@ class _EventView extends State<EventView> {
                   context: context,
                   delegate: _tab == 0
                       ? TeamSearch(
-                          teams:
-                              widget.event.teams.sortedTeams(sortingModifier),
+                          teams: widget.event.teams.values.toList(),
                           event: widget.event,
                         )
                       : MatchSearch(
-                          matches: widget.event.getSortedMatches(ascending),
+                          matches: widget.event.getSortedMatches(true),
                           event: widget.event,
                         ),
                 );
@@ -108,18 +107,15 @@ class _EventView extends State<EventView> {
         ),
         bottomNavigationBar: widget.event.type != EventType.remote
             ? CurvedNavigationBar(
+                animationDuration: const Duration(milliseconds: 400),
                 buttonBackgroundColor: Theme.of(context).colorScheme.secondary,
                 color: Theme.of(context).textTheme.bodyText1?.color ??
                     Colors.black,
                 index: _tab,
                 backgroundColor: Theme.of(context).canvasColor,
-                onTap: (index) {
-                  setState(
-                    () {
-                      _tab = index;
-                    },
-                  );
-                },
+                onTap: (index) => setState(
+                  () => _tab = index,
+                ),
                 items: [
                   Column(
                     mainAxisSize: MainAxisSize.min,
@@ -145,14 +141,14 @@ class _EventView extends State<EventView> {
                       Icon(
                         CupertinoIcons.sportscourt_fill,
                         size: 20,
-                        color: _tab != 1 ? Theme.of(context).canvasColor : null,
+                        color: _tab == 0 ? Theme.of(context).canvasColor : null,
                       ),
                       Text(
                         'Matches',
                         style: TextStyle(
                           fontSize: 10,
                           color:
-                              _tab != 1 ? Theme.of(context).canvasColor : null,
+                              _tab == 0 ? Theme.of(context).canvasColor : null,
                         ),
                       ),
                     ],
@@ -161,6 +157,7 @@ class _EventView extends State<EventView> {
               )
             : null,
         body: materialTabs()[_tab],
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: FloatingActionButton(
           backgroundColor: Theme.of(context).colorScheme.primary,
           tooltip: _tab == 0 ? 'Add Team' : 'Add Match',

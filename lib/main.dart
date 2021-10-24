@@ -73,7 +73,6 @@ class _TeamTrack extends State<TeamTrack> {
       backgroundColor: Colors.cyan,
       elevation: 0,
     ),
-    primarySwatch: Colors.cyan,
     visualDensity: VisualDensity.adaptivePlatformDensity,
   );
 
@@ -118,12 +117,6 @@ class AuthenticationWrapper extends StatelessWidget {
 }
 
 class MyApp extends StatelessWidget {
-  final lightTheme = ThemeData(
-    primarySwatch: Colors.deepPurple,
-    splashColor: Colors.cyan,
-    visualDensity: VisualDensity.adaptivePlatformDensity,
-  );
-
   @override
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);

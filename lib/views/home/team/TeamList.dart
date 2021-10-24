@@ -12,8 +12,11 @@ import 'package:teamtrack/functions/Statistics.dart';
 import 'dart:convert';
 
 class TeamList extends StatefulWidget {
-  TeamList({Key? key, required this.event, required this.sortMode})
-      : super(key: key);
+  TeamList({
+    Key? key,
+    required this.event,
+    required this.sortMode,
+  }) : super(key: key);
   final Event event;
   final OpModeType? sortMode;
   @override
@@ -29,6 +32,7 @@ class _TeamList extends State<TeamList> {
       onTap: () {},
     )
   ];
+
   @override
   Widget build(BuildContext context) => StreamBuilder<Database.Event>(
         stream: widget.event.getRef()?.onValue,

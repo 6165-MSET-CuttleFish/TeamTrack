@@ -144,6 +144,7 @@ class _TeamView extends State<TeamView> {
           backgroundColor: Theme.of(context).colorScheme.primary,
           actions: [
             IconButton(
+              tooltip: "Configure",
               icon: Icon(Icons.settings),
               onPressed: () => showModalBottomSheet(
                 context: context,
@@ -463,6 +464,8 @@ class _TeamView extends State<TeamView> {
                           ),
                           series: <ChartSeries>[
                             BoxAndWhiskerSeries<List<double>, int>(
+                              xAxisName: "Match",
+                              yAxisName: "Cycle Times (seconds)",
                               gradient: LinearGradient(
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
@@ -478,6 +481,8 @@ class _TeamView extends State<TeamView> {
                                   cycles.length != 0 ? cycles : [0, 0, 0, 0],
                             ),
                             LineSeries<int, int>(
+                              xAxisName: "Match",
+                              yAxisName: "Total Misses",
                               dashArray: [10],
                               width: 2,
                               color: Colors.red,
@@ -489,6 +494,8 @@ class _TeamView extends State<TeamView> {
                               yValueMapper: (int misses, _) => misses,
                             ),
                             LineSeries<int, int>(
+                              xAxisName: "Match",
+                              yAxisName: "Total Tele-Op Cycles",
                               width: 2,
                               color: teleColor,
                               dataSource: _team.scores
@@ -499,6 +506,8 @@ class _TeamView extends State<TeamView> {
                               yValueMapper: (int misses, _) => misses,
                             ),
                             LineSeries<int, int>(
+                              xAxisName: "Match",
+                              yAxisName: "Total Endgame Cycles",
                               width: 2,
                               color: endgameColor,
                               dataSource: _team.scores
