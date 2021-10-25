@@ -25,13 +25,6 @@ class TeamList extends StatefulWidget {
 
 class _TeamList extends State<TeamList> {
   final slider = SlidableStrechActionPane();
-  final secondaryActions = <Widget>[
-    IconSlideAction(
-      icon: Icons.delete,
-      color: Colors.red,
-      onTap: () {},
-    )
-  ];
 
   @override
   Widget build(BuildContext context) => StreamBuilder<Database.Event>(
@@ -133,8 +126,8 @@ class _TeamList extends State<TeamList> {
                           RotatedBox(
                             quarterTurns: 1,
                             child: BarGraph(
-                              height: 60,
-                              width: 25,
+                              height: 70,
+                              width: 30,
                               val: team.scores
                                   .meanScore(Dice.none, true, widget.sortMode),
                               max: max,

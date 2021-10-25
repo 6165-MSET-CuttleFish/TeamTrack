@@ -15,7 +15,7 @@ class PercentIncrease extends StatelessWidget {
             Icon(Icons.arrow_upward, color: CupertinoColors.systemGreen),
           if (percentIncrease < 0)
             Icon(Icons.arrow_downward, color: CupertinoColors.systemRed),
-          Text(percentIncrease.abs().toStringAsFixed(2) + " %",
+          Text("${percentIncrease.abs().toInt()}%",
               style: const TextStyle(fontSize: 14.0)),
         ],
       );

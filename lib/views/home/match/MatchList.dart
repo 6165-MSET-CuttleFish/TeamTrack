@@ -1,4 +1,5 @@
 import 'package:firebase_database/firebase_database.dart' as Database;
+import 'package:google_fonts/google_fonts.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/views/home/match/MatchConfig.dart';
 import 'package:teamtrack/views/home/match/MatchView.dart';
@@ -203,17 +204,17 @@ class _MatchList extends State<MatchList> {
                         children: [
                           Text(
                             e.redScore(showPenalties: true).toString(),
-                            style: TextStyle(
+                            style: GoogleFonts.gugi(
                               color: e.redScore(showPenalties: true) >
                                       e.blueScore(showPenalties: true)
                                   ? CupertinoColors.systemRed
                                   : Colors.grey,
                             ),
                           ),
-                          Text(" - "),
+                          Text(" - ", style: GoogleFonts.gugi()),
                           Text(
                             e.blueScore(showPenalties: true).toString(),
-                            style: TextStyle(
+                            style: GoogleFonts.gugi(
                               color: e.redScore(showPenalties: true) <
                                       e.blueScore(showPenalties: true)
                                   ? CupertinoColors.systemBlue
@@ -467,16 +468,16 @@ class _MatchList extends State<MatchList> {
               children: [
                 Text(
                   e.redScore(showPenalties: true).toString(),
-                  style: TextStyle(
+                  style: GoogleFonts.gugi(
                     color: e.alliance(widget.team) == e.red
                         ? CupertinoColors.systemYellow
                         : Colors.grey,
                   ),
                 ),
-                Text(" - "),
+                Text(" - ", style: GoogleFonts.gugi()),
                 Text(
                   e.blueScore(showPenalties: true).toString(),
-                  style: TextStyle(
+                  style: GoogleFonts.gugi(
                     color: e.alliance(widget.team) == e.blue
                         ? CupertinoColors.systemYellow
                         : Colors.grey,
@@ -597,7 +598,7 @@ class MatchSearch extends SearchDelegate<String?> {
                     suggestionList[index]
                         .redScore(showPenalties: true)
                         .toString(),
-                    style: TextStyle(
+                    style: GoogleFonts.gugi(
                       color:
                           suggestionList[index].redScore(showPenalties: true) >
                                   suggestionList[index]
@@ -606,12 +607,12 @@ class MatchSearch extends SearchDelegate<String?> {
                               : Colors.grey,
                     ),
                   ),
-                  Text(" - "),
+                  Text(" - ", style: GoogleFonts.gugi()),
                   Text(
                     suggestionList[index]
                         .blueScore(showPenalties: true)
                         .toString(),
-                    style: TextStyle(
+                    style: GoogleFonts.gugi(
                       color:
                           suggestionList[index].redScore(showPenalties: true) <
                                   suggestionList[index]

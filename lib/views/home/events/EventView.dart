@@ -107,7 +107,8 @@ class _EventView extends State<EventView> {
         ),
         bottomNavigationBar: widget.event.type != EventType.remote
             ? CurvedNavigationBar(
-                animationDuration: const Duration(milliseconds: 400),
+                animationCurve: Curves.easeOutQuint,
+                animationDuration: const Duration(milliseconds: 1000),
                 buttonBackgroundColor: Theme.of(context).colorScheme.secondary,
                 color: Theme.of(context).textTheme.bodyText1?.color ??
                     Colors.black,
