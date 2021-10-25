@@ -760,10 +760,9 @@ class _MatchView extends State<MatchView> {
 
   Row buttonRow() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        Flexible(
-          flex: 1,
+        SizedBox(
           child: PlatformButton(
             child: Text(
               _match?.red?.team1?.number ?? '?',
@@ -788,8 +787,7 @@ class _MatchView extends State<MatchView> {
                     ),
           ),
         ),
-        Flexible(
-          flex: 1,
+        SizedBox(
           child: PlatformButton(
             child: Text(
               _match?.red?.team2?.number ?? '?',
@@ -813,9 +811,7 @@ class _MatchView extends State<MatchView> {
                   },
           ),
         ),
-        Spacer(),
-        Flexible(
-          flex: 1,
+        SizedBox(
           child: PlatformButton(
             child: Text(
               _match?.blue?.team1?.number ?? '?',
@@ -838,8 +834,7 @@ class _MatchView extends State<MatchView> {
                   },
           ),
         ),
-        Flexible(
-          flex: 1,
+        SizedBox(
           child: PlatformButton(
             child: Text(
               _match?.blue?.team2?.number ?? '?',

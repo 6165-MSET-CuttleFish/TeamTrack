@@ -112,7 +112,7 @@ class _EventView extends State<EventView> {
                 color: Theme.of(context).textTheme.bodyText1?.color ??
                     Colors.black,
                 index: _tab,
-                backgroundColor: Theme.of(context).canvasColor,
+                backgroundColor: Colors.transparent,
                 onTap: (index) => setState(
                   () => _tab = index,
                 ),
