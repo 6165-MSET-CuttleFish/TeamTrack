@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:teamtrack/providers/Auth.dart';
 import 'package:teamtrack/models/GameModel.dart';
@@ -47,6 +48,14 @@ class _TeamTrack extends State<TeamTrack> {
   final lightTheme = ThemeData(
     splashColor: NewPlatform.isAndroid() ? Colors.cyan : Colors.transparent,
     visualDensity: VisualDensity.adaptivePlatformDensity,
+    textTheme: TextTheme(
+      bodyText1: GoogleFonts.gugi(color: Colors.white),
+      bodyText2: GoogleFonts.gugi(color: Colors.white),
+      caption: GoogleFonts.squadaOne(color: Colors.white),
+      headline6: GoogleFonts.gugi(color: Colors.white),
+      headline4: GoogleFonts.rockSalt(color: Colors.black),
+      button: GoogleFonts.gugi(color: Colors.white),
+    ),
     colorScheme: ColorScheme.light(
       primary: Colors.deepPurple,
       secondary: Colors.cyan,
@@ -55,7 +64,12 @@ class _TeamTrack extends State<TeamTrack> {
 
   final darkTheme = ThemeData(
     textTheme: TextTheme(
-      bodyText2: TextStyle(color: Colors.white),
+      bodyText1: GoogleFonts.gugi(color: Colors.white),
+      bodyText2: GoogleFonts.gugi(color: Colors.white),
+      caption: GoogleFonts.squadaOne(color: Colors.white),
+      headline6: GoogleFonts.gugi(color: Colors.white),
+      headline4: GoogleFonts.rockSalt(color: Colors.white),
+      button: GoogleFonts.gugi(color: Colors.white),
     ),
     backgroundColor: Colors.black,
     splashColor:

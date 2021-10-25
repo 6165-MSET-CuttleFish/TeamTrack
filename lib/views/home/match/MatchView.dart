@@ -220,14 +220,14 @@ class _MatchView extends State<MatchView> {
                                   alignment: Alignment.center,
                                   width: 100,
                                   child: Text(
-                                      _match
-                                              ?.redScore(
-                                                  showPenalties: _showPenalties)
-                                              .toString() ??
-                                          '0',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headline4),
+                                    _match
+                                            ?.redScore(
+                                                showPenalties: _showPenalties)
+                                            .toString() ??
+                                        '0',
+                                    style:
+                                        Theme.of(context).textTheme.headline4,
+                                  ),
                                 ),
                                 Container(
                                   child: Text('-',
@@ -239,14 +239,14 @@ class _MatchView extends State<MatchView> {
                                   alignment: Alignment.center,
                                   width: 100,
                                   child: Text(
-                                      _match
-                                              ?.blueScore(
-                                                  showPenalties: _showPenalties)
-                                              .toString() ??
-                                          '0',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headline4),
+                                    _match
+                                            ?.blueScore(
+                                                showPenalties: _showPenalties)
+                                            .toString() ??
+                                        '0',
+                                    style:
+                                        Theme.of(context).textTheme.headline4,
+                                  ),
                                 ),
                               ],
                             ),
@@ -768,9 +768,10 @@ class _MatchView extends State<MatchView> {
             child: Text(
               _match?.red?.team1?.number ?? '?',
               style: TextStyle(
-                  color: _selectedTeam == _match?.red?.team1
-                      ? Colors.grey
-                      : CupertinoColors.systemRed),
+                color: _selectedTeam == _match?.red?.team1
+                    ? Colors.grey
+                    : CupertinoColors.systemRed,
+              ),
             ),
             onPressed: _selectedTeam == _match?.red?.team1
                 ? null
