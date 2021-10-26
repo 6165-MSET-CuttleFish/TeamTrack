@@ -81,12 +81,12 @@ abstract class PlatformWidget<C extends Widget, M extends Widget>
 }
 
 class PlatformSwitch extends PlatformWidget<CupertinoSwitch, Switch> {
-  PlatformSwitch(
-      {Key? key,
-      required this.value,
-      required this.onChanged,
-      this.highlightColor})
-      : super(key: key);
+  PlatformSwitch({
+    Key? key,
+    required this.value,
+    required this.onChanged,
+    this.highlightColor,
+  }) : super(key: key);
   final bool value;
   final ValueChanged<bool>? onChanged;
   final Color? highlightColor;
@@ -790,6 +790,25 @@ class ScoreCard extends StatelessWidget {
   final List<Match>? matches;
   @override
   Widget build(BuildContext context) {
+    final allianceTotals = matches
+        ?.where(
+          (match) => match.dice == dice || dice == Dice.none,
+        )
+        .toList()
+        .spots(team, dice, false, type: type)
+        .removeOutliers(removeOutliers)
+        .map((spot) => spot.y);
+    final diceMatches = matches?.where(
+          (match) => match.dice == dice || dice == Dice.none,
+        ) ??
+        [];
+    final redAlliances =
+        diceMatches.map((match) => match.red).whereType<Alliance>();
+    final blueAlliances = diceMatches.map((e) => e.blue).whereType<Alliance>();
+    final allAlliances = redAlliances;
+    allAlliances.toList().addAll(blueAlliances);
+    final allAllianceTotals =
+        allAlliances.map((alliance) => alliance.allianceTotal(true, type: type));
     return CardView(
       isActive: scoreDivisions.diceScores(dice).length >= 1,
       child: Padding(
@@ -800,16 +819,7 @@ class ScoreCard extends StatelessWidget {
             BarGraph(
               val: !matchTotal
                   ? scoreDivisions.meanScore(dice, removeOutliers)
-                  : matches
-                          ?.where(
-                            (match) => match.dice == dice || dice == Dice.none,
-                          )
-                          .toList()
-                          .spots(team, dice, false, type: type)
-                          .removeOutliers(removeOutliers)
-                          .map((spot) => spot.y)
-                          .mean() ??
-                      0,
+                  : allianceTotals?.mean() ?? 0,
               max: !matchTotal
                   ? event.teams.maxMeanScore(dice, removeOutliers, type)
                   : matches
@@ -819,21 +829,12 @@ class ScoreCard extends StatelessWidget {
                           .toList()
                           .maxScore(false) ??
                       0,
-              title: 'Average',
+              title: 'Mean',
             ),
             BarGraph(
               val: !matchTotal
                   ? scoreDivisions.medianScore(dice, removeOutliers)
-                  : matches
-                          ?.where(
-                            (match) => match.dice == dice || dice == Dice.none,
-                          )
-                          .toList()
-                          .spots(team, dice, false, type: type)
-                          .removeOutliers(removeOutliers)
-                          .map((spot) => spot.y)
-                          .median() ??
-                      0,
+                  : allianceTotals?.median() ?? 0,
               max: !matchTotal
                   ? event.teams.maxMedianScore(dice, removeOutliers, type)
                   : matches
@@ -848,16 +849,7 @@ class ScoreCard extends StatelessWidget {
             BarGraph(
               val: !matchTotal
                   ? scoreDivisions.maxScore(dice, removeOutliers)
-                  : matches
-                          ?.where(
-                            (e) => e.dice == dice || dice == Dice.none,
-                          )
-                          .toList()
-                          .spots(team, dice, false, type: type)
-                          .removeOutliers(removeOutliers)
-                          .map((e) => e.y)
-                          .maxValue() ??
-                      0,
+                  : allianceTotals?.maxValue() ?? 0,
               max: !matchTotal
                   ? event.teams.maxScore(dice, removeOutliers, type)
                   : matches
@@ -872,16 +864,7 @@ class ScoreCard extends StatelessWidget {
             BarGraph(
               val: !matchTotal
                   ? scoreDivisions.standardDeviationScore(dice, removeOutliers)
-                  : matches
-                          ?.where(
-                            (match) => match.dice == dice || dice == Dice.none,
-                          )
-                          .toList()
-                          .spots(team, dice, false, type: type)
-                          .removeOutliers(removeOutliers)
-                          .map((spot) => spot.y)
-                          .standardDeviation() ??
-                      0,
+                  : allianceTotals?.standardDeviation() ?? 0,
               max: !matchTotal
                   ? event.teams
                       .lowestStandardDeviationScore(dice, removeOutliers, type)

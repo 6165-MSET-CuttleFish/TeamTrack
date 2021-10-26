@@ -407,7 +407,7 @@ class Alliance {
       (team1?.scores[id]?.penalties.total() ?? 0) +
       (team2?.scores[id]?.penalties.total() ?? 0);
 
-  int allianceTotal(String? id, bool? showPenalties, {OpModeType? type}) =>
+  int allianceTotal(bool? showPenalties, {OpModeType? type}) =>
       (((team1?.scores[id]?.getScoreDivision(type).total() ?? 0) +
                   (team2?.scores[id]?.getScoreDivision(type).total() ?? 0) +
                   ((showPenalties ?? false)
@@ -499,10 +499,10 @@ class Match {
   }
 
   int redScore({required bool? showPenalties}) =>
-      red?.allianceTotal(id, showPenalties) ?? 0;
+      red?.allianceTotal(showPenalties) ?? 0;
 
   int blueScore({required bool? showPenalties}) =>
-      blue?.allianceTotal(id, showPenalties) ?? 0;
+      blue?.allianceTotal(showPenalties) ?? 0;
 
   Match.fromJson(Map<String, dynamic> json, Map<String, Team> teamList,
       this.type, String gameName) {

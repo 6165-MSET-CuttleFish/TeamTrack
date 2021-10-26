@@ -31,12 +31,12 @@ class _InboxState extends State<Inbox> {
               (query.data?['inbox'] as Map<String, dynamic>?)?.values.toList();
           queryResult?.sort(
               (a, b) => (a['sendTime'] as Timestamp).compareTo(b['sendTime']));
-          if (queryResult?.length == 0) {
+          if (queryResult?.length == 0 || queryResult == null) {
             return EmptyList();
           }
           return ListView(
             children: queryResult
-                    ?.map(
+                    .map(
                       (e) => Slidable(
                         actionPane: slider,
                         secondaryActions: [
@@ -201,7 +201,8 @@ class _InboxState extends State<Inbox> {
                                             await transaction.get(docRef);
                                         if (!snapshot.exists) {
                                           throw Exception(
-                                              "User does not exist!");
+                                            "User does not exist!",
+                                          );
                                         }
                                         Map<String, dynamic> newInbox =
                                             snapshot.data()?["inbox"]
@@ -233,8 +234,7 @@ class _InboxState extends State<Inbox> {
                         ),
                       ),
                     )
-                    .toList() ??
-                [Text('')],
+                    .toList(),
           );
         } else
           return PlatformProgressIndicator();

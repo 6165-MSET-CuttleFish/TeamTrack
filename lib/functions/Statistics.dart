@@ -8,6 +8,32 @@ extension Ex on double {
   double toPrecision(int n) => double.parse(toStringAsFixed(n));
 }
 
+double mean(List<num> arr) {
+  double sum = 0;
+  for (var i = 0; i < arr.length; i++) {
+    sum += arr[i];
+  }
+  return sum / arr.length;
+}
+
+double median(List<num> arr) {
+  arr.sort();
+  if (arr.length % 2 == 0) {
+    return (arr[arr.length ~/ 2 - 1] + arr[arr.length ~/ 2]) / 2;
+  } else {
+    return arr[arr.length ~/ 2].toDouble();
+  }
+}
+
+double standardDeviation(List<num> arr) {
+  double avg = mean(arr);
+  double sum = 0;
+  for (var i = 0; i < arr.length; i++) {
+    sum += pow(arr[i] - avg, 2);
+  }
+  return sqrt(sum / arr.length);
+}
+
 extension Arithmetic on Iterable<num?> {
   double mean() {
     if (this.length == 0) return 0;
@@ -73,7 +99,8 @@ extension Arithmetic on Iterable<num?> {
   }
 
   List<double> removeOutliers(bool removeOutliers) {
-    if (this.length < 3) return this.map((e) => e?.toDouble() ?? 0).toList();
+    if (this.length < 3 || !removeOutliers)
+      return this.map((e) => e?.toDouble() ?? 0).toList();
     return this
         .map((e) => e?.toDouble() ?? 0)
         .where((e) => removeOutliers ? !e.isOutlier(this) : true)
@@ -99,7 +126,7 @@ extension MatchExtensions on List<Match> {
       final alliance = match.alliance(team);
       if (alliance != null) {
         final allianceTotal =
-            alliance.allianceTotal(match.id, showPenalties, type: type);
+            alliance.allianceTotal(showPenalties, type: type);
         val.add(FlSpot(i.toDouble(), allianceTotal.toDouble()));
         i++;
       }
@@ -112,9 +139,9 @@ extension MatchExtensions on List<Match> {
     for (int i = 0; i < this.length; i++) {
       final alliance = this[i].alliance(team);
       if (alliance != null) {
-        final allianceTotal = alliance.allianceTotal(this[i].id, false);
+        final allianceTotal = alliance.allianceTotal(false);
         val.add(allianceTotal);
-        final allianceTotal2 = alliance.allianceTotal(this[i].id, true);
+        final allianceTotal2 = alliance.allianceTotal(true);
         val.add(allianceTotal2);
       }
     }
@@ -258,6 +285,21 @@ extension ScoreDivExtension on List<ScoreDivision> {
         .removeOutliers(removeOutliers)
         .reduce(min)
         .toDouble();
+  }
+
+  double funcScore(Dice dice, bool removeOutliers,
+      {required double Function(List<num>) func}) {
+    final arr = this.diceScores(dice);
+    if (arr.length == 0) return 0;
+    return func(
+      arr
+          .map(
+            (e) => e.total().toDouble(),
+          )
+          .removeOutliers(
+            removeOutliers,
+          ),
+    );
   }
 
   double meanScore(Dice dice, bool removeOutliers) {
