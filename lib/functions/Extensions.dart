@@ -1,14 +1,13 @@
 import 'dart:convert';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/models/ScoreModel.dart';
 
 extension RoleExtension on Role {
+  // getter for showing to the user
   String name() {
-    // getter for showing to the user
     switch (this) {
       case Role.viewer:
         return 'Viewer';
@@ -19,8 +18,8 @@ extension RoleExtension on Role {
     }
   }
 
+  // for firebase
   String toRep() {
-    // for firebase
     switch (this) {
       case Role.viewer:
         return 'viewer';
@@ -28,6 +27,27 @@ extension RoleExtension on Role {
         return 'editor';
       case Role.admin:
         return 'admin';
+    }
+  }
+
+  // icon for showing to the user
+  Icon getIcon() {
+    switch (this) {
+      case Role.viewer:
+        return Icon(
+          Icons.visibility_outlined,
+          size: 2,
+        );
+      case Role.editor:
+        return Icon(
+          Icons.edit_outlined,
+          size: 2,
+        );
+      default:
+        return Icon(
+          Icons.admin_panel_settings_outlined,
+          size: 2,
+        );
     }
   }
 }
@@ -157,6 +177,18 @@ extension extOp on OpModeType {
 
 extension DiceExtension on Dice {
   String toVal(String gameName) {
+    if (NewPlatform.isWeb()) {
+      switch (this) {
+        case Dice.one:
+          return "1";
+        case Dice.two:
+          return "2";
+        case Dice.three:
+          return "3";
+        default:
+          return "All Cases";
+      }
+    }
     final skeleton = json.decode(
       remoteConfig.getString(
         gameName,

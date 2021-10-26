@@ -223,7 +223,7 @@ class _EventView extends State<EventView> {
           ),
           PlatformDialogAction(
             isDefaultAction: false,
-            child: Text('Save'),
+            child: Text('Add'),
             onPressed: () {
               setState(
                 () {

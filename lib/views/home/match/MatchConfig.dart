@@ -15,7 +15,7 @@ class _MatchConfigState extends State<MatchConfig> {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: Text('Add Match'),
+          title: Text('New Match'),
           backgroundColor: Theme.of(context).colorScheme.primary,
         ),
         body: SafeArea(
