@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:teamtrack/models/AppModel.dart';
 
 class AuthenticationService {
@@ -93,6 +94,13 @@ class AuthenticationService {
   }
 
   Future<UserCredential?> signInWithGoogle() async {
+    if (NewPlatform.isWeb()) {
+      GoogleAuthProvider googleProvider = GoogleAuthProvider();
+      googleProvider
+          .addScope('https://www.googleapis.com/auth/contacts.readonly');
+      googleProvider.setCustomParameters({'login_hint': 'user@example.com'});
+      return await _firebaseAuth.signInWithPopup(googleProvider);
+    }
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
     if (googleUser != null) {
       final GoogleSignInAuthentication googleAuth =

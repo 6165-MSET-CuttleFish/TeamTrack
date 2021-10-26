@@ -93,7 +93,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
                 Row(
                   children: [
-                    Text('I have read and understand the '),
+                    Text('I have read and agree to the '),
                     TextButton(
                         onPressed: () => launch(
                             "https://msetcuttlefish.weebly.com/privacy-policy-scouting-app.html"),
@@ -110,6 +110,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   child: Text("Sign Up"),
                   color: Colors.green,
                   onPressed: () async {
+                    if (!readPrivacyPolicy) {
+                      showPlatformDialog(
+                        context: context,
+                        builder: (context) => PlatformAlert(
+                          title: Text("Terms of Service"),
+                          content: Text(
+                              "You must read and agree to the terms of service before you can sign up."),
+                          actions: [
+                            PlatformDialogAction(
+                              child: Text("Okay"),
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
                     if ((_formKey.currentState?.validate() ?? false) &&
                         readPrivacyPolicy) {
                       String? s =

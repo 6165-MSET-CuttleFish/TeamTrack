@@ -49,7 +49,7 @@ void showPlatformDialog({
     showCupertinoDialog(
         context: context, builder: builder, barrierDismissible: false);
   } else {
-    showDialog(context: context, builder: builder, barrierDismissible: false);
+    showDialog(context: context, builder: builder, barrierDismissible: true);
   }
 }
 
