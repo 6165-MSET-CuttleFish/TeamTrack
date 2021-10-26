@@ -88,6 +88,15 @@ class _LoginView extends State<LoginView> {
             padding: const EdgeInsets.only(bottom: 10),
             child: Row(
               children: [
+                IconButton(
+                  onPressed: () => _controller.previousPage(
+                    duration: Duration(milliseconds: 200),
+                    curve: Curves.linear,
+                  ),
+                  icon: Icon(
+                    Icons.arrow_back_ios_new,
+                  ),
+                ),
                 Spacer(),
                 PlatformButton(
                   child: Text(

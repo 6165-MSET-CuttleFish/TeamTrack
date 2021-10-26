@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart' as Database;
 import 'package:flutter/foundation.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
@@ -10,6 +11,7 @@ import 'package:teamtrack/models/ScoreModel.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'package:teamtrack/functions/Statistics.dart';
+import 'package:teamtrack/providers/Auth.dart';
 import 'package:teamtrack/views/home/match/UsersRow.dart';
 import 'package:uuid/uuid.dart';
 import 'package:teamtrack/functions/Extensions.dart';
@@ -53,6 +55,18 @@ class _MatchView extends State<MatchView> {
       if (_match?.type == EventType.remote)
         _color = CupertinoColors.systemGreen;
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    final user = AuthenticationService(FirebaseAuth.instance).getUser();
+    final ttuser = widget.event.getTTUserFromUser(user);
+    final ref = widget.event
+        .getRef()
+        ?.child('matches/${widget.match?.id}/activeUsers/${user?.uid}');
+    ref?.set(ttuser.toJson());
+    ref?.onDisconnect().remove();
   }
 
   @override
@@ -199,12 +213,8 @@ class _MatchView extends State<MatchView> {
                         end: Alignment.bottomCenter,
                         colors: [
                           _color,
-                          Theme.of(context).canvasColor,
-                          Theme.of(context).canvasColor,
-                          Theme.of(context).canvasColor,
-                          Theme.of(context).canvasColor,
-                          Theme.of(context).canvasColor,
-                          Theme.of(context).canvasColor,
+                          for (int i = 0; i < 6; i++)
+                            Theme.of(context).canvasColor,
                         ],
                       ),
                     ),

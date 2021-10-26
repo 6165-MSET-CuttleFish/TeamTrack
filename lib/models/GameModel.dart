@@ -14,7 +14,7 @@ import 'package:provider/provider.dart';
 import 'package:teamtrack/functions/Extensions.dart';
 
 class Statics {
-  static String gameName = remoteConfig.getString("gameName");
+  static String gameName = "FreightFrenzy";
 }
 
 enum EventType { live, local, remote }

@@ -27,7 +27,7 @@ class DataModel {
   }
 
   void saveEvents() async {
-    var coded = events.map((e) => e.toJson()).toList();
+    final coded = events.map((e) => e.toJson()).toList();
     final prefs = await SharedPreferences.getInstance();
     prefs.setString("Events", jsonEncode(coded));
     print(coded);
@@ -85,7 +85,7 @@ class TeamTrackUser {
   TeamTrackUser.fromJson(Map<String, dynamic> json)
       : role = getRoleFromString(json['role']),
         email = json['email'],
-        displayName = json['displayName'],
+        displayName = json['name'],
         photoURL = json['photoURL'];
   Map<String, dynamic> toJson() => {
         'role': role.toRep(),

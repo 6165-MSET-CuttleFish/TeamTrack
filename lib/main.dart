@@ -18,23 +18,25 @@ import 'package:provider/provider.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  await remoteConfig.fetchAndActivate();
-  Statics.gameName = remoteConfig.getString("gameName");
-  await dataModel.restoreEvents();
-  var notification = PushNotifications();
-  await messaging.requestPermission(
-    alert: true,
-    announcement: false,
-    badge: true,
-    carPlay: false,
-    criticalAlert: false,
-    provisional: false,
-    sound: true,
-  );
-  await notification.initialize();
-  String? token = await notification.getToken();
-  if (token != "") {
-    dataModel.token = token;
+  if (!NewPlatform.isWeb()) {
+    await remoteConfig.fetchAndActivate();
+    Statics.gameName = remoteConfig.getString("gameName");
+    await dataModel.restoreEvents();
+    var notification = PushNotifications();
+    await messaging.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+    );
+    await notification.initialize();
+    String? token = await notification.getToken();
+    if (token != "") {
+      dataModel.token = token;
+    }
   }
   runApp(MyApp());
 }
@@ -128,7 +130,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-    firebaseDatabase.setPersistenceEnabled(true);
+    // firebaseDatabase.setPersistenceEnabled(true);
     return MultiProvider(
       providers: [
         Provider<AuthenticationService>(

@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:teamtrack/components/PFP.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/models/GameModel.dart';
+import 'package:teamtrack/functions/Extensions.dart';
 
 class Permissions extends StatefulWidget {
   const Permissions({Key? key, required this.event}) : super(key: key);
@@ -13,33 +15,33 @@ class Permissions extends StatefulWidget {
 class _PermissionsState extends State<Permissions> {
   @override
   Widget build(BuildContext context) => Container(
+        height: 50,
         child: ListView(
           children: widget.event.permissions.keys
-              .map(
-                (user) => ListTile(
-                  leading: getIcon(
-                    widget.event.permissions[user]?.role ?? Role.viewer,
-                  ),
-                  title: Text(
-                    widget.event.permissions[user]?.displayName ?? "Unknown",
-                  ),
-                  subtitle: Text(
-                    widget.event.permissions[user]?.email ?? "Unknown",
-                  ),
-                ),
-              )
+              .map((user) => ListTile(
+                    leading: PFP(user: widget.event.permissions[user]!),
+                    title: Text(
+                      widget.event.permissions[user]?.displayName ?? "Unknown",
+                    ),
+                    subtitle: Text(
+                      widget.event.permissions[user]?.email ?? "Unknown",
+                    ),
+                    trailing: DropdownButton<Role>(
+                      value:
+                          widget.event.permissions[user]?.role ?? Role.editor,
+                      items: Role.values
+                          .map(
+                            (e) => DropdownMenuItem<Role>(
+                              child: Text(
+                                e.name(),
+                              ),
+                              value: e,
+                            ),
+                          )
+                          .toList(),
+                    ),
+                  ))
               .toList(),
         ),
       );
-
-  Icon getIcon(Role role) {
-    switch (role) {
-      case Role.viewer:
-        return Icon(Icons.visibility);
-      case Role.editor:
-        return Icon(Icons.edit);
-      case Role.admin:
-        return Icon(Icons.verified_user);
-    }
-  }
 }

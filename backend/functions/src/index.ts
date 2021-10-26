@@ -32,14 +32,28 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
         "Cannot send an event to yourself"
     );
   }
+  let allowSend = true;
   await admin.database().ref()
-      .child(`Events/${data.gameName}/${data.id}/Permissions/${recipient.uid}`)
-      .set({
-        "role": data.role,
-        "name": recipient.displayName,
-        "email": recipient.email,
-        "photoURL": recipient.photoURL,
-      }); // update permissions for recepient
+      .child(`Events/${data.gameName}/${data.id}/Permissions`)
+      .transaction((data) => {
+        // only admins may send events
+        allowSend = data[sender.uid].role == "admin";
+        if (allowSend) {
+          data[recipient.uid] = {
+            "role": data.role,
+            "name": recipient.displayName,
+            "email": recipient.email,
+            "photoURL": recipient.photoURL,
+          }; // update permissions for recepient
+        }
+        return data;
+      });
+  if (!allowSend) {
+    throw new functions.https.HttpsError(
+        "permission-denied",
+        "You do not have admin access to your document"
+    );
+  }
   const meta = {
     "id": data.id,
     "name": data.name,
@@ -54,7 +68,6 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
   };
   const ref = admin.firestore().collection("users").doc(recipient.uid);
   let tokens:string[] = [];
-  let allowSend = true;
   const returnVal = await admin.firestore().runTransaction(async (t) => {
     const doc = await t.get(ref);
     const newInbox = doc?.data()?.inbox;
@@ -69,9 +82,15 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
     }
     t.update(ref, {inbox: newInbox});
   });
+  if (!allowSend) {
+    throw new functions.https.HttpsError(
+        "permission-denied",
+        "Unable to send event"
+    );
+  }
   const notification = {
-    title: `New Event: ${meta.name ?? "Unknown"} `,
-    body: `${sender.displayName ?? "Unknown"} has shared an event with you`,
+    title: "New Event",
+    body: `${sender.displayName ?? "Unknown"} shared "${meta.name}" with you`,
   };
   const message = {
     tokens: tokens,
