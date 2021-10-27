@@ -11,6 +11,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:teamtrack/functions/Statistics.dart';
 
 class EventView extends StatefulWidget {
   EventView({Key? key, required this.event}) : super(key: key);
@@ -93,7 +94,9 @@ class _EventView extends State<EventView> {
                   context: context,
                   delegate: _tab == 0
                       ? TeamSearch(
-                          teams: widget.event.teams.values.toList(),
+                          teams:
+                              widget.event.teams.sortedTeams(sortingModifier),
+                          sortMode: sortingModifier,
                           event: widget.event,
                         )
                       : MatchSearch(
