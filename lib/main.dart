@@ -6,9 +6,7 @@ import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:teamtrack/providers/Auth.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/providers/Theme.dart';
-import 'package:teamtrack/views/home/events/EventsList.dart';
-import 'package:teamtrack/views/auth/Login.dart';
-import 'package:teamtrack/views/auth/Verify.dart';
+import 'package:teamtrack/views/auth/AuthenticationWrapper.dart';
 import 'package:teamtrack/providers/PushNotifications.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:flutter/cupertino.dart';
@@ -110,20 +108,6 @@ class _TeamTrack extends State<TeamTrack> {
           ),
         ),
       );
-}
-
-class AuthenticationWrapper extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final firebaseUser = context.watch<User?>();
-    if (firebaseUser == null) {
-      return LoginView();
-    } else if (!firebaseUser.emailVerified && !firebaseUser.isAnonymous) {
-      return Verify();
-    } else {
-      return EventsList();
-    }
-  }
 }
 
 class MyApp extends StatelessWidget {

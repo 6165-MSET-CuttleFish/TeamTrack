@@ -35,18 +35,18 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
   let allowSend = true;
   await admin.database().ref()
       .child(`Events/${data.gameName}/${data.id}/Permissions`)
-      .transaction((data) => {
+      .transaction((transaction) => {
         // only admins may send events
-        allowSend = data[sender.uid].role == "admin";
+        allowSend = transaction[sender.uid].role == "admin";
         if (allowSend) {
-          data[recipient.uid] = {
+          transaction[recipient.uid] = {
             "role": data.role,
             "name": recipient.displayName,
             "email": recipient.email,
             "photoURL": recipient.photoURL,
           }; // update permissions for recepient
         }
-        return data;
+        return transaction;
       });
   if (!allowSend) {
     throw new functions.https.HttpsError(
@@ -180,7 +180,7 @@ export const fetchAPI = functions.https.onCall((data, context) => {
         "User not logged in"
     );
   }
-  const url = new URL("https://ftc-api.firstinspires.org/v2.0/");
+  const url = new URL(`https://ftc-api.firstinspires.org/v2.0/2021/matches/${data.eventCode}`);
   return fetch(url.toString(), {
     headers: {Authorization: `Basic ${ftcAPIKey}`},
   });

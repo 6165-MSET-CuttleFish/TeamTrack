@@ -1,7 +1,7 @@
 import 'package:firebase_database/firebase_database.dart' as Database;
-import 'package:google_fonts/google_fonts.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/views/home/match/MatchConfig.dart';
+import 'package:teamtrack/views/home/match/MatchRow.dart';
 import 'package:teamtrack/views/home/match/MatchView.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:flutter/cupertino.dart';
@@ -124,105 +124,53 @@ class _MatchList extends State<MatchList> {
     if (widget.event.type != EventType.remote) {
       return ListView(
         children: widget.team == null
-            ? widget.event.getSortedMatches(widget.ascending).map((e) {
-                widget.ascending ? i++ : i--;
-                return Slidable(
-                  actionPane: slider,
-                  secondaryActions: [
-                    IconSlideAction(
-                      icon: Icons.delete,
-                      color: Colors.red,
-                      onTap: () {
-                        showPlatformDialog(
-                          context: context,
-                          builder: (BuildContext context) => PlatformAlert(
-                            title: Text('Delete Match'),
-                            content: Text('Are you sure?'),
-                            actions: [
-                              PlatformDialogAction(
-                                isDefaultAction: true,
-                                child: Text('Cancel'),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                              PlatformDialogAction(
-                                isDefaultAction: false,
-                                isDestructive: true,
-                                child: Text('Confirm'),
-                                onPressed: () {
-                                  setState(
-                                    () {
-                                      widget.event.deleteMatch(e);
-                                    },
-                                  );
-                                  dataModel.saveEvents();
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Colors.grey,
-                        width: 1,
+            ? widget.event.getSortedMatches(widget.ascending).map(
+                (e) {
+                  widget.ascending ? i++ : i--;
+                  return Slidable(
+                    actionPane: slider,
+                    secondaryActions: [
+                      IconSlideAction(
+                        icon: Icons.delete,
+                        color: Colors.red,
+                        onTap: () {
+                          showPlatformDialog(
+                            context: context,
+                            builder: (BuildContext context) => PlatformAlert(
+                              title: Text('Delete Match'),
+                              content: Text('Are you sure?'),
+                              actions: [
+                                PlatformDialogAction(
+                                  isDefaultAction: true,
+                                  child: Text('Cancel'),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                                PlatformDialogAction(
+                                  isDefaultAction: false,
+                                  isDestructive: true,
+                                  child: Text('Confirm'),
+                                  onPressed: () {
+                                    setState(
+                                      () {
+                                        widget.event.deleteMatch(e);
+                                      },
+                                    );
+                                    dataModel.saveEvents();
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            ),
+                          );
+                        },
                       ),
-                    ),
-                    child: ListTile(
-                      leading: Text(i.toString()),
-                      title: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              (e.red?.team1?.name ?? '?') +
-                                  ' & ' +
-                                  (e.red?.team2?.name ?? '?'),
-                              style: Theme.of(context).textTheme.caption,
-                            ),
-                            Text(
-                              'VS',
-                              style: TextStyle(
-                                color: Colors.red,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
-                              ),
-                            ),
-                            Text(
-                              (e.blue?.team1?.name ?? '?') +
-                                  ' & ' +
-                                  (e.blue?.team2?.name ?? '?'),
-                              style: Theme.of(context).textTheme.caption,
-                            )
-                          ]),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            e.redScore(showPenalties: true).toString(),
-                            style: GoogleFonts.gugi(
-                              color: e.redScore(showPenalties: true) >
-                                      e.blueScore(showPenalties: true)
-                                  ? CupertinoColors.systemRed
-                                  : Colors.grey,
-                            ),
-                          ),
-                          Text(" - ", style: GoogleFonts.gugi()),
-                          Text(
-                            e.blueScore(showPenalties: true).toString(),
-                            style: GoogleFonts.gugi(
-                              color: e.redScore(showPenalties: true) <
-                                      e.blueScore(showPenalties: true)
-                                  ? CupertinoColors.systemBlue
-                                  : Colors.grey,
-                            ),
-                          ),
-                        ],
-                      ),
+                    ],
+                    child: MatchRow(
+                      match: e,
+                      event: widget.event,
+                      index: i,
                       onTap: () async {
                         final user = context.read<User?>();
                         final ttuser = widget.event.getTTUserFromUser(user);
@@ -246,9 +194,9 @@ class _MatchList extends State<MatchList> {
                         setState(() {});
                       },
                     ),
-                  ),
-                );
-              }).toList()
+                  );
+                },
+              ).toList()
             : _teamSpecMatches(),
       );
     } else {
@@ -392,125 +340,78 @@ class _MatchList extends State<MatchList> {
             ) !=
             null)
         .toList()
-        .map((e) {
-      i++;
-      return Slidable(
-        actionPane: slider,
-        secondaryActions: [
-          IconSlideAction(
-            icon: Icons.delete,
-            color: Colors.red,
-            onTap: () {
-              showPlatformDialog(
-                context: context,
-                builder: (context) => PlatformAlert(
-                  title: Text('Delete Match'),
-                  content: Text('Are you sure?'),
-                  actions: [
-                    PlatformDialogAction(
-                      isDefaultAction: true,
-                      child: Text('Cancel'),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                    PlatformDialogAction(
-                      isDefaultAction: false,
-                      isDestructive: true,
-                      child: Text('Confirm'),
-                      onPressed: () {
-                        setState(
-                          () => widget.event.deleteMatch(e),
-                        );
-                        dataModel.saveEvents();
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ],
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: Colors.grey,
-              width: 1,
-            ),
-          ),
-          child: ListTile(
-            leading: Text(i.toString()),
-            title:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(
-                (e.red?.team1?.name ?? '?') +
-                    ' & ' +
-                    (e.red?.team2?.name ?? '?'),
-                style: Theme.of(context).textTheme.caption,
-              ),
-              Text(
-                'VS',
-                style: TextStyle(
-                    color: Colors.red,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12),
-              ),
-              Text(
-                (e.blue?.team1?.name ?? '?') +
-                    ' & ' +
-                    (e.blue?.team2?.name ?? '?'),
-                style: Theme.of(context).textTheme.caption,
-              )
-            ]),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  e.redScore(showPenalties: true).toString(),
-                  style: GoogleFonts.gugi(
-                    color: e.alliance(widget.team) == e.red
-                        ? CupertinoColors.systemYellow
-                        : Colors.grey,
+        .map(
+      (match) {
+        i++;
+        return Slidable(
+          actionPane: slider,
+          secondaryActions: [
+            IconSlideAction(
+              icon: Icons.delete,
+              color: Colors.red,
+              onTap: () {
+                showPlatformDialog(
+                  context: context,
+                  builder: (context) => PlatformAlert(
+                    title: Text('Delete Match'),
+                    content: Text('Are you sure?'),
+                    actions: [
+                      PlatformDialogAction(
+                        isDefaultAction: true,
+                        child: Text('Cancel'),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                      PlatformDialogAction(
+                        isDefaultAction: false,
+                        isDestructive: true,
+                        child: Text('Confirm'),
+                        onPressed: () {
+                          setState(
+                            () => widget.event.deleteMatch(match),
+                          );
+                          dataModel.saveEvents();
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
                   ),
-                ),
-                Text(" - ", style: GoogleFonts.gugi()),
-                Text(
-                  e.blueScore(showPenalties: true).toString(),
-                  style: GoogleFonts.gugi(
-                    color: e.alliance(widget.team) == e.blue
-                        ? CupertinoColors.systemYellow
-                        : Colors.grey,
-                  ),
-                ),
-              ],
+                );
+              },
             ),
+          ],
+          child: MatchRow(
+            event: widget.event,
+            match: match,
+            index: i,
+            team: widget.team,
             onTap: () async {
               final user = context.read<User?>();
               final ttuser = widget.event.getTTUserFromUser(user);
               widget.event
                   .getRef()
-                  ?.child('matches/${e.id}/activeUsers/${user?.uid}')
+                  ?.child('matches/${match.id}/activeUsers/${user?.uid}')
                   .set(ttuser.toJson());
               await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => MatchView(
-                    match: e,
+                    match: match,
                     event: widget.event,
                   ),
                 ),
               );
               widget.event
                   .getRef()
-                  ?.child('matches/${e.id}//activeUsers/${user?.uid}')
+                  ?.child('matches/${match.id}//activeUsers/${user?.uid}')
                   .remove();
               setState(() {});
             },
           ),
-        ),
-      );
-    }).toList();
+        );
+      },
+    ).toList();
   }
 }
 
@@ -554,101 +455,39 @@ class MatchSearch extends SearchDelegate<String?> {
               (m.blue?.team2?.name.contains(query) ?? false),
         )
         .toList();
-    int i = 0;
     return ListView.builder(
-        itemCount: suggestionList.length,
-        itemBuilder: (context, index) {
-          i++;
-          return Container(
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Colors.grey,
-                width: 1,
+      itemCount: suggestionList.length,
+      itemBuilder: (context, index) {
+        return MatchRow(
+          event: event,
+          match: suggestionList[index],
+          index: index + 1,
+          onTap: () async {
+            close(context, null);
+            final user = context.read<User?>();
+            final ttuser = event.getTTUserFromUser(user);
+            event
+                .getRef()
+                ?.child(
+                    'matches/${suggestionList[index].id}/activeUsers/${user?.uid}')
+                .set(ttuser.toJson());
+            await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MatchView(
+                  match: suggestionList[index],
+                  event: event,
+                ),
               ),
-            ),
-            child: ListTile(
-              leading: Text(i.toString()),
-              title: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      (suggestionList[index].red?.team1?.name ?? '?') +
-                          ' & ' +
-                          (suggestionList[index].red?.team2?.name ?? '?'),
-                      style: Theme.of(context).textTheme.caption,
-                    ),
-                    Text(
-                      'VS',
-                      style: TextStyle(
-                          color: Colors.red,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12),
-                    ),
-                    Text(
-                      (suggestionList[index].blue?.team1?.name ?? '?') +
-                          ' & ' +
-                          (suggestionList[index].blue?.team2?.name ?? '?'),
-                      style: Theme.of(context).textTheme.caption,
-                    )
-                  ]),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    suggestionList[index]
-                        .redScore(showPenalties: true)
-                        .toString(),
-                    style: GoogleFonts.gugi(
-                      color:
-                          suggestionList[index].redScore(showPenalties: true) >
-                                  suggestionList[index]
-                                      .blueScore(showPenalties: true)
-                              ? CupertinoColors.systemRed
-                              : Colors.grey,
-                    ),
-                  ),
-                  Text(" - ", style: GoogleFonts.gugi()),
-                  Text(
-                    suggestionList[index]
-                        .blueScore(showPenalties: true)
-                        .toString(),
-                    style: GoogleFonts.gugi(
-                      color:
-                          suggestionList[index].redScore(showPenalties: true) <
-                                  suggestionList[index]
-                                      .blueScore(showPenalties: true)
-                              ? CupertinoColors.systemBlue
-                              : Colors.grey,
-                    ),
-                  ),
-                ],
-              ),
-              onTap: () async {
-                close(context, null);
-                final user = context.read<User?>();
-                final ttuser = event.getTTUserFromUser(user);
-                event
-                    .getRef()
-                    ?.child(
-                        'matches/${suggestionList[index].id}/activeUsers/${user?.uid}')
-                    .set(ttuser.toJson());
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => MatchView(
-                      match: suggestionList[index],
-                      event: event,
-                    ),
-                  ),
-                );
-                event
-                    .getRef()
-                    ?.child(
-                        'matches/${suggestionList[index].id}//activeUsers/${user?.uid}')
-                    .remove();
-              },
-            ),
-          );
-        });
+            );
+            event
+                .getRef()
+                ?.child(
+                    'matches/${suggestionList[index].id}//activeUsers/${user?.uid}')
+                .remove();
+          },
+        );
+      },
+    );
   }
 }

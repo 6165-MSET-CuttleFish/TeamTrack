@@ -16,6 +16,7 @@ import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:teamtrack/views/home/events/EventView.dart';
 import 'package:provider/provider.dart';
 import 'package:teamtrack/functions/Extensions.dart';
+import 'package:teamtrack/views/templates/TemplatesList.dart';
 
 class EventsList extends StatefulWidget {
   EventsList({Key? key}) : super(key: key);
@@ -67,6 +68,8 @@ class _EventsList extends State<EventsList> {
                     return Text("Inbox");
                   case 2:
                     return Text("Blocked Users");
+                  case 3:
+                    return Text("Templates");
                   default:
                     return Text("Events");
                 }
@@ -204,9 +207,17 @@ class _EventsList extends State<EventsList> {
                           Navigator.of(context).pop();
                         },
                       ),
+                      ListTile(
+                        leading: Icon(Icons.widgets_outlined),
+                        title: Text("Templates"),
+                        onTap: () {
+                          setState(() => _tab = 3);
+                          Navigator.of(context).pop();
+                        },
+                      ),
                       if (!(context.read<User?>()?.isAnonymous ?? true))
                         ListTile(
-                          leading: Icon(Icons.mail_rounded),
+                          leading: Icon(Icons.inbox_rounded),
                           title: Text("Inbox"),
                           trailing:
                               (data?['inbox'] as Map?)?.entries.length == 0
@@ -223,7 +234,8 @@ class _EventsList extends State<EventsList> {
                                                 .length
                                                 .toString() ??
                                             "0"),
-                                      )),
+                                      ),
+                                    ),
                           onTap: () {
                             setState(() => _tab = 1);
                             Navigator.of(context).pop();
@@ -305,6 +317,8 @@ class _EventsList extends State<EventsList> {
         return Inbox();
       case 2:
         return BlockList();
+      case 3:
+        return TemplatesList();
       default:
         return SafeArea(
           child: ListView(
