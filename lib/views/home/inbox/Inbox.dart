@@ -36,120 +36,31 @@ class _InboxState extends State<Inbox> {
           }
           return ListView(
             children: queryResult
-                    .map(
-                      (e) => Slidable(
-                        actionPane: slider,
-                        secondaryActions: [
-                          IconSlideAction(
-                            icon: Icons.warning,
-                            color: Colors.yellow,
-                            onTap: () {
-                              showPlatformDialog(
-                                context: context,
-                                builder: (BuildContext context) =>
-                                    PlatformAlert(
-                                  title: Text('Block user'),
-                                  content: Text('Are you sure?'),
-                                  actions: [
-                                    PlatformDialogAction(
-                                      isDefaultAction: true,
-                                      child: Text('Cancel'),
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                    ),
-                                    PlatformDialogAction(
-                                      isDefaultAction: false,
-                                      isDestructive: true,
-                                      child: Text('Confirm'),
-                                      onPressed: () async {
-                                        await firebaseFirestore.runTransaction(
-                                          (transaction) async {
-                                            var snapshot =
-                                                await transaction.get(docRef);
-                                            if (!snapshot.exists) {
-                                              throw Exception(
-                                                  "User does not exist!");
-                                            }
-                                            Map newBlocks = snapshot
-                                                .data()?['blockedUsers'];
-                                            newBlocks[e['senderID']] =
-                                                e['senderEmail'];
-                                            Map<String, dynamic> newInbox =
-                                                snapshot.data()?["inbox"]
-                                                    as Map<String, dynamic>;
-                                            newInbox.removeWhere((key, value) =>
-                                                value['senderID'] ==
-                                                e['senderID']);
-                                            return transaction.update(
-                                              docRef,
-                                              {
-                                                'blockedUsers': newBlocks,
-                                                'inbox': newInbox
-                                              },
-                                            );
-                                          },
-                                        );
-                                        dataModel.saveEvents();
-                                        Navigator.of(context).pop();
-                                        setState(() {});
-                                      },
-                                    ),
-                                  ],
+                .map(
+                  (e) => Slidable(
+                    actionPane: slider,
+                    secondaryActions: [
+                      IconSlideAction(
+                        icon: Icons.warning,
+                        color: Colors.yellow,
+                        onTap: () {
+                          showPlatformDialog(
+                            context: context,
+                            builder: (BuildContext context) => PlatformAlert(
+                              title: Text('Block user'),
+                              content: Text('Are you sure?'),
+                              actions: [
+                                PlatformDialogAction(
+                                  isDefaultAction: true,
+                                  child: Text('Cancel'),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
                                 ),
-                              );
-                            },
-                          ),
-                        ],
-                        child: Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.grey,
-                              width: 1,
-                            ),
-                          ),
-                          child: ListTile(
-                            leading: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(5),
-                                  child: Icon(
-                                    getTypeFromString(e['type']) ==
-                                            EventType.remote
-                                        ? CupertinoIcons
-                                            .rectangle_stack_person_crop_fill
-                                        : CupertinoIcons.person_3_fill,
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  ),
-                                ),
-                                Text((e['gameName'] as String)
-                                    .spaceBeforeCapital())
-                              ],
-                            ),
-                            title: Column(
-                              children: [
-                                Text(
-                                  e['name'] ?? "Unnamed Event",
-                                ),
-                                Text(
-                                  e['senderName'] ?? "Guest",
-                                ),
-                                Text(
-                                  e['senderEmail'] ?? "Suspicious Email",
-                                  style: TextStyle(fontSize: 12),
-                                )
-                              ],
-                            ),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  icon: Icon(
-                                    Icons.check,
-                                    color: Colors.green,
-                                  ),
+                                PlatformDialogAction(
+                                  isDefaultAction: false,
+                                  isDestructive: true,
+                                  child: Text('Confirm'),
                                   onPressed: () async {
                                     await firebaseFirestore.runTransaction(
                                       (transaction) async {
@@ -159,82 +70,163 @@ class _InboxState extends State<Inbox> {
                                           throw Exception(
                                               "User does not exist!");
                                         }
+                                        Map newBlocks =
+                                            snapshot.data()?['blockedUsers'];
+                                        newBlocks[e['senderID']] =
+                                            e['senderEmail'];
                                         Map<String, dynamic> newInbox =
                                             snapshot.data()?["inbox"]
                                                 as Map<String, dynamic>;
-                                        newInbox.removeWhere(
-                                            (key, value) => key == e['id']);
-                                        Map<String, dynamic> newEvents =
-                                            snapshot.data()?["events"]
-                                                as Map<String, dynamic>;
-                                        newEvents[e['id']] = e;
-                                        List newTokens =
-                                            snapshot.data()?['FCMtokens'];
-                                        if (!newTokens
-                                                .contains(dataModel.token) &&
-                                            dataModel.token != null) {
-                                          newTokens.add(dataModel.token!);
-                                        }
+                                        newInbox.removeWhere((key, value) =>
+                                            value['senderID'] == e['senderID']);
                                         return transaction.update(
                                           docRef,
                                           {
-                                            'events': newEvents,
-                                            'inbox': newInbox,
-                                            'FCMtokens': newTokens,
+                                            'blockedUsers': newBlocks,
+                                            'inbox': newInbox
                                           },
                                         );
                                       },
                                     );
-                                    setState(() {});
-                                  },
-                                ),
-                                Padding(padding: EdgeInsets.all(5)),
-                                IconButton(
-                                  icon: Icon(
-                                    Icons.delete,
-                                    color: Colors.red,
-                                  ),
-                                  onPressed: () async {
-                                    await firebaseFirestore.runTransaction(
-                                      (transaction) async {
-                                        var snapshot =
-                                            await transaction.get(docRef);
-                                        if (!snapshot.exists) {
-                                          throw Exception(
-                                            "User does not exist!",
-                                          );
-                                        }
-                                        Map<String, dynamic> newInbox =
-                                            snapshot.data()?["inbox"]
-                                                as Map<String, dynamic>;
-                                        newInbox.removeWhere(
-                                            (key, value) => key == e['id']);
-                                        List newTokens =
-                                            snapshot.data()?['FCMtokens'];
-                                        if (!newTokens
-                                                .contains(dataModel.token) &&
-                                            dataModel.token != null) {
-                                          newTokens.add(dataModel.token!);
-                                        }
-                                        return transaction.update(
-                                          docRef,
-                                          {
-                                            'inbox': newInbox,
-                                            'FCMtokens': newTokens,
-                                          },
-                                        );
-                                      },
-                                    );
+                                    dataModel.saveEvents();
+                                    Navigator.of(context).pop();
                                     setState(() {});
                                   },
                                 ),
                               ],
                             ),
-                          ),
+                          );
+                        },
+                      ),
+                    ],
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.grey,
+                          width: 1,
                         ),
                       ),
-                    )
-                    .toList(),
+                      child: ListTile(
+                        leading: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(5),
+                              child: Icon(
+                                getTypeFromString(e['type']) == EventType.remote
+                                    ? CupertinoIcons
+                                        .rectangle_stack_person_crop_fill
+                                    : CupertinoIcons.person_3_fill,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                            ),
+                            Text((e['gameName'] as String).spaceBeforeCapital())
+                          ],
+                        ),
+                        title: Column(
+                          children: [
+                            Text(
+                              e['name'] ?? "Unnamed Event",
+                            ),
+                            Text(
+                              e['senderName'] ?? "Guest",
+                            ),
+                            Text(
+                              e['senderEmail'] ?? "Suspicious Email",
+                              style: TextStyle(fontSize: 12),
+                            )
+                          ],
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: Icon(
+                                Icons.check,
+                                color: Colors.green,
+                              ),
+                              onPressed: () async {
+                                await firebaseFirestore.runTransaction(
+                                  (transaction) async {
+                                    var snapshot =
+                                        await transaction.get(docRef);
+                                    if (!snapshot.exists) {
+                                      throw Exception("User does not exist!");
+                                    }
+                                    Map<String, dynamic> newInbox =
+                                        snapshot.data()?["inbox"]
+                                            as Map<String, dynamic>;
+                                    newInbox.removeWhere(
+                                        (key, value) => key == e['id']);
+                                    Map<String, dynamic> newEvents =
+                                        snapshot.data()?["events"]
+                                            as Map<String, dynamic>;
+                                    newEvents[e['id']] = e;
+                                    List newTokens =
+                                        snapshot.data()?['FCMtokens'];
+                                    if (!newTokens.contains(dataModel.token) &&
+                                        dataModel.token != null) {
+                                      newTokens.add(dataModel.token!);
+                                    }
+                                    return transaction.update(
+                                      docRef,
+                                      {
+                                        'events': newEvents,
+                                        'inbox': newInbox,
+                                        'FCMtokens': newTokens,
+                                      },
+                                    );
+                                  },
+                                );
+                                setState(() {});
+                              },
+                            ),
+                            Padding(padding: EdgeInsets.all(5)),
+                            IconButton(
+                              icon: Icon(
+                                Icons.delete,
+                                color: Colors.red,
+                              ),
+                              onPressed: () async {
+                                await firebaseFirestore.runTransaction(
+                                  (transaction) async {
+                                    var snapshot =
+                                        await transaction.get(docRef);
+                                    if (!snapshot.exists) {
+                                      throw Exception(
+                                        "User does not exist!",
+                                      );
+                                    }
+                                    Map<String, dynamic> newInbox =
+                                        snapshot.data()?["inbox"]
+                                            as Map<String, dynamic>;
+                                    newInbox.removeWhere(
+                                        (key, value) => key == e['id']);
+                                    List newTokens =
+                                        snapshot.data()?['FCMtokens'];
+                                    if (!newTokens.contains(dataModel.token) &&
+                                        dataModel.token != null) {
+                                      newTokens.add(dataModel.token!);
+                                    }
+                                    return transaction.update(
+                                      docRef,
+                                      {
+                                        'inbox': newInbox,
+                                        'FCMtokens': newTokens,
+                                      },
+                                    );
+                                  },
+                                );
+                                setState(() {});
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+                .toList(),
           );
         } else
           return PlatformProgressIndicator();

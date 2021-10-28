@@ -72,9 +72,9 @@ class _TeamList extends State<TeamList> {
                                 child: Text('Confirm'),
                                 onPressed: () {
                                   String? s;
-                                  setState(() {
-                                    s = widget.event.deleteTeam(team);
-                                  });
+                                  setState(
+                                    () => s = widget.event.deleteTeam(team),
+                                  );
                                   dataModel.saveEvents();
                                   Navigator.of(context).pop();
                                   if (s != null)
