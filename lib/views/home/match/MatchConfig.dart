@@ -86,6 +86,7 @@ class _MatchConfigState extends State<MatchConfig> {
           children: [
             Expanded(
               child: TextFormField(
+                textInputAction: TextInputAction.next,
                 autofillHints: widget.event.teams.keys,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(labelText: 'Team number'),
@@ -116,6 +117,7 @@ class _MatchConfigState extends State<MatchConfig> {
             ),
             Expanded(
               child: TextFormField(
+                textInputAction: TextInputAction.next,
                 controller: controllers[i],
                 keyboardType: TextInputType.name,
                 textCapitalization: TextCapitalization.words,

@@ -196,6 +196,7 @@ class _EventView extends State<EventView> {
           mainAxisSize: MainAxisSize.min,
           children: [
             PlatformTextField(
+              textInputAction: TextInputAction.next,
               placeholder: 'Team number',
               keyboardType: TextInputType.number,
               textCapitalization: TextCapitalization.words,
@@ -207,6 +208,7 @@ class _EventView extends State<EventView> {
               padding: EdgeInsets.all(5),
             ),
             PlatformTextField(
+              textInputAction: TextInputAction.done,
               placeholder: 'Team name',
               keyboardType: TextInputType.name,
               textCapitalization: TextCapitalization.words,

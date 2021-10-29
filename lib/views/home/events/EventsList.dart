@@ -37,7 +37,7 @@ class _EventsList extends State<EventsList> {
 
   @override
   Widget build(BuildContext context) {
-    final themeChange = Provider.of<DarkThemeProvider>(context);
+    final themeChange = context.watch<DarkThemeProvider>();
     final TextEditingController controller = new TextEditingController();
     for (var event in dataModel.events.where((e) => !e.shared)) {
       event.authorEmail = context.read<User?>()?.email;
@@ -80,6 +80,7 @@ class _EventsList extends State<EventsList> {
                 padding: EdgeInsets.only(left: 30),
               ),
               IconButton(
+                tooltip: themeChange.darkTheme ? "Light Mode" : "Dark Mode",
                 icon: themeChange.darkTheme
                     ? Icon(CupertinoIcons.sun_max)
                     : Icon(CupertinoIcons.moon),
@@ -147,6 +148,7 @@ class _EventsList extends State<EventsList> {
                                   builder: (_) => PlatformAlert(
                                     title: Text("Change Display Name"),
                                     content: PlatformTextField(
+                                      textInputAction: TextInputAction.done,
                                       placeholder: "Display Name",
                                       keyboardType: TextInputType.name,
                                       controller: controller,
@@ -256,7 +258,7 @@ class _EventsList extends State<EventsList> {
                           title: Text("Link Account"),
                           onTap: () => Navigator.of(context).push(
                             platformPageRoute(
-                              (context) => LoginView(returnBack: true),
+                              builder: (context) => LoginView(returnBack: true),
                             ),
                           ),
                         ),
@@ -418,7 +420,7 @@ class _EventsList extends State<EventsList> {
                       Navigator.push(
                         context,
                         platformPageRoute(
-                          (context) => EventView(
+                          builder: (context) => EventView(
                             event: e,
                           ),
                         ),
@@ -432,58 +434,60 @@ class _EventsList extends State<EventsList> {
             .toList(),
         ...sharedEvents.values
             .where((element) => element.type == EventType.local)
-            .map((e) => Slidable(
-                  actions: [
-                    IconSlideAction(
-                      onTap: () => _onShare(e),
-                      icon: Icons.share,
-                      color: Colors.blue,
-                    )
-                  ],
-                  secondaryActions: [
-                    IconSlideAction(
-                      onTap: () => onDelete(e),
-                      icon: Icons.delete,
-                      color: Colors.red,
-                    )
-                  ],
-                  child: ListTileTheme(
-                    iconColor: Theme.of(context).primaryColor,
-                    child: ListTile(
-                      trailing: Icon(
-                        e.shared
-                            ? CupertinoIcons.cloud_fill
-                            : CupertinoIcons.lock_shield_fill,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                      leading: Icon(
-                        CupertinoIcons.person_3_fill,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                      title: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(e.name),
-                          Text(
-                            e.gameName.spaceBeforeCapital(),
-                            style: Theme.of(context).textTheme.caption,
-                          ),
-                        ],
-                      ),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          platformPageRoute(
-                            (context) => EventView(
-                              event: e,
-                            ),
-                          ),
-                        );
-                      },
+            .map(
+              (e) => Slidable(
+                actions: [
+                  IconSlideAction(
+                    onTap: () => _onShare(e),
+                    icon: Icons.share,
+                    color: Colors.blue,
+                  )
+                ],
+                secondaryActions: [
+                  IconSlideAction(
+                    onTap: () => onDelete(e),
+                    icon: Icons.delete,
+                    color: Colors.red,
+                  )
+                ],
+                child: ListTileTheme(
+                  iconColor: Theme.of(context).primaryColor,
+                  child: ListTile(
+                    trailing: Icon(
+                      e.shared
+                          ? CupertinoIcons.cloud_fill
+                          : CupertinoIcons.lock_shield_fill,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
+                    leading: Icon(
+                      CupertinoIcons.person_3_fill,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    title: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(e.name),
+                        Text(
+                          e.gameName.spaceBeforeCapital(),
+                          style: Theme.of(context).textTheme.caption,
+                        ),
+                      ],
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        platformPageRoute(
+                          builder: (context) => EventView(
+                            event: e,
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                  actionPane: slider,
-                ))
+                ),
+                actionPane: slider,
+              ),
+            )
             .toList()
       ];
 
@@ -560,7 +564,7 @@ class _EventsList extends State<EventsList> {
                       Navigator.push(
                         context,
                         platformPageRoute(
-                          (context) => EventView(
+                          builder: (context) => EventView(
                             event: e,
                           ),
                         ),
@@ -617,7 +621,7 @@ class _EventsList extends State<EventsList> {
                       Navigator.push(
                         context,
                         platformPageRoute(
-                          (context) => EventView(
+                          builder: (context) => EventView(
                             event: e,
                           ),
                         ),
@@ -736,6 +740,7 @@ class _EventsList extends State<EventsList> {
         builder: (BuildContext context) => PlatformAlert(
           title: Text('New Event'),
           content: PlatformTextField(
+            textInputAction: TextInputAction.done,
             keyboardType: TextInputType.name,
             textCapitalization: TextCapitalization.words,
             onChanged: (String input) {

@@ -157,6 +157,7 @@ class _LoginView extends State<LoginView> {
             ),
           ),
           PlatformTextField(
+            textInputAction: TextInputAction.next,
             controller: emailController,
             keyboardType: TextInputType.emailAddress,
             placeholder: "Email",
@@ -165,6 +166,7 @@ class _LoginView extends State<LoginView> {
             padding: EdgeInsets.all(10),
           ),
           PlatformTextField(
+            textInputAction: TextInputAction.next,
             controller: passwordController,
             keyboardType: TextInputType.visiblePassword,
             placeholder: "Password",

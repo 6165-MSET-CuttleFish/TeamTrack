@@ -60,13 +60,15 @@ class _MatchView extends State<MatchView> {
   @override
   void initState() {
     super.initState();
-    final user = AuthenticationService(FirebaseAuth.instance).getUser();
-    final ttuser = widget.event.getTTUserFromUser(user);
-    final ref = widget.event
-        .getRef()
-        ?.child('matches/${widget.match?.id}/activeUsers/${user?.uid}');
-    ref?.set(ttuser.toJson());
-    ref?.onDisconnect().remove();
+    if (widget.team == null) {
+      final user = AuthenticationService(FirebaseAuth.instance).getUser();
+      final ttuser = widget.event.getTTUserFromUser(user);
+      final ref = widget.event
+          .getRef()
+          ?.child('matches/${widget.match?.id}/activeUsers/${user?.uid}');
+      ref?.set(ttuser.toJson());
+      ref?.onDisconnect().remove();
+    }
   }
 
   @override
@@ -472,6 +474,107 @@ class _MatchView extends State<MatchView> {
     dataModel.saveEvents();
   }
 
+  Row buttonRow() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        SizedBox(
+          child: PlatformButton(
+            child: Text(
+              _match?.red?.team1?.number ?? '?',
+              style: TextStyle(
+                color: _selectedTeam == _match?.red?.team1
+                    ? Colors.grey
+                    : CupertinoColors.systemRed,
+              ),
+            ),
+            onPressed: _selectedTeam == _match?.red?.team1
+                ? null
+                : () => setState(
+                      () {
+                        _selectedTeam = _match?.red?.team1;
+                        _selectedAlliance = _match?.red;
+                        _color = CupertinoColors.systemRed;
+                        _score = _selectedTeam?.scores[_match?.id];
+                        incrementValue.count =
+                            _score?.teleScore.getElements()[0].incrementValue ??
+                                1;
+                      },
+                    ),
+          ),
+        ),
+        SizedBox(
+          child: PlatformButton(
+            child: Text(
+              _match?.red?.team2?.number ?? '?',
+              style: TextStyle(
+                color: _selectedTeam == _match?.red?.team2
+                    ? Colors.grey
+                    : CupertinoColors.systemRed,
+              ),
+            ),
+            onPressed: _selectedTeam == _match?.red?.team2
+                ? null
+                : () {
+                    setState(
+                      () {
+                        _selectedTeam = _match?.red?.team2;
+                        _selectedAlliance = _match?.red;
+                        _color = CupertinoColors.systemRed;
+                        _score = _selectedTeam?.scores[_match?.id];
+                      },
+                    );
+                  },
+          ),
+        ),
+        SizedBox(
+          child: PlatformButton(
+            child: Text(
+              _match?.blue?.team1?.number ?? '?',
+              style: TextStyle(
+                  color: _selectedTeam == _match?.blue?.team1
+                      ? Colors.grey
+                      : Colors.blue),
+            ),
+            onPressed: _selectedTeam == _match?.blue?.team1
+                ? null
+                : () {
+                    setState(
+                      () {
+                        _selectedTeam = _match?.blue?.team1;
+                        _selectedAlliance = _match?.blue;
+                        _color = Colors.blue;
+                        _score = _selectedTeam?.scores[_match?.id];
+                      },
+                    );
+                  },
+          ),
+        ),
+        SizedBox(
+          child: PlatformButton(
+            child: Text(
+              _match?.blue?.team2?.number ?? '?',
+              style: TextStyle(
+                  color: _selectedTeam == _match?.blue?.team2
+                      ? Colors.grey
+                      : Colors.blue),
+            ),
+            onPressed: _selectedTeam == _match?.blue?.team2
+                ? null
+                : () => setState(
+                      () {
+                        _selectedTeam = _match?.blue?.team2;
+                        _selectedAlliance = _match?.blue;
+                        _color = Colors.blue;
+                        _score = _selectedTeam?.scores[_match?.id];
+                      },
+                    ),
+          ),
+        )
+      ],
+    );
+  }
+
   Alliance? getPenaltyAlliance() {
     if (_match?.type == EventType.remote) return _selectedAlliance;
     if (_selectedAlliance == _match?.red) return _match?.blue;
@@ -767,106 +870,5 @@ class _MatchView extends State<MatchView> {
     } else {
       return 'red';
     }
-  }
-
-  Row buttonRow() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        SizedBox(
-          child: PlatformButton(
-            child: Text(
-              _match?.red?.team1?.number ?? '?',
-              style: TextStyle(
-                color: _selectedTeam == _match?.red?.team1
-                    ? Colors.grey
-                    : CupertinoColors.systemRed,
-              ),
-            ),
-            onPressed: _selectedTeam == _match?.red?.team1
-                ? null
-                : () => setState(
-                      () {
-                        _selectedTeam = _match?.red?.team1;
-                        _selectedAlliance = _match?.red;
-                        _color = CupertinoColors.systemRed;
-                        _score = _selectedTeam?.scores[_match?.id];
-                        incrementValue.count =
-                            _score?.teleScore.getElements()[0].incrementValue ??
-                                1;
-                      },
-                    ),
-          ),
-        ),
-        SizedBox(
-          child: PlatformButton(
-            child: Text(
-              _match?.red?.team2?.number ?? '?',
-              style: TextStyle(
-                color: _selectedTeam == _match?.red?.team2
-                    ? Colors.grey
-                    : CupertinoColors.systemRed,
-              ),
-            ),
-            onPressed: _selectedTeam == _match?.red?.team2
-                ? null
-                : () {
-                    setState(
-                      () {
-                        _selectedTeam = _match?.red?.team2;
-                        _selectedAlliance = _match?.red;
-                        _color = CupertinoColors.systemRed;
-                        _score = _selectedTeam?.scores[_match?.id];
-                      },
-                    );
-                  },
-          ),
-        ),
-        SizedBox(
-          child: PlatformButton(
-            child: Text(
-              _match?.blue?.team1?.number ?? '?',
-              style: TextStyle(
-                  color: _selectedTeam == _match?.blue?.team1
-                      ? Colors.grey
-                      : Colors.blue),
-            ),
-            onPressed: _selectedTeam == _match?.blue?.team1
-                ? null
-                : () {
-                    setState(
-                      () {
-                        _selectedTeam = _match?.blue?.team1;
-                        _selectedAlliance = _match?.blue;
-                        _color = Colors.blue;
-                        _score = _selectedTeam?.scores[_match?.id];
-                      },
-                    );
-                  },
-          ),
-        ),
-        SizedBox(
-          child: PlatformButton(
-            child: Text(
-              _match?.blue?.team2?.number ?? '?',
-              style: TextStyle(
-                  color: _selectedTeam == _match?.blue?.team2
-                      ? Colors.grey
-                      : Colors.blue),
-            ),
-            onPressed: _selectedTeam == _match?.blue?.team2
-                ? null
-                : () => setState(
-                      () {
-                        _selectedTeam = _match?.blue?.team2;
-                        _selectedAlliance = _match?.blue;
-                        _color = Colors.blue;
-                        _score = _selectedTeam?.scores[_match?.id];
-                      },
-                    ),
-          ),
-        )
-      ],
-    );
   }
 }

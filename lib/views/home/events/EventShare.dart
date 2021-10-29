@@ -26,47 +26,52 @@ Role shareRole = Role.editor;
 class _EventShareState extends State<EventShare> {
   @override
   Widget build(BuildContext context) => StreamBuilder<Database.Event>(
-      stream: widget.event.getRef()?.onValue,
-      builder: (context, eventHandler) {
-        if (eventHandler.hasData && !eventHandler.hasError) {
-          widget.event.updateLocal(
-            json.decode(
-              json.encode(eventHandler.data?.snapshot.value),
-            ),
-            context,
-          );
-        }
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            PlatformPicker<Role>(
-              value: shareRole,
-              onSelectedItemChanged: (newValue) {
-                HapticFeedback.lightImpact();
-                try {
-                  setState(() => shareRole = newValue ?? Role.editor);
-                } catch (e) {
-                  setState(() => shareRole = Role.values[newValue]);
-                }
-              },
-              items: Role.values
-                  .map(
-                    (e) => Text(
-                      e.name(),
-                      style: Theme.of(context).textTheme.bodyText1,
-                    ),
-                  )
-                  .toList(),
-              arr: Role.values,
-            ),
-            PlatformTextField(
-              placeholder: widget.event.shared ? 'Email' : '(Optional) Email',
-              keyboardType: TextInputType.emailAddress,
-              controller: widget.emailController,
-              autoCorrect: false,
-            ),
-            Permissions(event: widget.event),
-          ],
-        );
-      });
+        stream: widget.event.getRef()?.onValue,
+        builder: (context, eventHandler) {
+          if (eventHandler.hasData && !eventHandler.hasError) {
+            widget.event.updateLocal(
+              json.decode(
+                json.encode(eventHandler.data?.snapshot.value),
+              ),
+              context,
+            );
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                PlatformPicker<Role>(
+                  value: shareRole,
+                  onSelectedItemChanged: (newValue) {
+                    HapticFeedback.lightImpact();
+                    try {
+                      setState(() => shareRole = newValue ?? Role.editor);
+                    } catch (e) {
+                      setState(() => shareRole = Role.values[newValue]);
+                    }
+                  },
+                  items: Role.values
+                      .map(
+                        (e) => Text(
+                          e.name(),
+                          style: Theme.of(context).textTheme.bodyText1,
+                        ),
+                      )
+                      .toList(),
+                  arr: Role.values,
+                ),
+                PlatformTextField(
+                  textInputAction: TextInputAction.done,
+                  placeholder:
+                      widget.event.shared ? 'Email' : '(Optional) Email',
+                  keyboardType: TextInputType.emailAddress,
+                  controller: widget.emailController,
+                  autoCorrect: false,
+                ),
+                Permissions(event: widget.event),
+              ],
+            );
+          } else {
+            return Text("Your event will still be private");
+          }
+        },
+      );
 }
