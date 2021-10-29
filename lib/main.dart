@@ -39,6 +39,26 @@ Future<void> main() async {
   runApp(MyApp());
 }
 
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+    // firebaseDatabase.setPersistenceEnabled(true);
+    return MultiProvider(
+      providers: [
+        Provider<AuthenticationService>(
+          create: (_) => AuthenticationService(FirebaseAuth.instance),
+        ),
+        StreamProvider(
+            initialData: null,
+            create: (context) =>
+                context.read<AuthenticationService>().authStateChanges),
+      ],
+      child: TeamTrack(),
+    );
+  }
+}
+
 class TeamTrack extends StatefulWidget {
   @override
   _TeamTrack createState() => _TeamTrack();
@@ -108,24 +128,4 @@ class _TeamTrack extends State<TeamTrack> {
           ),
         ),
       );
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-    // firebaseDatabase.setPersistenceEnabled(true);
-    return MultiProvider(
-      providers: [
-        Provider<AuthenticationService>(
-          create: (_) => AuthenticationService(FirebaseAuth.instance),
-        ),
-        StreamProvider(
-            initialData: null,
-            create: (context) =>
-                context.read<AuthenticationService>().authStateChanges),
-      ],
-      child: TeamTrack(),
-    );
-  }
 }

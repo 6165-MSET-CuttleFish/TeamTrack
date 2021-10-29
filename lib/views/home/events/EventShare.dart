@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:firebase_database/firebase_database.dart' as Database;
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:teamtrack/models/AppModel.dart';
@@ -48,7 +49,14 @@ class _EventShareState extends State<EventShare> {
                   setState(() => shareRole = Role.values[newValue]);
                 }
               },
-              items: Role.values.map((e) => Text(e.name())).toList(),
+              items: Role.values
+                  .map(
+                    (e) => Text(
+                      e.name(),
+                      style: Theme.of(context).textTheme.bodyText1,
+                    ),
+                  )
+                  .toList(),
               arr: Role.values,
             ),
             PlatformTextField(

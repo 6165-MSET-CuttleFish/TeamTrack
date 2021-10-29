@@ -59,12 +59,16 @@ PageRoute platformPageRoute(Widget Function(BuildContext) builder) {
   return MaterialPageRoute(builder: builder);
 }
 
-abstract class PlatformWidget<C extends Widget, M extends Widget>
-    extends StatelessWidget {
+abstract class PlatformWidget<C extends Widget, M extends Widget,
+    W extends Widget?> extends StatelessWidget {
   PlatformWidget({Key? key}) : super(key: key);
 
   C buildCupertinoWidget(BuildContext context);
   M buildMaterialWidget(BuildContext context);
+  W? buildWebWidget(BuildContext context) {
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     try {
@@ -74,12 +78,12 @@ abstract class PlatformWidget<C extends Widget, M extends Widget>
         return buildMaterialWidget(context);
       }
     } catch (e) {
-      return buildMaterialWidget(context);
+      return buildWebWidget(context) ?? buildMaterialWidget(context);
     }
   }
 }
 
-class PlatformSwitch extends PlatformWidget<CupertinoSwitch, Switch> {
+class PlatformSwitch extends PlatformWidget<CupertinoSwitch, Switch, Null> {
   PlatformSwitch({
     Key? key,
     required this.value,
@@ -109,9 +113,80 @@ class PlatformSwitch extends PlatformWidget<CupertinoSwitch, Switch> {
   }
 }
 
-class PlatformAlert extends PlatformWidget<CupertinoAlertDialog, AlertDialog> {
-  PlatformAlert({Key? key, this.title, this.content, this.actions})
-      : super(key: key);
+class PlatformText extends PlatformWidget<Text, Text, SelectableText> {
+  PlatformText(
+    this.text, {
+    Key? key,
+    this.style,
+    this.strutStyle,
+    this.textAlign,
+    this.textDirection,
+    this.locale,
+    this.softWrap,
+    this.overflow,
+    this.textScaleFactor,
+    this.maxLines,
+    this.semanticsLabel,
+    this.textWidthBasis,
+    this.textHeightBehavior,
+  }) : super(key: key);
+  final String text;
+  final TextStyle? style;
+  final StrutStyle? strutStyle;
+  final TextAlign? textAlign;
+  final TextDirection? textDirection;
+  final Locale? locale;
+  final bool? softWrap;
+  final TextOverflow? overflow;
+  final double? textScaleFactor;
+  final int? maxLines;
+  final String? semanticsLabel;
+  final TextWidthBasis? textWidthBasis;
+  final TextHeightBehavior? textHeightBehavior;
+
+  @override
+  Text buildCupertinoWidget(BuildContext context) => Text(
+        text,
+        style: style,
+        strutStyle: strutStyle,
+        textAlign: textAlign,
+        textDirection: textDirection,
+        locale: locale,
+        softWrap: softWrap,
+        overflow: overflow,
+        textScaleFactor: textScaleFactor,
+        maxLines: maxLines,
+        semanticsLabel: semanticsLabel,
+        textWidthBasis: textWidthBasis,
+        textHeightBehavior: textHeightBehavior,
+      );
+
+  @override
+  Text buildMaterialWidget(BuildContext context) =>
+      buildCupertinoWidget(context);
+
+  @override
+  SelectableText buildWebWidget(BuildContext context) => SelectableText(
+        text,
+        style: style,
+        strutStyle: strutStyle,
+        textAlign: textAlign,
+        textDirection: textDirection,
+        textScaleFactor: textScaleFactor,
+        maxLines: maxLines,
+        textWidthBasis: textWidthBasis,
+        textHeightBehavior: textHeightBehavior,
+      );
+}
+
+class PlatformAlert
+    extends PlatformWidget<CupertinoAlertDialog, AlertDialog, Null> {
+  PlatformAlert({
+    Key? key,
+    this.title,
+    this.content,
+    this.actions,
+  }) : super(key: key);
   final Widget? title;
   final Widget? content;
   final List<Widget>? actions;
@@ -139,17 +214,17 @@ class PlatformAlert extends PlatformWidget<CupertinoAlertDialog, AlertDialog> {
 }
 
 class PlatformTextField
-    extends PlatformWidget<CupertinoTextField, TextFormField> {
-  PlatformTextField(
-      {Key? key,
-      this.onChanged,
-      this.keyboardType,
-      this.textCapitalization = TextCapitalization.none,
-      this.placeholder,
-      this.obscureText = false,
-      this.controller,
-      this.autoCorrect = true})
-      : super(key: key);
+    extends PlatformWidget<CupertinoTextField, TextFormField, Null> {
+  PlatformTextField({
+    Key? key,
+    this.onChanged,
+    this.keyboardType,
+    this.textCapitalization = TextCapitalization.none,
+    this.placeholder,
+    this.obscureText = false,
+    this.controller,
+    this.autoCorrect = true,
+  }) : super(key: key);
   final ValueChanged<String>? onChanged;
   final TextInputType? keyboardType;
   final TextCapitalization textCapitalization;
@@ -187,14 +262,14 @@ class PlatformTextField
 }
 
 class PlatformDialogAction
-    extends PlatformWidget<CupertinoDialogAction, TextButton> {
-  PlatformDialogAction(
-      {Key? key,
-      this.child,
-      this.isDefaultAction = false,
-      this.onPressed,
-      this.isDestructive = false})
-      : super(key: key);
+    extends PlatformWidget<CupertinoDialogAction, TextButton, Null> {
+  PlatformDialogAction({
+    Key? key,
+    this.child,
+    this.isDefaultAction = false,
+    this.onPressed,
+    this.isDestructive = false,
+  }) : super(key: key);
   final Widget? child;
   final bool isDefaultAction;
   final void Function()? onPressed;
@@ -225,14 +300,15 @@ class PlatformDialogAction
   }
 }
 
-class PlatformButton extends PlatformWidget<CupertinoButton, OutlinedButton> {
-  PlatformButton(
-      {Key? key,
-      required this.child,
-      this.onPressed,
-      this.disabledColor = Colors.transparent,
-      this.color})
-      : super(key: key);
+class PlatformButton
+    extends PlatformWidget<CupertinoButton, OutlinedButton, Null> {
+  PlatformButton({
+    Key? key,
+    required this.child,
+    this.onPressed,
+    this.disabledColor = Colors.transparent,
+    this.color,
+  }) : super(key: key);
   final Widget child;
   final void Function()? onPressed;
   final Color? color;
@@ -275,7 +351,7 @@ class PlatformButton extends PlatformWidget<CupertinoButton, OutlinedButton> {
 }
 
 class PlatformProgressIndicator extends PlatformWidget<
-    CupertinoActivityIndicator, CircularProgressIndicator> {
+    CupertinoActivityIndicator, CircularProgressIndicator, Null> {
   @override
   CupertinoActivityIndicator buildCupertinoWidget(BuildContext context) =>
       CupertinoActivityIndicator();
@@ -286,7 +362,7 @@ class PlatformProgressIndicator extends PlatformWidget<
 }
 
 class PlatformPicker<T>
-    extends PlatformWidget<CupertinoPicker, DropdownButton> {
+    extends PlatformWidget<CupertinoPicker, DropdownButton, Null> {
   PlatformPicker({
     Key? key,
     required this.items,
@@ -326,9 +402,12 @@ class PlatformPicker<T>
   }
 }
 
-class PlatformForm extends PlatformWidget<CupertinoFormSection, Form> {
-  PlatformForm({Key? key, required this.children, this.header})
-      : super(key: key);
+class PlatformForm extends PlatformWidget<CupertinoFormSection, Form, Null> {
+  PlatformForm({
+    Key? key,
+    required this.children,
+    this.header,
+  }) : super(key: key);
   final List<Widget> children;
   final Widget? header;
   @override
@@ -352,7 +431,7 @@ class PlatformForm extends PlatformWidget<CupertinoFormSection, Form> {
 }
 
 class PlatformFormField
-    extends PlatformWidget<CupertinoTextFormFieldRow, TextFormField> {
+    extends PlatformWidget<CupertinoTextFormFieldRow, TextFormField, Null> {
   PlatformFormField(
       {Key? key,
       required this.controller,
@@ -400,7 +479,7 @@ class PlatformFormField
 }
 
 class PlatformDatePicker
-    extends PlatformWidget<CupertinoDatePicker, CalendarDatePicker> {
+    extends PlatformWidget<CupertinoDatePicker, CalendarDatePicker, Null> {
   PlatformDatePicker(
       {Key? key,
       required this.minimumDate,
@@ -806,8 +885,9 @@ class ScoreCard extends StatelessWidget {
     final blueAlliances = diceMatches.map((e) => e.blue).whereType<Alliance>();
     final allAlliances = redAlliances;
     allAlliances.toList().addAll(blueAlliances);
-    final allAllianceTotals =
-        allAlliances.map((alliance) => alliance.allianceTotal(true, type: type));
+    final allAllianceTotals = allAlliances
+        .map((alliance) => alliance.allianceTotal(false, type: type).toDouble())
+        .toList();
     return CardView(
       isActive: scoreDivisions.diceScores(dice).length >= 1,
       child: Padding(
@@ -821,13 +901,7 @@ class ScoreCard extends StatelessWidget {
                   : allianceTotals?.mean() ?? 0,
               max: !matchTotal
                   ? event.teams.maxMeanScore(dice, removeOutliers, type)
-                  : matches
-                          ?.where(
-                            (e) => e.dice == dice || dice == Dice.none,
-                          )
-                          .toList()
-                          .maxScore(false) ??
-                      0,
+                  : allAllianceTotals.mean(),
               title: 'Mean',
             ),
             BarGraph(
@@ -836,13 +910,7 @@ class ScoreCard extends StatelessWidget {
                   : allianceTotals?.median() ?? 0,
               max: !matchTotal
                   ? event.teams.maxMedianScore(dice, removeOutliers, type)
-                  : matches
-                          ?.where(
-                            (e) => e.dice == dice || dice == Dice.none,
-                          )
-                          .toList()
-                          .maxScore(false) ??
-                      0,
+                  : allAllianceTotals.median(),
               title: 'Median',
             ),
             BarGraph(
@@ -851,13 +919,7 @@ class ScoreCard extends StatelessWidget {
                   : allianceTotals?.maxValue() ?? 0,
               max: !matchTotal
                   ? event.teams.maxScore(dice, removeOutliers, type)
-                  : matches
-                          ?.where(
-                            (e) => e.dice == dice || dice == Dice.none,
-                          )
-                          .toList()
-                          .maxScore(false) ??
-                      0,
+                  : allAllianceTotals.maxValue(),
               title: 'Best',
             ),
             BarGraph(
