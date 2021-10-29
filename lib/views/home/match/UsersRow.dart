@@ -13,7 +13,14 @@ class UsersRow extends StatefulWidget {
 class _UsersRowState extends State<UsersRow> {
   @override
   Widget build(BuildContext context) => RowSuper(
-        children: widget.users.map((user) => PFP(user: user)).toList(),
+        children: widget.users
+            .map(
+              (user) => PFP(
+                user: user,
+                showRole: true,
+              ),
+            )
+            .toList(),
         innerDistance: -10.0,
       );
 }

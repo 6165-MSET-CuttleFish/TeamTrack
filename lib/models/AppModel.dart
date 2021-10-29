@@ -82,16 +82,19 @@ class TeamTrackUser {
   String? email;
   String? displayName;
   String? photoURL;
+  String? watchingTeam;
   TeamTrackUser.fromJson(Map<String, dynamic> json)
       : role = getRoleFromString(json['role']),
         email = json['email'],
         displayName = json['name'],
+        watchingTeam = json['watchingTeam'],
         photoURL = json['photoURL'];
   Map<String, dynamic> toJson() => {
         'role': role.toRep(),
         'email': email,
         'displayName': displayName,
         'photoURL': photoURL,
+        'watchingTeam': watchingTeam,
       };
 }
 

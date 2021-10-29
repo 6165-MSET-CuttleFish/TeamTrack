@@ -47,7 +47,7 @@ class BarGraph extends StatelessWidget {
                 ),
               ),
               AnimatedContainer(
-                curve: Curves.fastLinearToSlowEaseIn,
+                curve: Curves.bounceOut,
                 duration: Duration(milliseconds: 600),
                 width: width,
                 height: inverted

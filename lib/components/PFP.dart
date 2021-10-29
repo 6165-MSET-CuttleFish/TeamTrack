@@ -9,21 +9,24 @@ class PFP extends StatelessWidget {
   final bool showRole;
 
   @override
-  Widget build(BuildContext context) => Stack(
-        alignment: Alignment.bottomRight,
-        children: [
-          user.photoURL != null
-              ? ClipRRect(
-                  borderRadius: BorderRadius.circular(300),
-                  child: Image.network(
-                    user.photoURL!,
-                    height: 28,
+  Widget build(BuildContext context) => Container(
+        height: 28,
+        child: Stack(
+          alignment: Alignment.bottomRight,
+          children: [
+            user.photoURL != null
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(300),
+                    child: Image.network(
+                      user.photoURL!,
+                      height: 28,
+                    ),
+                  )
+                : Icon(
+                    Icons.person,
                   ),
-                )
-              : Icon(
-                  Icons.person,
-                ),
-          if (showRole) user.role.getIcon(),
-        ],
+            if (showRole) user.role.getIcon(),
+          ],
+        ),
       );
 }
