@@ -10,6 +10,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:teamtrack/views/home/team/CheckList.dart';
 import 'package:uuid/uuid.dart';
 import 'package:firebase_database/firebase_database.dart' as Database;
 import 'dart:convert';
@@ -23,22 +24,23 @@ class TeamView extends StatefulWidget {
   final Team team;
   final Event event;
   @override
-  _TeamView createState() => _TeamView();
+  TeamViewState createState() => TeamViewState(team);
 }
 
-class _TeamView extends State<TeamView> {
+class TeamViewState extends State<TeamView> {
+  TeamViewState(this._team);
   Dice _dice = Dice.none;
   final _selections = [true, true, false, false, false];
-  Team _team = Team.nullTeam();
-  bool removeOutliers = false;
+  Team _team;
+  bool removeOutliers = false,
+      showPenalties = false,
+      matchIsScore = false,
+      _showCycles = false;
   final endgameColor = Colors.deepOrange;
   final penaltyColor = Colors.red;
   final teleColor = Colors.blue;
   final autoColor = Colors.green;
   final generalColor = Color.fromRGBO(230, 30, 213, 1);
-  bool showPenalties = false;
-  bool _showCycles = false;
-  bool _matchIsScore = false;
   @override
   Widget build(BuildContext context) => Scaffold(
         bottomNavigationBar: NewPlatform.isIOS()
@@ -51,13 +53,9 @@ class _TeamView extends State<TeamView> {
                     Dice.three: Text(Dice.three.toVal(widget.event.gameName)),
                     Dice.none: Text('All Cases')
                   },
-                  onValueChanged: (Dice? newDice) {
-                    setState(
-                      () {
-                        _dice = newDice ?? Dice.none;
-                      },
-                    );
-                  },
+                  onValueChanged: (Dice? newDice) => setState(
+                    () => _dice = newDice ?? Dice.none,
+                  ),
                 ),
               )
             : ButtonBar(
@@ -148,54 +146,7 @@ class _TeamView extends State<TeamView> {
               icon: Icon(Icons.settings),
               onPressed: () => showModalBottomSheet(
                 context: context,
-                builder: (context) => Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    CheckboxListTile(
-                      value: removeOutliers,
-                      onChanged: (_) => setState(
-                        () {
-                          removeOutliers = _ ?? false;
-                          Navigator.pop(context);
-                        },
-                      ),
-                      checkColor: Colors.black,
-                      tileColor: Colors.green,
-                      title: Text('Remove Outliers'),
-                      secondary: Icon(CupertinoIcons.arrow_branch),
-                    ),
-                    CheckboxListTile(
-                      value: showPenalties,
-                      onChanged: (_) {
-                        setState(
-                          () {
-                            showPenalties = _ ?? false;
-                            Navigator.pop(context);
-                          },
-                        );
-                      },
-                      checkColor: Colors.black,
-                      tileColor: Colors.red,
-                      title: Text('Count Penalties'),
-                      secondary: Icon(CupertinoIcons.xmark_seal_fill),
-                    ),
-                    if (widget.event.type != EventType.remote)
-                      CheckboxListTile(
-                        value: _matchIsScore,
-                        onChanged: (_) => setState(
-                          () {
-                            _matchIsScore = _ ?? false;
-                            Navigator.pop(context);
-                          },
-                        ),
-                        checkColor: Colors.black,
-                        tileColor: Colors.blue,
-                        title: Text('Match Total'),
-                        subtitle: Text('Consider match total as score total'),
-                        secondary: Icon(CupertinoIcons.square_stack),
-                      ),
-                  ],
-                ),
+                builder: (context) => CheckList(state: this),
               ),
             ),
             // IconButton(
@@ -719,7 +670,6 @@ class _TeamView extends State<TeamView> {
               context,
               platformPageRoute(
                 (context) => MatchView(
-                  match: Match.defaultMatch(EventType.remote),
                   event: widget.event,
                   team: _team,
                 ),
@@ -739,7 +689,7 @@ class _TeamView extends State<TeamView> {
         ),
       ),
       ScoreCard(
-        matchTotal: _matchIsScore,
+        matchTotal: matchIsScore,
         team: _team,
         event: widget.event,
         scoreDivisions: _team.scores.values.toList(),
@@ -757,7 +707,7 @@ class _TeamView extends State<TeamView> {
         ),
       ),
       ScoreCard(
-        matchTotal: _matchIsScore,
+        matchTotal: matchIsScore,
         team: _team,
         event: widget.event,
         type: OpModeType.auto,
@@ -776,7 +726,7 @@ class _TeamView extends State<TeamView> {
         ),
       ),
       ScoreCard(
-        matchTotal: _matchIsScore,
+        matchTotal: matchIsScore,
         team: _team,
         event: widget.event,
         type: OpModeType.tele,
@@ -795,7 +745,7 @@ class _TeamView extends State<TeamView> {
         ),
       ),
       ScoreCard(
-        matchTotal: _matchIsScore,
+        matchTotal: matchIsScore,
         team: _team,
         event: widget.event,
         type: OpModeType.endgame,

@@ -32,8 +32,7 @@ class NewPlatform {
 
   static bool isWeb() {
     try {
-      var temp = Platform.isAndroid;
-      print(temp);
+      Platform.isAndroid;
     } catch (e) {
       return true;
     }

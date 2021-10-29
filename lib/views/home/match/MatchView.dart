@@ -142,10 +142,11 @@ class _MatchView extends State<MatchView> {
                                   content: Text('Are you sure?'),
                                   actions: [
                                     PlatformDialogAction(
-                                        child: Text('Cancel'),
-                                        isDefaultAction: true,
-                                        onPressed: () =>
-                                            Navigator.of(context).pop()),
+                                      child: Text('Cancel'),
+                                      isDefaultAction: true,
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(),
+                                    ),
                                     PlatformDialogAction(
                                       child: Text('Confirm'),
                                       isDestructive: true,

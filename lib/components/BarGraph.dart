@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class BarGraph extends StatelessWidget {
   BarGraph({
@@ -59,9 +60,11 @@ class BarGraph extends StatelessWidget {
                 child: Center(
                   child: Text(
                     percentage != 0 ? percentage.toString() + '%' : '',
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: Colors.black,
+                    style: GoogleFonts.gugi(
+                      textStyle: TextStyle(
+                        fontSize: 10,
+                        color: Colors.black,
+                      ),
                     ),
                   ),
                 ),

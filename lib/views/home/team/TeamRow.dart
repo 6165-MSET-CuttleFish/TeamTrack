@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:teamtrack/components/BarGraph.dart';
 import 'package:teamtrack/components/PercentIncrease.dart';
 import 'package:teamtrack/models/GameModel.dart';
@@ -31,7 +32,7 @@ class TeamRow extends StatelessWidget {
         ),
       ),
       child: ListTile(
-        title: Text(team.name),
+        title: Text(team.name, style: GoogleFonts.gugi()),
         leading: Text(team.number, style: Theme.of(context).textTheme.caption),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
