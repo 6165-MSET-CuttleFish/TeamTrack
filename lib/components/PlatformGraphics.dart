@@ -52,7 +52,7 @@ void showPlatformDialog({
   }
 }
 
-PageRoute platformPageRoute(Widget Function(BuildContext) builder) {
+PageRoute platformPageRoute({required Widget Function(BuildContext) builder}) {
   if (NewPlatform.isIOS()) {
     return CupertinoPageRoute(builder: builder);
   }
@@ -224,6 +224,7 @@ class PlatformTextField
     this.obscureText = false,
     this.controller,
     this.autoCorrect = true,
+    this.textInputAction,
   }) : super(key: key);
   final ValueChanged<String>? onChanged;
   final TextInputType? keyboardType;
@@ -232,9 +233,11 @@ class PlatformTextField
   final bool obscureText;
   final TextEditingController? controller;
   final bool autoCorrect;
+  final TextInputAction? textInputAction;
   @override
   CupertinoTextField buildCupertinoWidget(BuildContext context) {
     return CupertinoTextField(
+      textInputAction: textInputAction,
       controller: controller,
       style: TextStyle(color: Theme.of(context).textTheme.bodyText2!.color),
       onChanged: onChanged,
@@ -249,6 +252,7 @@ class PlatformTextField
   @override
   TextFormField buildMaterialWidget(BuildContext context) {
     return TextFormField(
+      textInputAction: textInputAction,
       controller: controller,
       style: TextStyle(color: Theme.of(context).textTheme.bodyText2!.color),
       onChanged: onChanged,
@@ -371,10 +375,12 @@ class PlatformPicker<T>
     required this.arr,
   }) : super(key: key) {
     for (int i = 0; i < arr.length; i++) {
-      dropdownItems.add(DropdownMenuItem<T>(
-        child: items[i],
-        value: arr[i],
-      ));
+      dropdownItems.add(
+        DropdownMenuItem<T>(
+          child: items[i],
+          value: arr[i],
+        ),
+      );
     }
   }
   final void Function(dynamic)? onSelectedItemChanged;
@@ -386,7 +392,7 @@ class PlatformPicker<T>
   @override
   CupertinoPicker buildCupertinoWidget(BuildContext context) {
     return CupertinoPicker(
-      itemExtent: 50,
+      itemExtent: 40,
       onSelectedItemChanged: onSelectedItemChanged,
       children: items,
     );
@@ -564,14 +570,15 @@ class _Incrementor extends State<Incrementor> {
                 ?.child(widget.path!)
                 .runTransaction((mutableData) {
               if (widget.isTargetScore) {
-                for (int i = 0;
+                for (int i = 1;
                     i < (widget.element.nestedElements?.length ?? 0);
                     i++) {
                   mutableData.value['targetScore'][widget.opModeType?.toRep()]
                       [widget.element.nestedElements?[i].key] = 0;
                 }
-                mutableData.value['targetScore'][widget.opModeType?.toRep()]
-                    [widget.element.nestedElements?[val].key] = 1;
+                if (val != 0)
+                  mutableData.value['targetScore'][widget.opModeType?.toRep()]
+                      [widget.element.nestedElements?[val].key] = 1;
                 return mutableData;
               }
               final scoreIndex = widget.score?.id;
