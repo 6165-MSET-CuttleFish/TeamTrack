@@ -1,3 +1,4 @@
+import 'package:teamtrack/components/EmptyList.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/views/home/team/TeamRow.dart';
 import 'package:teamtrack/views/home/team/TeamView.dart';
@@ -41,87 +42,84 @@ class _TeamList extends State<TeamList> {
           }
           final max =
               widget.event.teams.maxMeanScore(Dice.none, true, widget.sortMode);
-          return ListView(
-            children: widget.event.teams
-                .sortedTeams(widget.sortMode)
-                .map(
-                  (team) => Slidable(
-                    child: TeamRow(
-                      team: team,
-                      event: widget.event,
-                      sortMode: widget.sortMode,
-                      max: max,
-                      onTap: () async {
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => TeamView(
-                              team: team,
-                              event: widget.event,
-                            ),
-                          ),
-                        );
-                        setState(() {});
-                      },
+          final teams = widget.event.teams.sortedTeams(widget.sortMode);
+          if (teams.length == 0) return EmptyList();
+          return ListView.builder(
+            itemCount: teams.length,
+            itemBuilder: (context, index) => Slidable(
+              child: TeamRow(
+                team: teams[index],
+                event: widget.event,
+                sortMode: widget.sortMode,
+                max: max,
+                onTap: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => TeamView(
+                        team: teams[index],
+                        event: widget.event,
+                      ),
                     ),
-                    actionPane: slider,
-                    secondaryActions: [
-                      IconSlideAction(
-                        icon: Icons.delete,
-                        color: Colors.red,
-                        onTap: () {
-                          showPlatformDialog(
-                            context: context,
-                            builder: (BuildContext context) => PlatformAlert(
-                              title: Text('Delete Team'),
-                              content: Text('Are you sure?'),
-                              actions: [
-                                PlatformDialogAction(
-                                  isDefaultAction: true,
-                                  child: Text('Cancel'),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                                PlatformDialogAction(
-                                  isDefaultAction: false,
-                                  isDestructive: true,
-                                  child: Text('Confirm'),
-                                  onPressed: () {
-                                    String? s;
-                                    setState(() {
-                                      s = widget.event.deleteTeam(team);
-                                    });
-                                    dataModel.saveEvents();
-                                    Navigator.of(context).pop();
-                                    if (s != null)
-                                      showPlatformDialog(
-                                        context: context,
-                                        builder: (context) => PlatformAlert(
-                                          title: Text('Error'),
-                                          content: Text(
-                                              'Team is present in matches'),
-                                          actions: [
-                                            PlatformDialogAction(
-                                              child: Text('Okay'),
-                                              isDefaultAction: true,
-                                              onPressed: () =>
-                                                  Navigator.of(context).pop(),
-                                            )
-                                          ],
-                                        ),
-                                      );
-                                  },
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      )
-                    ],
-                  ),
+                  );
+                  setState(() {});
+                },
+              ),
+              actionPane: slider,
+              secondaryActions: [
+                IconSlideAction(
+                  icon: Icons.delete,
+                  color: Colors.red,
+                  onTap: () {
+                    showPlatformDialog(
+                      context: context,
+                      builder: (BuildContext context) => PlatformAlert(
+                        title: Text('Delete Team'),
+                        content: Text('Are you sure?'),
+                        actions: [
+                          PlatformDialogAction(
+                            isDefaultAction: true,
+                            child: Text('Cancel'),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          PlatformDialogAction(
+                            isDefaultAction: false,
+                            isDestructive: true,
+                            child: Text('Confirm'),
+                            onPressed: () {
+                              String? s;
+                              setState(() {
+                                s = widget.event.deleteTeam(teams[index]);
+                              });
+                              dataModel.saveEvents();
+                              Navigator.of(context).pop();
+                              if (s != null)
+                                showPlatformDialog(
+                                  context: context,
+                                  builder: (context) => PlatformAlert(
+                                    title: Text('Error'),
+                                    content: Text('Team is present in matches'),
+                                    actions: [
+                                      PlatformDialogAction(
+                                        child: Text('Okay'),
+                                        isDefaultAction: true,
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(),
+                                      )
+                                    ],
+                                  ),
+                                );
+                            },
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                 )
-                .toList(),
+              ],
+            ),
           );
         },
       );
