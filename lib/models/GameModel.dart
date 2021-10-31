@@ -40,7 +40,13 @@ class Event {
   Map<String, Match> matches = {};
   String name = "";
   Timestamp timeStamp = Timestamp.now();
-  Map<String, TeamTrackUser> permissions = {};
+
+  Timestamp? sendTime;
+  String? senderId;
+  String? senderName;
+  String? senderEmail;
+
+  List<TeamTrackUser> users = [];
 
   void addTeam(Team newTeam) async {
     await getRef()
@@ -327,10 +333,18 @@ class Event {
         match.setDice(match.dice);
       }
       try {
-        permissions = (map['Permissions'] as Map<String, dynamic>)
-            .map((key, value) => MapEntry(key, TeamTrackUser.fromJson(value)));
+        users = (map['Permissions'] as Map<String, dynamic>)
+            .map((key, value) =>
+                MapEntry(key, TeamTrackUser.fromJson(value, key)))
+            .values
+            .toList();
       } catch (e) {}
-      role = permissions[context.read<User?>()?.uid]?.role ?? Role.editor;
+      role = users
+          .firstWhere(
+            (element) => element.id == context.read<User?>()?.uid,
+            orElse: () => TeamTrackUser(role: Role.editor),
+          )
+          .role;
     }
   }
 
@@ -363,6 +377,11 @@ class Event {
     }
     authorEmail = json?['authorEmail'];
     authorName = json?['authorName'];
+
+    senderId = json?['senderId'];
+    sendTime = json?['sendTime'];
+    senderEmail = json?['senderEmail'];
+
     for (var match in matches.values) {
       match.setDice(match.dice);
     }
@@ -444,7 +463,7 @@ class Match {
   Alliance? red;
   Alliance? blue;
   String id = '';
-  Map<String, TeamTrackUser>? activeUsers;
+  List<TeamTrackUser>? activeUsers;
   Timestamp timeStamp = Timestamp.now();
   Match(this.red, this.blue, this.type) {
     id = Uuid().v4();
@@ -453,7 +472,7 @@ class Match {
     blue?.opposingAlliance = red;
     red?.id = id;
     blue?.id = id;
-    activeUsers = {};
+    activeUsers = [];
   }
   static Match defaultMatch(EventType type) {
     return Match(
@@ -541,7 +560,9 @@ class Match {
       timeStamp = Timestamp.now();
     }
     activeUsers = (json['activeUsers'] as Map<String, dynamic>?)
-        ?.map((key, value) => MapEntry(key, TeamTrackUser.fromJson(value)));
+        ?.map((key, value) => MapEntry(key, TeamTrackUser.fromJson(value, key)))
+        .values
+        .toList();
   }
   Map<String, dynamic> toJson() => {
         'red': red?.toJson(),

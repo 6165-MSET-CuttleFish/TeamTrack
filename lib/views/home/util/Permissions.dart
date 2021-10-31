@@ -15,18 +15,18 @@ class Permissions extends StatefulWidget {
 class _PermissionsState extends State<Permissions> {
   @override
   Widget build(BuildContext context) => Column(
-        children: widget.event.permissions.keys
+        children: widget.event.users
             .map(
               (user) => ListTile(
-                leading: PFP(user: widget.event.permissions[user]!),
+                leading: PFP(user: user),
                 title: Text(
-                  widget.event.permissions[user]?.displayName ?? "Unknown",
+                  user.displayName ?? "Unknown",
                 ),
                 subtitle: Text(
-                  widget.event.permissions[user]?.email ?? "Unknown",
+                  user.email ?? "Unknown",
                 ),
                 trailing: DropdownButton<Role>(
-                  value: widget.event.permissions[user]?.role ?? Role.editor,
+                  value: user.role,
                   items: Role.values
                       .map(
                         (e) => DropdownMenuItem<Role>(

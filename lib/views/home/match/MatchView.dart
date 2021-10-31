@@ -123,8 +123,7 @@ class _MatchView extends State<MatchView> {
                               onPressed: () {},
                               splashColor: Colors.transparent,
                               child: UsersRow(
-                                users:
-                                    _match?.activeUsers?.values.toList() ?? [],
+                                users: _match?.activeUsers ?? [],
                               ),
                             )
                           : Text("Match Stats"),

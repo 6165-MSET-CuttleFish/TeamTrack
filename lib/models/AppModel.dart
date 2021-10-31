@@ -14,6 +14,7 @@ import '../functions/Extensions.dart';
 class DataModel {
   List<Event> events = [];
   String? token;
+  List<Event> inbox = [];
   List<Event> localEvents() {
     return events.where((e) => e.type == EventType.local).toList();
   }
@@ -83,7 +84,8 @@ class TeamTrackUser {
   String? displayName;
   String? photoURL;
   String? watchingTeam;
-  TeamTrackUser.fromJson(Map<String, dynamic> json)
+  String? id;
+  TeamTrackUser.fromJson(Map<String, dynamic> json, this.id)
       : role = getRoleFromString(json['role']),
         email = json['email'],
         displayName = json['name'],
