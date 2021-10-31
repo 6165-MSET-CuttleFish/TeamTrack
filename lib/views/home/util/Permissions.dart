@@ -37,6 +37,12 @@ class _PermissionsState extends State<Permissions> {
                         ),
                       )
                       .toList(),
+                  onChanged: (newValue) => setState(
+                    () => widget.event
+                        .getRef()
+                        ?.child('Permissions/${user.id}/role')
+                        .set(newValue?.toRep()),
+                  ),
                 ),
               ),
             )
