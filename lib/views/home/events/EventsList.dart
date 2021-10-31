@@ -167,7 +167,8 @@ class _EventsList extends State<EventsList> {
                                             await context
                                                 .read<User?>()
                                                 ?.updateDisplayName(
-                                                    controller.text);
+                                                  controller.text,
+                                                );
                                           Navigator.pop(context);
                                           showPlatformDialog(
                                             context: context,

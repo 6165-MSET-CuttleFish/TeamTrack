@@ -388,7 +388,7 @@ class Alliance {
   Team? team2;
   EventType eventType;
   Alliance? opposingAlliance;
-  late Score? sharedScore;
+  Score? sharedScore;
   String? id;
   Alliance(this.team1, this.team2, this.eventType, String gameName) {
     sharedScore =
@@ -425,8 +425,11 @@ class Alliance {
   )   : team1 = json['team1'] != null ? teamList[json['team1']] : null,
         team2 = json['team2'] != null ? teamList[json['team2']] : null,
         sharedScore = json['sharedScore'] != null
-            ? Score.fromJson(json['sharedScore'], gameName,
-                isAllianceScore: true)
+            ? Score.fromJson(
+                json['sharedScore'],
+                gameName,
+                isAllianceScore: true,
+              )
             : Score(Uuid().v4(), Dice.none, gameName, isAllianceScore: true);
   Map<String, dynamic> toJson() => {
         'team1': team1?.number,

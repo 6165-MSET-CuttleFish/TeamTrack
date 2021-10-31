@@ -170,6 +170,7 @@ class _MatchList extends State<MatchList> {
         ],
         child: MatchRow(
           match: matches[index],
+          team: widget.event.teams[widget.team?.number],
           event: widget.event,
           index: widget.ascending ? index + 1 : matches.length - index,
           onTap: () async {
