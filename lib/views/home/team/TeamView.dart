@@ -48,12 +48,18 @@ class TeamViewState extends State<TeamView> {
             ? SafeArea(
                 child: CupertinoSlidingSegmentedControl(
                   groupValue: _dice,
-                  children: <Dice, Widget>{
-                    Dice.one: Text(Dice.one.toVal(widget.event.gameName)),
-                    Dice.two: Text(Dice.two.toVal(widget.event.gameName)),
-                    Dice.three: Text(Dice.three.toVal(widget.event.gameName)),
-                    Dice.none: Text('All Cases')
-                  },
+                  children: Dice.values.asMap().map(
+                        (key, value) => MapEntry(
+                          value,
+                          Text(
+                            value == Dice.none
+                                ? 'All Cases'
+                                : value.toVal(
+                                    widget.event.gameName,
+                                  ),
+                          ),
+                        ),
+                      ),
                   onValueChanged: (Dice? newDice) => setState(
                     () => _dice = newDice ?? Dice.none,
                   ),
@@ -199,45 +205,45 @@ class TeamViewState extends State<TeamView> {
                               crossAxisAlignment: WrapCrossAlignment.center,
                               spacing: 0,
                               children: [
-                                if (widget.event.type != EventType.remote)
-                                  FlatButton(
-                                    color: _selections[0]
-                                        ? Color.fromRGBO(255, 166, 0, 1)
-                                        : null,
-                                    splashColor: Color.fromRGBO(255, 166, 0, 1),
-                                    onPressed: () {
-                                      setState(
-                                        () {
-                                          _selections[0] = !_selections[0];
-                                        },
-                                      );
-                                    },
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(18.0),
-                                      side: BorderSide(
-                                        color: Color.fromRGBO(255, 166, 0, 1),
-                                      ),
-                                    ),
-                                    child: Text('Alliance Total'),
-                                  ),
                                 FlatButton(
-                                  color: _selections[1] ? generalColor : null,
-                                  splashColor: generalColor,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(18.0),
-                                    side: BorderSide(
-                                      color: generalColor,
-                                    ),
-                                  ),
-                                  child: Text('Subtotal'),
+                                  color: _selections[0]
+                                      ? Color.fromRGBO(255, 166, 0, 1)
+                                      : null,
+                                  splashColor: Color.fromRGBO(255, 166, 0, 1),
                                   onPressed: () {
                                     setState(
                                       () {
-                                        _selections[1] = !_selections[1];
+                                        _selections[0] = !_selections[0];
                                       },
                                     );
                                   },
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(18.0),
+                                    side: BorderSide(
+                                      color: Color.fromRGBO(255, 166, 0, 1),
+                                    ),
+                                  ),
+                                  child: Text('Alliance Total'),
                                 ),
+                                if (widget.event.type != EventType.remote)
+                                  FlatButton(
+                                    color: _selections[1] ? generalColor : null,
+                                    splashColor: generalColor,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(18.0),
+                                      side: BorderSide(
+                                        color: generalColor,
+                                      ),
+                                    ),
+                                    child: Text('Subtotal'),
+                                    onPressed: () {
+                                      setState(
+                                        () {
+                                          _selections[1] = !_selections[1];
+                                        },
+                                      );
+                                    },
+                                  ),
                                 FlatButton(
                                   color: _selections[2] ? autoColor : null,
                                   splashColor: autoColor,
@@ -552,8 +558,7 @@ class TeamViewState extends State<TeamView> {
                                         applyCutOffY: true,
                                       )
                                     : null,
-                                show: _selections[0] &&
-                                    widget.event.type != EventType.remote,
+                                show: _selections[0],
                                 spots: widget.event
                                     .getSortedMatches(true)
                                     .where((e) =>
@@ -595,7 +600,8 @@ class TeamViewState extends State<TeamView> {
                                         applyCutOffY: true,
                                       )
                                     : null,
-                                show: _selections[1],
+                                show: _selections[1] &&
+                                    widget.event.type != EventType.remote,
                                 spots: _team.scores
                                     .diceScores(_dice)
                                     .spots(null, showPenalties: showPenalties)

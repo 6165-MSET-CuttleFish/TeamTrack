@@ -268,15 +268,20 @@ class _MatchView extends State<MatchView> {
                           Text(
                             (_selectedTeam?.name ?? '') +
                                 ' : ' +
-                                (_score
-                                        ?.total(
-                                          showPenalties: widget.event.type ==
-                                                  EventType.remote
-                                              ? _showPenalties
-                                              : false,
-                                        )
-                                        .toString() ??
-                                    ''),
+                                (widget.event.type != EventType.remote
+                                    ? (_score
+                                            ?.total(
+                                              showPenalties:
+                                                  widget.event.type ==
+                                                          EventType.remote
+                                                      ? _showPenalties
+                                                      : false,
+                                            )
+                                            .toString() ??
+                                        '')
+                                    : (_match?.score(
+                                            showPenalties: _showPenalties) ??
+                                        '')),
                             style: Theme.of(context).textTheme.headline6,
                           ),
                           if (widget.team == null)
@@ -361,28 +366,51 @@ class _MatchView extends State<MatchView> {
                                 SizedBox(
                                   child: Text(
                                     'Autonomous : ' +
-                                        (_score?.autoScore.total().toString() ??
-                                            '0'),
+                                        (widget.event.type != EventType.remote
+                                            ? (_score?.autoScore
+                                                    .total()
+                                                    .toString() ??
+                                                '0')
+                                            : (_selectedAlliance
+                                                    ?.total()
+                                                    .autoScore
+                                                    .total()
+                                                    .toString() ??
+                                                '0')),
                                     style: Theme.of(context).textTheme.caption,
                                   ),
                                 ),
                                 SizedBox(
                                   child: Text(
                                       'Tele-Op : ' +
-                                          (_score?.teleScore
-                                                  .total()
-                                                  .toString() ??
-                                              '0'),
+                                          (widget.event.type != EventType.remote
+                                              ? (_score?.teleScore
+                                                      .total()
+                                                      .toString() ??
+                                                  '0')
+                                              : (_selectedAlliance
+                                                      ?.total()
+                                                      .teleScore
+                                                      .total()
+                                                      .toString() ??
+                                                  '0')),
                                       style:
                                           Theme.of(context).textTheme.caption),
                                 ),
                                 SizedBox(
                                   child: Text(
                                       'Endgame : ' +
-                                          (_score?.endgameScore
-                                                  .total()
-                                                  .toString() ??
-                                              '0'),
+                                          (widget.event.type != EventType.remote
+                                              ? (_score?.endgameScore
+                                                      .total()
+                                                      .toString() ??
+                                                  '0')
+                                              : (_selectedAlliance
+                                                      ?.total()
+                                                      .endgameScore
+                                                      .total()
+                                                      .toString() ??
+                                                  '0')),
                                       style:
                                           Theme.of(context).textTheme.caption),
                                 )
@@ -620,10 +648,7 @@ class _MatchView extends State<MatchView> {
                 .toList() ??
             [],
         if (widget.team == null)
-          ..._selectedAlliance?.sharedScore?.teleScore
-                  .getElements()
-                  .parse()
-                  .map(
+          ..._selectedAlliance?.sharedScore.teleScore.getElements().parse().map(
                     (e) => Incrementor(
                       element: e,
                       onPressed: stateSetter,
@@ -726,7 +751,7 @@ class _MatchView extends State<MatchView> {
                   .toList() ??
               [],
           if (widget.team == null)
-            ..._selectedAlliance?.sharedScore?.teleScore
+            ..._selectedAlliance?.sharedScore.teleScore
                     .getElements()
                     .parse()
                     .map(
@@ -783,7 +808,7 @@ class _MatchView extends State<MatchView> {
               [],
           Padding(padding: EdgeInsets.all(5)),
           if (widget.team == null)
-            ..._selectedAlliance?.sharedScore?.endgameScore
+            ..._selectedAlliance?.sharedScore.endgameScore
                     .getElements()
                     .parse()
                     .map(

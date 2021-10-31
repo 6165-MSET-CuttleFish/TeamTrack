@@ -10,9 +10,10 @@ class Score extends ScoreDivision implements Comparable<Score> {
   EndgameScore endgameScore = EndgameScore({});
   Penalty penalties = Penalty();
   String id = '';
+  String gameName;
   late Dice dice;
   bool isAllianceScore;
-  Score(this.id, this.dice, String gameName, {this.isAllianceScore = false}) {
+  Score(this.id, this.dice, this.gameName, {this.isAllianceScore = false}) {
     var ref = isAllianceScore
         ? json.decode(remoteConfig.getValue(gameName).asString())['Alliance']
         : json.decode(remoteConfig.getValue(gameName).asString());
@@ -59,6 +60,15 @@ class Score extends ScoreDivision implements Comparable<Score> {
         (e) => e.reset(),
       );
 
+  Score operator +(Score other) {
+    Score result = Score(id, dice, gameName, isAllianceScore: isAllianceScore);
+    result.autoScore = this.autoScore + other.autoScore;
+    result.teleScore = this.teleScore + other.teleScore;
+    result.endgameScore = this.endgameScore + other.endgameScore;
+    result.penalties = this.penalties + other.penalties;
+    return result;
+  }
+
   @override
   Dice getDice() => dice;
   void setDice(Dice value, Timestamp time) {
@@ -74,7 +84,7 @@ class Score extends ScoreDivision implements Comparable<Score> {
     penalties.timeStamp = time;
   }
 
-  Score.fromJson(Map<String, dynamic> map, String gameName,
+  Score.fromJson(Map<String, dynamic> map, this.gameName,
       {this.isAllianceScore = false}) {
     var ref = isAllianceScore
         ? json.decode(remoteConfig.getValue(gameName).asString())['Alliance']
@@ -160,12 +170,15 @@ class AutoScore extends ScoreDivision {
 
   AutoScore operator +(AutoScore other) {
     var autoScore = AutoScore(ref);
-    autoScore.elements.keys.forEach(
-      (key) {
-        autoScore.elements[key] = (elements[key] ?? ScoringElement()) +
-            (other.elements[key] ?? ScoringElement());
-      },
-    );
+    for (final key in elements.keys) {
+      autoScore.elements[key] = (elements[key] ?? ScoringElement()) +
+          (other.elements[key] ?? ScoringElement());
+    }
+    for (final key in other.elements.keys) {
+      if (autoScore.elements[key] == null) {
+        autoScore.elements[key] = other.elements[key] ?? ScoringElement();
+      }
+    }
     return autoScore;
   }
 
@@ -252,6 +265,11 @@ class TeleScore extends ScoreDivision {
             (other.elements[key] ?? ScoringElement());
       },
     );
+    other.elements.keys.forEach((key) {
+      if (teleScore.elements[key] == null) {
+        teleScore.elements[key] = other.elements[key] ?? ScoringElement();
+      }
+    });
     return teleScore;
   }
 
@@ -346,6 +364,11 @@ class EndgameScore extends ScoreDivision {
             (other.elements[key] ?? ScoringElement());
       },
     );
+    other.elements.keys.forEach((key) {
+      if (endgameScore.elements[key] == null) {
+        endgameScore.elements[key] = other.elements[key] ?? ScoringElement();
+      }
+    });
     return endgameScore;
   }
 
@@ -427,17 +450,16 @@ class Penalty extends ScoreDivision {
 
 /// This class is used to represent a Scoring Element of FTC events.
 class ScoringElement {
-  ScoringElement({
-    this.name = '',
-    this.count = 0,
-    this.value = 1,
-    this.min,
-    this.max,
-    this.isBool = false,
-    this.key,
-    this.id,
-    this.nestedElements
-  }) {
+  ScoringElement(
+      {this.name = '',
+      this.count = 0,
+      this.value = 1,
+      this.min,
+      this.max,
+      this.isBool = false,
+      this.key,
+      this.id,
+      this.nestedElements}) {
     setStuff();
   }
   String name;
@@ -490,7 +512,8 @@ class ScoringElement {
 
 abstract class ScoreDivision {
   int total({bool? showPenalties}) => getElements()
-      .map((e) => e.scoreValue()) // map scoring elements to an array of their score values
+      .map((e) => e
+          .scoreValue()) // map scoring elements to an array of their score values
       .reduce((value, element) => value + element) // sum the array
       .clamp(0, 999); // clamp the sum to a min of 0 and a max of 999
   Dice getDice(); // get the dice object

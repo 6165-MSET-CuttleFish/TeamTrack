@@ -119,7 +119,7 @@ class _TeamTrack extends State<TeamTrack> {
   Widget build(context) => ChangeNotifierProvider(
         create: (_) => themeChangeProvider,
         child: Consumer<DarkThemeProvider>(
-          builder: (BuildContext context, value, Widget? child) => MaterialApp(
+          builder: (context, value, child) => MaterialApp(
             debugShowCheckedModeBanner: false,
             title: 'TeamTrack',
             theme: themeChangeProvider.darkTheme ? darkTheme : lightTheme,

@@ -47,15 +47,15 @@ class MatchRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Auto : ${match.getScore(team?.number)?.autoScore.total()}',
+                  'Auto : ${match.getAllianceScore(team?.number)?.autoScore.total()}',
                   style: Theme.of(context).textTheme.caption,
                 ),
                 Text(
-                  'Tele : ${match.getScore(team?.number)?.teleScore.total()}',
+                  'Tele : ${match.getAllianceScore(team?.number)?.teleScore.total()}',
                   style: Theme.of(context).textTheme.caption,
                 ),
                 Text(
-                  'Endgame : ${match.getScore(team?.number)?.endgameScore.total()}',
+                  'Endgame : ${match.getAllianceScore(team?.number)?.endgameScore.total()}',
                   style: Theme.of(context).textTheme.caption,
                 )
               ],

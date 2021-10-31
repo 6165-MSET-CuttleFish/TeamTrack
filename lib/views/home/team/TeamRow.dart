@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:teamtrack/components/BarGraph.dart';
-import 'package:teamtrack/components/PercentIncrease.dart';
+import 'package:teamtrack/components/PercentChange.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/functions/Statistics.dart';
 
@@ -38,7 +38,7 @@ class TeamRow extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (percentIncrease != null)
-              PercentIncrease(percentIncrease: percentIncrease),
+              PercentChange(percentIncrease: percentIncrease),
             Padding(
               padding: EdgeInsets.all(
                 10,

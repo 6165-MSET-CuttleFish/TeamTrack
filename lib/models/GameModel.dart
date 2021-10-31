@@ -407,9 +407,10 @@ class Alliance {
   Team? team2;
   EventType eventType;
   Alliance? opposingAlliance;
-  Score? sharedScore;
+  late Score sharedScore;
   String? id;
-  Alliance(this.team1, this.team2, this.eventType, String gameName) {
+  String gameName;
+  Alliance(this.team1, this.team2, this.eventType, this.gameName) {
     sharedScore =
         Score(Uuid().v4(), Dice.none, gameName, isAllianceScore: true);
   }
@@ -426,6 +427,13 @@ class Alliance {
       (team1?.scores[id]?.penalties.total() ?? 0) +
       (team2?.scores[id]?.penalties.total() ?? 0);
 
+  Score total() {
+    Score returnVal = (team1?.scores[id] ?? Score('', Dice.none, gameName)) +
+        (team2?.scores[id] ?? Score('', Dice.none, gameName)) +
+        (sharedScore);
+    return returnVal;
+  }
+
   int allianceTotal(bool? showPenalties, {OpModeType? type}) =>
       (((team1?.scores[id]?.getScoreDivision(type).total() ?? 0) +
                   (team2?.scores[id]?.getScoreDivision(type).total() ?? 0) +
@@ -434,13 +442,13 @@ class Alliance {
                           ? getPenalty()
                           : -getPenalty())
                       : 0)) +
-              (sharedScore?.total() ?? 0))
+              sharedScore.total())
           .clamp(0, 999);
   Alliance.fromJson(
     Map<String, dynamic> json,
     Map<String, Team> teamList,
     this.eventType,
-    String gameName,
+    this.gameName,
   )   : team1 = json['team1'] != null ? teamList[json['team1']] : null,
         team2 = json['team2'] != null ? teamList[json['team2']] : null,
         sharedScore = json['sharedScore'] != null
@@ -453,7 +461,7 @@ class Alliance {
   Map<String, dynamic> toJson() => {
         'team1': team1?.number,
         'team2': team2?.number,
-        'sharedScore': sharedScore?.toJson(),
+        'sharedScore': sharedScore.toJson(),
       };
 }
 
@@ -567,7 +575,6 @@ class Match {
   Map<String, dynamic> toJson() => {
         'red': red?.toJson(),
         'blue': blue?.toJson(),
-        'type': type.toString(),
         'dice': dice.toString(),
         'id': id.toString(),
         'seconds': timeStamp.seconds,
@@ -584,6 +591,13 @@ class Match {
     else if (number == blue?.team1?.number)
       return blue?.team1?.scores[id];
     else if (number == blue?.team2?.number) return blue?.team2?.scores[id];
+  }
+
+  Score? getAllianceScore(String? number) {
+    if (number == red?.team1?.number || number == red?.team2?.number)
+      return red?.total();
+    else if (number == blue?.team1?.number || number == blue?.team2?.number)
+      return blue?.total();
   }
 }
 

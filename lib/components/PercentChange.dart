@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class PercentIncrease extends StatelessWidget {
-  const PercentIncrease({
+class PercentChange extends StatelessWidget {
+  const PercentChange({
     Key? key,
     required this.percentIncrease,
   }) : super(key: key);

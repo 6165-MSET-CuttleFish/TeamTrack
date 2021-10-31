@@ -125,8 +125,7 @@ extension MatchExtensions on List<Match> {
     for (var match in arr) {
       final alliance = match.alliance(team);
       if (alliance != null) {
-        final allianceTotal =
-            alliance.allianceTotal(showPenalties, type: type);
+        final allianceTotal = alliance.allianceTotal(showPenalties, type: type);
         val.add(FlSpot(i.toDouble(), allianceTotal.toDouble()));
         i++;
       }
@@ -402,16 +401,12 @@ extension ScoresExtension on Map<String, Score> {
   }
 
   double? percentIncrease() {
-    this
-        .values
-        .toList()
-        .sort((a, b) => a.timeStamp.toDate().compareTo(b.timeStamp.toDate()));
-    if (this.values.length < 2 ||
-        this.values.toList()[this.values.length - 2].total() == 0) return null;
-    return this
-        .values
-        .last
+    final sorted = this.values.toList();
+    sorted.sort((a, b) => a.timeStamp.toDate().compareTo(b.timeStamp.toDate()));
+    if (sorted.length < 2 || sorted[this.values.length - 2].total() == 0)
+      return null;
+    return sorted.last
         .total()
-        .percentIncrease(this.values.toList()[this.values.length - 2].total());
+        .percentIncrease(sorted[this.values.length - 2].total());
   }
 }
