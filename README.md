@@ -6,6 +6,9 @@ A mobile scouting app made for the FIRST Tech Challenge with the goal of making 
 ## Setup
 Download and add the firebase config files to your respective platform: iOS, Android, or Web.
 
+- iOS: `ios/Runner/GoogleService-Info.plist`
+- Android: `android/app/google-services.json`
+- Web: `web/api/firebaseConfig.js`
 
 # Features
 - Create and share cloud events
