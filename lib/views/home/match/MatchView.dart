@@ -347,11 +347,8 @@ class _MatchView extends State<MatchView> {
                                             element: e,
                                             onPressed: stateSetter,
                                             event: widget.event,
-                                            path:
-                                                'teams/${_selectedTeam?.number}',
+                                            path: teamPath(OpModeType.penalty),
                                             score: _score,
-                                            opModeType: OpModeType.penalty,
-                                            isTargetScore: widget.team != null,
                                           ),
                                         )
                                         .toList() ??
@@ -598,23 +595,47 @@ class _MatchView extends State<MatchView> {
     }
   }
 
-  List<Widget> autoView() =>
-      _score?.autoScore
-          .getElements()
-          .parse()
-          .map(
-            (e) => Incrementor(
-              element: e,
-              onPressed: stateSetter,
-              opModeType: OpModeType.auto,
-              event: widget.event,
-              path: 'teams/${_selectedTeam?.number}',
-              score: _score,
-              isTargetScore: widget.team != null,
-            ),
-          )
-          .toList() ??
-      [];
+  String teamPath(OpModeType opModeType) {
+    if (widget.team != null) {
+      return 'teams/${_selectedTeam?.number}/targetScore/${opModeType.toRep()}';
+    }
+    return 'teams/${_selectedTeam?.number}/scores/${_score?.id}/${opModeType.toRep()}';
+  }
+
+  String matchPath(OpModeType opModeType) =>
+      'matches/${widget.match?.id}/${allianceColor()}/sharedScore/${OpModeType.endgame.toRep()}';
+
+  List<Widget> autoView() => [
+        ..._score?.autoScore
+                .getElements()
+                .parse()
+                .map(
+                  (e) => Incrementor(
+                    element: e,
+                    onPressed: stateSetter,
+                    event: widget.event,
+                    path: teamPath(OpModeType.auto),
+                    score: _score,
+                  ),
+                )
+                .toList() ??
+            [],
+        if (widget.team == null)
+          ..._selectedAlliance?.sharedScore?.teleScore
+                  .getElements()
+                  .parse()
+                  .map(
+                    (e) => Incrementor(
+                      element: e,
+                      onPressed: stateSetter,
+                      event: widget.event,
+                      path: matchPath(OpModeType.auto),
+                      score: _score,
+                      backgroundColor: Colors.green,
+                    ),
+                  ) ??
+              []
+      ];
 
   List<Widget> teleView() => !_paused || _allowView
       ? [
@@ -634,11 +655,9 @@ class _MatchView extends State<MatchView> {
             backgroundColor: Colors.red.withOpacity(0.3),
             element: _score?.teleScore.misses ?? ScoringElement(),
             onPressed: stateSetter,
-            opModeType: OpModeType.tele,
             event: widget.event,
-            path: 'teams/${_selectedTeam?.number}',
+            path: teamPath(OpModeType.auto),
             score: _score,
-            isTargetScore: widget.team != null,
           ),
           Padding(padding: EdgeInsets.all(5)),
           ..._score?.teleScore
@@ -650,26 +669,21 @@ class _MatchView extends State<MatchView> {
                       onPressed: stateSetter,
                       onDecrement: widget.team == null ? increaseMisses : null,
                       onIncrement: _paused ? null : onIncrement,
-                      opModeType: OpModeType.tele,
                       event: widget.event,
-                      path: 'teams/${_selectedTeam?.number}',
+                      path: teamPath(OpModeType.tele),
                       score: _score,
-                      isTargetScore: widget.team != null,
                       mutableIncrement: (mutableData) {
                         if (widget.team != null) {
-                          var ref = mutableData.value['targetScore']
-                              ['TeleScore'][e.key];
+                          var ref = mutableData.value[e.key];
                           if (ref < e.max!())
-                            mutableData.value['targetScore']['TeleScore']
-                                [e.key] = (ref ?? 0) + incrementValue.count;
+                            mutableData.value[e.key] =
+                                (ref ?? 0) + incrementValue.count;
                           return mutableData;
                         }
-                        final scoreIndex = _score?.id;
-                        var ref = mutableData.value['scores'][scoreIndex]
-                            ['TeleScore'];
+                        var ref = mutableData.value;
                         if (ref[e.key] < e.max!()) {
-                          mutableData.value['scores'][scoreIndex]['TeleScore']
-                              [e.key] = (ref[e.key] ?? 0) + e.incrementValue;
+                          mutableData.value[e.key] =
+                              (ref[e.key] ?? 0) + e.incrementValue;
                           lapses.add(
                             (_time -
                                     (lapses.length != 0
@@ -679,15 +693,12 @@ class _MatchView extends State<MatchView> {
                                 .toPrecision(3),
                           );
                           if (!_paused) {
-                            mutableData.value['scores'][scoreIndex]['TeleScore']
-                                ['CycleTimes'] = lapses;
+                            mutableData.value['CycleTimes'] = lapses;
                             if (_time < 90)
-                              mutableData.value['scores'][scoreIndex]
-                                      ['TeleScore']['TeleCycles'] =
+                              mutableData.value['TeleCycles'] =
                                   (ref['TeleCycles'] ?? 0) + 1;
                             else
-                              mutableData.value['scores'][scoreIndex]
-                                      ['TeleScore']['EndgameCycles'] =
+                              mutableData.value['EndgameCycles'] =
                                   (ref['EndgameCycles'] ?? 0) + 1;
                           }
                         }
@@ -695,22 +706,18 @@ class _MatchView extends State<MatchView> {
                       },
                       mutableDecrement: (mutableData) {
                         if (widget.team != null) {
-                          var ref = mutableData.value['targetScore']
-                              ['TeleScore'][e.key];
+                          var ref = mutableData.value[e.key];
                           if (ref < e.max!())
-                            mutableData.value['targetScore']['TeleScore']
-                                [e.key] = (ref ?? 0) - 1;
+                            mutableData.value[e.key] = (ref ?? 0) - 1;
                           return mutableData;
                         }
-                        final scoreIndex = _score?.id;
-                        var ref = mutableData.value['scores'][scoreIndex]
-                            ['TeleScore'];
+                        var ref = mutableData.value;
                         if (ref[e.key] < e.max!()) {
-                          mutableData.value['scores'][scoreIndex]['TeleScore']
-                              [e.key] = (ref[e.key] ?? 0) - e.decrementValue;
+                          mutableData.value[e.key] =
+                              (ref[e.key] ?? 0) - e.decrementValue;
                           if (!_paused) {
-                            mutableData.value['scores'][scoreIndex]['TeleScore']
-                                ['Misses'] = (ref['Misses'] ?? 0) + 1;
+                            mutableData.value['Misses'] =
+                                (ref['Misses'] ?? 0) + 1;
                           }
                         }
                         return mutableData;
@@ -729,9 +736,8 @@ class _MatchView extends State<MatchView> {
                         onPressed: stateSetter,
                         onDecrement:
                             widget.team == null ? increaseMisses : null,
-                        opModeType: OpModeType.tele,
                         event: widget.event,
-                        path: 'matches/${widget.match?.id}/${allianceColor()}}',
+                        path: matchPath(OpModeType.tele),
                         score: _score,
                         backgroundColor: Colors.green,
                       ),
@@ -769,11 +775,9 @@ class _MatchView extends State<MatchView> {
                     (e) => Incrementor(
                       element: e,
                       onPressed: stateSetter,
-                      opModeType: OpModeType.endgame,
                       event: widget.event,
-                      path: 'teams/${_selectedTeam?.number}',
+                      path: teamPath(OpModeType.endgame),
                       score: _score,
-                      isTargetScore: widget.team != null,
                     ),
                   )
                   .toList() ??
@@ -787,11 +791,8 @@ class _MatchView extends State<MatchView> {
                       (e) => Incrementor(
                         element: e,
                         onPressed: stateSetter,
-                        onDecrement:
-                            widget.team == null ? increaseMisses : null,
-                        opModeType: OpModeType.tele,
                         event: widget.event,
-                        path: 'matches/${widget.match?.id}/${allianceColor()}}',
+                        path: matchPath(OpModeType.endgame),
                         score: _score,
                         backgroundColor: Colors.green.withOpacity(0.3),
                       ),

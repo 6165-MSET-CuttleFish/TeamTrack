@@ -521,8 +521,6 @@ class Incrementor extends StatefulWidget {
     this.backgroundColor,
     this.event,
     this.score,
-    this.opModeType,
-    this.isTargetScore = false,
     this.mutableIncrement,
     this.mutableDecrement,
     this.path,
@@ -535,8 +533,6 @@ class Incrementor extends StatefulWidget {
   final Color? backgroundColor;
   final Event? event;
   final Score? score;
-  final OpModeType? opModeType;
-  final bool isTargetScore;
   final String? path;
   @override
   State<StatefulWidget> createState() => _Incrementor();
@@ -569,30 +565,13 @@ class _Incrementor extends State<Incrementor> {
                 ?.getRef()
                 ?.child(widget.path!)
                 .runTransaction((mutableData) {
-              if (widget.isTargetScore) {
-                for (int i = 1;
-                    i < (widget.element.nestedElements?.length ?? 0);
-                    i++) {
-                  mutableData.value['targetScore'][widget.opModeType?.toRep()]
-                      [widget.element.nestedElements?[i].key] = 0;
-                }
-                if (val != 0)
-                  mutableData.value['targetScore'][widget.opModeType?.toRep()]
-                      [widget.element.nestedElements?[val].key] = 1;
-                return mutableData;
-              }
-              final scoreIndex = widget.score?.id;
               for (int i = 1;
                   i < (widget.element.nestedElements?.length ?? 0);
                   i++) {
-                mutableData.value['scores'][scoreIndex]
-                        [widget.opModeType?.toRep()]
-                    [widget.element.nestedElements?[i].key] = 0;
+                mutableData.value[widget.element.nestedElements?[i].key] = 0;
               }
               if (val != 0)
-                mutableData.value['scores'][scoreIndex]
-                        [widget.opModeType?.toRep()]
-                    [widget.element.nestedElements?[val].key] = 1;
+                mutableData.value[widget.element.nestedElements?[val].key] = 1;
               return mutableData;
             });
         },
@@ -612,20 +591,9 @@ class _Incrementor extends State<Incrementor> {
                 ?.getRef()
                 ?.child(widget.path!)
                 .runTransaction((mutableData) {
-              if (widget.isTargetScore) {
-                mutableData.value['targetScore'][widget.opModeType?.toRep()]
-                        [widget.element.key] =
-                    val
-                        ? (widget.element.count < widget.element.max!() ? 1 : 0)
-                        : 0;
-                return mutableData;
-              }
-              final scoreIndex = widget.score?.id;
-              mutableData.value['scores'][scoreIndex]
-                      [widget.opModeType?.toRep()][widget.element.key] =
-                  val
-                      ? (widget.element.count < widget.element.max!() ? 1 : 0)
-                      : 0;
+              mutableData.value[widget.element.key] = val
+                  ? (widget.element.count < widget.element.max!() ? 1 : 0)
+                  : 0;
               return mutableData;
             });
         },
@@ -663,21 +631,7 @@ class _Incrementor extends State<Incrementor> {
                                     ?.child(widget.path!)
                                     .runTransaction(
                                   (mutableData) {
-                                    if (widget.mutableDecrement != null) {
-                                      return widget
-                                          .mutableDecrement!(mutableData);
-                                    }
-                                    if (widget.isTargetScore) {
-                                      mutableData.value['targetScore']
-                                                  [widget.opModeType?.toRep()]
-                                              [widget.element.key] =
-                                          widget.element.min!();
-                                      return mutableData;
-                                    }
-                                    final scoreIndex = widget.score?.id;
-                                    mutableData.value['scores'][scoreIndex]
-                                                [widget.opModeType?.toRep()]
-                                            [widget.element.key] =
+                                    mutableData.value[widget.element.key] =
                                         widget.element.min!();
                                     return mutableData;
                                   },
@@ -706,24 +660,9 @@ class _Incrementor extends State<Incrementor> {
                           if (widget.mutableDecrement != null) {
                             return widget.mutableDecrement!(mutableData);
                           }
-                          if (widget.isTargetScore) {
-                            var ref = mutableData.value['targetScore']
-                                    [widget.opModeType?.toRep()]
-                                [widget.element.key];
-                            if (ref > widget.element.min!())
-                              mutableData.value['targetScore']
-                                          [widget.opModeType?.toRep()]
-                                      [widget.element.key] =
-                                  (ref ?? 0) - widget.element.decrementValue;
-                            return mutableData;
-                          }
-                          final scoreIndex = widget.score?.id;
-                          var ref = mutableData.value['scores'][scoreIndex]
-                              [widget.opModeType?.toRep()][widget.element.key];
+                          var ref = mutableData.value[widget.element.key];
                           if (ref > widget.element.min!())
-                            mutableData.value['scores'][scoreIndex]
-                                        [widget.opModeType?.toRep()]
-                                    [widget.element.key] =
+                            mutableData.value[widget.element.key] =
                                 (ref ?? 0) - widget.element.decrementValue;
                           return mutableData;
                         },
@@ -760,24 +699,9 @@ class _Incrementor extends State<Incrementor> {
                           if (widget.mutableIncrement != null) {
                             return widget.mutableIncrement!(mutableData);
                           }
-                          if (widget.isTargetScore) {
-                            var ref = mutableData.value['targetScore']
-                                    [widget.opModeType?.toRep()]
-                                [widget.element.key];
-                            if (ref < widget.element.max!())
-                              mutableData.value['targetScore']
-                                          [widget.opModeType?.toRep()]
-                                      [widget.element.key] =
-                                  (ref ?? 0) + widget.element.incrementValue;
-                            return mutableData;
-                          }
-                          final scoreIndex = widget.score?.id;
-                          var ref = mutableData.value['scores'][scoreIndex]
-                              [widget.opModeType?.toRep()][widget.element.key];
+                          var ref = mutableData.value[widget.element.key];
                           if (ref < widget.element.max!())
-                            mutableData.value['scores'][scoreIndex]
-                                        [widget.opModeType?.toRep()]
-                                    [widget.element.key] =
+                            mutableData.value[widget.element.key] =
                                 (ref ?? 0) + widget.element.incrementValue;
                           return mutableData;
                         },
