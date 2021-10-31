@@ -14,34 +14,32 @@ class Permissions extends StatefulWidget {
 
 class _PermissionsState extends State<Permissions> {
   @override
-  Widget build(BuildContext context) => Container(
-        height: 50,
-        child: ListView(
-          children: widget.event.permissions.keys
-              .map((user) => ListTile(
-                    leading: PFP(user: widget.event.permissions[user]!),
-                    title: Text(
-                      widget.event.permissions[user]?.displayName ?? "Unknown",
-                    ),
-                    subtitle: Text(
-                      widget.event.permissions[user]?.email ?? "Unknown",
-                    ),
-                    trailing: DropdownButton<Role>(
-                      value:
-                          widget.event.permissions[user]?.role ?? Role.editor,
-                      items: Role.values
-                          .map(
-                            (e) => DropdownMenuItem<Role>(
-                              child: Text(
-                                e.name(),
-                              ),
-                              value: e,
-                            ),
-                          )
-                          .toList(),
-                    ),
-                  ))
-              .toList(),
-        ),
+  Widget build(BuildContext context) => Column(
+        children: widget.event.permissions.keys
+            .map(
+              (user) => ListTile(
+                leading: PFP(user: widget.event.permissions[user]!),
+                title: Text(
+                  widget.event.permissions[user]?.displayName ?? "Unknown",
+                ),
+                subtitle: Text(
+                  widget.event.permissions[user]?.email ?? "Unknown",
+                ),
+                trailing: DropdownButton<Role>(
+                  value: widget.event.permissions[user]?.role ?? Role.editor,
+                  items: Role.values
+                      .map(
+                        (e) => DropdownMenuItem<Role>(
+                          child: Text(
+                            e.name(),
+                          ),
+                          value: e,
+                        ),
+                      )
+                      .toList(),
+                ),
+              ),
+            )
+            .toList(),
       );
 }

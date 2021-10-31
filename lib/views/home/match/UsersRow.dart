@@ -13,6 +13,7 @@ class UsersRow extends StatefulWidget {
 class _UsersRowState extends State<UsersRow> {
   @override
   Widget build(BuildContext context) => RowSuper(
+        invert: true,
         children: widget.users
             .map(
               (user) => PFP(

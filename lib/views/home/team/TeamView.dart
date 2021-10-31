@@ -184,7 +184,258 @@ class TeamViewState extends State<TeamView> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
-                    children: body(),
+                    children: [
+                      Collapsible(
+                        isCollapsed: _team.scores.diceScores(_dice).length < 1,
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: widget.event.type != EventType.remote
+                                  ? EdgeInsets.all(40)
+                                  : EdgeInsets.all(20),
+                            ),
+                            Wrap(
+                              alignment: WrapAlignment.center,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              spacing: 0,
+                              children: [
+                                if (widget.event.type != EventType.remote)
+                                  FlatButton(
+                                    color: _selections[0]
+                                        ? Color.fromRGBO(255, 166, 0, 1)
+                                        : null,
+                                    splashColor: Color.fromRGBO(255, 166, 0, 1),
+                                    onPressed: () {
+                                      setState(
+                                        () {
+                                          _selections[0] = !_selections[0];
+                                        },
+                                      );
+                                    },
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(18.0),
+                                      side: BorderSide(
+                                        color: Color.fromRGBO(255, 166, 0, 1),
+                                      ),
+                                    ),
+                                    child: Text('Alliance Total'),
+                                  ),
+                                FlatButton(
+                                  color: _selections[1] ? generalColor : null,
+                                  splashColor: generalColor,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(18.0),
+                                    side: BorderSide(
+                                      color: generalColor,
+                                    ),
+                                  ),
+                                  child: Text('Subtotal'),
+                                  onPressed: () {
+                                    setState(
+                                      () {
+                                        _selections[1] = !_selections[1];
+                                      },
+                                    );
+                                  },
+                                ),
+                                FlatButton(
+                                  color: _selections[2] ? autoColor : null,
+                                  splashColor: autoColor,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(18.0),
+                                    side: BorderSide(color: autoColor),
+                                  ),
+                                  child: Text('Autonomous'),
+                                  onPressed: () {
+                                    setState(
+                                      () {
+                                        _selections[2] = !_selections[2];
+                                      },
+                                    );
+                                  },
+                                ),
+                                FlatButton(
+                                  color: _selections[3] ? teleColor : null,
+                                  splashColor: teleColor,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(18.0),
+                                    side: BorderSide(color: teleColor),
+                                  ),
+                                  child: Text('Tele-Op'),
+                                  onPressed: () {
+                                    setState(
+                                      () {
+                                        _selections[3] = !_selections[3];
+                                      },
+                                    );
+                                  },
+                                ),
+                                FlatButton(
+                                  color: _selections[4] ? endgameColor : null,
+                                  splashColor: endgameColor,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(18.0),
+                                    side: BorderSide(color: endgameColor),
+                                  ),
+                                  child: Text('Endgame'),
+                                  onPressed: () {
+                                    setState(
+                                      () {
+                                        _selections[4] = !_selections[4];
+                                      },
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                            _lineChart(),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        width: MediaQuery.of(context).size.width,
+                        child: PlatformButton(
+                          onPressed: () async {
+                            await Navigator.push(
+                              context,
+                              platformPageRoute(
+                                builder: (context) => MatchList(
+                                  event: widget.event,
+                                  team: _team,
+                                  ascending: true,
+                                ),
+                              ),
+                            );
+                            setState(() {});
+                          },
+                          color: CupertinoColors.systemGreen,
+                          child: Text('Matches'),
+                        ),
+                      ),
+                      if (NewPlatform.isIOS())
+                        Padding(
+                          padding: EdgeInsets.all(5),
+                        ),
+                      Container(
+                        width: MediaQuery.of(context).size.width / 2,
+                        child: PlatformButton(
+                          onPressed: () async {
+                            if (_team.targetScore == null) {
+                              _team.targetScore = Score(Uuid().v4(), Dice.none,
+                                  widget.event.gameName);
+                              widget.event
+                                  .getRef()
+                                  ?.child('teams/${widget.team.number}')
+                                  .runTransaction((mutableData) {
+                                mutableData.value['targetScore'] = Score(
+                                        Uuid().v4(),
+                                        Dice.none,
+                                        widget.event.gameName)
+                                    .toJson();
+                                return mutableData;
+                              });
+                              dataModel.saveEvents();
+                            }
+                            await Navigator.push(
+                              context,
+                              platformPageRoute(
+                                builder: (context) => MatchView(
+                                  event: widget.event,
+                                  team: _team,
+                                ),
+                              ),
+                            );
+                            setState(() {});
+                          },
+                          color: Colors.indigoAccent,
+                          child: Text('Target'),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 20, bottom: 10),
+                        child: Text(
+                          'Subtotal',
+                          style: Theme.of(context).textTheme.bodyText1,
+                        ),
+                      ),
+                      ScoreCard(
+                        matchTotal: matchIsScore,
+                        team: _team,
+                        event: widget.event,
+                        scoreDivisions: _team.scores.values.toList(),
+                        dice: _dice,
+                        removeOutliers: removeOutliers,
+                        matches: widget.event.type == EventType.remote
+                            ? null
+                            : widget.event.getSortedMatches(true),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 20, bottom: 10),
+                        child: Text(
+                          'Autonomous',
+                          style: Theme.of(context).textTheme.bodyText1,
+                        ),
+                      ),
+                      ScoreCard(
+                        matchTotal: matchIsScore,
+                        team: _team,
+                        event: widget.event,
+                        type: OpModeType.auto,
+                        scoreDivisions: _team.scores.values
+                            .map((e) => e.autoScore)
+                            .toList(),
+                        dice: _dice,
+                        removeOutliers: removeOutliers,
+                        matches: widget.event.type == EventType.remote
+                            ? null
+                            : widget.event.getSortedMatches(true),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 20, bottom: 10),
+                        child: Text(
+                          'Tele-Op',
+                          style: Theme.of(context).textTheme.bodyText1,
+                        ),
+                      ),
+                      ScoreCard(
+                        matchTotal: matchIsScore,
+                        team: _team,
+                        event: widget.event,
+                        type: OpModeType.tele,
+                        scoreDivisions: _team.scores.values
+                            .map((e) => e.teleScore)
+                            .toList(),
+                        dice: _dice,
+                        removeOutliers: removeOutliers,
+                        matches: widget.event.type == EventType.remote
+                            ? null
+                            : widget.event.getSortedMatches(true),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 20, bottom: 10),
+                        child: Text(
+                          'Endgame',
+                          style: Theme.of(context).textTheme.bodyText1,
+                        ),
+                      ),
+                      ScoreCard(
+                        matchTotal: matchIsScore,
+                        team: _team,
+                        event: widget.event,
+                        type: OpModeType.endgame,
+                        scoreDivisions: _team.scores.values
+                            .map((e) => e.endgameScore)
+                            .toList(),
+                        dice: _dice,
+                        removeOutliers: removeOutliers,
+                        matches: widget.event.type == EventType.remote
+                            ? null
+                            : widget.event.getSortedMatches(true),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.all(130),
+                      ),
+                    ],
                   ),
                 )
               ],
@@ -516,250 +767,4 @@ class TeamViewState extends State<TeamView> {
           ],
         )
       : Text('');
-
-  List<Widget> body() {
-    return <Widget>[
-      Collapsible(
-        isCollapsed: _team.scores.diceScores(_dice).length < 1,
-        child: Column(
-          children: [
-            Padding(
-              padding: widget.event.type != EventType.remote
-                  ? EdgeInsets.all(40)
-                  : EdgeInsets.all(20),
-            ),
-            Wrap(
-              alignment: WrapAlignment.center,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              spacing: 0,
-              children: [
-                if (widget.event.type != EventType.remote)
-                  FlatButton(
-                    color:
-                        _selections[0] ? Color.fromRGBO(255, 166, 0, 1) : null,
-                    splashColor: Color.fromRGBO(255, 166, 0, 1),
-                    onPressed: () {
-                      setState(
-                        () {
-                          _selections[0] = !_selections[0];
-                        },
-                      );
-                    },
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18.0),
-                      side: BorderSide(
-                        color: Color.fromRGBO(255, 166, 0, 1),
-                      ),
-                    ),
-                    child: Text('Alliance Total'),
-                  ),
-                FlatButton(
-                  color: _selections[1] ? generalColor : null,
-                  splashColor: generalColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18.0),
-                    side: BorderSide(
-                      color: generalColor,
-                    ),
-                  ),
-                  child: Text('Subtotal'),
-                  onPressed: () {
-                    setState(
-                      () {
-                        _selections[1] = !_selections[1];
-                      },
-                    );
-                  },
-                ),
-                FlatButton(
-                  color: _selections[2] ? autoColor : null,
-                  splashColor: autoColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18.0),
-                    side: BorderSide(color: autoColor),
-                  ),
-                  child: Text('Autonomous'),
-                  onPressed: () {
-                    setState(
-                      () {
-                        _selections[2] = !_selections[2];
-                      },
-                    );
-                  },
-                ),
-                FlatButton(
-                  color: _selections[3] ? teleColor : null,
-                  splashColor: teleColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18.0),
-                    side: BorderSide(color: teleColor),
-                  ),
-                  child: Text('Tele-Op'),
-                  onPressed: () {
-                    setState(
-                      () {
-                        _selections[3] = !_selections[3];
-                      },
-                    );
-                  },
-                ),
-                FlatButton(
-                  color: _selections[4] ? endgameColor : null,
-                  splashColor: endgameColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18.0),
-                    side: BorderSide(color: endgameColor),
-                  ),
-                  child: Text('Endgame'),
-                  onPressed: () {
-                    setState(
-                      () {
-                        _selections[4] = !_selections[4];
-                      },
-                    );
-                  },
-                ),
-              ],
-            ),
-            _lineChart(),
-          ],
-        ),
-      ),
-      Container(
-        width: MediaQuery.of(context).size.width,
-        child: PlatformButton(
-          onPressed: () async {
-            await Navigator.push(
-              context,
-              platformPageRoute(
-                builder: (context) => MatchList(
-                  event: widget.event,
-                  team: _team,
-                  ascending: true,
-                ),
-              ),
-            );
-            setState(() {});
-          },
-          color: CupertinoColors.systemGreen,
-          child: Text('Matches'),
-        ),
-      ),
-      if (NewPlatform.isIOS())
-        Padding(
-          padding: EdgeInsets.all(5),
-        ),
-      Container(
-        width: MediaQuery.of(context).size.width / 2,
-        child: PlatformButton(
-          onPressed: () async {
-            if (_team.targetScore == null) {
-              _team.targetScore =
-                  Score(Uuid().v4(), Dice.none, widget.event.gameName);
-              widget.event
-                  .getRef()
-                  ?.child('teams/${widget.team.number}')
-                  .runTransaction((mutableData) {
-                mutableData.value['targetScore'] =
-                    Score(Uuid().v4(), Dice.none, widget.event.gameName)
-                        .toJson();
-                return mutableData;
-              });
-              dataModel.saveEvents();
-            }
-            await Navigator.push(
-              context,
-              platformPageRoute(
-                builder: (context) => MatchView(
-                  event: widget.event,
-                  team: _team,
-                ),
-              ),
-            );
-            setState(() {});
-          },
-          color: Colors.indigoAccent,
-          child: Text('Target'),
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.only(top: 20, bottom: 10),
-        child: Text(
-          'Subtotal',
-          style: Theme.of(context).textTheme.bodyText1,
-        ),
-      ),
-      ScoreCard(
-        matchTotal: matchIsScore,
-        team: _team,
-        event: widget.event,
-        scoreDivisions: _team.scores.values.toList(),
-        dice: _dice,
-        removeOutliers: removeOutliers,
-        matches: widget.event.type == EventType.remote
-            ? null
-            : widget.event.getSortedMatches(true),
-      ),
-      Padding(
-        padding: const EdgeInsets.only(top: 20, bottom: 10),
-        child: Text(
-          'Autonomous',
-          style: Theme.of(context).textTheme.bodyText1,
-        ),
-      ),
-      ScoreCard(
-        matchTotal: matchIsScore,
-        team: _team,
-        event: widget.event,
-        type: OpModeType.auto,
-        scoreDivisions: _team.scores.values.map((e) => e.autoScore).toList(),
-        dice: _dice,
-        removeOutliers: removeOutliers,
-        matches: widget.event.type == EventType.remote
-            ? null
-            : widget.event.getSortedMatches(true),
-      ),
-      Padding(
-        padding: const EdgeInsets.only(top: 20, bottom: 10),
-        child: Text(
-          'Tele-Op',
-          style: Theme.of(context).textTheme.bodyText1,
-        ),
-      ),
-      ScoreCard(
-        matchTotal: matchIsScore,
-        team: _team,
-        event: widget.event,
-        type: OpModeType.tele,
-        scoreDivisions: _team.scores.values.map((e) => e.teleScore).toList(),
-        dice: _dice,
-        removeOutliers: removeOutliers,
-        matches: widget.event.type == EventType.remote
-            ? null
-            : widget.event.getSortedMatches(true),
-      ),
-      Padding(
-        padding: const EdgeInsets.only(top: 20, bottom: 10),
-        child: Text(
-          'Endgame',
-          style: Theme.of(context).textTheme.bodyText1,
-        ),
-      ),
-      ScoreCard(
-        matchTotal: matchIsScore,
-        team: _team,
-        event: widget.event,
-        type: OpModeType.endgame,
-        scoreDivisions: _team.scores.values.map((e) => e.endgameScore).toList(),
-        dice: _dice,
-        removeOutliers: removeOutliers,
-        matches: widget.event.type == EventType.remote
-            ? null
-            : widget.event.getSortedMatches(true),
-      ),
-      Padding(
-        padding: EdgeInsets.all(130),
-      ),
-    ];
-  }
 }
