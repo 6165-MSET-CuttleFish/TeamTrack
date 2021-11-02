@@ -94,7 +94,6 @@ class _BlockList extends State<BlockList> {
                                             );
                                           },
                                         );
-                                        dataModel.saveEvents();
                                         Navigator.of(context).pop();
                                         setState(() {});
                                       },

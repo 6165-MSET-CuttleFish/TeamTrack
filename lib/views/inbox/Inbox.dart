@@ -83,7 +83,6 @@ class _InboxState extends State<Inbox> {
                                     );
                                   },
                                 );
-                                dataModel.saveEvents();
                                 Navigator.of(context).pop();
                                 setState(() {});
                               },

@@ -75,9 +75,10 @@ class CollapsibleState extends State<Collapsible>
   @override
   Widget build(BuildContext context) {
     return SizeTransition(
-        axisAlignment: 0.0,
-        axis: Axis.vertical,
-        sizeFactor: _sizeAnimation,
-        child: widget.child);
+      axisAlignment: 0.0,
+      axis: Axis.vertical,
+      sizeFactor: _sizeAnimation,
+      child: widget.child,
+    );
   }
 }

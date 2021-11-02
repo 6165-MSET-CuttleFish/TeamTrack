@@ -1,13 +1,15 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:teamtrack/components/PFP.dart';
 import 'package:teamtrack/models/AppModel.dart';
-import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/functions/Extensions.dart';
 
 class Permissions extends StatefulWidget {
-  const Permissions({Key? key, required this.event}) : super(key: key);
-  final Event event;
+  const Permissions({Key? key, required this.users, required this.ref})
+      : super(key: key);
+  final List<TeamTrackUser> users;
+  final DatabaseReference? ref;
   @override
   _PermissionsState createState() => _PermissionsState();
 }
@@ -15,7 +17,7 @@ class Permissions extends StatefulWidget {
 class _PermissionsState extends State<Permissions> {
   @override
   Widget build(BuildContext context) => Column(
-        children: widget.event.users
+        children: widget.users
             .map(
               (user) => ListTile(
                 leading: PFP(user: user),
@@ -38,9 +40,8 @@ class _PermissionsState extends State<Permissions> {
                       )
                       .toList(),
                   onChanged: (newValue) => setState(
-                    () => widget.event
-                        .getRef()
-                        ?.child('Permissions/${user.id}/role')
+                    () => widget.ref
+                        ?.child('${user.id}/role')
                         .set(newValue?.toRep()),
                   ),
                 ),

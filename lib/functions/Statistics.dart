@@ -410,3 +410,15 @@ extension ScoresExtension on Map<String, Score> {
         .percentIncrease(sorted[this.values.length - 2].total());
   }
 }
+
+extension more on Iterable<ScoreDivision> {
+  double? percentIncrease() {
+    final sorted = this.toList();
+    sorted.sort((a, b) => a.timeStamp.toDate().compareTo(b.timeStamp.toDate()));
+    if (sorted.length < 2 || sorted[this.length - 2].total() == 0)
+      return null;
+    return sorted.last
+        .total()
+        .percentIncrease(sorted[this.length - 2].total());
+  }
+}

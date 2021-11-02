@@ -180,7 +180,6 @@ class _MatchConfigState extends State<MatchConfig> {
             for (TextEditingController controller in controllers) {
               controller.text = '';
             }
-            dataModel.saveEvents();
             Navigator.pop(context);
           }
         },

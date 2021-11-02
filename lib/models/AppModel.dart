@@ -13,21 +13,22 @@ import '../functions/Extensions.dart';
 
 class DataModel {
   List<Event> events = [];
+  List<Event> sharedEvents = [];
   String? token;
   List<Event> inbox = [];
-  List<Event> localEvents() {
-    return events.where((e) => e.type == EventType.local).toList();
-  }
 
-  List<Event> remoteEvents() {
-    return events.where((e) => e.type == EventType.remote).toList();
-  }
+  List<Event> allEvents() => events + sharedEvents;
 
-  List<Event> liveEvents() {
-    return events.where((e) => e.type == EventType.live).toList();
-  }
+  List<Event> localEvents() =>
+      allEvents().where((e) => e.type == EventType.local).toList();
 
-  void saveEvents() async {
+  List<Event> remoteEvents() =>
+      allEvents().where((e) => e.type == EventType.remote).toList();
+
+  List<Event> liveEvents() =>
+      allEvents().where((e) => e.type == EventType.live).toList();
+
+  Future<void> saveEvents() async {
     final coded = events.map((e) => e.toJson()).toList();
     final prefs = await SharedPreferences.getInstance();
     prefs.setString("Events", jsonEncode(coded));
@@ -38,7 +39,10 @@ class DataModel {
     try {
       final prefs = await SharedPreferences.getInstance();
       var x = jsonDecode(prefs.getString("Events") ?? '') as List;
-      events = x.map((e) => Event.fromJson(e)).toList();
+      events = x
+          .map((e) => Event.fromJson(e))
+          .where((element) => !element.shared)
+          .toList();
     } catch (e) {
       print("failed");
     }
@@ -94,7 +98,7 @@ class TeamTrackUser {
   Map<String, dynamic> toJson() => {
         'role': role.toRep(),
         'email': email,
-        'displayName': displayName,
+        'name': displayName,
         'photoURL': photoURL,
         'watchingTeam': watchingTeam,
       };

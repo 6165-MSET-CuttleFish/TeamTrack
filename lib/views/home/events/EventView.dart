@@ -244,7 +244,6 @@ class _EventView extends State<EventView> {
                   _newNumber = '';
                 },
               );
-              dataModel.saveEvents();
               Navigator.of(context).pop();
             },
           ),

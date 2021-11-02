@@ -308,7 +308,7 @@ class TeamViewState extends State<TeamView> {
                                 builder: (context) => MatchList(
                                   event: widget.event,
                                   team: _team,
-                                  ascending: true,
+                                  ascending: false,
                                 ),
                               ),
                             );
@@ -327,17 +327,20 @@ class TeamViewState extends State<TeamView> {
                         child: PlatformButton(
                           onPressed: () async {
                             if (_team.targetScore == null) {
-                              _team.targetScore = Score(Uuid().v4(), Dice.none,
-                                  widget.event.gameName);
-                              widget.event
+                              _team.targetScore = Score(
+                                Uuid().v4(),
+                                Dice.none,
+                                widget.event.gameName,
+                              );
+                              await widget.event
                                   .getRef()
                                   ?.child('teams/${widget.team.number}')
                                   .runTransaction((mutableData) {
                                 mutableData.value['targetScore'] = Score(
-                                        Uuid().v4(),
-                                        Dice.none,
-                                        widget.event.gameName)
-                                    .toJson();
+                                  Uuid().v4(),
+                                  Dice.none,
+                                  widget.event.gameName,
+                                ).toJson();
                                 return mutableData;
                               });
                               dataModel.saveEvents();

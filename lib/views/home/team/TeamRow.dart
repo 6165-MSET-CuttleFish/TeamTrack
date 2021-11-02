@@ -23,7 +23,10 @@ class TeamRow extends StatelessWidget {
 
   @override
   Widget build(context) {
-    final percentIncrease = team.scores.percentIncrease();
+    final percentIncrease = team.scores
+        .map((key, value) => MapEntry(key, value.getScoreDivision(sortMode)))
+        .values
+        .percentIncrease();
     return Container(
       decoration: BoxDecoration(
         border: Border.all(

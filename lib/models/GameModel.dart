@@ -53,6 +53,7 @@ class Event {
         ?.child('teams/${newTeam.number}')
         .update({"name": newTeam.name, "number": newTeam.number});
     teams[newTeam.number] = newTeam;
+    dataModel.saveEvents();
   }
 
   List<Match> getSortedMatches(bool ascending) {
@@ -154,6 +155,7 @@ class Event {
           Score(e.id, e.dice, gameName),
         );
       }
+      await dataModel.saveEvents();
     }
   }
 
@@ -252,6 +254,7 @@ class Event {
       e.blue?.team1?.scores.removeWhere((f, _) => f == e.id);
       e.blue?.team2?.scores.removeWhere((f, _) => f == e.id);
       matches.remove(e.id);
+      dataModel.saveEvents();
     }
     getRef()?.runTransaction(
       (mutableData) {
@@ -381,6 +384,7 @@ class Event {
     senderId = json?['senderId'];
     sendTime = json?['sendTime'];
     senderEmail = json?['senderEmail'];
+    senderName = json?['senderName'];
 
     for (var match in matches.values) {
       match.setDice(match.dice);
@@ -399,6 +403,15 @@ class Event {
         'authorEmail': authorEmail,
         'seconds': timeStamp.seconds,
         'nanoSeconds': timeStamp.nanoseconds,
+      };
+  Map<String, dynamic> toSimpleJson() => {
+        'gameName': gameName,
+        'name': name,
+        'type': type.toString(),
+        'authorName': authorName,
+        'authorEmail': authorEmail,
+        'sendTime': sendTime,
+        'id': id,
       };
 }
 

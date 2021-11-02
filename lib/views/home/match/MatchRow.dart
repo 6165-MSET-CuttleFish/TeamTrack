@@ -97,42 +97,45 @@ class MatchRow extends StatelessWidget {
           ],
         );
 
-  Widget scoreDisplay() => event.type == EventType.remote
-      ? Text(
-          match.score(
-            showPenalties: true,
-          ),
-        )
-      : Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              match.redScore(showPenalties: true).toString(),
-              style: GoogleFonts.gugi(
-                color: team == null
-                    ? (match.redScore(showPenalties: true) >
-                            match.blueScore(showPenalties: true)
-                        ? CupertinoColors.systemRed
-                        : Colors.grey)
-                    : (match.alliance(team) == match.red
-                        ? CupertinoColors.systemYellow
-                        : Colors.grey),
-              ),
+  Widget scoreDisplay() {
+    bool redIsGreater = match.redScore(showPenalties: true) >
+        match.blueScore(showPenalties: true);
+    bool teamIsRed = match.alliance(team) == match.red;
+    return event.type == EventType.remote
+        ? Text(
+            match.score(
+              showPenalties: true,
             ),
-            Text(" - ", style: GoogleFonts.gugi()),
-            Text(
-              match.blueScore(showPenalties: true).toString(),
-              style: GoogleFonts.gugi(
-                color: team == null
-                    ? (match.redScore(showPenalties: true) <
-                            match.blueScore(showPenalties: true)
-                        ? CupertinoColors.systemBlue
-                        : Colors.grey)
-                    : (match.alliance(team) == match.blue
-                        ? CupertinoColors.systemYellow
-                        : Colors.grey),
+          )
+        : Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                match.redScore(showPenalties: true).toString(),
+                style: GoogleFonts.gugi(
+                  fontWeight: redIsGreater ? FontWeight.bold : null,
+                  color: team == null
+                      ? (redIsGreater ? CupertinoColors.systemRed : Colors.grey)
+                      : (teamIsRed
+                          ? CupertinoColors.systemYellow
+                          : Colors.grey),
+                ),
               ),
-            ),
-          ],
-        );
+              Text(" - ", style: GoogleFonts.gugi()),
+              Text(
+                match.blueScore(showPenalties: true).toString(),
+                style: GoogleFonts.gugi(
+                  fontWeight: !redIsGreater ? FontWeight.bold : null,
+                  color: team == null
+                      ? (!redIsGreater
+                          ? CupertinoColors.systemBlue
+                          : Colors.grey)
+                      : (!teamIsRed
+                          ? CupertinoColors.systemYellow
+                          : Colors.grey),
+                ),
+              ),
+            ],
+          );
+  }
 }

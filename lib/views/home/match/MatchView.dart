@@ -34,7 +34,8 @@ class _MatchView extends State<MatchView> {
   Score? _score;
   int _view = 0;
   Match? _match;
-  bool _showPenalties = false;
+  bool _showPenalties = true;
+  bool _showRoles = false;
   final Stream<int> _periodicStream =
       Stream.periodic(const Duration(milliseconds: 100), (i) => i);
   double _time = 0;
@@ -120,10 +121,11 @@ class _MatchView extends State<MatchView> {
                       duration: const Duration(milliseconds: 500),
                       child: (_match?.activeUsers?.isNotEmpty ?? false)
                           ? RawMaterialButton(
-                              onPressed: () {},
+                              onPressed: () => _showRoles = !_showRoles,
                               splashColor: Colors.transparent,
                               child: UsersRow(
                                 users: _match?.activeUsers ?? [],
+                                showRole: _showRoles,
                               ),
                             )
                           : Text("Match Stats"),

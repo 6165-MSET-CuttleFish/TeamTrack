@@ -67,7 +67,8 @@ class _EventShareState extends State<EventShare> {
                 autoCorrect: false,
               ),
               Permissions(
-                event: widget.event,
+                users: widget.event.users,
+                ref: widget.event.getRef()?.child('Permissions'),
               ),
             ],
           );

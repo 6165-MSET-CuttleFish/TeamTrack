@@ -1,4 +1,5 @@
 import 'package:firebase_database/firebase_database.dart' as Database;
+import 'package:teamtrack/components/EmptyList.dart';
 import 'package:teamtrack/functions/Functions.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/views/home/match/MatchConfig.dart';
@@ -116,16 +117,18 @@ class _MatchList extends State<MatchList> {
       );
 
   Widget _matches() {
-    final matches = widget.event.type == EventType.remote
-        ? widget.event
-            .getSortedMatches(widget.ascending)
-            .where((e) =>
-                e.alliance(
-                  widget.event.teams[widget.team?.number],
-                ) !=
-                null)
-            .toList()
-        : widget.event.getSortedMatches(widget.ascending);
+    final matches =
+        (widget.event.type == EventType.remote || widget.team != null)
+            ? widget.event
+                .getSortedMatches(widget.ascending)
+                .where((e) =>
+                    e.alliance(
+                      widget.event.teams[widget.team?.number],
+                    ) !=
+                    null)
+                .toList()
+            : widget.event.getSortedMatches(widget.ascending);
+    if (matches.length == 0) return EmptyList();
     return ListView.builder(
       itemCount: matches.length,
       itemBuilder: (context, index) => Slidable(
@@ -158,7 +161,6 @@ class _MatchList extends State<MatchList> {
                             widget.event.deleteMatch(matches[index]);
                           },
                         );
-                        dataModel.saveEvents();
                         Navigator.of(context).pop();
                       },
                     ),
@@ -227,6 +229,7 @@ class MatchSearch extends SearchDelegate<String?> {
               (m.blue?.team2?.name.contains(query) ?? false),
         )
         .toList();
+    if (suggestionList.length == 0) return EmptyList();
     return ListView.builder(
       itemCount: suggestionList.length,
       itemBuilder: (context, index) {
