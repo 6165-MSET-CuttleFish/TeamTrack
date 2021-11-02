@@ -133,29 +133,16 @@ export const nativizeEvent = functions.database
     });
 
 // Delete event from user's inbox
-export const deleteEvent = functions.database
-    .ref("/Events/{gameName}/{event}")
-    .onDelete((snap) => {
-      const event = snap.val();
-      const users: Array<string> = [];
-      for (const [key] of Object.entries(event.Permissions)) {
-        users.push(key);
-      }
+export const removeUser = functions.database
+    .ref("/Events/{gameName}/{eventID}/Permissions/{uid}")
+    .onDelete(async (snap, context) => {
+      const ref = admin.firestore().collection("users")
+          .doc(context.params.uid);
       return admin.firestore().runTransaction(async (t) => {
-        const refs = users.map((user) => {
-          return admin.firestore().collection("users").doc(user);
-        });
-        const allDocs = new Map<FirebaseFirestore.DocumentSnapshot<
-        FirebaseFirestore.DocumentData>, unknown>();
-        for (const ref of refs) {
-          const doc = await t.get(ref);
-          const events = doc.data()?.events;
-          delete events[event.id];
-          allDocs.set(doc, events);
-        }
-        for (const doc of allDocs.keys()) {
-          t.update(doc.ref, {events: allDocs.get(doc)});
-        }
+        const doc = await t.get(ref);
+        const events = doc.data()?.events;
+        delete events[context.params.eventID];
+        t.update(ref, {events: events});
       });
     });
 
