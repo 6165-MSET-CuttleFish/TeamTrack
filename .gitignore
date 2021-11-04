@@ -40,7 +40,8 @@ app.*.symbols
 # Obfuscation related
 app.*.map.json
 
-#Firebase related
+# API keys
 android/app/google-services.json
 ios/Runner/GoogleService-Info.plist
 web/api/
+lib/api/
