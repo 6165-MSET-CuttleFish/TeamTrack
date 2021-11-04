@@ -1,12 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/providers/Auth.dart';
 
 class UserPresence {
   static rtdbAndLocalFsPresence(app) async {
-    final uid = AuthenticationService(FirebaseAuth.instance).getUser()?.uid;
+    final uid = AuthenticationService(firebaseAuth).getUser()?.uid;
     final userStatusDatabaseRef =
         firebaseDatabase.reference().child('userStatus/$uid');
     final userStatusFirestoreRef =
