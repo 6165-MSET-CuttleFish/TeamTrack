@@ -71,7 +71,7 @@ class _TeamTrack extends State<TeamTrack> {
     textTheme: TextTheme(
       caption: GoogleFonts.squadaOne(),
       headline6: GoogleFonts.gugi(),
-      headline4: GoogleFonts.squadaOne(color: Colors.black),
+      headline4: GoogleFonts.gugi(),
     ),
     colorScheme: ColorScheme.light(
       primary: Colors.deepPurple,
