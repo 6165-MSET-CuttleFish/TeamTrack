@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart' as Database;
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,6 +17,7 @@ class DataModel {
   List<Event> sharedEvents = [];
   String? token;
   List<Event> inbox = [];
+  List<TeamTrackUser> blockedUsers = [];
 
   List<Event> allEvents() => events + sharedEvents;
 
@@ -81,8 +83,13 @@ enum Role {
 }
 
 class TeamTrackUser {
-  TeamTrackUser(
-      {required this.role, this.displayName, this.email, this.photoURL});
+  TeamTrackUser({
+    required this.role,
+    this.displayName,
+    this.email,
+    this.photoURL,
+    this.id,
+  });
   Role role;
   String? email;
   String? displayName;
@@ -95,6 +102,12 @@ class TeamTrackUser {
         displayName = json['name'],
         watchingTeam = json['watchingTeam'],
         photoURL = json['photoURL'];
+  TeamTrackUser.fromUser(User user)
+      : role = Role.viewer,
+        email = user.email,
+        displayName = user.displayName,
+        photoURL = user.photoURL,
+        id = user.uid;
   Map<String, dynamic> toJson() => {
         'role': role.toRep(),
         'email': email,
@@ -112,3 +125,4 @@ final FirebaseFunctions functions = FirebaseFunctions.instance;
 final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 final RemoteConfig remoteConfig = RemoteConfig.instance;
 final FirebaseMessaging messaging = FirebaseMessaging.instance;
+final FirebaseAuth firebaseAuth = FirebaseAuth.instance;

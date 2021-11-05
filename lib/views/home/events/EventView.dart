@@ -162,17 +162,19 @@ class _EventView extends State<EventView> {
             : null,
         body: materialTabs()[_tab],
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          tooltip: _tab == 0 ? 'Add Team' : 'Add Match',
-          child: Icon(Icons.add),
-          onPressed: () async {
-            if (_tab == 0)
-              _teamConfig();
-            else
-              _matchConfig();
-          },
-        ),
+        floatingActionButton: widget.event.role != Role.viewer
+            ? FloatingActionButton(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                tooltip: _tab == 0 ? 'Add Team' : 'Add Match',
+                child: Icon(Icons.add),
+                onPressed: () async {
+                  if (_tab == 0)
+                    _teamConfig();
+                  else
+                    _matchConfig();
+                },
+              )
+            : null,
       );
 
   void _matchConfig() async {

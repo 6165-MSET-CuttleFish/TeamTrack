@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart' as Database;
 import 'package:flutter/cupertino.dart';
+import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:teamtrack/functions/Functions.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/models/Change.dart';
@@ -45,6 +46,9 @@ class Event {
   String? senderId;
   String? senderName;
   String? senderEmail;
+
+  TeamTrackUser? sender;
+  GeoFirePoint? location;
 
   List<TeamTrackUser> users = [];
 
@@ -381,10 +385,18 @@ class Event {
     authorEmail = json?['authorEmail'];
     authorName = json?['authorName'];
 
-    senderId = json?['senderId'];
+    senderId = json?['senderID'];
     sendTime = json?['sendTime'];
     senderEmail = json?['senderEmail'];
     senderName = json?['senderName'];
+
+    sender = TeamTrackUser(
+      role: Role.viewer,
+      id: senderId,
+      displayName: senderName,
+      photoURL: json?['photoURL'],
+      email: senderEmail,
+    );
 
     for (var match in matches.values) {
       match.setDice(match.dice);

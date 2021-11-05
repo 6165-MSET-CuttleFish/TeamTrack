@@ -78,9 +78,5 @@ void navigateToMatch(
       ),
     ),
   );
-  event
-      .getRef()
-      ?.child('matches/${match.id}/activeUsers/${user?.uid}')
-      .remove();
   state?.setState(() {});
 }

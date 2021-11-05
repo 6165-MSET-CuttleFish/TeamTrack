@@ -62,7 +62,7 @@ class _MatchView extends State<MatchView> {
   void initState() {
     super.initState();
     if (widget.team == null) {
-      final user = AuthenticationService(FirebaseAuth.instance).getUser();
+      final user = AuthenticationService(firebaseAuth).getUser();
       final ttuser = widget.event.getTTUserFromUser(user);
       final ref = widget.event
           .getRef()
@@ -70,6 +70,16 @@ class _MatchView extends State<MatchView> {
       ref?.set(ttuser.toJson());
       ref?.onDisconnect().remove();
     }
+  }
+
+  @override
+  void dispose() {
+    final user = AuthenticationService(firebaseAuth).getUser();
+    final ref = widget.event
+        .getRef()
+        ?.child('matches/${widget.match?.id}/activeUsers/${user?.uid}');
+    ref?.remove();
+    super.dispose();
   }
 
   @override

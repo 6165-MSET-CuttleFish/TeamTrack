@@ -157,9 +157,7 @@ class _MatchList extends State<MatchList> {
                       child: Text('Confirm'),
                       onPressed: () {
                         setState(
-                          () {
-                            widget.event.deleteMatch(matches[index]);
-                          },
+                          () => widget.event.deleteMatch(matches[index]),
                         );
                         Navigator.of(context).pop();
                       },
@@ -175,14 +173,12 @@ class _MatchList extends State<MatchList> {
           team: widget.event.teams[widget.team?.number],
           event: widget.event,
           index: widget.ascending ? index + 1 : matches.length - index,
-          onTap: () async {
-            navigateToMatch(
-              context,
-              match: matches[index],
-              event: widget.event,
-              state: this,
-            );
-          },
+          onTap: () => navigateToMatch(
+            context,
+            match: matches[index],
+            event: widget.event,
+            state: this,
+          ),
         ),
       ),
     );
