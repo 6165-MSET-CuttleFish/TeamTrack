@@ -21,10 +21,6 @@ class TemplatesList extends StatefulWidget {
 
 class _TemplatesListState extends State<TemplatesList> {
   late GoogleMapController mapController;
-  static const _initialCameraPosition = CameraPosition(
-    target: LatLng(37, -122),
-    zoom: 11.5,
-  );
   Location location = new Location();
 
   Geoflutterfire geo = Geoflutterfire();
@@ -55,6 +51,14 @@ class _TemplatesListState extends State<TemplatesList> {
           zoomControlsEnabled: false,
         ),
         Positioned(
+            bottom: 50,
+            right: 10,
+            child: FlatButton(
+              child: Icon(Icons.pin_drop, color: Colors.white),
+              color: Colors.green,
+              onPressed: _addGeoPoint,
+            )),
+        Positioned(
           bottom: 50,
           left: 10,
           child: PlatformSlider(
@@ -81,19 +85,27 @@ class _TemplatesListState extends State<TemplatesList> {
   }
 
   // Set GeoLocation Data
-  Future<void> _addGeoPoint(Event event) async {
-    var pos = await location.getLocation();
-    GeoFirePoint point =
-        geo.point(latitude: pos.latitude ?? 0, longitude: pos.longitude ?? 0);
-    final newEvent = Event.fromJson(event.toJson());
+  Future<DocumentReference> _addGeoPoint() async {
+    var pos = await mapController.getLatLng(
+      ScreenCoordinate(
+        x: -MediaQuery.of(context).size.height ~/ 2,
+        y: -MediaQuery.of(context).size.width ~/ 2,
+      ),
+    );
+    GeoFirePoint point = geo.point(
+      latitude: pos.latitude,
+      longitude: pos.longitude,
+    );
+    final newEvent = Event.fromJson(Event(
+      name: "Test Event",
+      type: EventType.local,
+      gameName: "FreightFrenzy",
+    ).toJson());
     newEvent.shared = true;
     var newEventJson = newEvent.toJson();
     newEventJson['position'] = point.data;
 
-    return firebaseFirestore
-        .collection('templates')
-        .doc(event.id)
-        .set(newEventJson);
+    return firebaseFirestore.collection('templates').add(newEventJson);
     // .add(newEventJson);
   }
 
@@ -102,7 +114,6 @@ class _TemplatesListState extends State<TemplatesList> {
     // mapController.clearMarkers();
     documentList.forEach((DocumentSnapshot document) {
       GeoPoint pos = (document.data() as Map?)?['position']['geopoint'];
-      double distance = (document.data() as Map?)?['distance'];
       var marker = Marker(
         markerId: MarkerId(document.id),
         position: LatLng(pos.latitude, pos.longitude),
@@ -131,7 +142,7 @@ class _TemplatesListState extends State<TemplatesList> {
     }).listen(_updateMarkers);
   }
 
-  _updateQuery(value) {
+  _updateQuery(double value) {
     final zoom = -0.02 * value + 14.0;
     mapController.moveCamera(CameraUpdate.zoomTo(zoom));
     setState(() {
