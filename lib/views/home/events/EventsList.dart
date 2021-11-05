@@ -321,9 +321,9 @@ class _EventsList extends State<EventsList> {
             ),
           ),
           body: Builder(builder: (_) => getHome()),
-          floatingActionButton: _tab == 0
+          floatingActionButton: _tab == 0 || _tab == 3
               ? FloatingActionButton(
-                  tooltip: "Add Event",
+                  tooltip: _tab == 3 ? "Push" : "Add Event",
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   splashColor: Theme.of(context).colorScheme.secondary,
                   child: Icon(Icons.add),

@@ -354,6 +354,78 @@ class PlatformButton
   }
 }
 
+class PlatformSlider extends PlatformWidget<CupertinoSlider, Slider, Null> {
+  PlatformSlider({
+    Key? key,
+    required this.value,
+    required this.onChanged,
+    this.onChangeStart,
+    this.onChangeEnd,
+    this.min = 0.0,
+    this.max = 1.0,
+    this.divisions,
+    this.label,
+    this.activeColor,
+    this.inactiveColor,
+    this.thumbColor,
+    this.mouseCursor,
+    this.semanticFormatterCallback,
+    this.focusNode,
+    this.autofocus = false,
+  }) : super(key: key);
+
+  final double value;
+  void Function(double)? onChanged;
+  void Function(double)? onChangeStart;
+  void Function(double)? onChangeEnd;
+  final double min;
+  final double max;
+  final int? divisions;
+  final String? label;
+  final Color? activeColor;
+  final Color? inactiveColor;
+  final Color? thumbColor;
+  final MouseCursor? mouseCursor;
+  final String Function(double)? semanticFormatterCallback;
+  final FocusNode? focusNode;
+  final bool autofocus;
+
+  @override
+  CupertinoSlider buildCupertinoWidget(BuildContext context) {
+    return CupertinoSlider(
+      value: value,
+      onChanged: onChanged,
+      min: min,
+      max: max,
+      divisions: divisions,
+      activeColor: activeColor,
+      thumbColor: thumbColor ?? CupertinoColors.white,
+      onChangeStart: onChangeStart,
+      onChangeEnd: onChangeEnd,
+    );
+  }
+
+  @override
+  Slider buildMaterialWidget(BuildContext context) {
+    return Slider(
+      value: value,
+      onChanged: onChanged,
+      min: min,
+      max: max,
+      divisions: divisions,
+      activeColor: activeColor,
+      focusNode: focusNode,
+      autofocus: autofocus,
+      label: label,
+      semanticFormatterCallback: semanticFormatterCallback,
+      mouseCursor: mouseCursor,
+      inactiveColor: inactiveColor,
+      onChangeStart: onChangeStart,
+      onChangeEnd: onChangeEnd,
+    );
+  }
+}
+
 class PlatformProgressIndicator extends PlatformWidget<
     CupertinoActivityIndicator, CircularProgressIndicator, Null> {
   @override
