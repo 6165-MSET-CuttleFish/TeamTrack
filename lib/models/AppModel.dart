@@ -6,6 +6,7 @@ import 'package:firebase_database/firebase_database.dart' as Database;
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:teamtrack/functions/Functions.dart';
+import 'package:teamtrack/models/FakeRemoteConfig.dart';
 import 'GameModel.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
@@ -123,6 +124,6 @@ final Database.FirebaseDatabase firebaseDatabase =
     Database.FirebaseDatabase.instance;
 final FirebaseFunctions functions = FirebaseFunctions.instance;
 final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-final RemoteConfig remoteConfig = RemoteConfig.instance;
 final FirebaseMessaging messaging = FirebaseMessaging.instance;
 final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+final FakeRemoteConfig remoteConfig = FakeRemoteConfig();

@@ -15,10 +15,10 @@ import 'package:provider/provider.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await remoteConfig.fetchAndActivate();
+  Statics.gameName = remoteConfig.getString("gameName");
+  await dataModel.restoreEvents();
   if (!NewPlatform.isWeb()) {
-    await remoteConfig.fetchAndActivate();
-    Statics.gameName = remoteConfig.getString("gameName");
-    await dataModel.restoreEvents();
     var notification = PushNotifications();
     await messaging.requestPermission(
       alert: true,

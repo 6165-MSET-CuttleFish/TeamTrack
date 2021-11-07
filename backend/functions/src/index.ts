@@ -173,3 +173,10 @@ export const fetchAPI = functions.https.onCall((data, context) => {
     headers: {Authorization: `Basic ${ftcAPIKey}`},
   });
 });
+
+export const remoteConfigToDatabase = functions.remoteConfig
+    .onUpdate(async () => {
+      const temp = await admin.remoteConfig().getTemplate();
+      return admin.database().ref().child("config")
+          .ref.set(temp.parameters);
+    });

@@ -159,7 +159,8 @@ class _InboxState extends State<Inbox> {
                                             await transaction.get(docRef);
                                         if (!snapshot.exists) {
                                           throw Exception(
-                                              "User does not exist!");
+                                            "User does not exist!",
+                                          );
                                         }
                                         Map<String, dynamic> newInbox =
                                             snapshot.data()?["inbox"]

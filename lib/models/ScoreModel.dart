@@ -15,8 +15,8 @@ class Score extends ScoreDivision implements Comparable<Score> {
   bool isAllianceScore;
   Score(this.id, this.dice, this.gameName, {this.isAllianceScore = false}) {
     var ref = isAllianceScore
-        ? json.decode(remoteConfig.getValue(gameName).asString())['Alliance']
-        : json.decode(remoteConfig.getValue(gameName).asString());
+        ? json.decode(remoteConfig.getString(gameName))['Alliance']
+        : json.decode(remoteConfig.getString(gameName));
     teleScore = TeleScore(ref['TeleScore']);
     autoScore = AutoScore(ref['AutoScore']);
     endgameScore = EndgameScore(ref['EndgameScore']);
@@ -87,8 +87,8 @@ class Score extends ScoreDivision implements Comparable<Score> {
   Score.fromJson(Map<String, dynamic> map, this.gameName,
       {this.isAllianceScore = false}) {
     var ref = isAllianceScore
-        ? json.decode(remoteConfig.getValue(gameName).asString())['Alliance']
-        : json.decode(remoteConfig.getValue(gameName).asString());
+        ? json.decode(remoteConfig.getString(gameName))['Alliance']
+        : json.decode(remoteConfig.getString(gameName));
     autoScore = map['AutoScore'] != null
         ? AutoScore.fromJson(map['AutoScore'], ref['AutoScore'])
         : AutoScore(ref['AutoScore']);
