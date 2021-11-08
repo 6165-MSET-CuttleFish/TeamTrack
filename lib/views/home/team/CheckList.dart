@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/views/home/team/TeamView.dart';
 
@@ -25,7 +26,7 @@ class _CheckListState extends State<CheckList> {
           ),
           checkColor: Colors.black,
           tileColor: Colors.green,
-          title: Text('Remove Outliers'),
+          title: PlatformText('Remove Outliers'),
           secondary: Icon(CupertinoIcons.arrow_branch),
         ),
         CheckboxListTile(
@@ -37,7 +38,7 @@ class _CheckListState extends State<CheckList> {
           ),
           checkColor: Colors.black,
           tileColor: Colors.red,
-          title: Text('Count Penalties'),
+          title: PlatformText('Count Penalties'),
           secondary: Icon(CupertinoIcons.xmark_seal_fill),
         ),
         if (widget.state.widget.event.type != EventType.remote)
@@ -50,8 +51,8 @@ class _CheckListState extends State<CheckList> {
             ),
             checkColor: Colors.black,
             tileColor: Colors.blue,
-            title: Text('Match Total'),
-            subtitle: Text('Consider match total as score total'),
+            title: PlatformText('Match Total'),
+            subtitle: PlatformText('Consider match total as score total'),
             secondary: Icon(CupertinoIcons.square_stack),
           ),
       ],

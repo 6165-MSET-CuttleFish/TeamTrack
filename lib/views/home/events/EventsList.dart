@@ -86,13 +86,13 @@ class _EventsList extends State<EventsList> {
               builder: (_) {
                 switch (_tab) {
                   case 1:
-                    return Text("Inbox");
+                    return PlatformText("Inbox");
                   case 2:
-                    return Text("Blocked Users");
+                    return PlatformText("Blocked Users");
                   case 3:
-                    return Text("Templates");
+                    return PlatformText("Templates");
                   default:
-                    return Text("Events");
+                    return PlatformText("Events");
                 }
               },
             ),
@@ -144,12 +144,12 @@ class _EventsList extends State<EventsList> {
                                     )
                                   else
                                     Icon(Icons.account_circle, size: 70),
-                                  Text(
+                                  PlatformText(
                                     context.read<User?>()?.displayName ??
                                         "Guest",
                                     style: TextStyle(color: Colors.white),
                                   ),
-                                  Text(
+                                  PlatformText(
                                     context.read<User?>()?.email ?? "",
                                     style: TextStyle(color: Colors.white),
                                   ),
@@ -167,7 +167,7 @@ class _EventsList extends State<EventsList> {
                                 showPlatformDialog(
                                   context: context,
                                   builder: (_) => PlatformAlert(
-                                    title: Text("Change Display Name"),
+                                    title: PlatformText("Change Display Name"),
                                     content: PlatformTextField(
                                       textInputAction: TextInputAction.done,
                                       placeholder: "Display Name",
@@ -176,13 +176,13 @@ class _EventsList extends State<EventsList> {
                                     ),
                                     actions: [
                                       PlatformDialogAction(
-                                        child: Text("Cancel"),
+                                        child: PlatformText("Cancel"),
                                         onPressed: () {
                                           Navigator.pop(context);
                                         },
                                       ),
                                       PlatformDialogAction(
-                                        child: Text("Confirm"),
+                                        child: PlatformText("Confirm"),
                                         onPressed: () async {
                                           if (controller.text.isNotEmpty)
                                             await context
@@ -194,11 +194,12 @@ class _EventsList extends State<EventsList> {
                                           showPlatformDialog(
                                             context: context,
                                             builder: (_) => PlatformAlert(
-                                              title: Text("Success"),
-                                              content: Text("Reload the App"),
+                                              title: PlatformText("Success"),
+                                              content: PlatformText(
+                                                  "Reload the App"),
                                               actions: [
                                                 PlatformDialogAction(
-                                                  child: Text("Okay"),
+                                                  child: PlatformText("Okay"),
                                                   onPressed: () {
                                                     Navigator.pop(context);
                                                   },
@@ -225,7 +226,7 @@ class _EventsList extends State<EventsList> {
                     children: [
                       ListTile(
                         leading: Icon(Icons.list),
-                        title: Text("Events"),
+                        title: PlatformText("Events"),
                         onTap: () {
                           setState(() => _tab = 0);
                           Navigator.of(context).pop();
@@ -233,7 +234,7 @@ class _EventsList extends State<EventsList> {
                       ),
                       ListTile(
                         leading: Icon(Icons.widgets_outlined),
-                        title: Text("Templates"),
+                        title: PlatformText("Templates"),
                         onTap: () {
                           setState(() => _tab = 3);
                           Navigator.of(context).pop();
@@ -242,24 +243,24 @@ class _EventsList extends State<EventsList> {
                       if (!(context.read<User?>()?.isAnonymous ?? true))
                         ListTile(
                           leading: Icon(Icons.inbox_rounded),
-                          title: Text("Inbox"),
-                          trailing:
-                              (data?['inbox'] as Map?)?.entries.length == 0
-                                  ? null
-                                  : Container(
-                                      decoration: ShapeDecoration(
-                                        color: Colors.red,
-                                        shape: CircleBorder(),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text((data?['inbox'] as Map?)
-                                                ?.entries
-                                                .length
-                                                .toString() ??
-                                            "0"),
-                                      ),
-                                    ),
+                          title: PlatformText("Inbox"),
+                          trailing: (data?['inbox'] as Map?)?.entries.length ==
+                                  0
+                              ? null
+                              : Container(
+                                  decoration: ShapeDecoration(
+                                    color: Colors.red,
+                                    shape: CircleBorder(),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: PlatformText((data?['inbox'] as Map?)
+                                            ?.entries
+                                            .length
+                                            .toString() ??
+                                        "0"),
+                                  ),
+                                ),
                           onTap: () {
                             setState(() => _tab = 1);
                             Navigator.of(context).pop();
@@ -268,7 +269,7 @@ class _EventsList extends State<EventsList> {
                       if (!(context.read<User?>()?.isAnonymous ?? true))
                         ListTile(
                           leading: Icon(Icons.people_alt),
-                          title: Text("Blocked Users"),
+                          title: PlatformText("Blocked Users"),
                           onTap: () {
                             setState(() => _tab = 2);
                             Navigator.of(context).pop();
@@ -277,7 +278,7 @@ class _EventsList extends State<EventsList> {
                       if (context.read<User?>()?.isAnonymous ?? false)
                         ListTile(
                           leading: Icon(Icons.link),
-                          title: Text("Link Account"),
+                          title: PlatformText("Link Account"),
                           onTap: () => Navigator.of(context).push(
                             platformPageRoute(
                               builder: (context) => LoginView(returnBack: true),
@@ -286,22 +287,22 @@ class _EventsList extends State<EventsList> {
                         ),
                       ListTile(
                         leading: Icon(Icons.logout),
-                        title: Text('Sign Out'),
+                        title: PlatformText('Sign Out'),
                         onTap: () {
                           showPlatformDialog(
                             context: context,
                             builder: (context) => PlatformAlert(
-                              title: Text('Sign Out'),
-                              content: Text('Are you sure?'),
+                              title: PlatformText('Sign Out'),
+                              content: PlatformText('Are you sure?'),
                               actions: [
                                 PlatformDialogAction(
                                   isDefaultAction: true,
-                                  child: Text('Cancel'),
+                                  child: PlatformText('Cancel'),
                                   onPressed: () => Navigator.of(context).pop(),
                                 ),
                                 PlatformDialogAction(
                                   isDestructive: true,
-                                  child: Text('Sign Out'),
+                                  child: PlatformText('Sign Out'),
                                   onPressed: () {
                                     Navigator.of(context).pop();
                                     context
@@ -350,13 +351,13 @@ class _EventsList extends State<EventsList> {
               ExpansionTile(
                 leading: Icon(CupertinoIcons.person_3),
                 initiallyExpanded: true,
-                title: Text('In-Person Events'),
+                title: PlatformText('In-Person Events'),
                 children: localEvents(),
               ),
               ExpansionTile(
                 leading: Icon(CupertinoIcons.rectangle_stack_person_crop),
                 initiallyExpanded: true,
-                title: Text('Remote Events'),
+                title: PlatformText('Remote Events'),
                 children: remoteEvents(),
               ),
             ],
@@ -384,12 +385,12 @@ class _EventsList extends State<EventsList> {
               showPlatformDialog(
                 context: context,
                 builder: (BuildContext context) => PlatformAlert(
-                  title: Text('Delete Event'),
-                  content: Text('Are you sure?'),
+                  title: PlatformText('Delete Event'),
+                  content: PlatformText('Are you sure?'),
                   actions: [
                     PlatformDialogAction(
                       isDefaultAction: true,
-                      child: Text('Cancel'),
+                      child: PlatformText('Cancel'),
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
@@ -397,7 +398,7 @@ class _EventsList extends State<EventsList> {
                     PlatformDialogAction(
                       isDefaultAction: false,
                       isDestructive: true,
-                      child: Text('Confirm'),
+                      child: PlatformText('Confirm'),
                       onPressed: () {
                         if (e.shared)
                           onDelete(e);
@@ -433,8 +434,8 @@ class _EventsList extends State<EventsList> {
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(e.name),
-                Text(
+                PlatformText(e.name),
+                PlatformText(
                   e.gameName.spaceBeforeCapital(),
                   style: Theme.of(context).textTheme.caption,
                 ),
@@ -462,7 +463,7 @@ class _EventsList extends State<EventsList> {
       showCupertinoModalPopup(
         context: context,
         builder: (context) => CupertinoActionSheet(
-          message: Text('Select Event Type'),
+          message: PlatformText('Select Event Type'),
           actions: [
             CupertinoActionSheetAction(
               onPressed: () {
@@ -474,8 +475,8 @@ class _EventsList extends State<EventsList> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Icon(CupertinoIcons.person_3_fill),
-                  Text('In-Person Event'),
-                  Text(''),
+                  PlatformText('In-Person Event'),
+                  PlatformText(''),
                 ],
               ),
             ),
@@ -489,13 +490,13 @@ class _EventsList extends State<EventsList> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Icon(CupertinoIcons.rectangle_stack_person_crop_fill),
-                    Text('Remote Event'),
-                    Text('')
+                    PlatformText('Remote Event'),
+                    PlatformText('')
                   ]),
             ),
           ],
           cancelButton: CupertinoActionSheetAction(
-            child: Text('Cancel'),
+            child: PlatformText('Cancel'),
             onPressed: () => {Navigator.pop(context)},
             isDefaultAction: true,
           ),
@@ -524,7 +525,7 @@ class _EventsList extends State<EventsList> {
                     _chosen();
                   },
                   leading: Icon(CupertinoIcons.person_3_fill),
-                  title: Text('In-Person Event'),
+                  title: PlatformText('In-Person Event'),
                 ),
               ),
             ),
@@ -545,7 +546,7 @@ class _EventsList extends State<EventsList> {
                   },
                   leading:
                       Icon(CupertinoIcons.rectangle_stack_person_crop_fill),
-                  title: Text('Remote Event'),
+                  title: PlatformText('Remote Event'),
                 ),
               ),
             ),
@@ -558,7 +559,7 @@ class _EventsList extends State<EventsList> {
   void _chosen() => showPlatformDialog(
         context: context,
         builder: (BuildContext context) => PlatformAlert(
-          title: Text('New Event'),
+          title: PlatformText('New Event'),
           content: PlatformTextField(
             textInputAction: TextInputAction.done,
             keyboardType: TextInputType.name,
@@ -571,7 +572,7 @@ class _EventsList extends State<EventsList> {
           actions: [
             PlatformDialogAction(
               isDefaultAction: true,
-              child: Text('Cancel'),
+              child: PlatformText('Cancel'),
               onPressed: () {
                 _newName = '';
                 Navigator.of(context).pop();
@@ -579,7 +580,7 @@ class _EventsList extends State<EventsList> {
             ),
             PlatformDialogAction(
               isDefaultAction: false,
-              child: Text('Save'),
+              child: PlatformText('Save'),
               onPressed: () {
                 setState(
                   () {
@@ -605,21 +606,21 @@ class _EventsList extends State<EventsList> {
       showPlatformDialog(
         context: context,
         builder: (context) => PlatformAlert(
-          title: Text(e.shared ? 'Share Event' : 'Upload Event'),
+          title: PlatformText(e.shared ? 'Share Event' : 'Upload Event'),
           content: EventShare(
             emailController: _emailController,
             event: e,
           ),
           actions: [
             PlatformDialogAction(
-              child: Text('Cancel'),
+              child: PlatformText('Cancel'),
               isDefaultAction: true,
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             PlatformDialogAction(
-              child: Text(e.shared ? 'Share' : 'Upload'),
+              child: PlatformText(e.shared ? 'Share' : 'Upload'),
               onPressed: () async {
                 showPlatformDialog(
                   context: context,
@@ -627,7 +628,7 @@ class _EventsList extends State<EventsList> {
                     content: Center(child: PlatformProgressIndicator()),
                     actions: [
                       PlatformDialogAction(
-                        child: Text('Back'),
+                        child: PlatformText('Back'),
                         isDefaultAction: true,
                         onPressed: () => Navigator.of(context).pop(),
                       ),
@@ -676,11 +677,11 @@ class _EventsList extends State<EventsList> {
       showPlatformDialog(
         context: context,
         builder: (context) => PlatformAlert(
-          title: Text('Cannot Share Event'),
-          content: Text('You must be logged in to share an event.'),
+          title: PlatformText('Cannot Share Event'),
+          content: PlatformText('You must be logged in to share an event.'),
           actions: [
             PlatformDialogAction(
-              child: Text('OK'),
+              child: PlatformText('OK'),
               isDefaultAction: true,
               onPressed: () {
                 Navigator.of(context).pop();
@@ -695,12 +696,12 @@ class _EventsList extends State<EventsList> {
     showPlatformDialog(
       context: context,
       builder: (BuildContext context) => PlatformAlert(
-        title: Text('Delete Event'),
-        content: Text('Are you sure?'),
+        title: PlatformText('Delete Event'),
+        content: PlatformText('Are you sure?'),
         actions: [
           PlatformDialogAction(
             isDefaultAction: true,
-            child: Text('Cancel'),
+            child: PlatformText('Cancel'),
             onPressed: () {
               Navigator.of(context).pop();
             },
@@ -708,7 +709,7 @@ class _EventsList extends State<EventsList> {
           PlatformDialogAction(
             isDefaultAction: false,
             isDestructive: true,
-            child: Text('Confirm'),
+            child: PlatformText('Confirm'),
             onPressed: () async {
               final uid = context.read<User?>()?.uid;
               await firebaseDatabase

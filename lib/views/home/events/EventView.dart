@@ -39,7 +39,7 @@ class _EventView extends State<EventView> {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: _tab == 0 ? Text('Teams') : Text('Matches'),
+          title: _tab == 0 ? PlatformText('Teams') : PlatformText('Matches'),
           backgroundColor: Theme.of(context).colorScheme.primary,
           actions: [
             _tab != 0
@@ -79,7 +79,8 @@ class _EventView extends State<EventView> {
                         (value) {
                           return DropdownMenuItem<OpModeType?>(
                             value: value,
-                            child: Text((value?.toVal() ?? "Subtotal") + " "),
+                            child: PlatformText(
+                                (value?.toVal() ?? "Subtotal") + " "),
                           );
                         },
                       ).toList(),
@@ -129,7 +130,7 @@ class _EventView extends State<EventView> {
                         size: 20,
                         color: _tab == 1 ? Theme.of(context).canvasColor : null,
                       ),
-                      Text(
+                      PlatformText(
                         'Teams',
                         style: TextStyle(
                           fontSize: 10,
@@ -147,7 +148,7 @@ class _EventView extends State<EventView> {
                         size: 20,
                         color: _tab == 0 ? Theme.of(context).canvasColor : null,
                       ),
-                      Text(
+                      PlatformText(
                         'Matches',
                         style: TextStyle(
                           fontSize: 10,
@@ -193,7 +194,7 @@ class _EventView extends State<EventView> {
     showPlatformDialog(
       context: context,
       builder: (BuildContext context) => PlatformAlert(
-        title: Text('New Team'),
+        title: PlatformText('New Team'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -221,7 +222,7 @@ class _EventView extends State<EventView> {
         actions: [
           PlatformDialogAction(
             isDefaultAction: true,
-            child: Text('Cancel'),
+            child: PlatformText('Cancel'),
             onPressed: () {
               _newName = '';
               _newNumber = '';
@@ -230,7 +231,7 @@ class _EventView extends State<EventView> {
           ),
           PlatformDialogAction(
             isDefaultAction: false,
-            child: Text('Add'),
+            child: PlatformText('Add'),
             onPressed: () {
               setState(
                 () {

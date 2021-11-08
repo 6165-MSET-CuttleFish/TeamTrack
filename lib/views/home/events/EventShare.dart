@@ -51,7 +51,7 @@ class _EventShareState extends State<EventShare> {
                 },
                 items: Role.values
                     .map(
-                      (e) => Text(
+                      (e) => PlatformText(
                         e.name(),
                         style: Theme.of(context).textTheme.bodyText1,
                       ),

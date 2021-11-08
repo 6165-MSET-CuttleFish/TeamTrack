@@ -26,13 +26,13 @@ class _Verify extends State<Verify> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
+                      PlatformText(
                         "A verfication email has been sent,",
                         style: TextStyle(
                           fontSize: 20,
                         ),
                       ),
-                      Text(
+                      PlatformText(
                         "Once verified, you will need to sign out and sign back in using these credentials",
                         style: TextStyle(
                           fontSize: 20,
@@ -40,16 +40,16 @@ class _Verify extends State<Verify> {
                       ),
                       PlatformButton(
                         color: Colors.blue,
-                        child: Text("Send Email Again"),
+                        child: PlatformText("Send Email Again"),
                         onPressed: () async {
                           await context.read<User?>()?.sendEmailVerification();
                           showPlatformDialog(
                             context: context,
                             builder: (_) => PlatformAlert(
-                              title: Text("Verification Email Sent"),
+                              title: PlatformText("Verification Email Sent"),
                               actions: [
                                 PlatformDialogAction(
-                                  child: Text("Okay"),
+                                  child: PlatformText("Okay"),
                                   onPressed: () => Navigator.pop(context),
                                   isDefaultAction: true,
                                 )
@@ -60,7 +60,7 @@ class _Verify extends State<Verify> {
                       ),
                       PlatformButton(
                         color: CupertinoColors.systemRed,
-                        child: Text("Sign Out"),
+                        child: PlatformText("Sign Out"),
                         onPressed: () =>
                             context.read<AuthenticationService>().signOut(),
                       ),

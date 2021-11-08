@@ -20,14 +20,15 @@ class _ChangeConfigState extends State<ChangeConfig> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('New Change'),
+        title: PlatformText('New Change'),
         backgroundColor: Theme.of(context).colorScheme.primary,
       ),
       body: ListView(
         children: [
-          Text(formatDate(_date, [dd, '/', mm, '/', yyyy, ' ', HH, ':', nn])),
+          PlatformText(
+              formatDate(_date, [dd, '/', mm, '/', yyyy, ' ', HH, ':', nn])),
           PlatformButton(
-            child: Text('Date'),
+            child: PlatformText('Date'),
             onPressed: () => showDatePicker(
               context: context,
               initialDate: _date,
@@ -44,7 +45,7 @@ class _ChangeConfigState extends State<ChangeConfig> {
             placeholder: 'Name',
           ),
           PlatformButton(
-            child: Text('Save'),
+            child: PlatformText('Save'),
             onPressed: () {
               widget.team.addChange(
                 Change(

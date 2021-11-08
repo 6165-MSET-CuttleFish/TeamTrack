@@ -49,9 +49,10 @@ class MyApp extends StatelessWidget {
           create: (_) => AuthenticationService(firebaseAuth),
         ),
         StreamProvider(
-            initialData: null,
-            create: (context) =>
-                context.read<AuthenticationService>().authStateChanges),
+          initialData: null,
+          create: (context) =>
+              context.read<AuthenticationService>().authStateChanges,
+        ),
       ],
       child: TeamTrack(),
     );
@@ -80,7 +81,8 @@ class _TeamTrack extends State<TeamTrack> {
 
   final darkTheme = ThemeData(
     textTheme: TextTheme(
-      caption: GoogleFonts.squadaOne(color: Colors.white),
+      bodyText2: GoogleFonts.ptSans(color: Colors.white),
+      caption: GoogleFonts.gugi(color: Colors.white),
       headline6: GoogleFonts.gugi(color: Colors.white),
       headline4: GoogleFonts.gugi(color: Colors.white),
     ),

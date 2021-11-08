@@ -9,7 +9,6 @@ import 'package:teamtrack/functions/Functions.dart';
 import 'package:teamtrack/models/FakeRemoteConfig.dart';
 import 'GameModel.dart';
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:firebase_remote_config/firebase_remote_config.dart';
 import '../providers/Theme.dart';
 import '../functions/Extensions.dart';
 

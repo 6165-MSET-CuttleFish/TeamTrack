@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/functions/Extensions.dart';
@@ -32,7 +33,7 @@ class MatchRow extends StatelessWidget {
         ),
       ),
       child: ListTile(
-        leading: Text(index.toString()),
+        leading: PlatformText(index.toString()),
         title: matchSummary(context),
         trailing: scoreDisplay(),
         onTap: onTap,
@@ -46,22 +47,22 @@ class MatchRow extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                PlatformText(
                   'Auto : ${match.getAllianceScore(team?.number)?.autoScore.total()}',
                   style: Theme.of(context).textTheme.caption,
                 ),
-                Text(
+                PlatformText(
                   'Tele : ${match.getAllianceScore(team?.number)?.teleScore.total()}',
                   style: Theme.of(context).textTheme.caption,
                 ),
-                Text(
+                PlatformText(
                   'Endgame : ${match.getAllianceScore(team?.number)?.endgameScore.total()}',
                   style: Theme.of(context).textTheme.caption,
                 )
               ],
             ),
             Spacer(),
-            Text(
+            PlatformText(
               '${json.decode(
                 remoteConfig.getString(
                   event.gameName,
@@ -74,13 +75,13 @@ class MatchRow extends StatelessWidget {
       : Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            PlatformText(
               (match.red?.team1?.name ?? '?') +
                   ' & ' +
                   (match.red?.team2?.name ?? '?'),
               style: Theme.of(context).textTheme.caption,
             ),
-            Text(
+            PlatformText(
               'VS',
               style: TextStyle(
                 color: Colors.red,
@@ -88,7 +89,7 @@ class MatchRow extends StatelessWidget {
                 fontSize: 12,
               ),
             ),
-            Text(
+            PlatformText(
               (match.blue?.team1?.name ?? '?') +
                   ' & ' +
                   (match.blue?.team2?.name ?? '?'),
@@ -98,11 +99,13 @@ class MatchRow extends StatelessWidget {
         );
 
   Widget scoreDisplay() {
-    bool redIsGreater = match.redScore(showPenalties: true) >
-        match.blueScore(showPenalties: true);
+    int redScore = match.redScore(showPenalties: true);
+    int blueScore = match.blueScore(showPenalties: true);
+    bool redIsGreater = redScore > blueScore;
+    bool blueIsGreater = blueScore > redScore;
     bool teamIsRed = match.alliance(team) == match.red;
     return event.type == EventType.remote
-        ? Text(
+        ? PlatformText(
             match.score(
               showPenalties: true,
             ),
@@ -110,7 +113,7 @@ class MatchRow extends StatelessWidget {
         : Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
+              PlatformText(
                 match.redScore(showPenalties: true).toString(),
                 style: GoogleFonts.gugi(
                   fontWeight: redIsGreater ? FontWeight.bold : null,
@@ -121,13 +124,13 @@ class MatchRow extends StatelessWidget {
                           : Colors.grey),
                 ),
               ),
-              Text(" - ", style: GoogleFonts.gugi()),
-              Text(
+              PlatformText(" - ", style: GoogleFonts.gugi()),
+              PlatformText(
                 match.blueScore(showPenalties: true).toString(),
                 style: GoogleFonts.gugi(
-                  fontWeight: !redIsGreater ? FontWeight.bold : null,
+                  fontWeight: blueIsGreater ? FontWeight.bold : null,
                   color: team == null
-                      ? (!redIsGreater
+                      ? (blueIsGreater
                           ? CupertinoColors.systemBlue
                           : Colors.grey)
                       : (!teamIsRed

@@ -99,7 +99,7 @@ class _LoginView extends State<LoginView> {
                 ),
                 Spacer(),
                 PlatformButton(
-                  child: Text(
+                  child: PlatformText(
                     "Forgot Password",
                     style: TextStyle(fontSize: 14),
                   ),
@@ -114,15 +114,15 @@ class _LoginView extends State<LoginView> {
                       showPlatformDialog(
                         context: context,
                         builder: (BuildContext context) => PlatformAlert(
-                          title: Text('Error'),
-                          content: Text(
+                          title: PlatformText('Error'),
+                          content: PlatformText(
                             s ?? 'Something went wrong',
                             style: Theme.of(context).textTheme.bodyText1,
                           ),
                           actions: [
                             PlatformDialogAction(
                               isDefaultAction: true,
-                              child: Text('Okay'),
+                              child: PlatformText('Okay'),
                               onPressed: () {
                                 Navigator.of(context).pop();
                               },
@@ -134,15 +134,15 @@ class _LoginView extends State<LoginView> {
                       showPlatformDialog(
                         context: context,
                         builder: (BuildContext context) => PlatformAlert(
-                          title: Text('Success'),
-                          content: Text(
+                          title: PlatformText('Success'),
+                          content: PlatformText(
                             'Reset email sent',
                             style: Theme.of(context).textTheme.bodyText1,
                           ),
                           actions: [
                             PlatformDialogAction(
                               isDefaultAction: true,
-                              child: Text('Okay'),
+                              child: PlatformText('Okay'),
                               onPressed: () {
                                 Navigator.of(context).pop();
                               },
@@ -176,7 +176,7 @@ class _LoginView extends State<LoginView> {
             padding: EdgeInsets.all(5),
           ),
           PlatformButton(
-            child: Text("Sign In"),
+            child: PlatformText("Sign In"),
             color: Colors.green,
             onPressed: () async {
               String? s = await context.read<AuthenticationService>().signIn(
@@ -189,15 +189,15 @@ class _LoginView extends State<LoginView> {
                 showPlatformDialog(
                   context: context,
                   builder: (BuildContext context) => PlatformAlert(
-                    title: Text('Error'),
-                    content: Text(
+                    title: PlatformText('Error'),
+                    content: PlatformText(
                       s ?? 'Something went wrong',
                       style: Theme.of(context).textTheme.bodyText1,
                     ),
                     actions: [
                       PlatformDialogAction(
                         isDefaultAction: true,
-                        child: Text('Okay'),
+                        child: PlatformText('Okay'),
                         onPressed: () {
                           Navigator.of(context).pop();
                         },
@@ -224,7 +224,10 @@ class _LoginView extends State<LoginView> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [Icon(Icons.arrow_back_ios_new_sharp), Text('Back')],
+              children: [
+                Icon(Icons.arrow_back_ios_new_sharp),
+                PlatformText('Back')
+              ],
             ),
           ),
         PlatformButton(
@@ -240,7 +243,7 @@ class _LoginView extends State<LoginView> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [Icon(Icons.person), Text('Sign Up')],
+            children: [Icon(Icons.person), PlatformText('Sign Up')],
           ),
         ),
         if (!(context.read<User?>()?.isAnonymous ?? false))
@@ -254,7 +257,7 @@ class _LoginView extends State<LoginView> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(Icons.visibility_off),
-                Text('Sign In Anonymously')
+                PlatformText('Sign In Anonymously')
               ],
             ),
           ),
