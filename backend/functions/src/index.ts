@@ -180,3 +180,18 @@ export const remoteConfigToDatabase = functions.remoteConfig
       return admin.database().ref().child("config")
           .ref.set(temp.parameters);
     });
+
+export const removeExpiredDocuments = functions.pubsub.schedule("every 1 week")
+    .onRun(async () => {
+      const db = admin.firestore();
+      const now = admin.firestore.Timestamp.now();
+      const ts = admin.firestore.Timestamp
+          .fromMillis(now.toMillis() - 86400000);
+      const snap = await db.collection("templates")
+          .where("sendTime", "<", ts).get();
+      const promises: Promise<FirebaseFirestore.WriteResult>[] = [];
+      snap.forEach((snap) => {
+        promises.push(snap.ref.delete());
+      });
+      return Promise.all(promises);
+    });
