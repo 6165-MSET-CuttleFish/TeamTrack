@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:teamtrack/components/BarGraph.dart';
 import 'package:teamtrack/components/PercentChange.dart';
+import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/functions/Statistics.dart';
 
@@ -35,8 +36,10 @@ class TeamRow extends StatelessWidget {
         ),
       ),
       child: ListTile(
-        title: Text(team.name, style: GoogleFonts.gugi()),
-        leading: Text(team.number, style: Theme.of(context).textTheme.caption),
+        title: PlatformText(team.name,
+            style: Theme.of(context).textTheme.bodyText1),
+        leading: PlatformText(team.number,
+            style: Theme.of(context).textTheme.caption),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [

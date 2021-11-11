@@ -24,7 +24,7 @@ class _ChangeList extends State<ChangeList> {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: Text('Changes'),
+          title: PlatformText('Changes'),
           backgroundColor: Theme.of(context).colorScheme.primary,
         ),
         floatingActionButton: FloatingActionButton(
@@ -62,12 +62,12 @@ class _ChangeList extends State<ChangeList> {
                             showPlatformDialog(
                               context: context,
                               builder: (BuildContext context) => PlatformAlert(
-                                title: Text('Delete Change'),
-                                content: Text('Are you sure?'),
+                                title: PlatformText('Delete Change'),
+                                content: PlatformText('Are you sure?'),
                                 actions: [
                                   PlatformDialogAction(
                                     isDefaultAction: true,
-                                    child: Text('Cancel'),
+                                    child: PlatformText('Cancel'),
                                     onPressed: () {
                                       Navigator.of(context).pop();
                                     },
@@ -75,7 +75,7 @@ class _ChangeList extends State<ChangeList> {
                                   PlatformDialogAction(
                                     isDefaultAction: false,
                                     isDestructive: true,
-                                    child: Text('Confirm'),
+                                    child: PlatformText('Confirm'),
                                     onPressed: () {
                                       setState(
                                         () => widget.team.deleteChange(e),
@@ -98,8 +98,8 @@ class _ChangeList extends State<ChangeList> {
                           ),
                         ),
                         child: ListTile(
-                          title: Text(e.title),
-                          leading: Text(e.startDate.toDate().toString(),
+                          title: PlatformText(e.title),
+                          leading: PlatformText(e.startDate.toDate().toString(),
                               style: Theme.of(context).textTheme.caption),
                         ),
                       ),

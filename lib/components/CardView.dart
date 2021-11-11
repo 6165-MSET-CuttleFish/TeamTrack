@@ -34,15 +34,15 @@ class _CardView extends State<CardView> {
             showPlatformDialog(
               context: context,
               builder: (BuildContext context) => PlatformAlert(
-                title: Text('Not Enough Data'),
-                content: Text(
+                title: PlatformText('Not Enough Data'),
+                content: PlatformText(
                   'Add more scores',
                   style: Theme.of(context).textTheme.bodyText1,
                 ),
                 actions: [
                   PlatformDialogAction(
                     isDefaultAction: true,
-                    child: Text('Okay'),
+                    child: PlatformText('Okay'),
                     onPressed: () {
                       Navigator.of(context).pop();
                     },

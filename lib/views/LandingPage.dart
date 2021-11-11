@@ -82,7 +82,7 @@ class _LandingPageState extends State<LandingPage> {
         });
         return Scaffold(
           appBar: AppBar(
-            title: Text(_buildTitle()),
+            title: PlatformText(_buildTitle()),
             actions: [
               Padding(
                 padding: EdgeInsets.only(left: 30),
@@ -142,12 +142,12 @@ class _LandingPageState extends State<LandingPage> {
                                     )
                                   else
                                     Icon(Icons.account_circle, size: 70),
-                                  Text(
+                                  PlatformText(
                                     context.read<User?>()?.displayName ??
                                         "Guest",
                                     style: TextStyle(color: Colors.white),
                                   ),
-                                  Text(
+                                  PlatformText(
                                     context.read<User?>()?.email ?? "",
                                     style: TextStyle(color: Colors.white),
                                   ),
@@ -165,7 +165,7 @@ class _LandingPageState extends State<LandingPage> {
                                 showPlatformDialog(
                                   context: context,
                                   builder: (_) => PlatformAlert(
-                                    title: Text("Change Display Name"),
+                                    title: PlatformText("Change Display Name"),
                                     content: PlatformTextField(
                                       textInputAction: TextInputAction.done,
                                       placeholder: "Display Name",
@@ -174,13 +174,13 @@ class _LandingPageState extends State<LandingPage> {
                                     ),
                                     actions: [
                                       PlatformDialogAction(
-                                        child: Text("Cancel"),
+                                        child: PlatformText("Cancel"),
                                         onPressed: () {
                                           Navigator.pop(context);
                                         },
                                       ),
                                       PlatformDialogAction(
-                                        child: Text("Confirm"),
+                                        child: PlatformText("Confirm"),
                                         onPressed: () async {
                                           if (controller.text.isNotEmpty)
                                             await context
@@ -192,11 +192,12 @@ class _LandingPageState extends State<LandingPage> {
                                           showPlatformDialog(
                                             context: context,
                                             builder: (_) => PlatformAlert(
-                                              title: Text("Success"),
-                                              content: Text("Reload the App"),
+                                              title: PlatformText("Success"),
+                                              content: PlatformText(
+                                                  "Reload the App"),
                                               actions: [
                                                 PlatformDialogAction(
-                                                  child: Text("Okay"),
+                                                  child: PlatformText("Okay"),
                                                   onPressed: () {
                                                     Navigator.pop(context);
                                                   },
@@ -223,7 +224,7 @@ class _LandingPageState extends State<LandingPage> {
                     children: [
                       ListTile(
                         leading: Icon(Icons.list),
-                        title: Text("Events"),
+                        title: PlatformText("Events"),
                         onTap: () {
                           setState(() => selectedPage = Page.events);
                           Navigator.of(context).pop();
@@ -231,7 +232,7 @@ class _LandingPageState extends State<LandingPage> {
                       ),
                       ListTile(
                         leading: Icon(Icons.widgets_outlined),
-                        title: Text("Templates"),
+                        title: PlatformText("Templates"),
                         onTap: () {
                           setState(() => selectedPage = Page.templates);
                           Navigator.of(context).pop();
@@ -240,7 +241,7 @@ class _LandingPageState extends State<LandingPage> {
                       if (!(context.read<User?>()?.isAnonymous ?? true))
                         ListTile(
                           leading: Icon(Icons.inbox_rounded),
-                          title: Text("Inbox"),
+                          title: PlatformText("Inbox"),
                           trailing: dataModel.inbox.length == 0
                               ? null
                               : Container(
@@ -250,8 +251,8 @@ class _LandingPageState extends State<LandingPage> {
                                   ),
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
-                                    child:
-                                        Text(dataModel.inbox.length.toString()),
+                                    child: PlatformText(
+                                        dataModel.inbox.length.toString()),
                                   ),
                                 ),
                           onTap: () {
@@ -262,7 +263,7 @@ class _LandingPageState extends State<LandingPage> {
                       if (!(context.read<User?>()?.isAnonymous ?? true))
                         ListTile(
                           leading: Icon(Icons.people_alt),
-                          title: Text("Blocked Users"),
+                          title: PlatformText("Blocked Users"),
                           onTap: () {
                             setState(() => selectedPage = Page.blockedUsers);
                             Navigator.of(context).pop();
@@ -271,7 +272,7 @@ class _LandingPageState extends State<LandingPage> {
                       if (context.read<User?>()?.isAnonymous ?? false)
                         ListTile(
                           leading: Icon(Icons.link),
-                          title: Text("Link Account"),
+                          title: PlatformText("Link Account"),
                           onTap: () => Navigator.of(context).push(
                             platformPageRoute(
                               builder: (context) => LoginView(returnBack: true),
@@ -280,22 +281,22 @@ class _LandingPageState extends State<LandingPage> {
                         ),
                       ListTile(
                         leading: Icon(Icons.logout),
-                        title: Text('Sign Out'),
+                        title: PlatformText('Sign Out'),
                         onTap: () {
                           showPlatformDialog(
                             context: context,
                             builder: (context) => PlatformAlert(
-                              title: Text('Sign Out'),
-                              content: Text('Are you sure?'),
+                              title: PlatformText('Sign Out'),
+                              content: PlatformText('Are you sure?'),
                               actions: [
                                 PlatformDialogAction(
                                   isDefaultAction: true,
-                                  child: Text('Cancel'),
+                                  child: PlatformText('Cancel'),
                                   onPressed: () => Navigator.of(context).pop(),
                                 ),
                                 PlatformDialogAction(
                                   isDestructive: true,
-                                  child: Text('Sign Out'),
+                                  child: PlatformText('Sign Out'),
                                   onPressed: () {
                                     Navigator.of(context).pop();
                                     context
@@ -352,7 +353,7 @@ class _LandingPageState extends State<LandingPage> {
       showCupertinoModalPopup(
         context: context,
         builder: (context) => CupertinoActionSheet(
-          message: Text('Select Event Type'),
+          message: PlatformText('Select Event Type'),
           actions: [
             CupertinoActionSheetAction(
               onPressed: () {
@@ -364,8 +365,8 @@ class _LandingPageState extends State<LandingPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Icon(CupertinoIcons.person_3_fill),
-                  Text('In-Person Event'),
-                  Text(''),
+                  PlatformText('In-Person Event'),
+                  PlatformText(''),
                 ],
               ),
             ),
@@ -379,13 +380,13 @@ class _LandingPageState extends State<LandingPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Icon(CupertinoIcons.rectangle_stack_person_crop_fill),
-                    Text('Remote Event'),
-                    Text('')
+                    PlatformText('Remote Event'),
+                    PlatformText('')
                   ]),
             ),
           ],
           cancelButton: CupertinoActionSheetAction(
-            child: Text('Cancel'),
+            child: PlatformText('Cancel'),
             onPressed: () => {Navigator.pop(context)},
             isDefaultAction: true,
           ),
@@ -414,7 +415,7 @@ class _LandingPageState extends State<LandingPage> {
                     _chosen();
                   },
                   leading: Icon(CupertinoIcons.person_3_fill),
-                  title: Text('In-Person Event'),
+                  title: PlatformText('In-Person Event'),
                 ),
               ),
             ),
@@ -435,7 +436,7 @@ class _LandingPageState extends State<LandingPage> {
                   },
                   leading:
                       Icon(CupertinoIcons.rectangle_stack_person_crop_fill),
-                  title: Text('Remote Event'),
+                  title: PlatformText('Remote Event'),
                 ),
               ),
             ),
@@ -447,7 +448,7 @@ class _LandingPageState extends State<LandingPage> {
   void _chosen() => showPlatformDialog(
         context: context,
         builder: (BuildContext context) => PlatformAlert(
-          title: Text('New Event'),
+          title: PlatformText('New Event'),
           content: PlatformTextField(
             textInputAction: TextInputAction.done,
             keyboardType: TextInputType.name,
@@ -460,7 +461,7 @@ class _LandingPageState extends State<LandingPage> {
           actions: [
             PlatformDialogAction(
               isDefaultAction: true,
-              child: Text('Cancel'),
+              child: PlatformText('Cancel'),
               onPressed: () {
                 _newName = '';
                 Navigator.of(context).pop();
@@ -468,7 +469,7 @@ class _LandingPageState extends State<LandingPage> {
             ),
             PlatformDialogAction(
               isDefaultAction: false,
-              child: Text('Save'),
+              child: PlatformText('Save'),
               onPressed: () {
                 setState(
                   () {

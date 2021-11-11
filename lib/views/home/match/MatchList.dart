@@ -44,7 +44,7 @@ class _MatchList extends State<MatchList> {
           }
           return Scaffold(
             appBar: AppBar(
-              title: Text('Matches'),
+              title: PlatformText('Matches'),
               backgroundColor: Theme.of(context).colorScheme.primary,
             ),
             body: _matches(),
@@ -56,10 +56,10 @@ class _MatchList extends State<MatchList> {
                   showPlatformDialog(
                     context: context,
                     builder: (context) => PlatformAlert(
-                      title: Text('New Match'),
+                      title: PlatformText('New Match'),
                       actions: [
                         PlatformDialogAction(
-                          child: Text('Cancel'),
+                          child: PlatformText('Cancel'),
                           onPressed: () {
                             setState(
                               () {
@@ -69,7 +69,7 @@ class _MatchList extends State<MatchList> {
                           },
                         ),
                         PlatformDialogAction(
-                          child: Text('Add'),
+                          child: PlatformText('Add'),
                           onPressed: () {
                             setState(
                               () {
@@ -141,12 +141,12 @@ class _MatchList extends State<MatchList> {
               showPlatformDialog(
                 context: context,
                 builder: (BuildContext context) => PlatformAlert(
-                  title: Text('Delete Match'),
-                  content: Text('Are you sure?'),
+                  title: PlatformText('Delete Match'),
+                  content: PlatformText('Are you sure?'),
                   actions: [
                     PlatformDialogAction(
                       isDefaultAction: true,
-                      child: Text('Cancel'),
+                      child: PlatformText('Cancel'),
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
@@ -154,7 +154,7 @@ class _MatchList extends State<MatchList> {
                     PlatformDialogAction(
                       isDefaultAction: false,
                       isDestructive: true,
-                      child: Text('Confirm'),
+                      child: PlatformText('Confirm'),
                       onPressed: () {
                         setState(
                           () => widget.event.deleteMatch(matches[index]),

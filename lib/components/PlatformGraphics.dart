@@ -162,8 +162,7 @@ class PlatformText extends PlatformWidget<Text, Text, SelectableText> {
       );
 
   @override
-  Text buildMaterialWidget(BuildContext context) =>
-      buildCupertinoWidget(context);
+  Text buildMaterialWidget(context) => buildCupertinoWidget(context);
 
   @override
   SelectableText buildWebWidget(BuildContext context) => SelectableText(
@@ -375,9 +374,9 @@ class PlatformSlider extends PlatformWidget<CupertinoSlider, Slider, Null> {
   }) : super(key: key);
 
   final double value;
-  void Function(double)? onChanged;
-  void Function(double)? onChangeStart;
-  void Function(double)? onChangeEnd;
+  final void Function(double)? onChanged;
+  final void Function(double)? onChangeStart;
+  final void Function(double)? onChangeEnd;
   final double min;
   final double max;
   final int? divisions;
@@ -616,7 +615,7 @@ class _Incrementor extends State<Incrementor> {
         children: widget.element.nestedElements?.asMap().map(
                   (key, value) => MapEntry(
                     key,
-                    Text(
+                    PlatformText(
                       value.name,
                     ),
                   ),
@@ -679,15 +678,15 @@ class _Incrementor extends State<Incrementor> {
                     showPlatformDialog(
                       context: context,
                       builder: (context) => PlatformAlert(
-                        title: Text("Reset Field"),
-                        content: Text("Are you sure?"),
+                        title: PlatformText("Reset Field"),
+                        content: PlatformText("Are you sure?"),
                         actions: [
                           PlatformDialogAction(
-                            child: Text("Cancel"),
+                            child: PlatformText("Cancel"),
                             onPressed: () => Navigator.pop(context),
                           ),
                           PlatformDialogAction(
-                            child: Text("Confirm"),
+                            child: PlatformText("Confirm"),
                             isDestructive: true,
                             onPressed: () async {
                               if (!(widget.event?.shared ?? false)) {
@@ -749,7 +748,7 @@ class _Incrementor extends State<Incrementor> {
           ),
           SizedBox(
             width: 20,
-            child: Text(
+            child: PlatformText(
               widget.element.count.toString(),
               textAlign: TextAlign.center,
             ),
@@ -799,7 +798,7 @@ class _Incrementor extends State<Incrementor> {
             child: widget.element.id == null
                 ? Row(
                     children: [
-                      Text(widget.element.name),
+                      PlatformText(widget.element.name),
                       Spacer(),
                       if (!widget.element.isBool)
                         buildIncrementor()
@@ -813,7 +812,7 @@ class _Incrementor extends State<Incrementor> {
                       children: [
                         Padding(
                           padding: const EdgeInsets.all(5.0),
-                          child: Text(widget.element.name),
+                          child: PlatformText(widget.element.name),
                         ),
                         SizedBox(
                           width: MediaQuery.of(context).size.width,
@@ -1109,7 +1108,7 @@ class ScoreCard extends StatelessWidget {
                 ),
               ),
             )
-          : Text(''),
+          : PlatformText(''),
     );
   }
 }

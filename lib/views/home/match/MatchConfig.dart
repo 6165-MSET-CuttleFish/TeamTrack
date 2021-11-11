@@ -15,7 +15,7 @@ class _MatchConfigState extends State<MatchConfig> {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: Text('New Match'),
+          title: PlatformText('New Match'),
           backgroundColor: Theme.of(context).colorScheme.primary,
         ),
         body: SafeArea(
@@ -56,7 +56,7 @@ class _MatchConfigState extends State<MatchConfig> {
               color: Colors.red,
             ),
             alignment: Alignment.center,
-            child: Text(
+            child: PlatformText(
               'Red Alliance',
               style: Theme.of(context).textTheme.headline6,
             ),
@@ -74,7 +74,7 @@ class _MatchConfigState extends State<MatchConfig> {
               color: Colors.blue,
             ),
             alignment: Alignment.center,
-            child: Text(
+            child: PlatformText(
               'Blue Alliance',
               style: Theme.of(context).textTheme.headline6,
             ),
@@ -149,7 +149,7 @@ class _MatchConfigState extends State<MatchConfig> {
     list.add(
       PlatformButton(
         color: Colors.green,
-        child: Text('Save'),
+        child: PlatformText('Save'),
         onPressed: () {
           if (_formKey.currentState?.validate() ?? false) {
             setState(

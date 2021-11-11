@@ -138,7 +138,7 @@ class _MatchView extends State<MatchView> {
                                 showRole: _showRoles,
                               ),
                             )
-                          : Text("Match Stats"),
+                          : PlatformText("Match Stats"),
                     ),
                     elevation: 0,
                     actions: widget.team == null
@@ -151,17 +151,17 @@ class _MatchView extends State<MatchView> {
                               onPressed: () => showPlatformDialog(
                                 context: context,
                                 builder: (_) => PlatformAlert(
-                                  title: Text('Reset Score'),
-                                  content: Text('Are you sure?'),
+                                  title: PlatformText('Reset Score'),
+                                  content: PlatformText('Are you sure?'),
                                   actions: [
                                     PlatformDialogAction(
-                                      child: Text('Cancel'),
+                                      child: PlatformText('Cancel'),
                                       isDefaultAction: true,
                                       onPressed: () =>
                                           Navigator.of(context).pop(),
                                     ),
                                     PlatformDialogAction(
-                                      child: Text('Confirm'),
+                                      child: PlatformText('Confirm'),
                                       isDestructive: true,
                                       onPressed: () => setState(
                                         () {
@@ -194,7 +194,7 @@ class _MatchView extends State<MatchView> {
                               ),
                             ),
                             Center(
-                              child: Text(
+                              child: PlatformText(
                                 _time.roundToDouble().toString(),
                               ),
                             ),
@@ -243,7 +243,7 @@ class _MatchView extends State<MatchView> {
                                 Container(
                                   alignment: Alignment.center,
                                   width: 100,
-                                  child: Text(
+                                  child: PlatformText(
                                     _match
                                             ?.redScore(
                                                 showPenalties: _showPenalties)
@@ -254,7 +254,7 @@ class _MatchView extends State<MatchView> {
                                   ),
                                 ),
                                 Container(
-                                  child: Text('-',
+                                  child: PlatformText('-',
                                       style: Theme.of(context)
                                           .textTheme
                                           .headline4),
@@ -262,7 +262,7 @@ class _MatchView extends State<MatchView> {
                                 Container(
                                   alignment: Alignment.center,
                                   width: 100,
-                                  child: Text(
+                                  child: PlatformText(
                                     _match
                                             ?.blueScore(
                                                 showPenalties: _showPenalties)
@@ -277,7 +277,7 @@ class _MatchView extends State<MatchView> {
                           if (_match?.type != EventType.remote &&
                               _match != null)
                             buttonRow(),
-                          Text(
+                          PlatformText(
                             (_selectedTeam?.name ?? '') +
                                 ' : ' +
                                 (widget.event.type != EventType.remote
@@ -329,7 +329,7 @@ class _MatchView extends State<MatchView> {
                                 (value) {
                                   return DropdownMenuItem<Dice>(
                                     value: value,
-                                    child: Text(
+                                    child: PlatformText(
                                       json.decode(
                                             remoteConfig.getString(
                                               widget.event.gameName,
@@ -352,7 +352,7 @@ class _MatchView extends State<MatchView> {
                                   value: _showPenalties,
                                   onChanged: (_) => _showPenalties = _ ?? false,
                                 ),
-                                title: Text(
+                                title: PlatformText(
                                   'Penalties',
                                   style: TextStyle(fontSize: 16),
                                 ),
@@ -376,7 +376,7 @@ class _MatchView extends State<MatchView> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 SizedBox(
-                                  child: Text(
+                                  child: PlatformText(
                                     'Autonomous : ' +
                                         (widget.event.type != EventType.remote
                                             ? (_score?.autoScore
@@ -393,7 +393,7 @@ class _MatchView extends State<MatchView> {
                                   ),
                                 ),
                                 SizedBox(
-                                  child: Text(
+                                  child: PlatformText(
                                       'Tele-Op : ' +
                                           (widget.event.type != EventType.remote
                                               ? (_score?.teleScore
@@ -410,7 +410,7 @@ class _MatchView extends State<MatchView> {
                                           Theme.of(context).textTheme.caption),
                                 ),
                                 SizedBox(
-                                  child: Text(
+                                  child: PlatformText(
                                       'Endgame : ' +
                                           (widget.event.type != EventType.remote
                                               ? (_score?.endgameScore
@@ -435,9 +435,9 @@ class _MatchView extends State<MatchView> {
                                 child: CupertinoSlidingSegmentedControl(
                                   groupValue: _view,
                                   children: <int, Widget>{
-                                    0: Text('Autonomous'),
-                                    1: Text('Tele-Op'),
-                                    2: Text('Endgame')
+                                    0: PlatformText('Autonomous'),
+                                    1: PlatformText('Tele-Op'),
+                                    2: PlatformText('Endgame')
                                   },
                                   onValueChanged: (int? x) {
                                     setState(
@@ -516,7 +516,7 @@ class _MatchView extends State<MatchView> {
       children: [
         SizedBox(
           child: PlatformButton(
-            child: Text(
+            child: PlatformText(
               _match?.red?.team1?.number ?? '?',
               style: TextStyle(
                 color: _selectedTeam == _match?.red?.team1
@@ -541,7 +541,7 @@ class _MatchView extends State<MatchView> {
         ),
         SizedBox(
           child: PlatformButton(
-            child: Text(
+            child: PlatformText(
               _match?.red?.team2?.number ?? '?',
               style: TextStyle(
                 color: _selectedTeam == _match?.red?.team2
@@ -565,7 +565,7 @@ class _MatchView extends State<MatchView> {
         ),
         SizedBox(
           child: PlatformButton(
-            child: Text(
+            child: PlatformText(
               _match?.blue?.team1?.number ?? '?',
               style: TextStyle(
                   color: _selectedTeam == _match?.blue?.team1
@@ -588,7 +588,7 @@ class _MatchView extends State<MatchView> {
         ),
         SizedBox(
           child: PlatformButton(
-            child: Text(
+            child: PlatformText(
               _match?.blue?.team2?.number ?? '?',
               style: TextStyle(
                   color: _selectedTeam == _match?.blue?.team2

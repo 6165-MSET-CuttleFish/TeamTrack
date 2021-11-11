@@ -93,11 +93,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
                 Row(
                   children: [
-                    Text('I have read and agree to the '),
+                    PlatformText('I have read and agree to the '),
                     TextButton(
                         onPressed: () => launch(
                             "https://msetcuttlefish.weebly.com/privacy-policy-scouting-app.html"),
-                        child: Text('terms of service')),
+                        child: PlatformText('terms of service')),
                     Spacer(),
                     PlatformSwitch(
                         value: readPrivacyPolicy,
@@ -107,19 +107,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ],
                 ),
                 PlatformButton(
-                  child: Text("Sign Up"),
+                  child: PlatformText("Sign Up"),
                   color: Colors.green,
                   onPressed: () async {
                     if (!readPrivacyPolicy) {
                       showPlatformDialog(
                         context: context,
                         builder: (context) => PlatformAlert(
-                          title: Text("Terms of Service"),
-                          content: Text(
+                          title: PlatformText("Terms of Service"),
+                          content: PlatformText(
                               "You must read and agree to the terms of service before you can sign up."),
                           actions: [
                             PlatformDialogAction(
-                              child: Text("Okay"),
+                              child: PlatformText("Okay"),
                               onPressed: () => Navigator.pop(context),
                             ),
                           ],
@@ -147,15 +147,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         showPlatformDialog(
                           context: context,
                           builder: (context) => PlatformAlert(
-                            title: Text('Error'),
-                            content: Text(
+                            title: PlatformText('Error'),
+                            content: PlatformText(
                               s ?? 'Something went wrong',
                               style: Theme.of(context).textTheme.bodyText1,
                             ),
                             actions: [
                               PlatformDialogAction(
                                 isDefaultAction: true,
-                                child: Text('Okay'),
+                                child: PlatformText('Okay'),
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                 },

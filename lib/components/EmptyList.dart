@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:teamtrack/components/PlatformGraphics.dart';
 
 class EmptyList extends StatelessWidget {
   const EmptyList({Key? key}) : super(key: key);
@@ -12,7 +13,7 @@ class EmptyList extends StatelessWidget {
             Icon(
               Icons.hourglass_empty_rounded,
             ),
-            Text(
+            PlatformText(
               "No Data",
               style: Theme.of(context).textTheme.bodyText2,
             )

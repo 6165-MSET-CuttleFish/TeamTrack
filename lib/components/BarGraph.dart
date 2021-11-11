@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:teamtrack/components/PlatformGraphics.dart';
 
 class BarGraph extends StatelessWidget {
   BarGraph({
@@ -31,7 +32,7 @@ class BarGraph extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(title, style: Theme.of(context).textTheme.caption),
+          PlatformText(title, style: Theme.of(context).textTheme.caption),
           Padding(
             padding: EdgeInsets.all(2),
           ),
@@ -58,7 +59,7 @@ class BarGraph extends StatelessWidget {
                   color: _colorSelect(val, max),
                 ),
                 child: Center(
-                  child: Text(
+                  child: PlatformText(
                     percentage != 0 ? percentage.toString() + '%' : '',
                     style: GoogleFonts.gugi(
                       textStyle: TextStyle(
@@ -74,7 +75,7 @@ class BarGraph extends StatelessWidget {
           Padding(
             padding: EdgeInsets.all(2),
           ),
-          Text(val.toInt().toString(),
+          PlatformText(val.toInt().toString(),
               style: Theme.of(context).textTheme.caption),
         ],
       );

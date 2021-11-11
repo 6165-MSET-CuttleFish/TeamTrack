@@ -44,12 +44,12 @@ class _InboxState extends State<Inbox> {
                     showPlatformDialog(
                       context: context,
                       builder: (BuildContext context) => PlatformAlert(
-                        title: Text('Block user'),
-                        content: Text('Are you sure?'),
+                        title: PlatformText('Block user'),
+                        content: PlatformText('Are you sure?'),
                         actions: [
                           PlatformDialogAction(
                             isDefaultAction: true,
-                            child: Text('Cancel'),
+                            child: PlatformText('Cancel'),
                             onPressed: () {
                               Navigator.of(context).pop();
                             },
@@ -57,7 +57,7 @@ class _InboxState extends State<Inbox> {
                           PlatformDialogAction(
                             isDefaultAction: false,
                             isDestructive: true,
-                            child: Text('Confirm'),
+                            child: PlatformText('Confirm'),
                             onPressed: () async {
                               await firebaseFirestore.runTransaction(
                                 (transaction) async {
@@ -111,18 +111,18 @@ class _InboxState extends State<Inbox> {
                           color: Theme.of(context).colorScheme.primary,
                         ),
                       ),
-                      Text(e.gameName.spaceBeforeCapital())
+                      PlatformText(e.gameName.spaceBeforeCapital())
                     ],
                   ),
                   title: Column(
                     children: [
-                      Text(
+                      PlatformText(
                         e.name,
                       ),
-                      Text(
+                      PlatformText(
                         e.senderName ?? "Guest",
                       ),
-                      Text(
+                      PlatformText(
                         e.senderEmail ?? "Suspicious Email",
                         style: TextStyle(fontSize: 12),
                       )
@@ -140,18 +140,18 @@ class _InboxState extends State<Inbox> {
                           showPlatformDialog(
                             context: context,
                             builder: (_) => PlatformAlert(
-                              title: Text('Accept Event'),
-                              content: Text('Are you sure?'),
+                              title: PlatformText('Accept Event'),
+                              content: PlatformText('Are you sure?'),
                               actions: [
                                 PlatformDialogAction(
                                   isDefaultAction: true,
-                                  child: Text('Cancel'),
+                                  child: PlatformText('Cancel'),
                                   onPressed: () {
                                     Navigator.of(context).pop();
                                   },
                                 ),
                                 PlatformDialogAction(
-                                  child: Text('Confirm'),
+                                  child: PlatformText('Confirm'),
                                   onPressed: () async {
                                     await firebaseFirestore.runTransaction(
                                       (transaction) async {
@@ -207,19 +207,19 @@ class _InboxState extends State<Inbox> {
                           showPlatformDialog(
                             context: context,
                             builder: (_) => PlatformAlert(
-                              title: Text('Delete Event from Inbox'),
-                              content: Text('Are you sure?'),
+                              title: PlatformText('Delete Event from Inbox'),
+                              content: PlatformText('Are you sure?'),
                               actions: [
                                 PlatformDialogAction(
                                   isDefaultAction: true,
-                                  child: Text('Cancel'),
+                                  child: PlatformText('Cancel'),
                                   onPressed: () {
                                     Navigator.of(context).pop();
                                   },
                                 ),
                                 PlatformDialogAction(
                                   isDestructive: true,
-                                  child: Text('Confirm'),
+                                  child: PlatformText('Confirm'),
                                   onPressed: () async {
                                     await firebaseFirestore.runTransaction(
                                       (transaction) async {

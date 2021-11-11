@@ -2,6 +2,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:teamtrack/components/PFP.dart';
+import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/functions/Extensions.dart';
 
@@ -21,10 +22,10 @@ class _PermissionsState extends State<Permissions> {
             .map(
               (user) => ListTile(
                 leading: PFP(user: user),
-                title: Text(
+                title: PlatformText(
                   user.displayName ?? "Unknown",
                 ),
-                subtitle: Text(
+                subtitle: PlatformText(
                   user.email ?? "Unknown",
                 ),
                 trailing: DropdownButton<Role>(
@@ -32,7 +33,7 @@ class _PermissionsState extends State<Permissions> {
                   items: Role.values
                       .map(
                         (e) => DropdownMenuItem<Role>(
-                          child: Text(
+                          child: PlatformText(
                             e.name(),
                           ),
                           value: e,
