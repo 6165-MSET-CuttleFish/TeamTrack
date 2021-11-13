@@ -53,6 +53,7 @@ class DataModel {
   Future<HttpsCallableResult<dynamic>> shareEvent({
     required String name,
     required String email,
+    required TeamTrackUser author,
     required String authorEmail,
     required String id,
     required String type,
@@ -66,6 +67,7 @@ class DataModel {
         'email': email,
         'name': name,
         'id': id,
+        'author': author.toJson(),
         'authorEmail': authorEmail,
         'type': type,
         'authorName': authorName,
@@ -102,13 +104,13 @@ class TeamTrackUser {
         displayName = json['name'],
         watchingTeam = json['watchingTeam'],
         photoURL = json['photoURL'];
-  TeamTrackUser.fromUser(User user)
+  TeamTrackUser.fromUser(User? user)
       : role = Role.viewer,
-        email = user.email,
-        displayName = user.displayName,
-        photoURL = user.photoURL,
-        id = user.uid;
-  Map<String, dynamic> toJson() => {
+        email = user?.email,
+        displayName = user?.displayName,
+        photoURL = user?.photoURL,
+        id = user?.uid;
+  Map<String, String?> toJson() => {
         'role': role.toRep(),
         'email': email,
         'name': displayName,

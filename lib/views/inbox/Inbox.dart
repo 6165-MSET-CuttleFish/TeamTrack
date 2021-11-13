@@ -67,11 +67,11 @@ class _InboxState extends State<Inbox> {
                                   }
                                   Map newBlocks =
                                       snapshot.data()?['blockedUsers'];
-                                  newBlocks[e.senderId] = e.sender?.toJson();
+                                  newBlocks[e.sender?.id] = e.sender?.toJson();
                                   Map<String, dynamic> newInbox = snapshot
                                       .data()?["inbox"] as Map<String, dynamic>;
                                   newInbox.removeWhere((key, value) =>
-                                      value['senderID'] == e.senderId);
+                                      value['senderID'] == e.sender?.id);
                                   return transaction.update(
                                     docRef,
                                     {
@@ -120,10 +120,10 @@ class _InboxState extends State<Inbox> {
                         e.name,
                       ),
                       PlatformText(
-                        e.senderName ?? "Guest",
+                        e.sender?.displayName?? "Guest",
                       ),
                       PlatformText(
-                        e.senderEmail ?? "Suspicious Email",
+                        e.sender?.email ?? "Suspicious Email",
                         style: TextStyle(fontSize: 12),
                       )
                     ],

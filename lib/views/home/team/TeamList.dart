@@ -179,6 +179,18 @@ class TeamSearch extends SearchDelegate<String?> {
         event: event,
         max: max,
         sortMode: sortMode,
+        onTap: () async {
+          close(context, null);
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => TeamView(
+                team: suggestionList[index],
+                event: event,
+              ),
+            ),
+          );
+        },
       ),
     );
   }

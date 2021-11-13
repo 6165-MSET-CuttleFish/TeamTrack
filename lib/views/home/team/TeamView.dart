@@ -224,7 +224,11 @@ class TeamViewState extends State<TeamView> {
                                       color: Color.fromRGBO(255, 166, 0, 1),
                                     ),
                                   ),
-                                  child: PlatformText('Alliance Total'),
+                                  child: PlatformText(
+                                    widget.event.type == EventType.remote
+                                        ? 'Total'
+                                        : 'Alliance Total',
+                                  ),
                                 ),
                                 if (widget.event.type != EventType.remote)
                                   FlatButton(
@@ -364,7 +368,9 @@ class TeamViewState extends State<TeamView> {
                       Padding(
                         padding: const EdgeInsets.only(top: 20, bottom: 10),
                         child: PlatformText(
-                          'Subtotal',
+                          widget.event.type == EventType.remote
+                              ? 'Total'
+                              : 'Subtotal',
                           style: Theme.of(context).textTheme.bodyText1,
                         ),
                       ),
