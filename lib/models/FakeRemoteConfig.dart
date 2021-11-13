@@ -9,7 +9,7 @@ class FakeRemoteConfig {
   RemoteConfig _remoteConfig = RemoteConfig.instance;
 
   Future<void> fetchAndActivate() {
-    if (NewPlatform.isWeb())
+    if (NewPlatform.isWeb)
       return firebaseDatabase
           .reference()
           .child('config')
@@ -22,7 +22,7 @@ class FakeRemoteConfig {
   }
 
   String getString(String key) {
-    if (NewPlatform.isWeb()) {
+    if (NewPlatform.isWeb) {
       final returnVal = _config?[key]['defaultValue']['value'];
       final x = json.decode(json.encode(returnVal?.replaceAll("/", "")));
       return x;

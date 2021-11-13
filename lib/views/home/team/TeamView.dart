@@ -44,7 +44,7 @@ class TeamViewState extends State<TeamView> {
   final generalColor = Color.fromRGBO(230, 30, 213, 1);
   @override
   Widget build(BuildContext context) => Scaffold(
-        bottomNavigationBar: NewPlatform.isIOS()
+        bottomNavigationBar: NewPlatform.isIOS
             ? SafeArea(
                 child: CupertinoSlidingSegmentedControl(
                   groupValue: _dice,
@@ -136,7 +136,7 @@ class TeamViewState extends State<TeamView> {
               ),
         appBar: AppBar(
           title: Column(
-            crossAxisAlignment: NewPlatform.isAndroid()
+            crossAxisAlignment: NewPlatform.isAndroid
                 ? CrossAxisAlignment.start
                 : CrossAxisAlignment.center,
             children: [
@@ -323,7 +323,7 @@ class TeamViewState extends State<TeamView> {
                           child: PlatformText('Matches'),
                         ),
                       ),
-                      if (NewPlatform.isIOS())
+                      if (NewPlatform.isIOS)
                         Padding(
                           padding: EdgeInsets.all(5),
                         ),

@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:firebase_database/firebase_database.dart' as Db;
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -14,46 +15,28 @@ import 'package:teamtrack/functions/Extensions.dart';
 import 'dart:io' show Platform;
 
 class NewPlatform {
-  static bool isIOS() {
-    try {
-      return Platform.isIOS;
-    } catch (e) {
-      return false;
-    }
-  }
+  static bool get isIOS => kIsWeb ? false : Platform.isIOS;
 
-  static bool isAndroid() {
-    try {
-      return Platform.isAndroid;
-    } catch (e) {
-      return true;
-    }
-  }
+  static bool get isAndroid => kIsWeb ? false : Platform.isAndroid;
 
-  static bool isWeb() {
-    try {
-      Platform.isAndroid;
-    } catch (e) {
-      return true;
-    }
-    return false;
-  }
+  static bool get isWeb => kIsWeb;
 }
 
-void showPlatformDialog({
+Future<void> showPlatformDialog({
   required BuildContext context,
   required Widget Function(BuildContext) builder,
 }) {
-  if (NewPlatform.isIOS()) {
-    showCupertinoDialog(
+  if (NewPlatform.isIOS) {
+    return showCupertinoDialog(
         context: context, builder: builder, barrierDismissible: false);
   } else {
-    showDialog(context: context, builder: builder, barrierDismissible: true);
+    return showDialog(
+        context: context, builder: builder, barrierDismissible: true);
   }
 }
 
 PageRoute platformPageRoute({required Widget Function(BuildContext) builder}) {
-  if (NewPlatform.isIOS()) {
+  if (NewPlatform.isIOS) {
     return CupertinoPageRoute(builder: builder);
   }
   return MaterialPageRoute(builder: builder);
@@ -72,7 +55,7 @@ abstract class PlatformWidget<C extends Widget, M extends Widget,
   @override
   Widget build(BuildContext context) {
     try {
-      if (NewPlatform.isIOS()) {
+      if (NewPlatform.isIOS) {
         return buildCupertinoWidget(context);
       } else {
         return buildMaterialWidget(context);

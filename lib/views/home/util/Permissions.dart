@@ -17,7 +17,7 @@ class Permissions extends StatefulWidget {
 
 class _PermissionsState extends State<Permissions> {
   @override
-  Widget build(BuildContext context) => Column(
+  Widget build(BuildContext context) => ListView(
         children: widget.users
             .map(
               (user) => ListTile(

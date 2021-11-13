@@ -18,7 +18,7 @@ Future<void> main() async {
   await remoteConfig.fetchAndActivate();
   Statics.gameName = remoteConfig.getString("gameName");
   await dataModel.restoreEvents();
-  if (!NewPlatform.isWeb()) {
+  if (!NewPlatform.isWeb) {
     var notification = PushNotifications();
     await messaging.requestPermission(
       alert: true,
@@ -66,7 +66,7 @@ class TeamTrack extends StatefulWidget {
 
 class _TeamTrack extends State<TeamTrack> {
   final lightTheme = ThemeData(
-    splashColor: NewPlatform.isAndroid() ? Colors.cyan : Colors.transparent,
+    splashColor: NewPlatform.isAndroid ? Colors.cyan : Colors.transparent,
     visualDensity: VisualDensity.adaptivePlatformDensity,
     textTheme: TextTheme(
       bodyText1: GoogleFonts.gugi(),
@@ -91,7 +91,7 @@ class _TeamTrack extends State<TeamTrack> {
     ),
     backgroundColor: Colors.black,
     splashColor:
-        NewPlatform.isAndroid() ? Colors.deepPurple : Colors.transparent,
+        NewPlatform.isAndroid ? Colors.deepPurple : Colors.transparent,
     shadowColor: Colors.white,
     brightness: Brightness.dark,
     canvasColor: Colors.black,

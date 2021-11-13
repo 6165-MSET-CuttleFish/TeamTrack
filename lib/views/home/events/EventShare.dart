@@ -3,6 +3,7 @@ import 'package:firebase_database/firebase_database.dart' as Database;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttercontactpicker/fluttercontactpicker.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/functions/Extensions.dart';
@@ -24,6 +25,7 @@ class EventShare extends StatefulWidget {
 Role shareRole = Role.editor;
 
 class _EventShareState extends State<EventShare> {
+  EmailContact? _emailContact;
   @override
   Widget build(BuildContext context) => StreamBuilder<Database.Event>(
         stream: widget.event.getRef()?.onValue,
@@ -36,42 +38,86 @@ class _EventShareState extends State<EventShare> {
               context,
             );
           }
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              PlatformPicker<Role>(
-                value: shareRole,
-                onSelectedItemChanged: (newValue) {
-                  HapticFeedback.lightImpact();
-                  try {
-                    setState(() => shareRole = newValue ?? Role.editor);
-                  } catch (e) {
-                    setState(() => shareRole = Role.values[newValue]);
-                  }
-                },
-                items: Role.values
-                    .map(
-                      (e) => PlatformText(
-                        e.name(),
-                        style: Theme.of(context).textTheme.bodyText1,
+          return Scaffold(
+            appBar: AppBar(
+              title: PlatformText(
+                'Share Event',
+              ),
+              backgroundColor: Theme.of(context).colorScheme.primary,
+            ),
+            body: Column(
+              children: [
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: _onPressed,
+                      tooltip: 'Select Contact',
+                      icon: Icon(Icons.contact_mail),
+                    ),
+                    Expanded(
+                      child: PlatformTextField(
+                        textInputAction: TextInputAction.done,
+                        placeholder: 'Email',
+                        keyboardType: TextInputType.emailAddress,
+                        controller: widget.emailController,
+                        autoCorrect: false,
                       ),
-                    )
-                    .toList(),
-                arr: Role.values,
-              ),
-              PlatformTextField(
-                textInputAction: TextInputAction.done,
-                placeholder: widget.event.shared ? 'Email' : '(Optional) Email',
-                keyboardType: TextInputType.emailAddress,
-                controller: widget.emailController,
-                autoCorrect: false,
-              ),
-              Permissions(
-                users: widget.event.users,
-                ref: widget.event.getRef()?.child('Permissions'),
-              ),
-            ],
+                    ),
+                  ],
+                ),
+                PlatformPicker<Role>(
+                  value: shareRole,
+                  onSelectedItemChanged: (newValue) {
+                    HapticFeedback.lightImpact();
+                    try {
+                      setState(() => shareRole = newValue ?? Role.editor);
+                    } catch (e) {
+                      setState(() => shareRole = Role.values[newValue]);
+                    }
+                  },
+                  items: Role.values
+                      .map(
+                        (e) => PlatformText(
+                          e.name(),
+                          style: Theme.of(context).textTheme.bodyText1,
+                        ),
+                      )
+                      .toList(),
+                  arr: Role.values,
+                ),
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  child: PlatformButton(
+                    child: PlatformText('Share'),
+                    color: Colors.green,
+                    onPressed: () async {
+                      HapticFeedback.lightImpact();
+                      if (widget.event.shared) {
+                        if (widget.emailController.text.trim().isNotEmpty) {
+                          await dataModel.shareEvent(
+                            event: widget.event,
+                            email: widget.emailController.text.trim(),
+                            role: shareRole,
+                          );
+                        }
+                      }
+                      Navigator.pop(context);
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: Permissions(
+                    users: widget.event.users,
+                    ref: widget.event.getRef()?.child('Permissions'),
+                  ),
+                ),
+              ],
+            ),
           );
         },
       );
+  void _onPressed() async {
+    _emailContact = await FlutterContactPicker.pickEmailContact();
+    widget.emailController.text = _emailContact?.email?.email ?? '';
+  }
 }

@@ -180,7 +180,7 @@ extension extOp on OpModeType {
 
 extension DiceExtension on Dice {
   String toVal(String gameName) {
-    if (NewPlatform.isWeb()) {
+    if (NewPlatform.isWeb) {
       switch (this) {
         case Dice.one:
           return "1";

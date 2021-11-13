@@ -51,27 +51,19 @@ class DataModel {
   }
 
   Future<HttpsCallableResult<dynamic>> shareEvent({
-    required String name,
+    required Event event,
     required String email,
-    required TeamTrackUser author,
-    required String authorEmail,
-    required String id,
-    required String type,
-    required String authorName,
-    required String gameName,
     required Role role,
   }) async {
     final HttpsCallable callable = functions.httpsCallable('shareEvent');
     return callable.call(
       {
         'email': email,
-        'name': name,
-        'id': id,
-        'author': author.toJson(),
-        'authorEmail': authorEmail,
-        'type': type,
-        'authorName': authorName,
-        'gameName': gameName,
+        'name': event.name,
+        'id': event.id,
+        'author': event.author?.toJson(),
+        'type': event.type.toString(),
+        'gameName': event.gameName,
         'role': role.toRep(),
       },
     );

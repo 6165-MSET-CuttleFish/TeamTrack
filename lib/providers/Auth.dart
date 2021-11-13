@@ -94,7 +94,7 @@ class AuthenticationService {
   }
 
   Future<UserCredential?> signInWithGoogle() async {
-    if (NewPlatform.isWeb()) {
+    if (NewPlatform.isWeb) {
       GoogleAuthProvider googleProvider = GoogleAuthProvider();
       googleProvider
           .addScope('https://www.googleapis.com/auth/contacts.readonly');

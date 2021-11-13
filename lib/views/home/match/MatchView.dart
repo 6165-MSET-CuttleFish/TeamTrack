@@ -434,7 +434,7 @@ class _MatchView extends State<MatchView> {
                               ],
                             ),
                           ),
-                          if (NewPlatform.isIOS())
+                          if (NewPlatform.isIOS)
                             SizedBox(
                                 width: MediaQuery.of(context).size.width,
                                 child: CupertinoSlidingSegmentedControl(
@@ -453,7 +453,7 @@ class _MatchView extends State<MatchView> {
                                     );
                                   },
                                 )),
-                          if (NewPlatform.isAndroid())
+                          if (NewPlatform.isAndroid)
                             SizedBox(
                               height: 50,
                               child: TabBar(
@@ -479,7 +479,7 @@ class _MatchView extends State<MatchView> {
                             height: 5,
                             thickness: 2,
                           ),
-                          if (NewPlatform.isAndroid())
+                          if (NewPlatform.isAndroid)
                             Expanded(
                               child: TabBarView(
                                 children: [
@@ -495,7 +495,7 @@ class _MatchView extends State<MatchView> {
                                 ],
                               ),
                             ),
-                          if (NewPlatform.isIOS())
+                          if (NewPlatform.isIOS)
                             Expanded(
                               child: viewSelect(),
                             )

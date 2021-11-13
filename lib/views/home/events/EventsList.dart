@@ -458,7 +458,7 @@ class _EventsList extends State<EventsList> {
   String? _newName;
 
   void _onPressed() {
-    if (NewPlatform.isIOS())
+    if (NewPlatform.isIOS)
       showCupertinoModalPopup(
         context: context,
         builder: (context) => CupertinoActionSheet(
@@ -602,84 +602,65 @@ class _EventsList extends State<EventsList> {
       );
   TextEditingController _emailController = TextEditingController();
   void _onShare(Event e) {
-    if (!(context.read<User?>()?.isAnonymous ?? true))
-      showPlatformDialog(
-        context: context,
-        builder: (context) => PlatformAlert(
-          title: PlatformText(e.shared ? 'Share Event' : 'Upload Event'),
-          content: EventShare(
-            emailController: _emailController,
-            event: e,
-          ),
-          actions: [
-            PlatformDialogAction(
-              child: PlatformText('Cancel'),
-              isDefaultAction: true,
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+    if (!(context.read<User?>()?.isAnonymous ?? true)) {
+      if (!e.shared) {
+        showPlatformDialog(
+          context: context,
+          builder: (context) => PlatformAlert(
+            title: PlatformText('Upload Event'),
+            content: PlatformText(
+              'Your event will still be private',
             ),
-            PlatformDialogAction(
-              child: PlatformText(e.shared ? 'Share' : 'Upload'),
-              onPressed: () async {
-                showPlatformDialog(
-                  context: context,
-                  builder: (_) => PlatformAlert(
-                    content: Center(child: PlatformProgressIndicator()),
-                    actions: [
-                      PlatformDialogAction(
-                        child: PlatformText('Back'),
-                        isDefaultAction: true,
-                        onPressed: () => Navigator.of(context).pop(),
-                      ),
-                    ],
-                  ),
-                );
-                final user = context.read<User?>();
-                if (!e.shared) {
-                  var json = e.toJson();
-                  json['shared'] = true;
-                  if (user?.uid != null)
-                    json['Permissions'] = {
-                      user?.uid: {
-                        "role": Role.admin.toRep(),
-                        "name": user?.displayName,
-                        "email": user?.email,
-                      },
-                    };
+            actions: [
+              PlatformDialogAction(
+                child: PlatformText('Cancel'),
+                isDefaultAction: true,
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              PlatformDialogAction(
+                child: PlatformText('Upload'),
+                onPressed: () async {
+                  showPlatformDialog(
+                    context: context,
+                    builder: (_) => PlatformAlert(
+                      content: Center(child: PlatformProgressIndicator()),
+                      actions: [
+                        PlatformDialogAction(
+                          child: PlatformText('Back'),
+                          isDefaultAction: true,
+                          onPressed: () => Navigator.of(context).pop(),
+                        ),
+                      ],
+                    ),
+                  );
+                  e.shared = true;
+                  final json = e.toJson();
                   await firebaseDatabase
                       .reference()
                       .child("Events/${e.gameName}/${e.id}")
                       .set(json);
                   dataModel.events.remove(e);
                   setState(() => dataModel.saveEvents);
-                }
-                if (_emailController.text.trim().isNotEmpty) {
-                  await firebaseDatabase
-                      .reference()
-                      .child("Events/${e.gameName}/${e.id}/Permissions")
-                      .set(true);
-                  // await dataModel.shareEvent(
-                  //   name: e.name,
-                  //   authorName: e.author?.displayName ?? '',
-                  //   authorEmail: e.author?.email ?? '',
-                  //   author: e.author ?? TeamTrackUser.fromUser(user),
-                  //   id: e.id,
-                  //   type: e.type.toString(),
-                  //   email: _emailController.text.trim(),
-                  //   gameName: e.gameName,
-                  //   role: shareRole,
-                  // );
-
-                }
-                _emailController.clear();
-                Navigator.of(context).pop();
-              },
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        );
+      } else {
+        Navigator.of(context).push(
+          platformPageRoute(
+            builder: (context) => EventShare(
+              emailController: _emailController,
+              event: e,
             ),
-          ],
-        ),
-      );
-    else
+          ),
+        );
+      }
+    } else {
       showPlatformDialog(
         context: context,
         builder: (context) => PlatformAlert(
@@ -696,6 +677,7 @@ class _EventsList extends State<EventsList> {
           ],
         ),
       );
+    }
   }
 
   void onDelete(Event e) async {
