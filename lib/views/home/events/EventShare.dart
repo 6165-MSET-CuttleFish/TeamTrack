@@ -52,7 +52,8 @@ class _EventShareState extends State<EventShare> {
                     IconButton(
                       onPressed: _onPressed,
                       tooltip: 'Select Contact',
-                      icon: Icon(Icons.contact_mail),
+                      icon: Icon(Icons.contacts),
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                     Expanded(
                       child: PlatformTextField(
@@ -85,24 +86,27 @@ class _EventShareState extends State<EventShare> {
                       .toList(),
                   arr: Role.values,
                 ),
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  child: PlatformButton(
-                    child: PlatformText('Share'),
-                    color: Colors.green,
-                    onPressed: () async {
-                      HapticFeedback.lightImpact();
-                      if (widget.event.shared) {
-                        if (widget.emailController.text.trim().isNotEmpty) {
-                          await dataModel.shareEvent(
-                            event: widget.event,
-                            email: widget.emailController.text.trim(),
-                            role: shareRole,
-                          );
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    width: MediaQuery.of(context).size.width,
+                    child: PlatformButton(
+                      child: PlatformText('Share'),
+                      color: Colors.green,
+                      onPressed: () async {
+                        HapticFeedback.lightImpact();
+                        if (widget.event.shared) {
+                          if (widget.emailController.text.trim().isNotEmpty) {
+                            await dataModel.shareEvent(
+                              event: widget.event,
+                              email: widget.emailController.text.trim(),
+                              role: shareRole,
+                            );
+                          }
                         }
-                      }
-                      Navigator.pop(context);
-                    },
+                        Navigator.pop(context);
+                      },
+                    ),
                   ),
                 ),
                 Expanded(

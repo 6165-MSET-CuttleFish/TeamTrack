@@ -433,7 +433,10 @@ class _EventsList extends State<EventsList> {
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                PlatformText(e.name),
+                PlatformText(
+                  e.name,
+                  style: Theme.of(context).textTheme.bodyText1,
+                ),
                 PlatformText(
                   e.gameName.spaceBeforeCapital(),
                   style: Theme.of(context).textTheme.caption,

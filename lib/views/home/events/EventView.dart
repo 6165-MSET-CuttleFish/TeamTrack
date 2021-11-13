@@ -101,8 +101,9 @@ class _EventView extends State<EventView> {
                           event: widget.event,
                         )
                       : MatchSearch(
-                          matches: widget.event.getSortedMatches(true),
+                          matches: widget.event.getSortedMatches(ascending),
                           event: widget.event,
+                          ascending: ascending,
                         ),
                 );
               },

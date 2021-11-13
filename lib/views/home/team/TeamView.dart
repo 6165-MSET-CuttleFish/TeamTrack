@@ -11,7 +11,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:teamtrack/views/home/team/CheckList.dart';
-import 'package:teamtrack/views/home/change/ChangeList.dart';
 import 'package:uuid/uuid.dart';
 import 'package:firebase_database/firebase_database.dart' as Database;
 import 'dart:convert';
@@ -157,18 +156,18 @@ class TeamViewState extends State<TeamView> {
                 builder: (context) => CheckList(state: this),
               ),
             ),
-            IconButton(
-              icon: Icon(Icons.list_alt),
-              tooltip: 'Robot Iterations',
-              onPressed: () => Navigator.of(context).push(
-                platformPageRoute(
-                  builder: (context) => ChangeList(
-                    team: _team,
-                    event: widget.event,
-                  ),
-                ),
-              ),
-            ),
+            // IconButton(
+            //   icon: Icon(Icons.list_alt),
+            //   tooltip: 'Robot Iterations',
+            //   onPressed: () => Navigator.of(context).push(
+            //     platformPageRoute(
+            //       builder: (context) => ChangeList(
+            //         team: _team,
+            //         event: widget.event,
+            //       ),
+            //     ),
+            //   ),
+            // ),
           ],
         ),
         body: StreamBuilder<Database.Event>(

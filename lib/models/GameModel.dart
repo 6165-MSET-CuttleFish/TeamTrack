@@ -514,6 +514,7 @@ class Match {
   String id = '';
   List<TeamTrackUser>? activeUsers;
   Timestamp timeStamp = Timestamp.now();
+
   Match(this.red, this.blue, this.type) {
     id = Uuid().v4();
     timeStamp = Timestamp.now();
@@ -523,6 +524,7 @@ class Match {
     blue?.id = id;
     activeUsers = [];
   }
+
   static Match defaultMatch(EventType type) {
     return Match(
       Alliance(Team('1', 'Alpha'), Team('2', 'Beta'), type, ""),
@@ -538,8 +540,16 @@ class Match {
     } else if ((blue?.team1?.equals(team) ?? false) ||
         (blue?.team2?.equals(team) ?? false)) {
       return blue;
-    } else {
-      return null;
+    }
+  }
+
+  Alliance? opposingAlliance(Team? team) {
+    if ((red?.team1?.equals(team) ?? false) ||
+        (red?.team2?.equals(team) ?? false)) {
+      return blue;
+    } else if ((blue?.team1?.equals(team) ?? false) ||
+        (blue?.team2?.equals(team) ?? false)) {
+      return red;
     }
   }
 

@@ -37,7 +37,10 @@ class MatchRow extends StatelessWidget {
 
   @override
   Widget build(context) {
-    if (event.type == EventType.remote) {}
+    final alliance = match.alliance(team);
+    final opposing = match.opposingAlliance(team);
+    final allianceTotal = alliance?.allianceTotal(true);
+    final opposingTotal = opposing?.allianceTotal(true);
     return Container(
       decoration: BoxDecoration(
         border: Border.all(
@@ -49,9 +52,24 @@ class MatchRow extends StatelessWidget {
         leading: PlatformText(index.toString()),
         title: matchSummary(context),
         trailing: team != null ? null : scoreDisplay(),
+        tileColor: event.type != EventType.remote
+            ? _getColor(allianceTotal ?? 0, opposingTotal ?? 0)
+            : null,
         onTap: onTap,
       ),
     );
+  }
+
+  Color? _getColor(int allianceScore, int opponentScore) {
+    if (allianceScore > opponentScore) {
+      return Colors.green.withOpacity(
+          (((allianceScore - opponentScore) / allianceScore) * 0.7)
+              .clamp(0.2, 0.7));
+    } else if (allianceScore < opponentScore) {
+      return Colors.red.withOpacity(
+          (((opponentScore - allianceScore) / opponentScore) * 0.7)
+              .clamp(0.2, 0.7));
+    }
   }
 
   Widget matchSummary(BuildContext context) => team != null

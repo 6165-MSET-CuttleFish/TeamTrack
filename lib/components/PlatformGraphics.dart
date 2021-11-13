@@ -448,7 +448,7 @@ class PlatformPicker<T>
     return CupertinoPicker(
       itemExtent: 40,
       onSelectedItemChanged: onSelectedItemChanged,
-      children: items,
+      children: items.map((i) => Center(child: i)).toList(),
     );
   }
 

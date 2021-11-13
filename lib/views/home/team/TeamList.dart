@@ -168,7 +168,7 @@ class TeamSearch extends SearchDelegate<String?> {
               (q) => q.number.contains(query),
             ),
             ...teams.where(
-              (q) => q.name.contains(query),
+              (q) => q.name.toLowerCase().contains(query.toLowerCase()),
             ),
           ].toList()
         : teams;
