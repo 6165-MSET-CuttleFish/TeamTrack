@@ -120,8 +120,7 @@ export const nativizeEvent = functions.database
         events[event.id] = {
           "name": event.name,
           "sendDate": admin.database.ServerValue.TIMESTAMP,
-          "authorName": event.authorName,
-          "authorEmail": event.authorEmail,
+          "author": event.author,
           "id": event.id,
           "type": event.type,
           "gameName": event.gameName,
