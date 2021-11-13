@@ -60,16 +60,15 @@ extension Arithmetic on Iterable<num?> {
   }
 
   double median() {
-    if (this.length < 2) return 0;
+    if (this.length == 0) return 0;
     final arr = this.sorted();
     int index = this.length ~/ 2;
-    if (this.length % 2 == 0)
-      return [arr[(index - 1).clamp(0, 999)], arr[index]].mean();
+    if (this.length % 2 == 0) return [arr[index - 1], arr[index]].mean();
     return arr[index];
   }
 
   double q1() {
-    if (this.length < 2) return 0;
+    if (this.length < 3) return 0;
     final arr = this.sorted();
     if (this.length % 2 == 0) {
       return arr.sublist(0, (this.length ~/ 2) - 1).median();
@@ -80,9 +79,12 @@ extension Arithmetic on Iterable<num?> {
   double iqr() => q3() - q1();
 
   double q3() {
-    if (this.length < 2) return 0;
+    if (this.length < 3) return 0;
     final arr = this.sorted();
-    return arr.sublist(this.length ~/ 2).median();
+    if (this.length % 2 == 0) {
+      return arr.sublist(this.length ~/ 2).median();
+    }
+    return arr.sublist(this.length ~/ 2 + 1).median();
   }
 
   double maxValue() =>
@@ -91,7 +93,6 @@ extension Arithmetic on Iterable<num?> {
       this.length != 0 ? this.map((e) => e?.toDouble() ?? 0).reduce(min) : 0;
 
   List<double> sorted() {
-    if (this.length < 2) return [];
     List<double> val = [];
     for (num? i in this) val.add(i?.toDouble() ?? 0);
     val.sort((a, b) => a.compareTo(b));
@@ -415,10 +416,7 @@ extension more on Iterable<ScoreDivision> {
   double? percentIncrease() {
     final sorted = this.toList();
     sorted.sort((a, b) => a.timeStamp.toDate().compareTo(b.timeStamp.toDate()));
-    if (sorted.length < 2 || sorted[this.length - 2].total() == 0)
-      return null;
-    return sorted.last
-        .total()
-        .percentIncrease(sorted[this.length - 2].total());
+    if (sorted.length < 2 || sorted[this.length - 2].total() == 0) return null;
+    return sorted.last.total().percentIncrease(sorted[this.length - 2].total());
   }
 }
