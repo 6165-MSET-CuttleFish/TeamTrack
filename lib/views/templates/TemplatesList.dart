@@ -39,6 +39,7 @@ class _TemplatesListState extends State<TemplatesList> {
 
   Widget build(context) {
     return Stack(
+      alignment: Alignment.bottomCenter,
       children: [
         GoogleMap(
           initialCameraPosition:
@@ -50,28 +51,29 @@ class _TemplatesListState extends State<TemplatesList> {
           markers: markers,
           zoomControlsEnabled: false,
         ),
-        Positioned(
-            bottom: 50,
-            right: 10,
-            child: FlatButton(
-              child: Icon(Icons.pin_drop, color: Colors.white),
-              color: Colors.green,
-              onPressed: _addGeoPoint,
-            )),
-        Positioned(
-          bottom: 50,
-          left: 10,
-          child: PlatformSlider(
-            min: 100.0,
-            max: 500.0,
-            divisions: 4,
-            value: radius.value,
-            label: 'Radius ${radius.value}km',
-            activeColor: Colors.green,
-            inactiveColor: Colors.green.withOpacity(0.2),
-            onChanged: _updateQuery,
+        Padding(
+          padding: const EdgeInsets.only(bottom: 60.0, left: 20),
+          child: Row(
+            children: [
+              PlatformSlider(
+                min: 100.0,
+                max: 500.0,
+                divisions: 4,
+                value: radius.value,
+                label: 'Radius ${radius.value} km',
+                activeColor: Colors.green,
+                inactiveColor: Colors.green.withOpacity(0.2),
+                onChanged: _updateQuery,
+              ),
+              IconButton(
+                icon: Icon(Icons.pin_drop, color: Colors.white),
+                color: Colors.green,
+                splashColor: Colors.green,
+                onPressed: _addGeoPoint,
+              ),
+            ],
           ),
-        )
+        ),
       ],
     );
   }
@@ -88,8 +90,8 @@ class _TemplatesListState extends State<TemplatesList> {
   Future<DocumentReference> _addGeoPoint() async {
     var pos = await mapController.getLatLng(
       ScreenCoordinate(
-        x: -MediaQuery.of(context).size.height ~/ 2,
-        y: -MediaQuery.of(context).size.width ~/ 2,
+        x: MediaQuery.of(context).size.height ~/ 2,
+        y: MediaQuery.of(context).size.width ~/ 2,
       ),
     );
     GeoFirePoint point = geo.point(
@@ -99,7 +101,7 @@ class _TemplatesListState extends State<TemplatesList> {
     final newEvent = Event.fromJson(Event(
       name: "Test Event",
       type: EventType.local,
-      gameName: "FreightFrenzy",
+      gameName: Statics.gameName,
     ).toJson());
     newEvent.shared = true;
     var newEventJson = newEvent.toJson();
@@ -138,13 +140,24 @@ class _TemplatesListState extends State<TemplatesList> {
     // subscribe to query
     subscription = radius.switchMap((rad) {
       return geo.collection(collectionRef: ref).within(
-          center: center, radius: rad, field: 'position', strictMode: true);
+            center: center,
+            radius: rad,
+            field: 'position',
+            strictMode: true,
+          );
     }).listen(_updateMarkers);
   }
 
   _updateQuery(double value) {
-    final zoom = -0.02 * value + 14.0;
-    mapController.moveCamera(CameraUpdate.zoomTo(zoom));
+    final zoomMap = {
+      100.0: 12.0,
+      200.0: 10.0,
+      300.0: 7.0,
+      400.0: 6.0,
+      500.0: 5.0
+    };
+    final zoom = zoomMap[value];
+    mapController.moveCamera(CameraUpdate.zoomTo(zoom ?? 0));
     setState(() {
       radius.add(value);
     });
