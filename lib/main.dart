@@ -73,7 +73,7 @@ class _TeamTrack extends State<TeamTrack> {
       bodyText2: GoogleFonts.gugi(),
       caption: GoogleFonts.gugi(),
       headline6: GoogleFonts.gugi(),
-      headline4: GoogleFonts.gugi(),
+      headline4: GoogleFonts.gugi(color: Colors.black),
     ),
     colorScheme: ColorScheme.light(
       primary: Colors.deepPurple,

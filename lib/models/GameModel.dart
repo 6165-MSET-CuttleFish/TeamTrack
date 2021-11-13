@@ -106,21 +106,18 @@ class Event with ClusterItem {
   }
 
   void addMatch(Match e) async {
-    await getRef()?.runTransaction((mutableData) {
-      var newMatches = mutableData.value['matches'] ?? {};
-      newMatches[e.id] = e.toJson();
-      mutableData.value['matches'] = newMatches;
+    await getRef()?.child('matches/${e.id}').set(e.toJson());
+    await getRef()?.child('teams').runTransaction((mutableData) {
       for (var team in e.getTeams()) {
         if (team != null) {
           try {
-            var ref = mutableData.value['teams'] as Map? ?? {};
+            var ref = mutableData.value as Map? ?? {};
             ref.putIfAbsent(team.number, () => team.toJson());
-
-            mutableData.value['teams'] = ref;
+            mutableData.value = ref;
           } catch (e) {
             var ref;
-            if (mutableData.value['teams'] != null) {
-              ref = List.from(mutableData.value['teams'])
+            if (mutableData.value != null) {
+              ref = List.from(mutableData.value)
                   .where((element) => element != null)
                   .toList();
             } else {
@@ -129,19 +126,18 @@ class Event with ClusterItem {
             var map = Map<String, dynamic>.fromIterable(ref,
                 key: (item) => item["number"], value: (item) => item);
             map.putIfAbsent(team.number, () => team.toJson());
-            mutableData.value['teams'] = map;
+            mutableData.value = map;
           }
           var teamIndex;
           try {
-            mutableData.value['teams'] as Map;
+            mutableData.value as Map;
             teamIndex = team.number;
           } catch (e) {
             teamIndex = int.parse(team.number);
           }
-          var ref =
-              mutableData.value['teams'][teamIndex]['scores'] as Map? ?? {};
+          var ref = mutableData.value[teamIndex]['scores'] as Map? ?? {};
           ref.putIfAbsent(e.id, () => Score(e.id, e.dice, gameName).toJson());
-          mutableData.value['teams'][teamIndex]['scores'] = ref;
+          mutableData.value[teamIndex]['scores'] = ref;
         }
       }
       return mutableData;
