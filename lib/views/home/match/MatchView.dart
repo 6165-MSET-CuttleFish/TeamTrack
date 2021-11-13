@@ -44,13 +44,16 @@ class _MatchView extends State<MatchView> {
   bool _allowView = false;
   _MatchView(this._match, Team? team, Event event) {
     _selectedAlliance = _match?.red;
-    if (team != null) {
+    if (_match == null) {
       _allowView = true;
-      _score = team.targetScore;
+      _score = team?.targetScore;
       _selectedTeam = team;
       _color = CupertinoColors.systemGreen;
     } else {
       _selectedTeam = _match?.red?.team1;
+      if (team != null) {
+        _selectedTeam = team;
+      }
       _score = _selectedTeam?.scores[_match?.id];
       if (_match?.type == EventType.remote)
         _color = CupertinoColors.systemGreen;
@@ -60,7 +63,7 @@ class _MatchView extends State<MatchView> {
   @override
   void initState() {
     super.initState();
-    if (widget.team == null) {
+    if (widget.match != null) {
       final user = AuthenticationService(firebaseAuth).getUser();
       final ttuser = widget.event.getTTUserFromUser(user);
       final ref = widget.event
@@ -92,7 +95,7 @@ class _MatchView extends State<MatchView> {
               ),
               context,
             );
-            if (widget.team == null) {
+            if (widget.match != null) {
               _match = widget.event.matches[_match?.id];
             }
             _selectedTeam = widget.event.teams[_selectedTeam?.number];
@@ -101,7 +104,7 @@ class _MatchView extends State<MatchView> {
               _selectedAlliance = _match?.red;
             else if (_color == CupertinoColors.systemBlue)
               _selectedAlliance = _match?.blue;
-            if (widget.team != null) {
+            if (widget.match == null) {
               _score = _selectedTeam?.targetScore;
             } else {
               _score = _selectedTeam?.scores[_match?.id];
@@ -140,7 +143,7 @@ class _MatchView extends State<MatchView> {
                           : PlatformText("Match Stats"),
                     ),
                     elevation: 0,
-                    actions: widget.team == null
+                    actions: widget.match != null
                         ? [
                             IconButton(
                               tooltip: "Reset Score",
@@ -235,7 +238,7 @@ class _MatchView extends State<MatchView> {
                       child: Column(
                         children: [
                           if (_match?.type != EventType.remote &&
-                              widget.team == null)
+                              widget.match != null)
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
@@ -290,7 +293,7 @@ class _MatchView extends State<MatchView> {
                                             )
                                             .toString() ??
                                         '')
-                                    : (widget.team != null
+                                    : (widget.match == null
                                         ? (_score?.total().toString() ?? '')
                                         : (_match?.score(
                                                 showPenalties:
@@ -298,7 +301,7 @@ class _MatchView extends State<MatchView> {
                                             ''))),
                             style: Theme.of(context).textTheme.headline6,
                           ),
-                          if (widget.team == null)
+                          if (widget.match != null)
                             DropdownButton<Dice>(
                               value: _match?.dice,
                               icon: Icon(Icons.height_rounded),
@@ -342,7 +345,7 @@ class _MatchView extends State<MatchView> {
                               ).toList(),
                             ),
                           if (getPenaltyAlliance() != null &&
-                              widget.team == null)
+                              widget.match != null)
                             ExpansionTile(
                                 leading: Checkbox(
                                   checkColor: Colors.black,
@@ -379,7 +382,7 @@ class _MatchView extends State<MatchView> {
                                     'Autonomous : ' +
                                         ((widget.event.type !=
                                                     EventType.remote ||
-                                                widget.team != null)
+                                                widget.match == null)
                                             ? (_score?.autoScore
                                                     .total()
                                                     .toString() ??
@@ -398,7 +401,7 @@ class _MatchView extends State<MatchView> {
                                       'Tele-Op : ' +
                                           ((widget.event.type !=
                                                       EventType.remote ||
-                                                  widget.team != null)
+                                                  widget.match == null)
                                               ? (_score?.teleScore
                                                       .total()
                                                       .toString() ??
@@ -417,7 +420,7 @@ class _MatchView extends State<MatchView> {
                                       'Endgame : ' +
                                           ((widget.event.type !=
                                                       EventType.remote ||
-                                                  widget.team != null)
+                                                  widget.match == null)
                                               ? (_score?.endgameScore
                                                       .total()
                                                       .toString() ??
@@ -640,7 +643,7 @@ class _MatchView extends State<MatchView> {
   }
 
   String teamPath(OpModeType opModeType) {
-    if (widget.team != null) {
+    if (widget.match == null) {
       return 'teams/${_selectedTeam?.number}/targetScore/${opModeType.toRep()}';
     }
     return 'teams/${_selectedTeam?.number}/scores/${_score?.id}/${opModeType.toRep()}';
@@ -664,7 +667,7 @@ class _MatchView extends State<MatchView> {
                 )
                 .toList() ??
             [],
-        if (widget.team == null)
+        if (widget.match != null)
           ..._selectedAlliance?.sharedScore.teleScore.getElements().parse().map(
                     (e) => Incrementor(
                       element: e,
@@ -708,13 +711,13 @@ class _MatchView extends State<MatchView> {
                     (e) => Incrementor(
                       element: e,
                       onPressed: stateSetter,
-                      onDecrement: widget.team == null ? increaseMisses : null,
+                      onDecrement: widget.match != null ? increaseMisses : null,
                       onIncrement: _paused ? null : onIncrement,
                       event: widget.event,
                       path: teamPath(OpModeType.tele),
                       score: _score,
                       mutableIncrement: (mutableData) {
-                        if (widget.team != null) {
+                        if (widget.match == null) {
                           var ref = mutableData.value[e.key];
                           if (ref < e.max!())
                             mutableData.value[e.key] =
@@ -746,7 +749,7 @@ class _MatchView extends State<MatchView> {
                         return mutableData;
                       },
                       mutableDecrement: (mutableData) {
-                        if (widget.team != null) {
+                        if (widget.match == null) {
                           var ref = mutableData.value[e.key];
                           if (ref < e.max!())
                             mutableData.value[e.key] = (ref ?? 0) - 1;
@@ -767,7 +770,7 @@ class _MatchView extends State<MatchView> {
                   )
                   .toList() ??
               [],
-          if (widget.team == null)
+          if (widget.match != null)
             ..._selectedAlliance?.sharedScore.teleScore
                     .getElements()
                     .parse()
@@ -776,7 +779,7 @@ class _MatchView extends State<MatchView> {
                         element: e,
                         onPressed: stateSetter,
                         onDecrement:
-                            widget.team == null ? increaseMisses : null,
+                            widget.match != null ? increaseMisses : null,
                         event: widget.event,
                         path: matchPath(OpModeType.tele),
                         score: _score,
@@ -824,7 +827,7 @@ class _MatchView extends State<MatchView> {
                   .toList() ??
               [],
           Padding(padding: EdgeInsets.all(5)),
-          if (widget.team == null)
+          if (widget.match != null)
             ..._selectedAlliance?.sharedScore.endgameScore
                     .getElements()
                     .parse()
@@ -893,7 +896,7 @@ class _MatchView extends State<MatchView> {
           .toPrecision(3),
     );
     _score?.teleScore.cycleTimes = lapses;
-    if (widget.team != null) {
+    if (widget.match == null) {
       widget.event
           .getRef()
           ?.child('teams/${_selectedTeam?.number}')

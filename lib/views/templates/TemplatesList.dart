@@ -6,6 +6,7 @@ import 'package:location/location.dart';
 import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:teamtrack/components/EmptyList.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'dart:async';
 
@@ -34,48 +35,56 @@ class _TemplatesListState extends State<TemplatesList> {
   @override
   initState() {
     super.initState();
-    radius.add(100);
+    radius.add(300);
   }
 
+  @override
   Widget build(context) {
-    return Stack(
-      alignment: Alignment.bottomCenter,
-      children: [
-        GoogleMap(
-          initialCameraPosition:
-              CameraPosition(target: LatLng(37, -122), zoom: 15),
-          onMapCreated: _onMapCreated,
-          myLocationEnabled: true,
-          mapType: MapType.normal,
-          compassEnabled: true,
-          markers: markers,
-          zoomControlsEnabled: false,
-        ),
-        Padding(
-          padding: const EdgeInsets.only(bottom: 60.0, left: 20),
-          child: Row(
+    return FutureBuilder<LocationData>(
+        future: location.getLocation(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) return PlatformProgressIndicator();
+          return Stack(
+            alignment: Alignment.bottomCenter,
             children: [
-              PlatformSlider(
-                min: 100.0,
-                max: 500.0,
-                divisions: 4,
-                value: radius.value,
-                label: 'Radius ${radius.value} km',
-                activeColor: Colors.green,
-                inactiveColor: Colors.green.withOpacity(0.2),
-                onChanged: _updateQuery,
+              GoogleMap(
+                initialCameraPosition: CameraPosition(
+                  target: LatLng(snapshot.data?.latitude ?? 0,
+                      snapshot.data?.longitude ?? 0),
+                  zoom: 7,
+                ),
+                onMapCreated: _onMapCreated,
+                myLocationEnabled: true,
+                mapType: MapType.normal,
+                compassEnabled: true,
+                markers: markers,
+                zoomControlsEnabled: false,
               ),
-              IconButton(
-                icon: Icon(Icons.pin_drop, color: Colors.white),
-                color: Colors.green,
-                splashColor: Colors.green,
-                onPressed: _addGeoPoint,
+              Row(
+                children: [
+                  Container(
+                    height: 30,
+                    child: PlatformSlider(
+                      min: 100.0,
+                      max: 500.0,
+                      divisions: 4,
+                      value: radius.value,
+                      label: 'Radius ${radius.value} km',
+                      activeColor: Colors.green,
+                      inactiveColor: Colors.green.withOpacity(0.2),
+                      onChanged: _updateQuery,
+                    ),
+                  ),
+                  RawMaterialButton(
+                    child: Icon(Icons.pin_drop, color: Colors.white),
+                    fillColor: Colors.green,
+                    onPressed: _addGeoPoint,
+                  ),
+                ],
               ),
             ],
-          ),
-        ),
-      ],
-    );
+          );
+        });
   }
 
   // Map Created Lifecycle Hook
@@ -90,8 +99,8 @@ class _TemplatesListState extends State<TemplatesList> {
   Future<DocumentReference> _addGeoPoint() async {
     var pos = await mapController.getLatLng(
       ScreenCoordinate(
-        x: MediaQuery.of(context).size.height ~/ 2,
-        y: MediaQuery.of(context).size.width ~/ 2,
+        x: MediaQuery.of(context).size.width ~/ 2,
+        y: MediaQuery.of(context).size.height ~/ 2,
       ),
     );
     GeoFirePoint point = geo.point(

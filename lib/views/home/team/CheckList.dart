@@ -51,9 +51,9 @@ class _CheckListState extends State<CheckList> {
             ),
             checkColor: Colors.black,
             tileColor: Colors.blue,
-            title: PlatformText('Match Total'),
-            subtitle: PlatformText('Consider match total as score total'),
-            secondary: Icon(CupertinoIcons.square_stack),
+            title: PlatformText('Alliance Total'),
+            subtitle: PlatformText('Consider alliance total as total score'),
+            secondary: Icon(Icons.stacked_line_chart),
           ),
       ],
     );

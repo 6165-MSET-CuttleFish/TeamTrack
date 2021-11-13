@@ -61,6 +61,7 @@ void navigateToMatch(
   BuildContext context, {
   required Match match,
   required Event event,
+  Team? team,
   State? state,
 }) async {
   final user = context.read<User?>();
@@ -75,6 +76,7 @@ void navigateToMatch(
       builder: (context) => MatchView(
         match: match,
         event: event,
+        team: team,
       ),
     ),
   );

@@ -86,6 +86,7 @@ class _MatchList extends State<MatchList> {
                                 ) !=
                                 null)
                             .toList(),
+                        ascending: widget.ascending,
                         event: widget.event,
                       ),
                     );
@@ -98,6 +99,7 @@ class _MatchList extends State<MatchList> {
                 FloatingActionButtonLocation.centerFloat,
             floatingActionButton: _fabIsVisible
                 ? FloatingActionButton(
+                    tooltip: 'Add Match',
                     onPressed: () async {
                       if (widget.event.type == EventType.remote)
                         showPlatformDialog(
@@ -245,6 +247,7 @@ class _MatchList extends State<MatchList> {
             context,
             match: matches[index],
             event: widget.event,
+            team: widget.team,
             state: this,
           ),
         ),

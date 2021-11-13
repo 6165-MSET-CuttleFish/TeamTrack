@@ -90,8 +90,7 @@ class _TeamTrack extends State<TeamTrack> {
       headline4: GoogleFonts.gugi(color: Colors.white),
     ),
     backgroundColor: Colors.black,
-    splashColor:
-        NewPlatform.isAndroid ? Colors.deepPurple : Colors.transparent,
+    splashColor: NewPlatform.isAndroid ? Colors.deepPurple : Colors.transparent,
     shadowColor: Colors.white,
     brightness: Brightness.dark,
     canvasColor: Colors.black,

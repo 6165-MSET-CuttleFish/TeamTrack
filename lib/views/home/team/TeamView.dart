@@ -19,8 +19,11 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:teamtrack/functions/Extensions.dart';
 
 class TeamView extends StatefulWidget {
-  TeamView({Key? key, required this.team, required this.event})
-      : super(key: key);
+  TeamView({
+    Key? key,
+    required this.team,
+    required this.event,
+  }) : super(key: key);
   final Team team;
   final Event event;
   @override
@@ -139,10 +142,15 @@ class TeamViewState extends State<TeamView> {
                 ? CrossAxisAlignment.start
                 : CrossAxisAlignment.center,
             children: [
-              PlatformText(widget.team.name),
+              PlatformText(widget.team.name,
+                  style: widget.team.number == '6165'
+                      ? TextStyle(fontSize: 20, fontFamily: 'Revival')
+                      : null),
               PlatformText(
                 widget.team.number,
-                style: Theme.of(context).textTheme.caption,
+                style: widget.team.number == '6165'
+                    ? TextStyle(fontSize: 12, fontFamily: 'Revival Gothic')
+                    : Theme.of(context).textTheme.caption,
               ),
             ],
           ),

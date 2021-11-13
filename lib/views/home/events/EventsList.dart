@@ -232,7 +232,7 @@ class _EventsList extends State<EventsList> {
                         },
                       ),
                       ListTile(
-                        leading: Icon(Icons.widgets_outlined),
+                        leading: Icon(CupertinoIcons.square_stack),
                         title: PlatformText("Templates"),
                         onTap: () {
                           setState(() => _tab = 3);

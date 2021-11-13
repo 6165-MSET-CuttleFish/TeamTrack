@@ -50,7 +50,29 @@ class MatchRow extends StatelessWidget {
       ),
       child: ListTile(
         leading: PlatformText(index.toString()),
-        title: matchSummary(context),
+        title: team != null
+            ? Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (event.type != EventType.remote)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            child: matchSummary(context),
+                            width: 200,
+                          ),
+                          scoreDisplay(),
+                        ],
+                      ),
+                    ),
+                  teamSummary(context),
+                ],
+              )
+            : matchSummary(context),
         trailing: team != null ? null : scoreDisplay(),
         tileColor: event.type != EventType.remote
             ? _getColor(allianceTotal ?? 0, opposingTotal ?? 0)
@@ -72,21 +94,10 @@ class MatchRow extends StatelessWidget {
     }
   }
 
-  Widget matchSummary(BuildContext context) => team != null
-      ? Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            if (event.type != EventType.remote)
-              Padding(
-                padding: const EdgeInsets.all(5.0),
-                child: BarGraph(
-                  height: height,
-                  width: width,
-                  val: team?.scores[match.id]?.total().toDouble() ?? 0,
-                  max: totalMax,
-                  title: 'Total',
-                ),
-              ),
+  Row teamSummary(BuildContext context) => Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          if (event.type != EventType.remote)
             Padding(
               padding: const EdgeInsets.all(5.0),
               child: BarGraph(
@@ -94,78 +105,88 @@ class MatchRow extends StatelessWidget {
                 width: width,
                 val: team?.scores[match.id]?.total().toDouble() ?? 0,
                 max: totalMax,
-                title: event.type == EventType.remote ? 'Total' : 'Sub',
+                title: 'Total',
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: BarGraph(
-                height: height,
-                width: width,
-                val: team?.scores[match.id]?.autoScore.total().toDouble() ?? 0,
-                max: autoMax,
-                title: 'Auto',
-              ),
+          Padding(
+            padding: const EdgeInsets.all(5.0),
+            child: BarGraph(
+              height: height,
+              width: width,
+              val: team?.scores[match.id]?.total().toDouble() ?? 0,
+              max: totalMax,
+              title: event.type == EventType.remote ? 'Total' : 'Sub',
             ),
-            Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: BarGraph(
-                height: height,
-                width: width,
-                val: team?.scores[match.id]?.teleScore.total().toDouble() ?? 0,
-                max: teleMax,
-                title: 'Tele',
-              ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(5.0),
+            child: BarGraph(
+              height: height,
+              width: width,
+              val: team?.scores[match.id]?.autoScore.total().toDouble() ?? 0,
+              max: autoMax,
+              title: 'Auto',
             ),
-            Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: BarGraph(
-                height: height,
-                width: width,
-                val: team?.scores[match.id]?.endgameScore.total().toDouble() ??
-                    0,
-                max: endMax,
-                title: 'End',
-              ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(5.0),
+            child: BarGraph(
+              height: height,
+              width: width,
+              val: team?.scores[match.id]?.teleScore.total().toDouble() ?? 0,
+              max: teleMax,
+              title: 'Tele',
             ),
-            Container(
-              width: 80,
-              child: PlatformText(
-                '${json.decode(
-                  remoteConfig.getString(
-                    event.gameName,
-                  ),
-                )['Dice']['name']} : ${match.dice.toVal(event.gameName)}',
-                style: Theme.of(context).textTheme.caption,
-              ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(5.0),
+            child: BarGraph(
+              height: height,
+              width: width,
+              val: team?.scores[match.id]?.endgameScore.total().toDouble() ?? 0,
+              max: endMax,
+              title: 'End',
             ),
-          ],
-        )
-      : Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            PlatformText(
-              (match.red?.team1?.name ?? '?') +
-                  ' & ' +
-                  (match.red?.team2?.name ?? '?'),
+          ),
+          Container(
+            width: 80,
+            child: PlatformText(
+              '${json.decode(
+                remoteConfig.getString(
+                  event.gameName,
+                ),
+              )['Dice']['name']} : ${match.dice.toVal(event.gameName)}',
               style: Theme.of(context).textTheme.caption,
             ),
-            PlatformText(
-              'VS',
-              style: TextStyle(
-                color: Colors.red,
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-              ),
+          ),
+        ],
+      );
+
+  Widget matchSummary(BuildContext context) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          PlatformText(
+            (match.red?.team1?.name ?? '?') +
+                ' & ' +
+                (match.red?.team2?.name ?? '?'),
+            style: Theme.of(context).textTheme.caption,
+          ),
+          PlatformText(
+            'VS',
+            style: TextStyle(
+              color: Colors.red,
+              fontWeight: FontWeight.bold,
+              fontSize: 12,
             ),
-            PlatformText(
-              (match.blue?.team1?.name ?? '?') +
-                  ' & ' +
-                  (match.blue?.team2?.name ?? '?'),
-              style: Theme.of(context).textTheme.caption,
-            )
-          ],
-        );
+          ),
+          PlatformText(
+            (match.blue?.team1?.name ?? '?') +
+                ' & ' +
+                (match.blue?.team2?.name ?? '?'),
+            style: Theme.of(context).textTheme.caption,
+          )
+        ],
+      );
 
   Widget scoreDisplay() {
     int redScore = match.redScore(showPenalties: true);
