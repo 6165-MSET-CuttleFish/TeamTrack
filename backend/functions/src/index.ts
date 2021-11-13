@@ -36,6 +36,7 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
   await admin.database().ref()
       .child(`Events/${data.gameName}/${data.id}/Permissions`)
       .transaction((transaction) => {
+        console.log(transaction);
         // only admins may send events
         allowSend = transaction[sender.uid].role == "admin";
         if (allowSend) {
@@ -57,12 +58,8 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
   const meta = {
     "id": data.id,
     "name": data.name,
-    "authorEmail": data.authorEmail,
-    "authorName": data.authorName,
-    "senderName": sender.displayName,
-    "senderEmail": sender.email,
-    "senderPhotoURL": sender.photoURL,
-    "senderID": sender.uid,
+    "author": data.author,
+    "sender": sender.toJSON(),
     "sendTime": admin.firestore.FieldValue.serverTimestamp(),
     "type": data.type,
     "gameName": data.gameName,
@@ -181,17 +178,17 @@ export const remoteConfigToDatabase = functions.remoteConfig
           .ref.set(temp.parameters);
     });
 
-export const removeExpiredDocuments = functions.pubsub.schedule("every 1 week")
-    .onRun(async () => {
-      const db = admin.firestore();
-      const now = admin.firestore.Timestamp.now();
-      const ts = admin.firestore.Timestamp
-          .fromMillis(now.toMillis() - 86400000);
-      const snap = await db.collection("templates")
-          .where("sendTime", "<", ts).get();
-      const promises: Promise<FirebaseFirestore.WriteResult>[] = [];
-      snap.forEach((snap) => {
-        promises.push(snap.ref.delete());
-      });
-      return Promise.all(promises);
-    });
+// functions.pubsub.schedule("every 1 week")
+//     .onRun(async () => {
+//       const db = admin.firestore();
+//       const now = admin.firestore.Timestamp.now();
+//       const ts = admin.firestore.Timestamp
+//           .fromMillis(now.toMillis() - 86400000);
+//       const snap = await db.collection("templates")
+//           .where("sendTime", "<", ts).get();
+//       const promises: Promise<FirebaseFirestore.WriteResult>[] = [];
+//       snap.forEach((snap) => {
+//         promises.push(snap.ref.delete());
+//       });
+//       return Promise.all(promises);
+//     });
