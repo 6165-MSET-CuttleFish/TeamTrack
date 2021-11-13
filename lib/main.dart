@@ -69,7 +69,9 @@ class _TeamTrack extends State<TeamTrack> {
     splashColor: NewPlatform.isAndroid() ? Colors.cyan : Colors.transparent,
     visualDensity: VisualDensity.adaptivePlatformDensity,
     textTheme: TextTheme(
-      caption: GoogleFonts.squadaOne(),
+      bodyText1: GoogleFonts.gugi(),
+      bodyText2: GoogleFonts.gugi(),
+      caption: GoogleFonts.gugi(),
       headline6: GoogleFonts.gugi(),
       headline4: GoogleFonts.gugi(),
     ),
@@ -81,7 +83,8 @@ class _TeamTrack extends State<TeamTrack> {
 
   final darkTheme = ThemeData(
     textTheme: TextTheme(
-      bodyText2: GoogleFonts.ptSans(color: Colors.white),
+      bodyText1: GoogleFonts.gugi(color: Colors.white),
+      bodyText2: GoogleFonts.gugi(color: Colors.white),
       caption: GoogleFonts.gugi(color: Colors.white),
       headline6: GoogleFonts.gugi(color: Colors.white),
       headline4: GoogleFonts.gugi(color: Colors.white),

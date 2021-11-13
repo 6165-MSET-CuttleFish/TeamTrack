@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart' as Database;
 import 'package:flutter/foundation.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
@@ -12,7 +11,7 @@ import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'package:teamtrack/functions/Statistics.dart';
 import 'package:teamtrack/providers/Auth.dart';
-import 'package:teamtrack/views/home/match/UsersRow.dart';
+import 'package:teamtrack/views/home/util/UsersRow.dart';
 import 'package:uuid/uuid.dart';
 import 'package:teamtrack/functions/Extensions.dart';
 
@@ -211,7 +210,7 @@ class _MatchView extends State<MatchView> {
                               icon: Icon(Icons.stop),
                               onPressed: () => setState(
                                 () {
-                                  lapses.clear();
+                                  lapses = [];
                                   _paused = true;
                                   _time = 0;
                                 },
@@ -291,9 +290,12 @@ class _MatchView extends State<MatchView> {
                                             )
                                             .toString() ??
                                         '')
-                                    : (_match?.score(
-                                            showPenalties: _showPenalties) ??
-                                        '')),
+                                    : (widget.team != null
+                                        ? (_score?.total().toString() ?? '')
+                                        : (_match?.score(
+                                                showPenalties:
+                                                    _showPenalties) ??
+                                            ''))),
                             style: Theme.of(context).textTheme.headline6,
                           ),
                           if (widget.team == null)
@@ -317,11 +319,8 @@ class _MatchView extends State<MatchView> {
                                 );
                                 widget.event
                                     .getRef()
-                                    ?.runTransaction((mutableData) {
-                                  mutableData.value['matches'][_match?.id]
-                                      ['dice'] = newValue.toString();
-                                  return mutableData;
-                                });
+                                    ?.child('matches/${_match?.id}/dice')
+                                    .set(newValue.toString());
                                 dataModel.saveEvents();
                               },
                               items: [Dice.one, Dice.two, Dice.three]
@@ -378,7 +377,9 @@ class _MatchView extends State<MatchView> {
                                 SizedBox(
                                   child: PlatformText(
                                     'Autonomous : ' +
-                                        (widget.event.type != EventType.remote
+                                        ((widget.event.type !=
+                                                    EventType.remote ||
+                                                widget.team != null)
                                             ? (_score?.autoScore
                                                     .total()
                                                     .toString() ??
@@ -395,7 +396,9 @@ class _MatchView extends State<MatchView> {
                                 SizedBox(
                                   child: PlatformText(
                                       'Tele-Op : ' +
-                                          (widget.event.type != EventType.remote
+                                          ((widget.event.type !=
+                                                      EventType.remote ||
+                                                  widget.team != null)
                                               ? (_score?.teleScore
                                                       .total()
                                                       .toString() ??
@@ -412,7 +415,9 @@ class _MatchView extends State<MatchView> {
                                 SizedBox(
                                   child: PlatformText(
                                       'Endgame : ' +
-                                          (widget.event.type != EventType.remote
+                                          ((widget.event.type !=
+                                                      EventType.remote ||
+                                                  widget.team != null)
                                               ? (_score?.endgameScore
                                                       .total()
                                                       .toString() ??

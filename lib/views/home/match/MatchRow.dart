@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:teamtrack/components/BarGraph.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/models/AppModel.dart';
@@ -15,12 +16,24 @@ class MatchRow extends StatelessWidget {
     required this.index,
     this.onTap,
     this.team,
+    this.autoMax = 0,
+    this.teleMax = 0,
+    this.endMax = 0,
+    this.totalMax = 0,
+    this.allianceTotalMax = 0,
   }) : super(key: key);
   final Event event;
   final Match match;
   final int index;
   final Team? team;
+  final double autoMax;
+  final double teleMax;
+  final double endMax;
+  final double totalMax;
+  final double allianceTotalMax;
   final void Function()? onTap;
+  final double width = 30;
+  final double height = 60;
 
   @override
   Widget build(context) {
@@ -35,40 +48,78 @@ class MatchRow extends StatelessWidget {
       child: ListTile(
         leading: PlatformText(index.toString()),
         title: matchSummary(context),
-        trailing: scoreDisplay(),
+        trailing: team != null ? null : scoreDisplay(),
         onTap: onTap,
       ),
     );
   }
 
-  Widget matchSummary(BuildContext context) => event.type == EventType.remote
+  Widget matchSummary(BuildContext context) => team != null
       ? Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                PlatformText(
-                  'Auto : ${match.getAllianceScore(team?.number)?.autoScore.total()}',
-                  style: Theme.of(context).textTheme.caption,
+            if (event.type != EventType.remote)
+              Padding(
+                padding: const EdgeInsets.all(5.0),
+                child: BarGraph(
+                  height: height,
+                  width: width,
+                  val: team?.scores[match.id]?.total().toDouble() ?? 0,
+                  max: totalMax,
+                  title: 'Total',
                 ),
-                PlatformText(
-                  'Tele : ${match.getAllianceScore(team?.number)?.teleScore.total()}',
-                  style: Theme.of(context).textTheme.caption,
-                ),
-                PlatformText(
-                  'Endgame : ${match.getAllianceScore(team?.number)?.endgameScore.total()}',
-                  style: Theme.of(context).textTheme.caption,
-                )
-              ],
+              ),
+            Padding(
+              padding: const EdgeInsets.all(5.0),
+              child: BarGraph(
+                height: height,
+                width: width,
+                val: team?.scores[match.id]?.total().toDouble() ?? 0,
+                max: totalMax,
+                title: event.type == EventType.remote ? 'Total' : 'Sub',
+              ),
             ),
-            Spacer(),
-            PlatformText(
-              '${json.decode(
-                remoteConfig.getString(
-                  event.gameName,
-                ),
-              )['Dice']['name']} : ${match.dice.toVal(event.gameName)}',
-              style: Theme.of(context).textTheme.caption,
+            Padding(
+              padding: const EdgeInsets.all(5.0),
+              child: BarGraph(
+                height: height,
+                width: width,
+                val: team?.scores[match.id]?.autoScore.total().toDouble() ?? 0,
+                max: autoMax,
+                title: 'Auto',
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(5.0),
+              child: BarGraph(
+                height: height,
+                width: width,
+                val: team?.scores[match.id]?.teleScore.total().toDouble() ?? 0,
+                max: teleMax,
+                title: 'Tele',
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(5.0),
+              child: BarGraph(
+                height: height,
+                width: width,
+                val: team?.scores[match.id]?.endgameScore.total().toDouble() ??
+                    0,
+                max: endMax,
+                title: 'End',
+              ),
+            ),
+            Container(
+              width: 80,
+              child: PlatformText(
+                '${json.decode(
+                  remoteConfig.getString(
+                    event.gameName,
+                  ),
+                )['Dice']['name']} : ${match.dice.toVal(event.gameName)}',
+                style: Theme.of(context).textTheme.caption,
+              ),
             ),
           ],
         )
@@ -104,41 +155,29 @@ class MatchRow extends StatelessWidget {
     bool redIsGreater = redScore > blueScore;
     bool blueIsGreater = blueScore > redScore;
     bool teamIsRed = match.alliance(team) == match.red;
-    return event.type == EventType.remote
-        ? PlatformText(
-            match.score(
-              showPenalties: true,
-            ),
-          )
-        : Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              PlatformText(
-                match.redScore(showPenalties: true).toString(),
-                style: GoogleFonts.gugi(
-                  fontWeight: redIsGreater ? FontWeight.bold : null,
-                  color: team == null
-                      ? (redIsGreater ? CupertinoColors.systemRed : Colors.grey)
-                      : (teamIsRed
-                          ? CupertinoColors.systemYellow
-                          : Colors.grey),
-                ),
-              ),
-              PlatformText(" - ", style: GoogleFonts.gugi()),
-              PlatformText(
-                match.blueScore(showPenalties: true).toString(),
-                style: GoogleFonts.gugi(
-                  fontWeight: blueIsGreater ? FontWeight.bold : null,
-                  color: team == null
-                      ? (blueIsGreater
-                          ? CupertinoColors.systemBlue
-                          : Colors.grey)
-                      : (!teamIsRed
-                          ? CupertinoColors.systemYellow
-                          : Colors.grey),
-                ),
-              ),
-            ],
-          );
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        PlatformText(
+          match.redScore(showPenalties: true).toString(),
+          style: GoogleFonts.gugi(
+            fontWeight: redIsGreater ? FontWeight.bold : null,
+            color: team == null
+                ? (redIsGreater ? CupertinoColors.systemRed : Colors.grey)
+                : (teamIsRed ? CupertinoColors.systemYellow : Colors.grey),
+          ),
+        ),
+        PlatformText(" - ", style: GoogleFonts.gugi()),
+        PlatformText(
+          match.blueScore(showPenalties: true).toString(),
+          style: GoogleFonts.gugi(
+            fontWeight: blueIsGreater ? FontWeight.bold : null,
+            color: team == null
+                ? (blueIsGreater ? CupertinoColors.systemBlue : Colors.grey)
+                : (!teamIsRed ? CupertinoColors.systemYellow : Colors.grey),
+          ),
+        ),
+      ],
+    );
   }
 }

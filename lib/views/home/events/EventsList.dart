@@ -40,8 +40,7 @@ class _EventsList extends State<EventsList> {
     final TextEditingController controller = new TextEditingController();
     for (var event in dataModel.events.where((e) => !e.shared)) {
       final user = context.read<User?>();
-      event.authorEmail = user?.email;
-      event.authorName = user?.displayName;
+      event.author = TeamTrackUser.fromUser(user);
     }
     return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>?>(
       stream: firebaseFirestore
@@ -559,7 +558,8 @@ class _EventsList extends State<EventsList> {
   void _chosen() => showPlatformDialog(
         context: context,
         builder: (BuildContext context) => PlatformAlert(
-          title: PlatformText('New Event'),
+          title: PlatformText(
+              'New ${_newType == EventType.remote ? 'Remote' : 'In-Person'} Event'),
           content: PlatformTextField(
             textInputAction: TextInputAction.done,
             keyboardType: TextInputType.name,
@@ -580,7 +580,7 @@ class _EventsList extends State<EventsList> {
             ),
             PlatformDialogAction(
               isDefaultAction: false,
-              child: PlatformText('Save'),
+              child: PlatformText('Add'),
               onPressed: () {
                 setState(
                   () {
@@ -635,16 +635,16 @@ class _EventsList extends State<EventsList> {
                     ],
                   ),
                 );
+                final user = context.read<User?>();
                 if (!e.shared) {
                   var json = e.toJson();
                   json['shared'] = true;
-                  final uid = context.read<User?>()?.uid;
-                  if (uid != null)
+                  if (user?.uid != null)
                     json['Permissions'] = {
-                      uid: {
+                      user?.uid: {
                         "role": Role.admin.toRep(),
-                        "name": e.authorName,
-                        "email": e.authorEmail,
+                        "name": user?.displayName,
+                        "email": user?.email,
                       },
                     };
                   await firebaseDatabase
@@ -655,16 +655,22 @@ class _EventsList extends State<EventsList> {
                   setState(() => dataModel.saveEvents);
                 }
                 if (_emailController.text.trim().isNotEmpty) {
-                  await dataModel.shareEvent(
-                    name: e.name,
-                    authorName: e.authorName ?? '',
-                    authorEmail: e.authorEmail ?? '',
-                    id: e.id,
-                    type: e.type.toString(),
-                    email: _emailController.text.trim(),
-                    gameName: e.gameName,
-                    role: shareRole,
-                  );
+                  await firebaseDatabase
+                      .reference()
+                      .child("Events/${e.gameName}/${e.id}/Permissions")
+                      .set(true);
+                  // await dataModel.shareEvent(
+                  //   name: e.name,
+                  //   authorName: e.author?.displayName ?? '',
+                  //   authorEmail: e.author?.email ?? '',
+                  //   author: e.author ?? TeamTrackUser.fromUser(user),
+                  //   id: e.id,
+                  //   type: e.type.toString(),
+                  //   email: _emailController.text.trim(),
+                  //   gameName: e.gameName,
+                  //   role: shareRole,
+                  // );
+
                 }
                 _emailController.clear();
                 Navigator.of(context).pop();
@@ -692,41 +698,17 @@ class _EventsList extends State<EventsList> {
       );
   }
 
-  void onDelete(Event e) {
-    showPlatformDialog(
-      context: context,
-      builder: (BuildContext context) => PlatformAlert(
-        title: PlatformText('Delete Event'),
-        content: PlatformText('Are you sure?'),
-        actions: [
-          PlatformDialogAction(
-            isDefaultAction: true,
-            child: PlatformText('Cancel'),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-          PlatformDialogAction(
-            isDefaultAction: false,
-            isDestructive: true,
-            child: PlatformText('Confirm'),
-            onPressed: () async {
-              final uid = context.read<User?>()?.uid;
-              await firebaseDatabase
-                  .reference()
-                  .child('Events/${e.gameName}/${e.id}/Permissions/$uid')
-                  .remove();
-              dataModel.saveEvents();
-              if (e.users
-                      .firstWhere(
-                          (element) => element.id == context.read<User?>()?.uid)
-                      .role ==
-                  Role.admin) e.getRef()?.remove();
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      ),
-    );
+  void onDelete(Event e) async {
+    final uid = context.read<User?>()?.uid;
+    await firebaseDatabase
+        .reference()
+        .child('Events/${e.gameName}/${e.id}/Permissions/$uid')
+        .remove();
+    dataModel.saveEvents();
+    if (e.users
+            .firstWhere((element) => element.id == context.read<User?>()?.uid)
+            .role ==
+        Role.admin) e.getRef()?.remove();
+    Navigator.of(context).pop();
   }
 }

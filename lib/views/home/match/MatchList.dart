@@ -9,6 +9,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
+import 'package:teamtrack/functions/Statistics.dart';
 import 'dart:convert';
 
 class MatchList extends StatefulWidget {
@@ -129,6 +130,20 @@ class _MatchList extends State<MatchList> {
                 .toList()
             : widget.event.getSortedMatches(widget.ascending);
     if (matches.length == 0) return EmptyList();
+    double autoMax = 0;
+    double teleMax = 0;
+    double endMax = 0;
+    double totalMax = 0;
+    if (widget.team != null) {
+      autoMax =
+          widget.team?.scores.maxScore(Dice.none, false, OpModeType.auto) ?? 0;
+      teleMax =
+          widget.team?.scores.maxScore(Dice.none, false, OpModeType.tele) ?? 0;
+      endMax =
+          widget.team?.scores.maxScore(Dice.none, false, OpModeType.endgame) ??
+              0;
+      totalMax = widget.team?.scores.maxScore(Dice.none, false, null) ?? 0;
+    }
     return ListView.builder(
       itemCount: matches.length,
       itemBuilder: (context, index) => Slidable(
@@ -173,6 +188,10 @@ class _MatchList extends State<MatchList> {
           team: widget.event.teams[widget.team?.number],
           event: widget.event,
           index: widget.ascending ? index + 1 : matches.length - index,
+          autoMax: autoMax,
+          teleMax: teleMax,
+          endMax: endMax,
+          totalMax: totalMax,
           onTap: () => navigateToMatch(
             context,
             match: matches[index],

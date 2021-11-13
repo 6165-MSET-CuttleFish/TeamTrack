@@ -31,8 +31,9 @@ class Event {
     this.role = Role.editor,
   });
   String id = Uuid().v4();
-  String? authorName;
-  String? authorEmail;
+
+  TeamTrackUser? author;
+
   String gameName = Statics.gameName;
   Role role = Role.editor;
   bool shared = false;
@@ -43,11 +44,9 @@ class Event {
   Timestamp timeStamp = Timestamp.now();
 
   Timestamp? sendTime;
-  String? senderId;
-  String? senderName;
-  String? senderEmail;
 
   TeamTrackUser? sender;
+
   GeoFirePoint? location;
 
   List<TeamTrackUser> users = [];
@@ -334,8 +333,16 @@ class Event {
       } catch (e) {
         timeStamp = Timestamp.now();
       }
-      authorEmail = map['authorEmail'];
-      authorName = map['authorName'];
+
+      try {
+        author = TeamTrackUser.fromJson(map['author'], null);
+      } catch (e) {
+        author = TeamTrackUser(
+            role: Role.editor,
+            displayName: map['authorName'],
+            email: map['authorEmail']);
+      }
+
       for (var match in matches.values) {
         match.setDice(match.dice);
       }
@@ -382,21 +389,29 @@ class Event {
     } catch (e) {
       timeStamp = Timestamp.now();
     }
-    authorEmail = json?['authorEmail'];
-    authorName = json?['authorName'];
 
-    senderId = json?['senderID'];
+    try {
+      author = TeamTrackUser.fromJson(json?['author'], null);
+    } catch (e) {
+      author = TeamTrackUser(
+          role: Role.editor,
+          displayName: json?['authorName'],
+          email: json?['authorEmail']);
+    }
+
+    try {
+      sender = TeamTrackUser.fromJson(json?['sender'], null);
+    } catch (e) {
+      sender = TeamTrackUser(
+        role: Role.editor,
+        displayName: json?['senderName'],
+        email: json?['senderEmail'],
+        id: json?['senderID'],
+        photoURL: json?['photoURL'],
+      );
+    }
+
     sendTime = json?['sendTime'];
-    senderEmail = json?['senderEmail'];
-    senderName = json?['senderName'];
-
-    sender = TeamTrackUser(
-      role: Role.viewer,
-      id: senderId,
-      displayName: senderName,
-      photoURL: json?['photoURL'],
-      email: senderEmail,
-    );
 
     for (var match in matches.values) {
       match.setDice(match.dice);
@@ -411,8 +426,7 @@ class Event {
         'type': type.toString(),
         'shared': shared,
         'id': id,
-        'authorName': authorName,
-        'authorEmail': authorEmail,
+        'author': author?.toJson(),
         'seconds': timeStamp.seconds,
         'nanoSeconds': timeStamp.nanoseconds,
       };
@@ -420,8 +434,6 @@ class Event {
         'gameName': gameName,
         'name': name,
         'type': type.toString(),
-        'authorName': authorName,
-        'authorEmail': authorEmail,
         'sendTime': sendTime,
         'id': id,
       };
