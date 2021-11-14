@@ -294,8 +294,15 @@ class TeleScore extends ScoreDivision {
     } catch (e) {
       cycleTimes = [];
     }
-    teleCycles = map['TeleCycles'] ?? 0;
-    endgameCycles = map['EndgameCycles'] ?? 0;
+    double cycleSum = 0;
+    for (final cycleTime in cycleTimes) {
+      cycleSum += cycleTime;
+      if (cycleSum < 90) {
+        teleCycles++;
+      } else {
+        endgameCycles++;
+      }
+    }
     misses = ScoringElement(
         name: 'Misses', count: map['Misses'] ?? 0, key: 'Misses', value: 1);
 

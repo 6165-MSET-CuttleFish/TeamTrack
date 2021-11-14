@@ -39,6 +39,7 @@ class _MatchView extends State<MatchView> {
       Stream.periodic(const Duration(milliseconds: 100), (i) => i);
   double _time = 0;
   List<double> lapses = [];
+  double sum = 0;
   int? _previousStreamValue = 0;
   bool _paused = true;
   bool _allowView = false;
@@ -214,6 +215,7 @@ class _MatchView extends State<MatchView> {
                               onPressed: () => setState(
                                 () {
                                   lapses = [];
+                                  sum = 0;
                                   _paused = true;
                                   _time = 0;
                                 },
@@ -700,7 +702,7 @@ class _MatchView extends State<MatchView> {
             element: _score?.teleScore.misses ?? ScoringElement(),
             onPressed: stateSetter,
             event: widget.event,
-            path: teamPath(OpModeType.auto),
+            path: teamPath(OpModeType.tele),
             score: _score,
           ),
           Padding(padding: EdgeInsets.all(5)),
@@ -729,21 +731,11 @@ class _MatchView extends State<MatchView> {
                           mutableData.value[e.key] =
                               (ref[e.key] ?? 0) + e.incrementValue;
                           lapses.add(
-                            (_time -
-                                    (lapses.length != 0
-                                        ? lapses.reduce(
-                                            (value, element) => value + element)
-                                        : 0))
-                                .toPrecision(3),
+                            (_time - sum).toPrecision(3),
                           );
+                          sum = _time;
                           if (!_paused) {
                             mutableData.value['CycleTimes'] = lapses;
-                            if (_time < 90)
-                              mutableData.value['TeleCycles'] =
-                                  (ref['TeleCycles'] ?? 0) + 1;
-                            else
-                              mutableData.value['EndgameCycles'] =
-                                  (ref['EndgameCycles'] ?? 0) + 1;
                           }
                         }
                         return mutableData;
@@ -889,24 +881,10 @@ class _MatchView extends State<MatchView> {
 
   void onIncrement() {
     lapses.add(
-      (_time -
-              (lapses.length != 0
-                  ? lapses.reduce((value, element) => value + element)
-                  : 0))
-          .toPrecision(3),
+      (_time - sum).toPrecision(3),
     );
+    sum = _time;
     _score?.teleScore.cycleTimes = lapses;
-    if (widget.match == null) {
-      widget.event
-          .getRef()
-          ?.child('teams/${_selectedTeam?.number}')
-          .runTransaction((mutableData) {
-        final scoreIndex = _score?.id;
-        mutableData.value['scores'][scoreIndex]['TeleScore']['CycleTimes'] =
-            lapses;
-        return mutableData;
-      });
-    }
   }
 
   String allianceColor() {

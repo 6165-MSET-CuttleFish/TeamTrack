@@ -1,6 +1,7 @@
 import 'package:firebase_database/firebase_database.dart' as Database;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:teamtrack/components/PFP.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:teamtrack/models/AppModel.dart';
@@ -51,11 +52,14 @@ class _PermissionsState extends State<Permissions> {
                       .toList(),
                   onChanged: (widget.event.role == Role.admin &&
                           widget.currentUser?.uid != user.uid)
-                      ? (newValue) => setState(
+                      ? (newValue) {
+                          HapticFeedback.lightImpact();
+                          setState(
                             () => widget.ref
                                 ?.child('${user.uid}/role')
                                 .set(newValue?.toRep()),
-                          )
+                          );
+                        }
                       : null,
                 ),
               ),
