@@ -33,6 +33,8 @@ class _MatchView extends State<MatchView> {
   Score? _score;
   int _view = 0;
   Match? _match;
+  final blue = Colors.blue;
+  final red = CupertinoColors.systemRed;
   bool _showPenalties = true;
   bool _showRoles = false;
   final Stream<int> _periodicStream =
@@ -54,6 +56,10 @@ class _MatchView extends State<MatchView> {
       _selectedTeam = _match?.red?.team1;
       if (team != null) {
         _selectedTeam = team;
+        if (_match?.alliance(team) == _match?.blue) {
+          _selectedAlliance = _match?.red;
+          _color = Colors.blue;
+        }
       }
       _score = _selectedTeam?.scores[_match?.id];
       if (_match?.type == EventType.remote)
@@ -103,8 +109,7 @@ class _MatchView extends State<MatchView> {
             _selectedAlliance = _match?.red;
             if (_color == CupertinoColors.systemRed)
               _selectedAlliance = _match?.red;
-            else if (_color == CupertinoColors.systemBlue)
-              _selectedAlliance = _match?.blue;
+            else if (_color == Colors.blue) _selectedAlliance = _match?.blue;
             if (widget.match == null) {
               _score = _selectedTeam?.targetScore;
             } else {
@@ -529,9 +534,7 @@ class _MatchView extends State<MatchView> {
             child: PlatformText(
               _match?.red?.team1?.number ?? '?',
               style: TextStyle(
-                color: _selectedTeam == _match?.red?.team1
-                    ? Colors.grey
-                    : CupertinoColors.systemRed,
+                color: _selectedTeam == _match?.red?.team1 ? Colors.grey : red,
               ),
             ),
             onPressed: _selectedTeam == _match?.red?.team1
@@ -540,7 +543,7 @@ class _MatchView extends State<MatchView> {
                       () {
                         _selectedTeam = _match?.red?.team1;
                         _selectedAlliance = _match?.red;
-                        _color = CupertinoColors.systemRed;
+                        _color = red;
                         _score = _selectedTeam?.scores[_match?.id];
                         incrementValue.count =
                             _score?.teleScore.getElements()[0].incrementValue ??
@@ -554,9 +557,7 @@ class _MatchView extends State<MatchView> {
             child: PlatformText(
               _match?.red?.team2?.number ?? '?',
               style: TextStyle(
-                color: _selectedTeam == _match?.red?.team2
-                    ? Colors.grey
-                    : CupertinoColors.systemRed,
+                color: _selectedTeam == _match?.red?.team2 ? Colors.grey : red,
               ),
             ),
             onPressed: _selectedTeam == _match?.red?.team2
@@ -566,7 +567,7 @@ class _MatchView extends State<MatchView> {
                       () {
                         _selectedTeam = _match?.red?.team2;
                         _selectedAlliance = _match?.red;
-                        _color = CupertinoColors.systemRed;
+                        _color = red;
                         _score = _selectedTeam?.scores[_match?.id];
                       },
                     );
@@ -580,7 +581,7 @@ class _MatchView extends State<MatchView> {
               style: TextStyle(
                   color: _selectedTeam == _match?.blue?.team1
                       ? Colors.grey
-                      : Colors.blue),
+                      : blue),
             ),
             onPressed: _selectedTeam == _match?.blue?.team1
                 ? null
@@ -589,7 +590,7 @@ class _MatchView extends State<MatchView> {
                       () {
                         _selectedTeam = _match?.blue?.team1;
                         _selectedAlliance = _match?.blue;
-                        _color = Colors.blue;
+                        _color = blue;
                         _score = _selectedTeam?.scores[_match?.id];
                       },
                     );
@@ -603,7 +604,7 @@ class _MatchView extends State<MatchView> {
               style: TextStyle(
                   color: _selectedTeam == _match?.blue?.team2
                       ? Colors.grey
-                      : Colors.blue),
+                      : blue),
             ),
             onPressed: _selectedTeam == _match?.blue?.team2
                 ? null
@@ -611,7 +612,7 @@ class _MatchView extends State<MatchView> {
                       () {
                         _selectedTeam = _match?.blue?.team2;
                         _selectedAlliance = _match?.blue;
-                        _color = Colors.blue;
+                        _color = blue;
                         _score = _selectedTeam?.scores[_match?.id];
                       },
                     ),
@@ -888,7 +889,7 @@ class _MatchView extends State<MatchView> {
   }
 
   String allianceColor() {
-    if (_selectedAlliance == widget.match?.blue) {
+    if (_selectedAlliance == _match?.blue) {
       return 'blue';
     } else {
       return 'red';
