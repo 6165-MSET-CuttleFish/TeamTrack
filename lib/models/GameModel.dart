@@ -322,7 +322,7 @@ class Event with ClusterItem {
                 .where((team) => team != null),
           ).asMap().map(
                 (key, value) => MapEntry(
-                  key.toString(),
+                  value.number,
                   value,
                 ),
               );

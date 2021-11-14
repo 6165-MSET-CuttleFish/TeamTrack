@@ -18,7 +18,7 @@ save(String key, value) async {
   prefs.setString(key, json.encode(value));
 }
 
-Role getRoleFromString(String role) {
+Role getRoleFromString(String? role) {
   switch (role) {
     case "viewer":
       return Role.viewer;

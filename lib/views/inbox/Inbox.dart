@@ -120,7 +120,7 @@ class _InboxState extends State<Inbox> {
                         e.name,
                       ),
                       PlatformText(
-                        e.sender?.displayName?? "Guest",
+                        e.sender?.displayName ?? "Guest",
                       ),
                       PlatformText(
                         e.sender?.email ?? "Suspicious Email",
@@ -207,7 +207,7 @@ class _InboxState extends State<Inbox> {
                           showPlatformDialog(
                             context: context,
                             builder: (_) => PlatformAlert(
-                              title: PlatformText('Delete Event from Inbox'),
+                              title: PlatformText('Delete Event'),
                               content: PlatformText('Are you sure?'),
                               actions: [
                                 PlatformDialogAction(

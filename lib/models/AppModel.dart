@@ -74,7 +74,7 @@ class TeamTrackUser {
   TeamTrackUser.fromJson(Map<String, dynamic> json, this.uid)
       : role = getRoleFromString(json['role']),
         email = json['email'],
-        displayName = json['name'],
+        displayName = json['displayName'],
         watchingTeam = json['watchingTeam'],
         photoURL = json['photoURL'];
   TeamTrackUser.fromUser(User? user)
@@ -86,7 +86,7 @@ class TeamTrackUser {
   Map<String, String?> toJson() => {
         'role': role.toRep(),
         'email': email,
-        'name': displayName,
+        'displayName': displayName,
         'photoURL': photoURL,
         'watchingTeam': watchingTeam,
       };

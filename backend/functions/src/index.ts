@@ -36,7 +36,6 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
   await admin.database().ref()
       .child(`Events/${data.gameName}/${data.id}/Permissions`)
       .transaction((transaction) => {
-        console.log(transaction);
         // only admins may send events
         allowSend = transaction[sender.uid].role == "admin";
         if (allowSend) {
@@ -59,7 +58,12 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
     "id": data.id,
     "name": data.name,
     "author": data.author,
-    "sender": sender.toJSON(),
+    "sender": {
+      "uid": sender.uid,
+      "displayName": sender.displayName,
+      "email": sender.email,
+      "photoURL": sender.photoURL,
+    },
     "sendTime": admin.firestore.FieldValue.serverTimestamp(),
     "type": data.type,
     "gameName": data.gameName,
@@ -110,7 +114,7 @@ export const nativizeEvent = functions.database
       const user = await admin.auth().getUser(context.auth?.uid ?? "");
       snap.ref.child("Permissions").child(context.auth?.uid ?? "").set({
         "role": "admin",
-        "name": user.displayName,
+        "displayName": user.displayName,
         "email": user.email,
         "photoURL": user.photoURL,
       });
