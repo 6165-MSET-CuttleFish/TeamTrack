@@ -25,7 +25,7 @@ class EventsList extends StatefulWidget {
 }
 
 class _EventsList extends State<EventsList> {
-  final slider = SlidableStrechActionPane();
+  final slider = SlidableDrawerActionPane();
   final secondaryActions = <Widget>[
     IconSlideAction(
       icon: Icons.delete,
@@ -74,7 +74,7 @@ class _EventsList extends State<EventsList> {
           } catch (e) {
             dataModel.blockedUsers.add(TeamTrackUser(
                 role: Role.viewer,
-                id: key,
+                uid: key,
                 email: data?['blockedUsers']?[key]));
           }
         });
@@ -372,11 +372,17 @@ class _EventsList extends State<EventsList> {
 
   Slidable eventTile(Event e) => Slidable(
         actions: [
+          if (e.shared)
+            IconSlideAction(
+              onTap: () {},
+              icon: Icons.share_location,
+              color: Colors.orange,
+            ),
           IconSlideAction(
             onTap: () => _onShare(e),
-            icon: Icons.share,
+            icon: e.shared ? Icons.share : Icons.upload,
             color: Colors.blue,
-          )
+          ),
         ],
         secondaryActions: [
           IconSlideAction(
@@ -691,7 +697,7 @@ class _EventsList extends State<EventsList> {
         .remove();
     dataModel.saveEvents();
     if (e.users
-            .firstWhere((element) => element.id == context.read<User?>()?.uid)
+            .firstWhere((element) => element.uid == context.read<User?>()?.uid)
             .role ==
         Role.admin) e.getRef()?.remove();
     Navigator.of(context).pop();

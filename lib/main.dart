@@ -19,7 +19,7 @@ Future<void> main() async {
   Statics.gameName = remoteConfig.getString("gameName");
   await dataModel.restoreEvents();
   if (!NewPlatform.isWeb) {
-    var notification = PushNotifications();
+    final notification = PushNotifications();
     await messaging.requestPermission(
       alert: true,
       announcement: false,

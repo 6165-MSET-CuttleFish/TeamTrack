@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart' as Database;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/functions/Extensions.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/views/home/util/Permissions.dart';
+import 'package:provider/provider.dart';
 
 class EventShare extends StatefulWidget {
   const EventShare({
@@ -38,80 +40,81 @@ class _EventShareState extends State<EventShare> {
               context,
             );
           }
+          final currentUser = TeamTrackUser.fromUser(context.read<User?>());
           return Scaffold(
             appBar: AppBar(
               title: PlatformText(
-                'Share Event',
+                widget.event.role == Role.admin ? 'Share Event' : 'Permissions',
               ),
               backgroundColor: Theme.of(context).colorScheme.primary,
             ),
             body: Column(
               children: [
-                Row(
-                  children: [
-                    IconButton(
-                      onPressed: _onPressed,
-                      tooltip: 'Select Contact',
-                      icon: Icon(Icons.contacts),
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                    Expanded(
-                      child: PlatformTextField(
-                        textInputAction: TextInputAction.done,
-                        placeholder: 'Email',
-                        keyboardType: TextInputType.emailAddress,
-                        controller: widget.emailController,
-                        autoCorrect: false,
+                if (widget.event.role == Role.admin)
+                  Row(
+                    children: [
+                      IconButton(
+                        onPressed: _onPressed,
+                        tooltip: 'Select Contact',
+                        icon: Icon(Icons.contacts),
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      Expanded(
+                        child: PlatformTextField(
+                          textInputAction: TextInputAction.done,
+                          placeholder: 'Email',
+                          keyboardType: TextInputType.emailAddress,
+                          controller: widget.emailController,
+                          autoCorrect: false,
+                        ),
+                      ),
+                    ],
+                  ),
+                if (widget.event.role == Role.admin)
+                  DropdownButton<Role>(
+                    value: shareRole,
+                    onChanged: (newValue) {
+                      HapticFeedback.lightImpact();
+                      setState(() => shareRole = newValue ?? Role.editor);
+                    },
+                    items: Role.values
+                        .map(
+                          (e) => DropdownMenuItem<Role>(
+                            child: Text(e.name()),
+                            value: e,
+                          ),
+                        )
+                        .toList(),
+                  ),
+                if (widget.event.role == Role.admin)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      child: PlatformButton(
+                        child: PlatformText('Share'),
+                        color: Colors.green,
+                        onPressed: () async {
+                          HapticFeedback.lightImpact();
+                          if (widget.event.shared) {
+                            if (widget.emailController.text.trim().isNotEmpty) {
+                              await widget.event.shareEvent(
+                                email: widget.emailController.text.trim(),
+                                role: shareRole,
+                              );
+                              widget.emailController.clear();
+                            }
+                          }
+                          Navigator.pop(context);
+                        },
                       ),
                     ),
-                  ],
-                ),
-                PlatformPicker<Role>(
-                  value: shareRole,
-                  onSelectedItemChanged: (newValue) {
-                    HapticFeedback.lightImpact();
-                    try {
-                      setState(() => shareRole = newValue ?? Role.editor);
-                    } catch (e) {
-                      setState(() => shareRole = Role.values[newValue]);
-                    }
-                  },
-                  items: Role.values
-                      .map(
-                        (e) => PlatformText(
-                          e.name(),
-                          style: Theme.of(context).textTheme.bodyText1,
-                        ),
-                      )
-                      .toList(),
-                  arr: Role.values,
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    width: MediaQuery.of(context).size.width,
-                    child: PlatformButton(
-                      child: PlatformText('Share'),
-                      color: Colors.green,
-                      onPressed: () async {
-                        HapticFeedback.lightImpact();
-                        if (widget.event.shared) {
-                          if (widget.emailController.text.trim().isNotEmpty) {
-                            await dataModel.shareEvent(
-                              event: widget.event,
-                              email: widget.emailController.text.trim(),
-                              role: shareRole,
-                            );
-                          }
-                        }
-                        Navigator.pop(context);
-                      },
-                    ),
                   ),
-                ),
                 Expanded(
                   child: Permissions(
+                    event: widget.event,
                     users: widget.event.users,
+                    currentUser: currentUser,
                     ref: widget.event.getRef()?.child('Permissions'),
                   ),
                 ),

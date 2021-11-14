@@ -95,58 +95,44 @@ class MatchRow extends StatelessWidget {
   }
 
   Row teamSummary(BuildContext context) => Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisSize: MainAxisSize.max,
         children: [
           if (event.type != EventType.remote)
-            Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: BarGraph(
-                height: height,
-                width: width,
-                val: team?.scores[match.id]?.total().toDouble() ?? 0,
-                max: totalMax,
-                title: 'Total',
-              ),
-            ),
-          Padding(
-            padding: const EdgeInsets.all(5.0),
-            child: BarGraph(
+            BarGraph(
               height: height,
               width: width,
               val: team?.scores[match.id]?.total().toDouble() ?? 0,
               max: totalMax,
-              title: event.type == EventType.remote ? 'Total' : 'Sub',
+              title: 'Total',
             ),
+          BarGraph(
+            height: height,
+            width: width,
+            val: team?.scores[match.id]?.total().toDouble() ?? 0,
+            max: totalMax,
+            title: event.type == EventType.remote ? 'Total' : 'Sub',
           ),
-          Padding(
-            padding: const EdgeInsets.all(5.0),
-            child: BarGraph(
-              height: height,
-              width: width,
-              val: team?.scores[match.id]?.autoScore.total().toDouble() ?? 0,
-              max: autoMax,
-              title: 'Auto',
-            ),
+          BarGraph(
+            height: height,
+            width: width,
+            val: team?.scores[match.id]?.autoScore.total().toDouble() ?? 0,
+            max: autoMax,
+            title: 'Auto',
           ),
-          Padding(
-            padding: const EdgeInsets.all(5.0),
-            child: BarGraph(
-              height: height,
-              width: width,
-              val: team?.scores[match.id]?.teleScore.total().toDouble() ?? 0,
-              max: teleMax,
-              title: 'Tele',
-            ),
+          BarGraph(
+            height: height,
+            width: width,
+            val: team?.scores[match.id]?.teleScore.total().toDouble() ?? 0,
+            max: teleMax,
+            title: 'Tele',
           ),
-          Padding(
-            padding: const EdgeInsets.all(5.0),
-            child: BarGraph(
-              height: height,
-              width: width,
-              val: team?.scores[match.id]?.endgameScore.total().toDouble() ?? 0,
-              max: endMax,
-              title: 'End',
-            ),
+          BarGraph(
+            height: height,
+            width: width,
+            val: team?.scores[match.id]?.endgameScore.total().toDouble() ?? 0,
+            max: endMax,
+            title: 'End',
           ),
           Container(
             width: 80,

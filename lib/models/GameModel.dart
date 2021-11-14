@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart' as Database;
 import 'package:flutter/cupertino.dart';
@@ -54,6 +55,24 @@ class Event with ClusterItem {
   LatLng get location => LatLng(loc?.latitude ?? 0, loc?.longitude ?? 0);
 
   List<TeamTrackUser> users = [];
+
+  Future<HttpsCallableResult<dynamic>> shareEvent({
+    required String email,
+    required Role role,
+  }) async {
+    final callable = functions.httpsCallable('shareEvent');
+    return callable.call(
+      {
+        'email': email,
+        'name': this.name,
+        'id': this.id,
+        'author': this.author?.toJson(),
+        'type': this.type.toString(),
+        'gameName': this.gameName,
+        'role': role.toRep(),
+      },
+    );
+  }
 
   void addTeam(Team newTeam) async {
     await getRef()
@@ -355,7 +374,7 @@ class Event with ClusterItem {
       } catch (e) {}
       role = users
           .firstWhere(
-            (element) => element.id == context.read<User?>()?.uid,
+            (element) => element.uid == context.read<User?>()?.uid,
             orElse: () => TeamTrackUser(role: Role.editor),
           )
           .role;
@@ -406,7 +425,7 @@ class Event with ClusterItem {
         role: Role.editor,
         displayName: json?['senderName'],
         email: json?['senderEmail'],
-        id: json?['senderID'],
+        uid: json?['senderID'],
         photoURL: json?['photoURL'],
       );
     }

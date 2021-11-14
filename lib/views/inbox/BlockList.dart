@@ -92,7 +92,7 @@ class _BlockList extends State<BlockList> {
                               }
                               Map newBlocks = snapshot.data()?['blockedUsers'];
                               newBlocks
-                                  .removeWhere((key, value) => key == e.id);
+                                  .removeWhere((key, value) => key == e.uid);
                               return transaction.update(
                                 docRef,
                                 {

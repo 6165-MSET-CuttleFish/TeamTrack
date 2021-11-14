@@ -67,11 +67,11 @@ class _InboxState extends State<Inbox> {
                                   }
                                   Map newBlocks =
                                       snapshot.data()?['blockedUsers'];
-                                  newBlocks[e.sender?.id] = e.sender?.toJson();
+                                  newBlocks[e.sender?.uid] = e.sender?.toJson();
                                   Map<String, dynamic> newInbox = snapshot
                                       .data()?["inbox"] as Map<String, dynamic>;
                                   newInbox.removeWhere((key, value) =>
-                                      value['senderID'] == e.sender?.id);
+                                      value['senderID'] == e.sender?.uid);
                                   return transaction.update(
                                     docRef,
                                     {

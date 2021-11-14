@@ -49,25 +49,6 @@ class DataModel {
       print("failed");
     }
   }
-
-  Future<HttpsCallableResult<dynamic>> shareEvent({
-    required Event event,
-    required String email,
-    required Role role,
-  }) async {
-    final HttpsCallable callable = functions.httpsCallable('shareEvent');
-    return callable.call(
-      {
-        'email': email,
-        'name': event.name,
-        'id': event.id,
-        'author': event.author?.toJson(),
-        'type': event.type.toString(),
-        'gameName': event.gameName,
-        'role': role.toRep(),
-      },
-    );
-  }
 }
 
 enum Role {
@@ -82,15 +63,15 @@ class TeamTrackUser {
     this.displayName,
     this.email,
     this.photoURL,
-    this.id,
+    this.uid,
   });
   Role role;
   String? email;
   String? displayName;
   String? photoURL;
   String? watchingTeam;
-  String? id;
-  TeamTrackUser.fromJson(Map<String, dynamic> json, this.id)
+  String? uid;
+  TeamTrackUser.fromJson(Map<String, dynamic> json, this.uid)
       : role = getRoleFromString(json['role']),
         email = json['email'],
         displayName = json['name'],
@@ -101,7 +82,7 @@ class TeamTrackUser {
         email = user?.email,
         displayName = user?.displayName,
         photoURL = user?.photoURL,
-        id = user?.uid;
+        uid = user?.uid;
   Map<String, String?> toJson() => {
         'role': role.toRep(),
         'email': email,

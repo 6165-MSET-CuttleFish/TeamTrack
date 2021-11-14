@@ -31,23 +31,23 @@ extension RoleExtension on Role {
   }
 
   // icon for showing to the user
-  Icon getIcon({Color? color, double? size = 17}) {
+  Icon getIcon({Color? color, double? size = 14}) {
     switch (this) {
       case Role.viewer:
         return Icon(
-          Icons.visibility_outlined,
+          Icons.visibility,
           color: color,
           size: size,
         );
       case Role.editor:
         return Icon(
-          Icons.edit_outlined,
+          Icons.edit,
           color: color,
           size: size,
         );
       default:
         return Icon(
-          Icons.admin_panel_settings_outlined,
+          Icons.admin_panel_settings,
           color: color,
           size: size,
         );
