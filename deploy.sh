@@ -5,6 +5,3 @@ cd backend
 # Deploy android frontend
 cd ..
 flutter build appbundle
-
-# Deploy ios frontend
-flutter build ios --release
