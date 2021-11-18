@@ -41,7 +41,7 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
         if (allowSend) {
           transaction[recipient.uid] = {
             "role": data.role,
-            "name": recipient.displayName,
+            "displayName": recipient.displayName,
             "email": recipient.email,
             "photoURL": recipient.photoURL,
           }; // update permissions for recepient
