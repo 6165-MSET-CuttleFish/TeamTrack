@@ -816,17 +816,17 @@ class _Incrementor extends State<Incrementor> {
 }
 
 class ScoreCard extends StatelessWidget {
-  ScoreCard(
-      {Key? key,
-      required this.scoreDivisions,
-      required this.dice,
-      required this.team,
-      required this.event,
-      this.type,
-      required this.removeOutliers,
-      this.matches,
-      required this.matchTotal})
-      : super(key: key) {
+  ScoreCard({
+    Key? key,
+    required this.scoreDivisions,
+    required this.dice,
+    required this.team,
+    required this.event,
+    this.type,
+    required this.removeOutliers,
+    this.matches,
+    required this.matchTotal,
+  }) : super(key: key) {
     switch (type) {
       case OpModeType.auto:
         targetScore = team.targetScore?.autoScore;

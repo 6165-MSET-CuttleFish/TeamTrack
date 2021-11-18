@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/models/ScoreModel.dart';
+import 'package:teamtrack/models/StatConfig.dart';
 
 extension Ex on double {
   double toPrecision(int n) => double.parse(toStringAsFixed(n));
@@ -194,27 +195,46 @@ extension TeamsExtension on Map<String, Team> {
     }
   }
 
-  List<Team> sortedTeams(OpModeType? type) {
+  List<Team> sortedTeams(
+      OpModeType? type, StatConfig statConfig, List<Match> matches) {
     List<Team> val = [];
     for (Team team in this.values) {
       val.add(team);
     }
-    val.sort(
-      (a, b) => b.scores.values
-          .map(
-            ((score) => score.getScoreDivision(type)),
-          )
-          .toList()
-          .meanScore(Dice.none, true)
-          .compareTo(
-            a.scores.values
-                .map(
-                  ((score) => score.getScoreDivision(type)),
-                )
-                .toList()
-                .meanScore(Dice.none, true),
-          ),
-    );
+    if (statConfig.allianceTotal) {
+      val.sort((a, b) {
+        final allianceTotalsB = matches
+            .toList()
+            .spots(b, Dice.none, statConfig.showPenalties, type: type)
+            .removeOutliers(statConfig.removeOutliers)
+            .map((spot) => spot.y)
+            .mean();
+        final allianceTotalsA = matches
+            .toList()
+            .spots(a, Dice.none, statConfig.showPenalties, type: type)
+            .removeOutliers(statConfig.removeOutliers)
+            .map((spot) => spot.y)
+            .mean();
+        return allianceTotalsB.compareTo(allianceTotalsA);
+      });
+    } else {
+      val.sort(
+        (a, b) => b.scores.values
+            .map(
+              ((score) => score.getScoreDivision(type)),
+            )
+            .toList()
+            .meanScore(Dice.none, statConfig.removeOutliers)
+            .compareTo(
+              a.scores.values
+                  .map(
+                    ((score) => score.getScoreDivision(type)),
+                  )
+                  .toList()
+                  .meanScore(Dice.none, statConfig.removeOutliers),
+            ),
+      );
+    }
     return val;
   }
 

@@ -149,7 +149,7 @@ class _MatchConfigState extends State<MatchConfig> {
     list.add(
       PlatformButton(
         color: Colors.green,
-        child: PlatformText('Save'),
+        child: PlatformText('Add'),
         onPressed: () {
           if (_formKey.currentState?.validate() ?? false) {
             setState(

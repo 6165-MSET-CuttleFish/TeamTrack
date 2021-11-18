@@ -1,5 +1,6 @@
 import 'package:teamtrack/components/EmptyList.dart';
 import 'package:teamtrack/models/GameModel.dart';
+import 'package:teamtrack/models/StatConfig.dart';
 import 'package:teamtrack/views/home/team/TeamRow.dart';
 import 'package:teamtrack/views/home/team/TeamView.dart';
 import 'package:teamtrack/models/AppModel.dart';
@@ -16,9 +17,11 @@ class TeamList extends StatefulWidget {
     Key? key,
     required this.event,
     required this.sortMode,
+    required this.statConfig,
   }) : super(key: key);
   final Event event;
   final OpModeType? sortMode;
+  final StatConfig statConfig;
   @override
   State<StatefulWidget> createState() => _TeamList();
 }
@@ -40,9 +43,28 @@ class _TeamList extends State<TeamList> {
               context,
             );
           }
-          final max =
-              widget.event.teams.maxMeanScore(Dice.none, true, widget.sortMode);
-          final teams = widget.event.teams.sortedTeams(widget.sortMode);
+          var max = widget.event.teams.maxMeanScore(
+            Dice.none,
+            widget.statConfig.removeOutliers,
+            widget.sortMode,
+          );
+          final teams = widget.statConfig.sorted
+              ? widget.event.teams.sortedTeams(widget.sortMode,
+                  widget.statConfig, widget.event.matches.values.toList())
+              : widget.event.teams.values.toList();
+          if (widget.statConfig.allianceTotal) {
+            max = teams
+                .map(
+                  (e) => widget.event.matches.values
+                      .toList()
+                      .spots(e, Dice.none, widget.statConfig.showPenalties,
+                          type: widget.sortMode)
+                      .removeOutliers(widget.statConfig.removeOutliers)
+                      .map((spot) => spot.y)
+                      .mean(),
+                )
+                .maxValue();
+          }
           if (teams.length == 0) return EmptyList();
           return ListView.builder(
             itemCount: teams.length,
@@ -51,6 +73,7 @@ class _TeamList extends State<TeamList> {
                 team: teams[index],
                 event: widget.event,
                 sortMode: widget.sortMode,
+                statConfig: widget.statConfig,
                 max: max,
                 onTap: () async {
                   await Navigator.push(
@@ -131,13 +154,34 @@ class TeamSearch extends SearchDelegate<String?> {
     required this.teams,
     required this.event,
     this.sortMode,
+    required this.statConfig,
   }) {
-    max = event.teams.maxMeanScore(Dice.none, true, sortMode);
+    max = event.teams
+        .maxMeanScore(Dice.none, statConfig.removeOutliers, sortMode);
+    final teams = event.teams.sortedTeams(
+      sortMode,
+      statConfig,
+      event.matches.values.toList(),
+    );
+    if (statConfig.allianceTotal) {
+      max = teams
+          .map(
+            (e) => event.matches.values
+                .toList()
+                .spots(e, Dice.none, statConfig.showPenalties, type: sortMode)
+                .removeOutliers(statConfig.removeOutliers)
+                .map((spot) => spot.y)
+                .mean(),
+          )
+          .maxValue();
+    }
   }
   late double max;
   OpModeType? sortMode;
   List<Team> teams;
   Event event;
+  StatConfig statConfig;
+
   @override
   List<Widget> buildActions(BuildContext context) => [
         if (query.isNotEmpty)
@@ -175,6 +219,7 @@ class TeamSearch extends SearchDelegate<String?> {
     return ListView.builder(
       itemCount: suggestionList.length,
       itemBuilder: (context, index) => TeamRow(
+        statConfig: statConfig,
         team: suggestionList[index],
         event: event,
         max: max,

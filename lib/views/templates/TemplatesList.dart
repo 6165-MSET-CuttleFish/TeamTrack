@@ -6,7 +6,6 @@ import 'package:location/location.dart';
 import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:teamtrack/components/EmptyList.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'dart:async';
 
@@ -60,27 +59,30 @@ class _TemplatesListState extends State<TemplatesList> {
                 markers: markers,
                 zoomControlsEnabled: false,
               ),
-              Row(
-                children: [
-                  Container(
-                    height: 30,
-                    child: PlatformSlider(
-                      min: 100.0,
-                      max: 500.0,
-                      divisions: 4,
-                      value: radius.value,
-                      label: 'Radius ${radius.value} km',
-                      activeColor: Colors.green,
-                      inactiveColor: Colors.green.withOpacity(0.2),
-                      onChanged: _updateQuery,
+              Padding(
+                padding: const EdgeInsets.only(bottom: 50.0),
+                child: Row(
+                  children: [
+                    Container(
+                      height: 30,
+                      child: PlatformSlider(
+                        min: 100.0,
+                        max: 500.0,
+                        divisions: 4,
+                        value: radius.value,
+                        label: 'Radius ${radius.value} km',
+                        activeColor: Colors.green,
+                        inactiveColor: Colors.green.withOpacity(0.2),
+                        onChanged: _updateQuery,
+                      ),
                     ),
-                  ),
-                  RawMaterialButton(
-                    child: Icon(Icons.pin_drop, color: Colors.white),
-                    fillColor: Colors.green,
-                    onPressed: _addGeoPoint,
-                  ),
-                ],
+                    RawMaterialButton(
+                      child: Icon(Icons.pin_drop, color: Colors.white),
+                      fillColor: Colors.green,
+                      onPressed: _addGeoPoint,
+                    ),
+                  ],
+                ),
               ),
             ],
           );

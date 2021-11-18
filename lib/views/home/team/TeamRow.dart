@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:teamtrack/components/BarGraph.dart';
 import 'package:teamtrack/components/PercentChange.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/functions/Statistics.dart';
+import 'package:teamtrack/models/StatConfig.dart';
 
 class TeamRow extends StatelessWidget {
   const TeamRow({
@@ -15,12 +15,14 @@ class TeamRow extends StatelessWidget {
     required this.max,
     this.sortMode,
     this.onTap,
+    required this.statConfig,
   }) : super(key: key);
   final Team team;
   final Event event;
   final double max;
   final OpModeType? sortMode;
   final void Function()? onTap;
+  final StatConfig statConfig;
 
   @override
   Widget build(context) {
@@ -36,10 +38,14 @@ class TeamRow extends StatelessWidget {
         ),
       ),
       child: ListTile(
-        title: PlatformText(team.name,
-            style: Theme.of(context).textTheme.bodyText1),
-        leading: PlatformText(team.number,
-            style: Theme.of(context).textTheme.caption),
+        title: PlatformText(
+          team.name,
+          style: Theme.of(context).textTheme.bodyText1,
+        ),
+        leading: PlatformText(
+          team.number,
+          style: Theme.of(context).textTheme.caption,
+        ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -55,7 +61,16 @@ class TeamRow extends StatelessWidget {
               child: BarGraph(
                 height: 70,
                 width: 30,
-                val: team.scores.meanScore(Dice.none, true, sortMode),
+                val: statConfig.allianceTotal
+                    ? event.matches.values
+                        .toList()
+                        .spots(team, Dice.none, statConfig.showPenalties,
+                            type: sortMode)
+                        .removeOutliers(statConfig.removeOutliers)
+                        .map((spot) => spot.y)
+                        .mean()
+                    : team.scores.meanScore(
+                        Dice.none, statConfig.removeOutliers, sortMode),
                 max: max,
                 title: 'Mean',
               ),

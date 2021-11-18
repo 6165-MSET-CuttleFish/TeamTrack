@@ -1,7 +1,9 @@
 import 'package:flutter/services.dart';
 import 'package:teamtrack/models/GameModel.dart';
+import 'package:teamtrack/models/StatConfig.dart';
 import 'package:teamtrack/views/home/match/MatchConfig.dart';
 import 'package:teamtrack/views/home/match/MatchList.dart';
+import 'package:teamtrack/views/home/util/CheckList.dart';
 import 'package:teamtrack/views/home/team/TeamList.dart';
 import 'package:teamtrack/functions/Extensions.dart';
 import 'package:teamtrack/models/AppModel.dart';
@@ -23,11 +25,13 @@ class EventView extends StatefulWidget {
 class _EventView extends State<EventView> {
   final slider = SlidableStrechActionPane();
   OpModeType? sortingModifier;
+  StatConfig _statConfig = StatConfig();
   bool ascending = false;
   List<Widget> materialTabs() => [
         TeamList(
           event: widget.event,
           sortMode: sortingModifier,
+          statConfig: _statConfig,
         ),
         MatchList(
           event: widget.event,
@@ -42,6 +46,19 @@ class _EventView extends State<EventView> {
           title: _tab == 0 ? PlatformText('Teams') : PlatformText('Matches'),
           backgroundColor: Theme.of(context).colorScheme.primary,
           actions: [
+            if (_tab == 0)
+              IconButton(
+                icon: Icon(Icons.settings),
+                tooltip: 'Configure',
+                onPressed: () => showModalBottomSheet(
+                  context: context,
+                  builder: (_) => CheckList(
+                    state: this,
+                    event: widget.event,
+                    statConfig: _statConfig,
+                  ),
+                ),
+              ),
             _tab != 0
                 ? IconButton(
                     tooltip: "Sort",
@@ -79,8 +96,7 @@ class _EventView extends State<EventView> {
                         (value) {
                           return DropdownMenuItem<OpModeType?>(
                             value: value,
-                            child: PlatformText(
-                                (value?.toVal() ?? "Subtotal") + " "),
+                            child: PlatformText((value?.toVal() ?? "Total")),
                           );
                         },
                       ).toList(),
@@ -95,8 +111,14 @@ class _EventView extends State<EventView> {
                   context: context,
                   delegate: _tab == 0
                       ? TeamSearch(
-                          teams:
-                              widget.event.teams.sortedTeams(sortingModifier),
+                          statConfig: _statConfig,
+                          teams: _statConfig.sorted
+                              ? widget.event.teams.sortedTeams(
+                                  sortingModifier,
+                                  _statConfig,
+                                  widget.event.matches.values.toList(),
+                                )
+                              : widget.event.teams.values.toList(),
                           sortMode: sortingModifier,
                           event: widget.event,
                         )

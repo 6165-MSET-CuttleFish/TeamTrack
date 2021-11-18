@@ -198,7 +198,7 @@ class MatchRow extends StatelessWidget {
           style: GoogleFonts.gugi(
             fontWeight: blueIsGreater ? FontWeight.bold : null,
             color: team == null
-                ? (blueIsGreater ? CupertinoColors.systemBlue : Colors.grey)
+                ? (blueIsGreater ? Colors.blue : Colors.grey)
                 : (!teamIsRed ? CupertinoColors.systemYellow : Colors.grey),
           ),
         ),

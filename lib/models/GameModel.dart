@@ -23,7 +23,7 @@ class Statics {
 
 enum EventType { live, local, remote }
 enum Dice { one, two, three, none }
-enum OpModeType { auto, tele, endgame, penalty }
+enum OpModeType { auto, tele, endgame, penalty,  }
 enum UserType { admin, editor, viewer }
 
 class Event with ClusterItem {
