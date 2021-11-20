@@ -1,5 +1,6 @@
 import 'package:firebase_database/firebase_database.dart' as Database;
 import 'package:flutter/foundation.dart';
+import 'package:teamtrack/components/Incrementor.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -11,8 +12,8 @@ import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'package:teamtrack/functions/Statistics.dart';
 import 'package:teamtrack/providers/Auth.dart';
-import 'package:teamtrack/views/home/util/ScoreSummary.dart';
-import 'package:teamtrack/views/home/util/UsersRow.dart';
+import 'package:teamtrack/components/ScoreSummary.dart';
+import 'package:teamtrack/components/UsersRow.dart';
 import 'package:uuid/uuid.dart';
 import 'package:teamtrack/functions/Extensions.dart';
 

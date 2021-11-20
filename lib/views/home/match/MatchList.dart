@@ -14,7 +14,7 @@ import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:teamtrack/functions/Statistics.dart';
 import 'dart:convert';
 
-import 'package:teamtrack/views/home/util/CheckList.dart';
+import 'package:teamtrack/components/CheckList.dart';
 
 class MatchList extends StatefulWidget {
   MatchList({

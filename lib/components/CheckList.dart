@@ -74,7 +74,7 @@ class _CheckListState extends State<CheckList> {
             checkColor: Colors.black,
             tileColor: widget.statConfig.allianceTotal ? Colors.blue : null,
             title: PlatformText('Alliance Total'),
-            subtitle: PlatformText('Consider alliance total as total score'),
+            subtitle: PlatformText('Consider alliance total as score'),
             secondary: Icon(Icons.stacked_line_chart),
           ),
       ],

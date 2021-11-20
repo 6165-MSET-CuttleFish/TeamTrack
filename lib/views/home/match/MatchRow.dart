@@ -4,12 +4,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:teamtrack/components/BarGraph.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:teamtrack/models/GameModel.dart';
-import 'package:teamtrack/models/AppModel.dart';
-import 'package:teamtrack/functions/Extensions.dart';
 import 'package:teamtrack/models/ScoreModel.dart';
-import 'dart:convert';
 import 'package:teamtrack/models/StatConfig.dart';
-import 'package:teamtrack/views/home/util/ScoreSummary.dart';
+import 'package:teamtrack/components/ScoreSummary.dart';
 
 class MatchRow extends StatelessWidget {
   const MatchRow({

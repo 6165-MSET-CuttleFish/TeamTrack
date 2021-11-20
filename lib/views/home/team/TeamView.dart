@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:teamtrack/components/Collapsible.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
+import 'package:teamtrack/components/ScoreCard.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/models/StatConfig.dart';
 import 'package:teamtrack/views/home/match/MatchList.dart';
@@ -11,7 +12,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:teamtrack/views/home/util/CheckList.dart';
+import 'package:teamtrack/components/CheckList.dart';
 import 'package:uuid/uuid.dart';
 import 'package:firebase_database/firebase_database.dart' as Database;
 import 'dart:convert';
@@ -34,9 +35,8 @@ class TeamView extends StatefulWidget {
 class _TeamViewState extends State<TeamView> {
   _TeamViewState(this._team);
   Dice _dice = Dice.none;
-  final _selections = [true, true, false, false, false];
+  final _selections = [true, false, false, false];
   Team _team;
-  StatConfig _statConfig = StatConfig();
   bool _showCycles = false;
   final endgameColor = Colors.deepOrange;
   final penaltyColor = Colors.red;
@@ -162,7 +162,7 @@ class _TeamViewState extends State<TeamView> {
                 context: context,
                 builder: (context) => CheckList(
                   state: this,
-                  statConfig: _statConfig,
+                  statConfig: widget.event.statConfig,
                   event: widget.event,
                   showSorting: false,
                 ),
@@ -218,10 +218,8 @@ class _TeamViewState extends State<TeamView> {
                               spacing: 0,
                               children: [
                                 FlatButton(
-                                  color: _selections[0]
-                                      ? Color.fromRGBO(255, 166, 0, 1)
-                                      : null,
-                                  splashColor: Color.fromRGBO(255, 166, 0, 1),
+                                  color: _selections[0] ? generalColor : null,
+                                  splashColor: generalColor,
                                   onPressed: () {
                                     setState(
                                       () {
@@ -232,36 +230,13 @@ class _TeamViewState extends State<TeamView> {
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(18.0),
                                     side: BorderSide(
-                                      color: Color.fromRGBO(255, 166, 0, 1),
+                                      color: generalColor,
                                     ),
                                   ),
-                                  child: PlatformText(
-                                    widget.event.type == EventType.remote
-                                        ? 'Total'
-                                        : 'Alliance Total',
-                                  ),
+                                  child: PlatformText('Total'),
                                 ),
-                                if (widget.event.type != EventType.remote)
-                                  FlatButton(
-                                    color: _selections[1] ? generalColor : null,
-                                    splashColor: generalColor,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(18.0),
-                                      side: BorderSide(
-                                        color: generalColor,
-                                      ),
-                                    ),
-                                    child: PlatformText('Subtotal'),
-                                    onPressed: () {
-                                      setState(
-                                        () {
-                                          _selections[1] = !_selections[1];
-                                        },
-                                      );
-                                    },
-                                  ),
                                 FlatButton(
-                                  color: _selections[2] ? autoColor : null,
+                                  color: _selections[1] ? autoColor : null,
                                   splashColor: autoColor,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(18.0),
@@ -271,13 +246,13 @@ class _TeamViewState extends State<TeamView> {
                                   onPressed: () {
                                     setState(
                                       () {
-                                        _selections[2] = !_selections[2];
+                                        _selections[1] = !_selections[1];
                                       },
                                     );
                                   },
                                 ),
                                 FlatButton(
-                                  color: _selections[3] ? teleColor : null,
+                                  color: _selections[2] ? teleColor : null,
                                   splashColor: teleColor,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(18.0),
@@ -287,13 +262,13 @@ class _TeamViewState extends State<TeamView> {
                                   onPressed: () {
                                     setState(
                                       () {
-                                        _selections[3] = !_selections[3];
+                                        _selections[2] = !_selections[2];
                                       },
                                     );
                                   },
                                 ),
                                 FlatButton(
-                                  color: _selections[4] ? endgameColor : null,
+                                  color: _selections[3] ? endgameColor : null,
                                   splashColor: endgameColor,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(18.0),
@@ -303,7 +278,7 @@ class _TeamViewState extends State<TeamView> {
                                   onPressed: () {
                                     setState(
                                       () {
-                                        _selections[4] = !_selections[4];
+                                        _selections[3] = !_selections[3];
                                       },
                                     );
                                   },
@@ -384,12 +359,12 @@ class _TeamViewState extends State<TeamView> {
                         ),
                       ),
                       ScoreCard(
-                        matchTotal: _statConfig.allianceTotal,
+                        matchTotal: widget.event.statConfig.allianceTotal,
                         team: _team,
                         event: widget.event,
                         scoreDivisions: _team.scores.values.toList(),
                         dice: _dice,
-                        removeOutliers: _statConfig.removeOutliers,
+                        removeOutliers: widget.event.statConfig.removeOutliers,
                         matches: widget.event.type == EventType.remote
                             ? null
                             : widget.event.getSortedMatches(true),
@@ -402,7 +377,7 @@ class _TeamViewState extends State<TeamView> {
                         ),
                       ),
                       ScoreCard(
-                        matchTotal: _statConfig.allianceTotal,
+                        matchTotal: widget.event.statConfig.allianceTotal,
                         team: _team,
                         event: widget.event,
                         type: OpModeType.auto,
@@ -410,7 +385,7 @@ class _TeamViewState extends State<TeamView> {
                             .map((e) => e.autoScore)
                             .toList(),
                         dice: _dice,
-                        removeOutliers: _statConfig.removeOutliers,
+                        removeOutliers: widget.event.statConfig.removeOutliers,
                         matches: widget.event.type == EventType.remote
                             ? null
                             : widget.event.getSortedMatches(true),
@@ -423,7 +398,7 @@ class _TeamViewState extends State<TeamView> {
                         ),
                       ),
                       ScoreCard(
-                        matchTotal: _statConfig.allianceTotal,
+                        matchTotal: widget.event.statConfig.allianceTotal,
                         team: _team,
                         event: widget.event,
                         type: OpModeType.tele,
@@ -431,7 +406,7 @@ class _TeamViewState extends State<TeamView> {
                             .map((e) => e.teleScore)
                             .toList(),
                         dice: _dice,
-                        removeOutliers: _statConfig.removeOutliers,
+                        removeOutliers: widget.event.statConfig.removeOutliers,
                         matches: widget.event.type == EventType.remote
                             ? null
                             : widget.event.getSortedMatches(true),
@@ -444,7 +419,7 @@ class _TeamViewState extends State<TeamView> {
                         ),
                       ),
                       ScoreCard(
-                        matchTotal: _statConfig.allianceTotal,
+                        matchTotal: widget.event.statConfig.allianceTotal,
                         team: _team,
                         event: widget.event,
                         type: OpModeType.endgame,
@@ -452,7 +427,7 @@ class _TeamViewState extends State<TeamView> {
                             .map((e) => e.endgameScore)
                             .toList(),
                         dice: _dice,
-                        removeOutliers: _statConfig.removeOutliers,
+                        removeOutliers: widget.event.statConfig.removeOutliers,
                         matches: widget.event.type == EventType.remote
                             ? null
                             : widget.event.getSortedMatches(true),
@@ -578,56 +553,33 @@ class _TeamViewState extends State<TeamView> {
                                       )
                                     : null,
                                 show: _selections[0],
-                                spots: widget.event
-                                    .getSortedMatches(true)
-                                    .where((e) =>
-                                        e.dice == _dice || _dice == Dice.none)
-                                    .toList()
-                                    .spots(
-                                        _team, _dice, _statConfig.showPenalties)
-                                    .removeOutliers(_statConfig.removeOutliers),
-                                colors: [
-                                  Color.fromRGBO(255, 166, 0, 1),
-                                ],
-                                isCurved: true,
-                                isStrokeCapRound: true,
-                                preventCurveOverShooting: true,
-                                barWidth: 5,
-                              ),
-                              LineChartBarData(
-                                belowBarData: _team.targetScore != null
-                                    ? BarAreaData(
-                                        show: true,
-                                        colors: [
-                                          Colors.lightGreenAccent
-                                              .withOpacity(0.2)
-                                        ],
-                                        cutOffY: _team.targetScore
-                                            ?.total()
-                                            .toDouble(),
-                                        applyCutOffY: true,
-                                      )
-                                    : null,
-                                aboveBarData: _team.targetScore != null
-                                    ? BarAreaData(
-                                        show: true,
-                                        colors: [
-                                          Colors.redAccent.withOpacity(0.2)
-                                        ],
-                                        cutOffY: _team.targetScore
-                                            ?.total()
-                                            .toDouble(),
-                                        applyCutOffY: true,
-                                      )
-                                    : null,
-                                show: _selections[1] &&
-                                    widget.event.type != EventType.remote,
-                                spots: _team.scores
-                                    .diceScores(_dice)
-                                    .spots(null,
-                                        showPenalties:
-                                            _statConfig.showPenalties)
-                                    .removeOutliers(_statConfig.removeOutliers),
+                                spots: widget.event.statConfig.allianceTotal
+                                    ? widget.event
+                                        .getSortedMatches(true)
+                                        .where((e) =>
+                                            e.dice == _dice ||
+                                            _dice == Dice.none)
+                                        .toList()
+                                        .spots(
+                                          _team,
+                                          _dice,
+                                          widget.event.statConfig.showPenalties,
+                                        )
+                                        .removeOutliers(
+                                          widget
+                                              .event.statConfig.removeOutliers,
+                                        )
+                                    : _team.scores
+                                        .diceScores(_dice)
+                                        .spots(
+                                          null,
+                                          showPenalties: widget
+                                              .event.statConfig.showPenalties,
+                                        )
+                                        .removeOutliers(
+                                          widget
+                                              .event.statConfig.removeOutliers,
+                                        ),
                                 colors: [
                                   generalColor,
                                 ],
@@ -637,11 +589,27 @@ class _TeamViewState extends State<TeamView> {
                                 barWidth: 5,
                               ),
                               LineChartBarData(
-                                show: _selections[2],
-                                spots: _team.scores
-                                    .diceScores(_dice)
-                                    .spots(OpModeType.auto)
-                                    .removeOutliers(_statConfig.removeOutliers),
+                                show: _selections[1],
+                                spots: widget.event.statConfig.allianceTotal
+                                    ? widget.event
+                                        .getSortedMatches(true)
+                                        .where(
+                                          (e) =>
+                                              e.dice == _dice ||
+                                              _dice == Dice.none,
+                                        )
+                                        .toList()
+                                        .spots(_team, _dice, false,
+                                            type: OpModeType.auto)
+                                        .removeOutliers(widget
+                                            .event.statConfig.removeOutliers)
+                                    : _team.scores
+                                        .diceScores(_dice)
+                                        .spots(OpModeType.auto)
+                                        .removeOutliers(
+                                          widget
+                                              .event.statConfig.removeOutliers,
+                                        ),
                                 colors: [
                                   autoColor,
                                 ],
@@ -651,11 +619,27 @@ class _TeamViewState extends State<TeamView> {
                                 barWidth: 5,
                               ),
                               LineChartBarData(
-                                show: _selections[3],
-                                spots: _team.scores
-                                    .diceScores(_dice)
-                                    .spots(OpModeType.tele)
-                                    .removeOutliers(_statConfig.removeOutliers),
+                                show: _selections[2],
+                                spots: widget.event.statConfig.allianceTotal
+                                    ? widget.event
+                                        .getSortedMatches(true)
+                                        .where(
+                                          (e) =>
+                                              e.dice == _dice ||
+                                              _dice == Dice.none,
+                                        )
+                                        .toList()
+                                        .spots(_team, _dice, false,
+                                            type: OpModeType.tele)
+                                        .removeOutliers(widget
+                                            .event.statConfig.removeOutliers)
+                                    : _team.scores
+                                        .diceScores(_dice)
+                                        .spots(OpModeType.tele)
+                                        .removeOutliers(
+                                          widget
+                                              .event.statConfig.removeOutliers,
+                                        ),
                                 colors: [
                                   teleColor,
                                 ],
@@ -665,11 +649,27 @@ class _TeamViewState extends State<TeamView> {
                                 barWidth: 5,
                               ),
                               LineChartBarData(
-                                show: _selections[4],
-                                spots: _team.scores
-                                    .diceScores(_dice)
-                                    .spots(OpModeType.endgame)
-                                    .removeOutliers(_statConfig.removeOutliers),
+                                show: _selections[3],
+                                spots: widget.event.statConfig.allianceTotal
+                                    ? widget.event
+                                        .getSortedMatches(true)
+                                        .where(
+                                          (e) =>
+                                              e.dice == _dice ||
+                                              _dice == Dice.none,
+                                        )
+                                        .toList()
+                                        .spots(_team, _dice, false,
+                                            type: OpModeType.endgame)
+                                        .removeOutliers(widget
+                                            .event.statConfig.removeOutliers)
+                                    : _team.scores
+                                        .diceScores(_dice)
+                                        .spots(OpModeType.endgame)
+                                        .removeOutliers(
+                                          widget
+                                              .event.statConfig.removeOutliers,
+                                        ),
                                 colors: [
                                   endgameColor,
                                 ],
@@ -731,7 +731,7 @@ class _TeamViewState extends State<TeamView> {
                               color: teleColor,
                               dataSource: _team.scores
                                   .diceScores(_dice)
-                                  .map((e) => e.teleScore.teleCycles)
+                                  .map((e) => e.teleScore.teleCycles())
                                   .toList(),
                               xValueMapper: (int misses, _) => _ + 1,
                               yValueMapper: (int misses, _) => misses,
@@ -743,9 +743,7 @@ class _TeamViewState extends State<TeamView> {
                               color: endgameColor,
                               dataSource: _team.scores
                                   .diceScores(_dice)
-                                  .map(
-                                    (e) => e.teleScore.endgameCycles,
-                                  )
+                                  .map((e) => e.teleScore.endgameCycles())
                                   .toList(),
                               xValueMapper: (int misses, _) => _ + 1,
                               yValueMapper: (int misses, _) => misses,

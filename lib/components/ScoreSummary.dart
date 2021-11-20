@@ -34,10 +34,7 @@ class ScoreSummary extends StatelessWidget {
         BarGraph(
           height: height,
           width: width,
-          val: score
-                  ?.total(showPenalties: showPenalties)
-                  .toDouble() ??
-              0,
+          val: score?.total(showPenalties: showPenalties).toDouble() ?? 0,
           max: totalMax,
           title: 'Total',
         ),

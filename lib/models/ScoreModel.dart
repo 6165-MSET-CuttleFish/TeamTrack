@@ -209,8 +209,6 @@ class TeleScore extends ScoreDivision {
     for (final element in this.getElements()) {
       element.count = 0;
     }
-    teleCycles = 0;
-    endgameCycles = 0;
     cycleTimes = [];
     misses.count = 0;
   }
@@ -219,8 +217,33 @@ class TeleScore extends ScoreDivision {
   Map<String, ScoringElement> elements = Map();
   List<ScoringElement> getElements() => elements.values.toList();
   List<double> cycleTimes = [];
-  int teleCycles = 0;
-  int endgameCycles = 0;
+
+  int teleCycles() {
+    double cycleSum = 0;
+    int cycles = 0;
+    for (final cycleTime in cycleTimes) {
+      cycleSum += cycleTime;
+      if (cycleSum < 90) {
+        cycles++;
+      } else {
+        break;
+      }
+    }
+    return cycles;
+  }
+
+  int endgameCycles() {
+    double cycleSum = 0;
+    int cycles = 0;
+    for (final cycleTime in cycleTimes) {
+      cycleSum += cycleTime;
+      if (cycleSum > 90) {
+        cycles++;
+      }
+    }
+    return cycles;
+  }
+
   ScoringElement misses =
       ScoringElement(name: "Misses", value: 1, key: 'Misses');
   Dice getDice() => dice;
@@ -294,15 +317,6 @@ class TeleScore extends ScoreDivision {
     } catch (e) {
       cycleTimes = [];
     }
-    double cycleSum = 0;
-    for (final cycleTime in cycleTimes) {
-      cycleSum += cycleTime;
-      if (cycleSum < 90) {
-        teleCycles++;
-      } else {
-        endgameCycles++;
-      }
-    }
     misses = ScoringElement(
         name: 'Misses', count: map['Misses'] ?? 0, key: 'Misses', value: 1);
 
@@ -312,8 +326,6 @@ class TeleScore extends ScoreDivision {
         ...elements.map((key, value) => MapEntry(key, value.count)),
         'Misses': misses.count,
         'CycleTimes': json.encode(cycleTimes),
-        'TeleCycles': teleCycles,
-        'EndgameCycles': endgameCycles,
       };
 }
 
