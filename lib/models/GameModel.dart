@@ -10,7 +10,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:teamtrack/functions/Functions.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/models/Change.dart';
-import 'package:tuple/tuple.dart';
+import 'package:teamtrack/models/StatConfig.dart';
 import 'ScoreModel.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter/material.dart';
@@ -21,10 +21,28 @@ class Statics {
   static String gameName = "FreightFrenzy";
 }
 
-enum EventType { live, local, remote }
-enum Dice { one, two, three, none }
-enum OpModeType { auto, tele, endgame, penalty,  }
-enum UserType { admin, editor, viewer }
+enum EventType {
+  live,
+  local,
+  remote,
+}
+enum Dice {
+  one,
+  two,
+  three,
+  none,
+}
+enum OpModeType {
+  auto,
+  tele,
+  endgame,
+  penalty,
+}
+enum UserType {
+  admin,
+  editor,
+  viewer,
+}
 
 class Event with ClusterItem {
   Event({
@@ -33,7 +51,9 @@ class Event with ClusterItem {
     required this.gameName,
     this.role = Role.editor,
   });
+
   String id = Uuid().v4();
+  StatConfig statConfig = StatConfig();
 
   TeamTrackUser? author;
 
@@ -102,26 +122,13 @@ class Event with ClusterItem {
 
   List<Match> getMatches(Team team) {
     var arr = <Match>[];
-    for (var match in matches.values) {
+    final matches = getSortedMatches(true);
+    for (var match in matches) {
       if (team.scores[match.id] != null) {
         arr.add(match);
       }
     }
     return arr;
-  }
-
-  List<Tuple2<Team, List<Match>>> getMatchLists() {
-    var bigArr = <Tuple2<Team, List<Match>>>[];
-    for (var team in teams.values) {
-      var smallArr = <Match>[];
-      for (var match in matches.values) {
-        if (match.alliance(team) != null) {
-          smallArr.add(match);
-        }
-      }
-      bigArr.add(Tuple2(team, smallArr));
-    }
-    return bigArr;
   }
 
   void addMatch(Match e) async {
@@ -390,6 +397,7 @@ class Event with ClusterItem {
     role = Role.editor;
     gameName = json?['gameName'] ?? Statics.gameName;
     type = getTypeFromString(json?['type']);
+    statConfig.allianceTotal = type == EventType.remote;
     name = json?['name'];
     try {
       teams = (json?['teams'] as Map)

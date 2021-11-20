@@ -1,6 +1,5 @@
 import 'package:flutter/services.dart';
 import 'package:teamtrack/models/GameModel.dart';
-import 'package:teamtrack/models/StatConfig.dart';
 import 'package:teamtrack/views/home/match/MatchConfig.dart';
 import 'package:teamtrack/views/home/match/MatchList.dart';
 import 'package:teamtrack/views/home/util/CheckList.dart';
@@ -25,13 +24,12 @@ class EventView extends StatefulWidget {
 class _EventView extends State<EventView> {
   final slider = SlidableStrechActionPane();
   OpModeType? sortingModifier;
-  StatConfig _statConfig = StatConfig();
   bool ascending = false;
   List<Widget> materialTabs() => [
         TeamList(
           event: widget.event,
           sortMode: sortingModifier,
-          statConfig: _statConfig,
+          statConfig: widget.event.statConfig,
         ),
         MatchList(
           event: widget.event,
@@ -55,7 +53,7 @@ class _EventView extends State<EventView> {
                   builder: (_) => CheckList(
                     state: this,
                     event: widget.event,
-                    statConfig: _statConfig,
+                    statConfig: widget.event.statConfig,
                   ),
                 ),
               ),
@@ -111,11 +109,11 @@ class _EventView extends State<EventView> {
                   context: context,
                   delegate: _tab == 0
                       ? TeamSearch(
-                          statConfig: _statConfig,
-                          teams: _statConfig.sorted
+                          statConfig: widget.event.statConfig,
+                          teams: widget.event.statConfig.sorted
                               ? widget.event.teams.sortedTeams(
                                   sortingModifier,
-                                  _statConfig,
+                                  widget.event.statConfig,
                                   widget.event.matches.values.toList(),
                                 )
                               : widget.event.teams.values.toList(),
@@ -123,6 +121,7 @@ class _EventView extends State<EventView> {
                           event: widget.event,
                         )
                       : MatchSearch(
+                          statConfig: widget.event.statConfig,
                           matches: widget.event.getSortedMatches(ascending),
                           event: widget.event,
                           ascending: ascending,

@@ -10,12 +10,12 @@ class CheckList extends StatefulWidget {
     required this.state,
     required this.event,
     required this.statConfig,
-    this.team,
+    this.showSorting = true,
   }) : super(key: key);
   final StatConfig statConfig;
   final State state;
   final Event event;
-  final Team? team;
+  final bool showSorting;
   @override
   _CheckListState createState() => _CheckListState();
 }
@@ -26,7 +26,7 @@ class _CheckListState extends State<CheckList> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (widget.team == null)
+        if (widget.showSorting)
           CheckboxListTile(
             value: widget.statConfig.sorted,
             onChanged: (_) => setState(

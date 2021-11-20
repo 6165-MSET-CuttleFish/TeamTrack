@@ -873,6 +873,16 @@ class ScoreCard extends StatelessWidget {
     final allAllianceTotals = allAlliances
         .map((alliance) => alliance.allianceTotal(false, type: type).toDouble())
         .toList();
+    final maxAllianceDeviation = event.teams.values
+        .map(
+          (e) => event.matches.values
+              .toList()
+              .spots(e, Dice.none, false, type: type)
+              .removeOutliers(removeOutliers)
+              .map((spot) => spot.y)
+              .standardDeviation(),
+        )
+        .minValue();
     return CardView(
       isActive: scoreDivisions.diceScores(dice).length >= 1,
       child: Padding(
@@ -914,21 +924,7 @@ class ScoreCard extends StatelessWidget {
               max: !matchTotal
                   ? event.teams
                       .lowestStandardDeviationScore(dice, removeOutliers, type)
-                  : event
-                      .getMatchLists()
-                      .map(
-                        (matches) => matches.item2
-                            .where(
-                              (match) =>
-                                  match.dice == dice || dice == Dice.none,
-                            )
-                            .toList()
-                            .spots(matches.item1, dice, false, type: type)
-                            .removeOutliers(removeOutliers)
-                            .map((spot) => spot.y)
-                            .standardDeviation(),
-                      )
-                      .minValue(),
+                  : maxAllianceDeviation,
               inverted: true,
               title: 'Deviation',
             ),

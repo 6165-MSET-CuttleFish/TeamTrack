@@ -164,7 +164,7 @@ class _TeamViewState extends State<TeamView> {
                   state: this,
                   statConfig: _statConfig,
                   event: widget.event,
-                  team: _team,
+                  showSorting: false,
                 ),
               ),
             ),
@@ -379,9 +379,7 @@ class _TeamViewState extends State<TeamView> {
                       Padding(
                         padding: const EdgeInsets.only(top: 20, bottom: 10),
                         child: PlatformText(
-                          widget.event.type == EventType.remote
-                              ? 'Total'
-                              : 'Subtotal',
+                          'Total',
                           style: Theme.of(context).textTheme.bodyText1,
                         ),
                       ),

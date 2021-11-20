@@ -11,6 +11,7 @@ import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'package:teamtrack/functions/Statistics.dart';
 import 'package:teamtrack/providers/Auth.dart';
+import 'package:teamtrack/views/home/util/ScoreSummary.dart';
 import 'package:teamtrack/views/home/util/UsersRow.dart';
 import 'package:uuid/uuid.dart';
 import 'package:teamtrack/functions/Extensions.dart';
@@ -35,16 +36,17 @@ class _MatchView extends State<MatchView> {
   Match? _match;
   final blue = Colors.blue;
   final red = CupertinoColors.systemRed;
-  bool _showPenalties = true;
-  bool _showRoles = false;
+  bool _showPenalties = true,
+      _allianceTotal = false,
+      _showRoles = false,
+      _paused = true,
+      _allowView = false;
   final Stream<int> _periodicStream =
       Stream.periodic(const Duration(milliseconds: 100), (i) => i);
   double _time = 0;
   List<double> lapses = [];
   double sum = 0;
   int? _previousStreamValue = 0;
-  bool _paused = true;
-  bool _allowView = false;
   _MatchView(this._match, Team? team, Event event) {
     _selectedAlliance = _match?.red;
     if (_match == null) {
@@ -262,11 +264,56 @@ class _MatchView extends State<MatchView> {
                                         Theme.of(context).textTheme.headline4,
                                   ),
                                 ),
-                                Container(
-                                  child: PlatformText('-',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headline4),
+                                DropdownButton<Dice>(
+                                  value: _match?.dice,
+                                  focusColor: Colors.black,
+                                  icon: Icon(Icons.height_rounded),
+                                  iconSize: 24,
+                                  iconEnabledColor:
+                                      Theme.of(context).colorScheme.primary,
+                                  elevation: 16,
+                                  style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary),
+                                  underline: Container(
+                                    height: 0.5,
+                                    color: Colors.deepPurple,
+                                  ),
+                                  onChanged: (newValue) {
+                                    setState(
+                                      () {
+                                        HapticFeedback.mediumImpact();
+                                        _match?.setDice(newValue ?? Dice.one);
+                                      },
+                                    );
+                                    widget.event
+                                        .getRef()
+                                        ?.child('matches/${_match?.id}/dice')
+                                        .set((newValue ?? Dice.one).toString());
+                                    dataModel.saveEvents();
+                                  },
+                                  items: [Dice.one, Dice.two, Dice.three]
+                                      .map<DropdownMenuItem<Dice>>(
+                                        (value) => DropdownMenuItem<Dice>(
+                                          value: value,
+                                          child: PlatformText(
+                                            json.decode(
+                                                  remoteConfig.getString(
+                                                    widget.event.gameName,
+                                                  ),
+                                                )['Dice']['name'] +
+                                                ' : ' +
+                                                value.toVal(
+                                                  widget.event.gameName,
+                                                ),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyText1,
+                                          ),
+                                        ),
+                                      )
+                                      .toList(),
                                 ),
                                 Container(
                                   alignment: Alignment.center,
@@ -286,203 +333,190 @@ class _MatchView extends State<MatchView> {
                           if (_match?.type != EventType.remote &&
                               _match != null)
                             buttonRow(),
-                          PlatformText(
-                            (_selectedTeam?.name ?? '') +
-                                ' : ' +
-                                (widget.event.type != EventType.remote
-                                    ? (_score
-                                            ?.total(
-                                              showPenalties:
-                                                  widget.event.type ==
-                                                          EventType.remote
-                                                      ? _showPenalties
-                                                      : false,
-                                            )
-                                            .toString() ??
-                                        '')
-                                    : (widget.match == null
-                                        ? (_score?.total().toString() ?? '')
-                                        : (_match?.score(
-                                                showPenalties:
-                                                    _showPenalties) ??
-                                            ''))),
-                            style: Theme.of(context).textTheme.headline6,
-                          ),
-                          if (widget.match != null)
-                            DropdownButton<Dice>(
-                              value: _match?.dice,
-                              icon: Icon(Icons.height_rounded),
-                              iconSize: 24,
-                              elevation: 16,
-                              style: TextStyle(
-                                  color: Theme.of(context).colorScheme.primary),
-                              underline: Container(
-                                height: 0.5,
-                                color: Colors.deepPurple,
+                          Column(
+                            children: [
+                              PlatformText(
+                                (_selectedTeam?.name ?? ''),
+                                style: Theme.of(context).textTheme.headline6,
                               ),
-                              onChanged: (newValue) {
-                                setState(
-                                  () {
-                                    HapticFeedback.mediumImpact();
-                                    _match?.setDice(newValue ?? Dice.one);
-                                  },
-                                );
-                                widget.event
-                                    .getRef()
-                                    ?.child('matches/${_match?.id}/dice')
-                                    .set(newValue.toString());
-                                dataModel.saveEvents();
-                              },
-                              items: [Dice.one, Dice.two, Dice.three]
-                                  .map<DropdownMenuItem<Dice>>(
-                                (value) {
-                                  return DropdownMenuItem<Dice>(
-                                    value: value,
-                                    child: PlatformText(
-                                      json.decode(
-                                            remoteConfig.getString(
-                                              widget.event.gameName,
-                                            ),
-                                          )['Dice']['name'] +
-                                          ' : ' +
-                                          value.toVal(widget.event.gameName),
-                                    ),
-                                  );
-                                },
-                              ).toList(),
-                            ),
-                          if (getPenaltyAlliance() != null &&
-                              widget.match != null)
-                            ExpansionTile(
-                                leading: Checkbox(
-                                  checkColor: Colors.black,
-                                  fillColor:
-                                      MaterialStateProperty.all(Colors.red),
-                                  value: _showPenalties,
-                                  onChanged: (_) => _showPenalties = _ ?? false,
-                                ),
-                                title: PlatformText(
-                                  'Penalties',
-                                  style: TextStyle(fontSize: 16),
-                                ),
-                                children: _score?.penalties
-                                        .getElements()
-                                        .map(
-                                          (e) => Incrementor(
-                                            element: e,
-                                            onPressed: stateSetter,
-                                            event: widget.event,
-                                            path: teamPath(OpModeType.penalty),
-                                            score: _score,
-                                          ),
-                                        )
-                                        .toList() ??
-                                    []),
-                          Padding(
-                            padding: EdgeInsets.only(
-                                left: 25, right: 25, bottom: 10, top: 10),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                SizedBox(
-                                  child: PlatformText(
-                                    'Autonomous : ' +
-                                        ((widget.event.type !=
-                                                    EventType.remote ||
-                                                widget.match == null)
-                                            ? (_score?.autoScore
+                              RawMaterialButton(
+                                fillColor: _allianceTotal
+                                    ? _color.withOpacity(0.3)
+                                    : null,
+                                onPressed: () =>
+                                    _allianceTotal = !_allianceTotal,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                    left: 8.0,
+                                    right: 8.0,
+                                    top: 8.0,
+                                  ),
+                                  child: ScoreSummary(
+                                    event: widget.event,
+                                    score: (widget.event.type ==
+                                                    EventType.remote &&
+                                                widget.match != null) ||
+                                            _allianceTotal
+                                        ? _selectedAlliance?.total()
+                                        : _score,
+                                    autoMax: (widget.event.type ==
+                                                    EventType.remote &&
+                                                widget.match != null) ||
+                                            _allianceTotal
+                                        ? widget.event.matches.values
+                                            .map((element) =>
+                                                [element.red, element.blue])
+                                            .reduce((value, element) =>
+                                                value + element)
+                                            .map((e) =>
+                                                e?.total().autoScore.total())
+                                            .maxValue()
+                                        : widget.event.teams.values
+                                            .map((e) => widget.match == null
+                                                ? e.targetScore?.autoScore
                                                     .total()
-                                                    .toString() ??
-                                                '0')
-                                            : (_selectedAlliance
-                                                    ?.total()
-                                                    .autoScore
+                                                : e.scores.maxScore(Dice.none,
+                                                    false, OpModeType.auto))
+                                            .maxValue(),
+                                    teleMax: (widget.event.type ==
+                                                    EventType.remote &&
+                                                widget.match != null) ||
+                                            _allianceTotal
+                                        ? widget.event.matches.values
+                                            .map((element) =>
+                                                [element.red, element.blue])
+                                            .reduce((value, element) =>
+                                                value + element)
+                                            .map((e) =>
+                                                e?.total().teleScore.total())
+                                            .maxValue()
+                                        : widget.event.teams.values
+                                            .map((e) => widget.match == null
+                                                ? e.targetScore?.teleScore
                                                     .total()
-                                                    .toString() ??
-                                                '0')),
-                                    style: Theme.of(context).textTheme.caption,
+                                                : e.scores.maxScore(Dice.none,
+                                                    false, OpModeType.tele))
+                                            .maxValue(),
+                                    endMax: (widget.event.type ==
+                                                    EventType.remote &&
+                                                widget.match != null) ||
+                                            _allianceTotal
+                                        ? widget.event.matches.values
+                                            .map((element) =>
+                                                [element.red, element.blue])
+                                            .reduce((value, element) =>
+                                                value + element)
+                                            .map((e) =>
+                                                e?.total().endgameScore.total())
+                                            .maxValue()
+                                        : widget.event.teams.values
+                                            .map((e) =>
+                                                widget.match == null
+                                                    ? e.targetScore
+                                                        ?.endgameScore
+                                                        .total()
+                                                    : e.scores.maxScore(
+                                                        Dice.none,
+                                                        false,
+                                                        OpModeType.endgame))
+                                            .maxValue(),
+                                    totalMax: (widget.event.type ==
+                                                    EventType.remote &&
+                                                widget.match != null) ||
+                                            _allianceTotal
+                                        ? widget.event.matches.values
+                                            .map((element) =>
+                                                [element.red, element.blue])
+                                            .reduce((value, element) =>
+                                                value + element)
+                                            .map((e) => e?.total().total())
+                                            .maxValue()
+                                        : widget.event.teams.values
+                                            .map((e) => widget.match == null
+                                                ? e.targetScore?.total()
+                                                : e.scores.maxScore(
+                                                    Dice.none, false, null))
+                                            .maxValue(),
+                                    showPenalties: _showPenalties,
+                                    height: 40,
                                   ),
                                 ),
-                                SizedBox(
-                                  child: PlatformText(
-                                      'Tele-Op : ' +
-                                          ((widget.event.type !=
-                                                      EventType.remote ||
-                                                  widget.match == null)
-                                              ? (_score?.teleScore
-                                                      .total()
-                                                      .toString() ??
-                                                  '0')
-                                              : (_selectedAlliance
-                                                      ?.total()
-                                                      .teleScore
-                                                      .total()
-                                                      .toString() ??
-                                                  '0')),
-                                      style:
-                                          Theme.of(context).textTheme.caption),
-                                ),
-                                SizedBox(
-                                  child: PlatformText(
-                                      'Endgame : ' +
-                                          ((widget.event.type !=
-                                                      EventType.remote ||
-                                                  widget.match == null)
-                                              ? (_score?.endgameScore
-                                                      .total()
-                                                      .toString() ??
-                                                  '0')
-                                              : (_selectedAlliance
-                                                      ?.total()
-                                                      .endgameScore
-                                                      .total()
-                                                      .toString() ??
-                                                  '0')),
-                                      style:
-                                          Theme.of(context).textTheme.caption),
-                                )
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
+                          if (getPenaltyAlliance() != null &&
+                              widget.match != null)
+                            Material(
+                              child: ExpansionTile(
+                                  leading: Checkbox(
+                                    checkColor: Colors.black,
+                                    fillColor:
+                                        MaterialStateProperty.all(Colors.red),
+                                    value: _showPenalties,
+                                    onChanged: (_) =>
+                                        _showPenalties = _ ?? false,
+                                  ),
+                                  title: PlatformText(
+                                    'Penalties',
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                  children: _score?.penalties
+                                          .getElements()
+                                          .map(
+                                            (e) => Incrementor(
+                                              element: e,
+                                              onPressed: stateSetter,
+                                              event: widget.event,
+                                              path:
+                                                  teamPath(OpModeType.penalty),
+                                              score: _score,
+                                            ),
+                                          )
+                                          .toList() ??
+                                      []),
+                            ),
                           if (NewPlatform.isIOS)
                             SizedBox(
-                                width: MediaQuery.of(context).size.width,
-                                child: CupertinoSlidingSegmentedControl(
-                                  groupValue: _view,
-                                  children: <int, Widget>{
-                                    0: PlatformText('Autonomous'),
-                                    1: PlatformText('Tele-Op'),
-                                    2: PlatformText('Endgame')
-                                  },
-                                  onValueChanged: (int? x) {
-                                    setState(
-                                      () {
-                                        HapticFeedback.mediumImpact();
-                                        _view = x ?? 0;
-                                      },
-                                    );
-                                  },
-                                )),
+                              width: MediaQuery.of(context).size.width,
+                              child: CupertinoSlidingSegmentedControl(
+                                groupValue: _view,
+                                children: <int, Widget>{
+                                  0: PlatformText('Autonomous'),
+                                  1: PlatformText('Tele-Op'),
+                                  2: PlatformText('Endgame')
+                                },
+                                onValueChanged: (int? x) {
+                                  setState(
+                                    () {
+                                      HapticFeedback.mediumImpact();
+                                      _view = x ?? 0;
+                                    },
+                                  );
+                                },
+                              ),
+                            ),
                           if (NewPlatform.isAndroid)
                             SizedBox(
                               height: 50,
-                              child: TabBar(
-                                labelColor:
-                                    Theme.of(context).colorScheme.primary,
-                                unselectedLabelColor: Colors.grey,
-                                labelStyle:
-                                    TextStyle(fontFamily: '.SF UI Display'),
-                                tabs: [
-                                  Tab(
-                                    text: 'Autonomous',
-                                  ),
-                                  Tab(
-                                    text: 'Tele-Op',
-                                  ),
-                                  Tab(
-                                    text: 'Endgame',
-                                  )
-                                ],
+                              child: Material(
+                                child: TabBar(
+                                  labelColor:
+                                      Theme.of(context).colorScheme.primary,
+                                  unselectedLabelColor: Colors.grey,
+                                  labelStyle:
+                                      TextStyle(fontFamily: '.SF UI Display'),
+                                  tabs: [
+                                    Tab(
+                                      text: 'Autonomous',
+                                    ),
+                                    Tab(
+                                      text: 'Tele-Op',
+                                    ),
+                                    Tab(
+                                      text: 'Endgame',
+                                    )
+                                  ],
+                                ),
                               ),
                             ),
                           Divider(

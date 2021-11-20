@@ -5,6 +5,7 @@ import 'package:teamtrack/components/PercentChange.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/functions/Statistics.dart';
+import 'package:teamtrack/models/ScoreModel.dart';
 import 'package:teamtrack/models/StatConfig.dart';
 
 class TeamRow extends StatelessWidget {
@@ -26,10 +27,17 @@ class TeamRow extends StatelessWidget {
 
   @override
   Widget build(context) {
-    final percentIncrease = team.scores
-        .map((key, value) => MapEntry(key, value.getScoreDivision(sortMode)))
-        .values
-        .percentIncrease();
+    final percentIncrease = statConfig.allianceTotal
+        ? event
+            .getMatches(team)
+            .map((e) => e.alliance(team)?.total())
+            .whereType<Score>()
+            .percentIncrease()
+        : team.scores
+            .map(
+                (key, value) => MapEntry(key, value.getScoreDivision(sortMode)))
+            .values
+            .percentIncrease();
     return Container(
       decoration: BoxDecoration(
         border: Border.all(
@@ -49,8 +57,7 @@ class TeamRow extends StatelessWidget {
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (percentIncrease != null)
-              PercentChange(percentIncrease: percentIncrease),
+            if (percentIncrease != null) PercentChange(percentIncrease),
             Padding(
               padding: EdgeInsets.all(
                 10,

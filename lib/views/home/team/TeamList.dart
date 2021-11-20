@@ -43,6 +43,11 @@ class _TeamList extends State<TeamList> {
               context,
             );
           }
+          if (!eventHandler.hasData && widget.event.shared) {
+            return Center(
+              child: PlatformProgressIndicator(),
+            );
+          }
           var max = widget.event.teams.maxMeanScore(
             Dice.none,
             widget.statConfig.removeOutliers,

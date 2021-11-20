@@ -6,7 +6,10 @@ import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/functions/Extensions.dart';
+import 'package:teamtrack/models/ScoreModel.dart';
 import 'dart:convert';
+import 'package:teamtrack/models/StatConfig.dart';
+import 'package:teamtrack/views/home/util/ScoreSummary.dart';
 
 class MatchRow extends StatelessWidget {
   const MatchRow({
@@ -20,7 +23,7 @@ class MatchRow extends StatelessWidget {
     this.teleMax = 0,
     this.endMax = 0,
     this.totalMax = 0,
-    this.allianceTotalMax = 0,
+    required this.statConfig,
   }) : super(key: key);
   final Event event;
   final Match match;
@@ -30,7 +33,7 @@ class MatchRow extends StatelessWidget {
   final double teleMax;
   final double endMax;
   final double totalMax;
-  final double allianceTotalMax;
+  final StatConfig statConfig;
   final void Function()? onTap;
   final double width = 30;
   final double height = 60;
@@ -94,59 +97,20 @@ class MatchRow extends StatelessWidget {
     }
   }
 
-  Row teamSummary(BuildContext context) => Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          if (event.type != EventType.remote)
-            BarGraph(
-              height: height,
-              width: width,
-              val: team?.scores[match.id]?.total().toDouble() ?? 0,
-              max: totalMax,
-              title: 'Total',
-            ),
-          BarGraph(
-            height: height,
-            width: width,
-            val: team?.scores[match.id]?.total().toDouble() ?? 0,
-            max: totalMax,
-            title: event.type == EventType.remote ? 'Total' : 'Sub',
-          ),
-          BarGraph(
-            height: height,
-            width: width,
-            val: team?.scores[match.id]?.autoScore.total().toDouble() ?? 0,
-            max: autoMax,
-            title: 'Auto',
-          ),
-          BarGraph(
-            height: height,
-            width: width,
-            val: team?.scores[match.id]?.teleScore.total().toDouble() ?? 0,
-            max: teleMax,
-            title: 'Tele',
-          ),
-          BarGraph(
-            height: height,
-            width: width,
-            val: team?.scores[match.id]?.endgameScore.total().toDouble() ?? 0,
-            max: endMax,
-            title: 'End',
-          ),
-          Container(
-            width: 80,
-            child: PlatformText(
-              '${json.decode(
-                remoteConfig.getString(
-                  event.gameName,
-                ),
-              )['Dice']['name']} : ${match.dice.toVal(event.gameName)}',
-              style: Theme.of(context).textTheme.caption,
-            ),
-          ),
-        ],
-      );
+  ScoreSummary teamSummary(BuildContext context) {
+    Score? score = statConfig.allianceTotal
+        ? match.alliance(team)?.total()
+        : team?.scores[match.id];
+    return ScoreSummary(
+      event: event,
+      score: score,
+      autoMax: autoMax,
+      teleMax: teleMax,
+      endMax: endMax,
+      totalMax: totalMax,
+      showPenalties: event.statConfig.showPenalties,
+    );
+  }
 
   Widget matchSummary(BuildContext context) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -189,7 +153,7 @@ class MatchRow extends StatelessWidget {
             fontWeight: redIsGreater ? FontWeight.bold : null,
             color: team == null
                 ? (redIsGreater ? CupertinoColors.systemRed : Colors.grey)
-                : (teamIsRed ? CupertinoColors.systemYellow : Colors.grey),
+                : (teamIsRed ? CupertinoColors.activeOrange : Colors.grey),
           ),
         ),
         PlatformText(" - ", style: GoogleFonts.gugi()),
@@ -199,7 +163,7 @@ class MatchRow extends StatelessWidget {
             fontWeight: blueIsGreater ? FontWeight.bold : null,
             color: team == null
                 ? (blueIsGreater ? Colors.blue : Colors.grey)
-                : (!teamIsRed ? CupertinoColors.systemYellow : Colors.grey),
+                : (!teamIsRed ? CupertinoColors.activeOrange : Colors.grey),
           ),
         ),
       ],

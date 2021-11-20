@@ -23,7 +23,6 @@ environment:
 dependencies:
   provider: ^5.0.0
   uuid: ^3.0.4
-  tuple: ^2.0.0
   shared_preferences: ^2.0.6
   fluttercontactpicker: ^4.5.1
   url_launcher: ^6.0.6

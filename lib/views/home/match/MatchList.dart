@@ -3,6 +3,7 @@ import 'package:flutter/rendering.dart';
 import 'package:teamtrack/components/EmptyList.dart';
 import 'package:teamtrack/functions/Functions.dart';
 import 'package:teamtrack/models/GameModel.dart';
+import 'package:teamtrack/models/StatConfig.dart';
 import 'package:teamtrack/views/home/match/MatchConfig.dart';
 import 'package:teamtrack/views/home/match/MatchRow.dart';
 import 'package:teamtrack/models/AppModel.dart';
@@ -12,6 +13,8 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:teamtrack/functions/Statistics.dart';
 import 'dart:convert';
+
+import 'package:teamtrack/views/home/util/CheckList.dart';
 
 class MatchList extends StatefulWidget {
   MatchList({
@@ -62,6 +65,11 @@ class _MatchList extends State<MatchList> {
               context,
             );
           }
+          if (!eventHandler.hasData && widget.event.shared) {
+            return Center(
+              child: PlatformProgressIndicator(),
+            );
+          }
           if (widget.team == null) {
             return _matches();
           }
@@ -71,6 +79,19 @@ class _MatchList extends State<MatchList> {
               backgroundColor: Theme.of(context).colorScheme.primary,
               actions: [
                 IconButton(
+                  icon: Icon(Icons.settings),
+                  tooltip: 'Configure',
+                  onPressed: () => showModalBottomSheet(
+                    context: context,
+                    builder: (_) => CheckList(
+                      state: this,
+                      event: widget.event,
+                      statConfig: widget.event.statConfig,
+                      showSorting: false,
+                    ),
+                  ),
+                ),
+                IconButton(
                   icon: Icon(
                     Icons.search,
                   ),
@@ -78,6 +99,7 @@ class _MatchList extends State<MatchList> {
                     showSearch(
                       context: context,
                       delegate: MatchSearch(
+                        statConfig: widget.event.statConfig,
                         matches: widget.event
                             .getSortedMatches(widget.ascending)
                             .where((e) =>
@@ -97,72 +119,73 @@ class _MatchList extends State<MatchList> {
             body: _matches(scrollController),
             floatingActionButtonLocation:
                 FloatingActionButtonLocation.centerFloat,
-            floatingActionButton: _fabIsVisible
-                ? FloatingActionButton(
-                    tooltip: 'Add Match',
-                    onPressed: () async {
-                      if (widget.event.type == EventType.remote)
-                        showPlatformDialog(
-                          context: context,
-                          builder: (context) => PlatformAlert(
-                            title: PlatformText('New Match'),
-                            actions: [
-                              PlatformDialogAction(
-                                child: PlatformText('Cancel'),
-                                onPressed: () {
-                                  setState(
-                                    () {
-                                      Navigator.pop(context);
-                                    },
-                                  );
-                                },
-                              ),
-                              PlatformDialogAction(
-                                child: PlatformText('Add'),
-                                onPressed: () {
-                                  setState(
-                                    () {
-                                      widget.event.addMatch(
-                                        Match(
-                                          Alliance(
-                                            widget.event
-                                                .teams[widget.team?.number],
-                                            null,
-                                            widget.event.type,
-                                            widget.event.gameName,
-                                          ),
-                                          Alliance(
-                                            null,
-                                            null,
-                                            widget.event.type,
-                                            widget.event.gameName,
-                                          ),
-                                          EventType.remote,
-                                        ),
+            floatingActionButton:
+                _fabIsVisible && widget.event.role != Role.viewer
+                    ? FloatingActionButton(
+                        tooltip: 'Add Match',
+                        onPressed: () async {
+                          if (widget.event.type == EventType.remote)
+                            showPlatformDialog(
+                              context: context,
+                              builder: (context) => PlatformAlert(
+                                title: PlatformText('New Match'),
+                                actions: [
+                                  PlatformDialogAction(
+                                    child: PlatformText('Cancel'),
+                                    onPressed: () {
+                                      setState(
+                                        () {
+                                          Navigator.pop(context);
+                                        },
                                       );
-                                      dataModel.saveEvents();
-                                      Navigator.pop(context);
                                     },
-                                  );
-                                },
+                                  ),
+                                  PlatformDialogAction(
+                                    child: PlatformText('Add'),
+                                    onPressed: () {
+                                      setState(
+                                        () {
+                                          widget.event.addMatch(
+                                            Match(
+                                              Alliance(
+                                                widget.event
+                                                    .teams[widget.team?.number],
+                                                null,
+                                                widget.event.type,
+                                                widget.event.gameName,
+                                              ),
+                                              Alliance(
+                                                null,
+                                                null,
+                                                widget.event.type,
+                                                widget.event.gameName,
+                                              ),
+                                              EventType.remote,
+                                            ),
+                                          );
+                                          dataModel.saveEvents();
+                                          Navigator.pop(context);
+                                        },
+                                      );
+                                    },
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                        );
-                      else {
-                        await Navigator.of(context).push(
-                          platformPageRoute(
-                            builder: (_) => MatchConfig(
-                              event: widget.event,
-                            ),
-                          ),
-                        );
-                        setState(() {});
-                      }
-                    },
-                    child: Icon(Icons.add),
-                  )
-                : null,
+                            );
+                          else {
+                            await Navigator.of(context).push(
+                              platformPageRoute(
+                                builder: (_) => MatchConfig(
+                                  event: widget.event,
+                                ),
+                              ),
+                            );
+                            setState(() {});
+                          }
+                        },
+                        child: Icon(Icons.add),
+                      )
+                    : null,
           );
         },
       );
@@ -243,6 +266,7 @@ class _MatchList extends State<MatchList> {
           teleMax: teleMax,
           endMax: endMax,
           totalMax: totalMax,
+          statConfig: widget.event.statConfig,
           onTap: () => navigateToMatch(
             context,
             match: matches[index],
@@ -257,11 +281,17 @@ class _MatchList extends State<MatchList> {
 }
 
 class MatchSearch extends SearchDelegate<String?> {
-  MatchSearch(
-      {required this.matches, required this.event, this.ascending = true});
+  MatchSearch({
+    required this.matches,
+    required this.event,
+    this.ascending = true,
+    required this.statConfig,
+  });
   final List<Match> matches;
   final Event event;
   final bool ascending;
+  StatConfig statConfig;
+
   @override
   List<Widget> buildActions(BuildContext context) => [
         if (query.isNotEmpty)
@@ -309,20 +339,20 @@ class MatchSearch extends SearchDelegate<String?> {
     if (suggestionList.length == 0) return EmptyList();
     return ListView.builder(
       itemCount: suggestionList.length,
-      itemBuilder: (context, index) {
-        return MatchRow(
-            event: event,
+      itemBuilder: (context, index) => MatchRow(
+        statConfig: statConfig,
+        event: event,
+        match: suggestionList[index],
+        index: ascending ? index + 1 : suggestionList.length - index,
+        onTap: () {
+          close(context, null);
+          navigateToMatch(
+            context,
             match: suggestionList[index],
-            index: ascending ? index + 1 : suggestionList.length - index,
-            onTap: () {
-              close(context, null);
-              navigateToMatch(
-                context,
-                match: suggestionList[index],
-                event: event,
-              );
-            });
-      },
+            event: event,
+          );
+        },
+      ),
     );
   }
 }

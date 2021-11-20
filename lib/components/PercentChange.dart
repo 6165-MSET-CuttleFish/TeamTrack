@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
 
 class PercentChange extends StatelessWidget {
-  const PercentChange({
+  const PercentChange(
+    this.percentIncrease, {
     Key? key,
-    required this.percentIncrease,
   }) : super(key: key);
   final double percentIncrease;
   @override
