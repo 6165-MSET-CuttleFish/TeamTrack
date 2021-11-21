@@ -208,14 +208,42 @@ class _MatchList extends State<MatchList> {
     double endMax = 0;
     double totalMax = 0;
     if (widget.team != null) {
-      autoMax =
-          widget.team?.scores.maxScore(Dice.none, false, OpModeType.auto) ?? 0;
-      teleMax =
-          widget.team?.scores.maxScore(Dice.none, false, OpModeType.tele) ?? 0;
-      endMax =
-          widget.team?.scores.maxScore(Dice.none, false, OpModeType.endgame) ??
+      autoMax = widget.event.statConfig.allianceTotal
+          ? widget.event.matches.values
+              .toList()
+              .spots(widget.team!, Dice.none, false, type: OpModeType.auto)
+              .removeOutliers(widget.event.statConfig.removeOutliers)
+              .map((spot) => spot.y)
+              .maxValue()
+          : widget.team?.scores.maxScore(Dice.none, false, OpModeType.auto) ??
               0;
-      totalMax = widget.team?.scores.maxScore(Dice.none, false, null) ?? 0;
+      teleMax = widget.event.statConfig.allianceTotal
+          ? widget.event.matches.values
+              .toList()
+              .spots(widget.team!, Dice.none, false, type: OpModeType.tele)
+              .removeOutliers(widget.event.statConfig.removeOutliers)
+              .map((spot) => spot.y)
+              .maxValue()
+          : widget.team?.scores.maxScore(Dice.none, false, OpModeType.tele) ??
+              0;
+      endMax = widget.event.statConfig.allianceTotal
+          ? widget.event.matches.values
+              .toList()
+              .spots(widget.team!, Dice.none, false, type: OpModeType.endgame)
+              .removeOutliers(widget.event.statConfig.removeOutliers)
+              .map((spot) => spot.y)
+              .maxValue()
+          : widget.team?.scores
+                  .maxScore(Dice.none, false, OpModeType.endgame) ??
+              0;
+      totalMax = widget.event.statConfig.allianceTotal
+          ? widget.event.matches.values
+              .toList()
+              .spots(widget.team!, Dice.none, false)
+              .removeOutliers(widget.event.statConfig.removeOutliers)
+              .map((spot) => spot.y)
+              .maxValue()
+          : widget.team?.scores.maxScore(Dice.none, false, null) ?? 0;
     }
     return ListView.builder(
       controller: NewPlatform.isIOS ? null : scrollController,

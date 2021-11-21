@@ -224,7 +224,7 @@ class ScoreCard extends StatelessWidget {
                       maxY: [
                         event.matches.values
                             .toList()
-                            .maxAllianceScore(type)
+                            .maxAllianceScore(type: type, dice: dice)
                             .toDouble(),
                         targetScore?.total().toDouble() ?? 0.0
                       ].reduce(max),

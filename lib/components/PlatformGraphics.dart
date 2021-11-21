@@ -483,15 +483,15 @@ class PlatformForm extends PlatformWidget<CupertinoFormSection, Form, Null> {
 
 class PlatformFormField
     extends PlatformWidget<CupertinoTextFormFieldRow, TextFormField, Null> {
-  PlatformFormField(
-      {Key? key,
-      required this.controller,
-      this.validator,
-      this.placeholder,
-      this.keyboardType,
-      this.prefix,
-      this.obscureText = false})
-      : super(key: key);
+  PlatformFormField({
+    Key? key,
+    required this.controller,
+    this.validator,
+    this.placeholder,
+    this.keyboardType,
+    this.prefix,
+    this.obscureText = false,
+  }) : super(key: key);
   final TextEditingController controller;
   final String? Function(String?)? validator;
   final String? placeholder;
@@ -531,12 +531,12 @@ class PlatformFormField
 
 class PlatformDatePicker
     extends PlatformWidget<CupertinoDatePicker, CalendarDatePicker, Null> {
-  PlatformDatePicker(
-      {Key? key,
-      required this.minimumDate,
-      required this.maximumDate,
-      required this.onDateChanged})
-      : super(key: key);
+  PlatformDatePicker({
+    Key? key,
+    required this.minimumDate,
+    required this.maximumDate,
+    required this.onDateChanged,
+  }) : super(key: key);
   final DateTime maximumDate, minimumDate;
   final void Function(DateTime) onDateChanged;
   @override

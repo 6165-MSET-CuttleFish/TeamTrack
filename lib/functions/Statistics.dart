@@ -135,9 +135,12 @@ extension MatchExtensions on List<Match> {
     return val;
   }
 
-  int maxAllianceScore([OpModeType? type]) {
+  int maxAllianceScore({OpModeType? type, Dice? dice}) {
     var max = 0;
-    for (Match match in this) {
+    final matches = dice == null || dice == Dice.none
+        ? this
+        : this.where((element) => element.dice == dice);
+    for (Match match in matches) {
       for (Alliance? alliance in match.getAlliances()) {
         if ((alliance?.allianceTotal(true, type: type) ?? 0) > max)
           max = alliance?.allianceTotal(true, type: type) ?? 0;

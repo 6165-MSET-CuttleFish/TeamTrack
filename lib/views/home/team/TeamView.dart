@@ -510,10 +510,16 @@ class _TeamViewState extends State<TeamView> {
                             minX: 0,
                             minY: 0,
                             maxY: [
-                              widget.event.matches.values
-                                  .toList()
-                                  .maxAllianceScore()
-                                  .toDouble(),
+                              widget.event.statConfig.allianceTotal
+                                  ? widget.event.matches.values
+                                      .toList()
+                                      .maxAllianceScore(dice: _dice)
+                                      .toDouble()
+                                  : widget.event.teams.maxScore(
+                                      _dice,
+                                      widget.event.statConfig.removeOutliers,
+                                      null,
+                                    ),
                               _team.targetScore?.total().toDouble() ?? 0.0
                             ].reduce(max),
                             lineBarsData: [
@@ -717,30 +723,32 @@ class _TeamViewState extends State<TeamView> {
                               xValueMapper: (int misses, _) => _ + 1,
                               yValueMapper: (int misses, _) => misses,
                             ),
-                            LineSeries<int, int>(
-                              xAxisName: "Match",
-                              yAxisName: "Total Tele-Op Cycles",
-                              width: 2,
-                              color: teleColor,
-                              dataSource: _team.scores
-                                  .diceScores(_dice)
-                                  .map((e) => e.teleScore.teleCycles())
-                                  .toList(),
-                              xValueMapper: (int misses, _) => _ + 1,
-                              yValueMapper: (int misses, _) => misses,
-                            ),
-                            LineSeries<int, int>(
-                              xAxisName: "Match",
-                              yAxisName: "Total Endgame Cycles",
-                              width: 2,
-                              color: endgameColor,
-                              dataSource: _team.scores
-                                  .diceScores(_dice)
-                                  .map((e) => e.teleScore.endgameCycles())
-                                  .toList(),
-                              xValueMapper: (int misses, _) => _ + 1,
-                              yValueMapper: (int misses, _) => misses,
-                            ),
+                            if (_selections[2])
+                              LineSeries<int, int>(
+                                xAxisName: "Match",
+                                yAxisName: "Total Tele-Op Cycles",
+                                width: 2,
+                                color: teleColor,
+                                dataSource: _team.scores
+                                    .diceScores(_dice)
+                                    .map((e) => e.teleScore.teleCycles())
+                                    .toList(),
+                                xValueMapper: (int misses, _) => _ + 1,
+                                yValueMapper: (int misses, _) => misses,
+                              ),
+                            if (_selections[3])
+                              LineSeries<int, int>(
+                                xAxisName: "Match",
+                                yAxisName: "Total Endgame Cycles",
+                                width: 2,
+                                color: endgameColor,
+                                dataSource: _team.scores
+                                    .diceScores(_dice)
+                                    .map((e) => e.teleScore.endgameCycles())
+                                    .toList(),
+                                xValueMapper: (int misses, _) => _ + 1,
+                                yValueMapper: (int misses, _) => misses,
+                              ),
                           ],
                         ),
                 ),
