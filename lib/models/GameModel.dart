@@ -98,7 +98,7 @@ class Event with ClusterItem {
     await getRef()
         ?.child('teams/${newTeam.number}')
         .update({"name": newTeam.name, "number": newTeam.number});
-    teams[newTeam.number] = newTeam;
+    teams.putIfAbsent(newTeam.number, () => newTeam);
     dataModel.saveEvents();
   }
 
@@ -506,7 +506,7 @@ class Alliance {
                           ? getPenalty()
                           : -getPenalty())
                       : 0)) +
-              sharedScore.total())
+              sharedScore.getScoreDivision(type).total())
           .clamp(0, 999);
   Alliance.fromJson(
     Map<String, dynamic> json,
@@ -577,6 +577,8 @@ class Match {
   }
 
   List<Team?> getTeams() => [red?.team1, red?.team2, blue?.team1, blue?.team2];
+
+  List<Alliance?> getAlliances() => [red, blue];
 
   void setDice(Dice dice) {
     this.dice = dice;

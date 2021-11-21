@@ -22,7 +22,7 @@ class ScoreCard extends StatelessWidget {
     this.type,
     required this.removeOutliers,
     this.matches,
-    required this.matchTotal,
+    required this.allianceTotal,
   }) : super(key: key) {
     switch (type) {
       case OpModeType.auto:
@@ -43,7 +43,7 @@ class ScoreCard extends StatelessWidget {
   final Dice dice;
   final Team team;
   final Event event;
-  final bool matchTotal;
+  final bool allianceTotal;
   final OpModeType? type;
   ScoreDivision? targetScore;
   final bool removeOutliers;
@@ -106,37 +106,37 @@ class ScoreCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             BarGraph(
-              val: !matchTotal
+              val: !allianceTotal
                   ? scoreDivisions.meanScore(dice, removeOutliers)
                   : allianceTotals?.mean() ?? 0,
-              max: !matchTotal
+              max: !allianceTotal
                   ? event.teams.maxMeanScore(dice, removeOutliers, type)
                   : maxAllianceMean,
               title: 'Mean',
             ),
             BarGraph(
-              val: !matchTotal
+              val: !allianceTotal
                   ? scoreDivisions.medianScore(dice, removeOutliers)
                   : allianceTotals?.median() ?? 0,
-              max: !matchTotal
+              max: !allianceTotal
                   ? event.teams.maxMedianScore(dice, removeOutliers, type)
                   : maxAllianceMedian,
               title: 'Median',
             ),
             BarGraph(
-              val: !matchTotal
+              val: !allianceTotal
                   ? scoreDivisions.maxScore(dice, removeOutliers)
                   : allianceTotals?.maxValue() ?? 0,
-              max: !matchTotal
+              max: !allianceTotal
                   ? event.teams.maxScore(dice, removeOutliers, type)
                   : maxAllianceBest,
               title: 'Best',
             ),
             BarGraph(
-              val: !matchTotal
+              val: !allianceTotal
                   ? scoreDivisions.standardDeviationScore(dice, removeOutliers)
                   : allianceTotals?.standardDeviation() ?? 0,
-              max: !matchTotal
+              max: !allianceTotal
                   ? event.teams
                       .lowestStandardDeviationScore(dice, removeOutliers, type)
                   : maxAllianceDeviation,
@@ -221,10 +221,13 @@ class ScoreCard extends StatelessWidget {
                         scoreDivisions.minScore(dice, removeOutliers),
                         targetScore?.total().toDouble() ?? 0.0
                       ].reduce(min),
-                      // maxY: [
-                      //   scoreDivisions.maxScore(dice, removeOutliers),
-                      //   targetScore?.total().toDouble() ?? 0.0
-                      // ].reduce(max),
+                      maxY: [
+                        event.matches.values
+                            .toList()
+                            .maxAllianceScore(type)
+                            .toDouble(),
+                        targetScore?.total().toDouble() ?? 0.0
+                      ].reduce(max),
                       lineBarsData: [
                         if (matches != null)
                           LineChartBarData(

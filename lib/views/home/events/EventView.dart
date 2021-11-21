@@ -116,7 +116,7 @@ class _EventView extends State<EventView> {
                                   widget.event.statConfig,
                                   widget.event.matches.values.toList(),
                                 )
-                              : widget.event.teams.values.toList(),
+                              : widget.event.teams.orderedTeams(),
                           sortMode: sortingModifier,
                           event: widget.event,
                         )

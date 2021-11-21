@@ -135,19 +135,17 @@ extension MatchExtensions on List<Match> {
     return val;
   }
 
-  int maxAllianceScore(Team team) {
-    List<int> val = [];
-    for (int i = 0; i < this.length; i++) {
-      final alliance = this[i].alliance(team);
-      if (alliance != null) {
-        final allianceTotal = alliance.allianceTotal(false);
-        val.add(allianceTotal);
-        final allianceTotal2 = alliance.allianceTotal(true);
-        val.add(allianceTotal2);
+  int maxAllianceScore([OpModeType? type]) {
+    var max = 0;
+    for (Match match in this) {
+      for (Alliance? alliance in match.getAlliances()) {
+        if ((alliance?.allianceTotal(true, type: type) ?? 0) > max)
+          max = alliance?.allianceTotal(true, type: type) ?? 0;
+        if ((alliance?.allianceTotal(false, type: type) ?? 0) > max)
+          max = alliance?.allianceTotal(false, type: type) ?? 0;
       }
     }
-    if (val.isEmpty) return 0;
-    return val.reduce(max);
+    return max;
   }
 
   double maxScore(bool showPenalties) => this
@@ -190,9 +188,15 @@ extension TeamsExtension on Map<String, Team> {
       var newTeam = Team(
           number.replaceAll(new RegExp(r' -,[^\w\s]+'), '').replaceAll(' ', ''),
           name);
-      event.teams[newTeam.number] = newTeam; //addTeam(newTeam);
+      event.teams[newTeam.number] = newTeam;
       return newTeam;
     }
+  }
+
+  List<Team> orderedTeams() {
+    final arr = this.values.toList();
+    arr.sort((a, b) => int.parse(a.number).compareTo(int.parse(b.number)));
+    return arr;
   }
 
   List<Team> sortedTeams(

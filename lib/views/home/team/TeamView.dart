@@ -359,15 +359,13 @@ class _TeamViewState extends State<TeamView> {
                         ),
                       ),
                       ScoreCard(
-                        matchTotal: widget.event.statConfig.allianceTotal,
+                        allianceTotal: widget.event.statConfig.allianceTotal,
                         team: _team,
                         event: widget.event,
                         scoreDivisions: _team.scores.values.toList(),
                         dice: _dice,
                         removeOutliers: widget.event.statConfig.removeOutliers,
-                        matches: widget.event.type == EventType.remote
-                            ? null
-                            : widget.event.getSortedMatches(true),
+                        matches: widget.event.getSortedMatches(true),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(top: 20, bottom: 10),
@@ -377,7 +375,7 @@ class _TeamViewState extends State<TeamView> {
                         ),
                       ),
                       ScoreCard(
-                        matchTotal: widget.event.statConfig.allianceTotal,
+                        allianceTotal: widget.event.statConfig.allianceTotal,
                         team: _team,
                         event: widget.event,
                         type: OpModeType.auto,
@@ -386,9 +384,7 @@ class _TeamViewState extends State<TeamView> {
                             .toList(),
                         dice: _dice,
                         removeOutliers: widget.event.statConfig.removeOutliers,
-                        matches: widget.event.type == EventType.remote
-                            ? null
-                            : widget.event.getSortedMatches(true),
+                        matches: widget.event.getSortedMatches(true),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(top: 20, bottom: 10),
@@ -398,7 +394,7 @@ class _TeamViewState extends State<TeamView> {
                         ),
                       ),
                       ScoreCard(
-                        matchTotal: widget.event.statConfig.allianceTotal,
+                        allianceTotal: widget.event.statConfig.allianceTotal,
                         team: _team,
                         event: widget.event,
                         type: OpModeType.tele,
@@ -407,9 +403,7 @@ class _TeamViewState extends State<TeamView> {
                             .toList(),
                         dice: _dice,
                         removeOutliers: widget.event.statConfig.removeOutliers,
-                        matches: widget.event.type == EventType.remote
-                            ? null
-                            : widget.event.getSortedMatches(true),
+                        matches: widget.event.getSortedMatches(true),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(top: 20, bottom: 10),
@@ -419,7 +413,7 @@ class _TeamViewState extends State<TeamView> {
                         ),
                       ),
                       ScoreCard(
-                        matchTotal: widget.event.statConfig.allianceTotal,
+                        allianceTotal: widget.event.statConfig.allianceTotal,
                         team: _team,
                         event: widget.event,
                         type: OpModeType.endgame,
@@ -428,9 +422,7 @@ class _TeamViewState extends State<TeamView> {
                             .toList(),
                         dice: _dice,
                         removeOutliers: widget.event.statConfig.removeOutliers,
-                        matches: widget.event.type == EventType.remote
-                            ? null
-                            : widget.event.getSortedMatches(true),
+                        matches: widget.event.getSortedMatches(true),
                       ),
                       Padding(
                         padding: EdgeInsets.all(130),
@@ -519,9 +511,9 @@ class _TeamViewState extends State<TeamView> {
                             minX: 0,
                             minY: 0,
                             maxY: [
-                              widget.event
-                                  .getSortedMatches(true)
-                                  .maxAllianceScore(_team)
+                              widget.event.matches.values
+                                  .toList()
+                                  .maxAllianceScore()
                                   .toDouble(),
                               _team.targetScore?.total().toDouble() ?? 0.0
                             ].reduce(max),
@@ -631,8 +623,10 @@ class _TeamViewState extends State<TeamView> {
                                         .toList()
                                         .spots(_team, _dice, false,
                                             type: OpModeType.tele)
-                                        .removeOutliers(widget
-                                            .event.statConfig.removeOutliers)
+                                        .removeOutliers(
+                                          widget
+                                              .event.statConfig.removeOutliers,
+                                        )
                                     : _team.scores
                                         .diceScores(_dice)
                                         .spots(OpModeType.tele)

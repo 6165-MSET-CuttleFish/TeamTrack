@@ -56,7 +56,7 @@ class _TeamList extends State<TeamList> {
           final teams = widget.statConfig.sorted
               ? widget.event.teams.sortedTeams(widget.sortMode,
                   widget.statConfig, widget.event.matches.values.toList())
-              : widget.event.teams.values.toList();
+              : widget.event.teams.orderedTeams();
           if (widget.statConfig.allianceTotal) {
             max = teams
                 .map(
@@ -163,11 +163,7 @@ class TeamSearch extends SearchDelegate<String?> {
   }) {
     max = event.teams
         .maxMeanScore(Dice.none, statConfig.removeOutliers, sortMode);
-    final teams = event.teams.sortedTeams(
-      sortMode,
-      statConfig,
-      event.matches.values.toList(),
-    );
+    final teams = event.teams.values;
     if (statConfig.allianceTotal) {
       max = teams
           .map(
