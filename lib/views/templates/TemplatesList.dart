@@ -26,16 +26,12 @@ class _TemplatesListState extends State<TemplatesList> {
   Geoflutterfire geo = Geoflutterfire();
 
   // Stateful Data
-  BehaviorSubject<double> radius = BehaviorSubject();
+  BehaviorSubject<double> radius = BehaviorSubject.seeded(300);
   Set<Marker> markers = Set();
 
   // Subscription
   late StreamSubscription subscription;
-  @override
-  initState() {
-    super.initState();
-    radius.add(300);
-  }
+  LocationData? currentLocation;
 
   @override
   Widget build(context) {
@@ -43,6 +39,7 @@ class _TemplatesListState extends State<TemplatesList> {
         future: location.getLocation(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) return PlatformProgressIndicator();
+          currentLocation = snapshot.data;
           return Stack(
             alignment: Alignment.bottomCenter,
             children: [
@@ -140,9 +137,9 @@ class _TemplatesListState extends State<TemplatesList> {
 
   _startQuery() async {
     // Get users location
-    var pos = await location.getLocation();
-    final lat = pos.latitude;
-    final lng = pos.longitude;
+    var pos = currentLocation;
+    final lat = pos?.latitude;
+    final lng = pos?.longitude;
 
     // Make a referece to firestore
     final ref = firebaseFirestore.collection('templates');

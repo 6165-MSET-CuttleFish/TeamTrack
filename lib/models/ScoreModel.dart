@@ -5,9 +5,9 @@ import 'package:teamtrack/models/GameModel.dart';
 
 /// This class is used to represent the scoring structure of traditional and remote FTC events.
 class Score extends ScoreDivision implements Comparable<Score> {
-  TeleScore teleScore = TeleScore({});
-  AutoScore autoScore = AutoScore({});
-  EndgameScore endgameScore = EndgameScore({});
+  late TeleScore teleScore;
+  late AutoScore autoScore;
+  late EndgameScore endgameScore;
   Penalty penalties = Penalty();
   String id = '';
   String gameName;

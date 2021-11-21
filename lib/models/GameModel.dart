@@ -195,7 +195,7 @@ class Event with ClusterItem {
         if ((match.red?.hasTeam(team) ?? false) ||
             (match.blue?.hasTeam(team) ?? false)) {
           if (type == EventType.remote)
-            match.red?.team1 == null;
+            match.red?.team1 = null;
           else
             x = 'some';
         }

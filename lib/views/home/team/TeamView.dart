@@ -3,7 +3,6 @@ import 'package:teamtrack/components/Collapsible.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:teamtrack/components/ScoreCard.dart';
 import 'package:teamtrack/models/GameModel.dart';
-import 'package:teamtrack/models/StatConfig.dart';
 import 'package:teamtrack/views/home/match/MatchList.dart';
 import 'package:teamtrack/views/home/match/MatchView.dart';
 import 'package:teamtrack/models/AppModel.dart';
