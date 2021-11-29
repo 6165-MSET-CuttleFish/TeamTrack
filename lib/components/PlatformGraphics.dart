@@ -16,22 +16,23 @@ class NewPlatform {
 Future<void> showPlatformDialog({
   required BuildContext context,
   required Widget Function(BuildContext) builder,
-}) {
-  if (NewPlatform.isIOS) {
-    return showCupertinoDialog(
-        context: context, builder: builder, barrierDismissible: false);
-  } else {
-    return showDialog(
-        context: context, builder: builder, barrierDismissible: true);
-  }
-}
+}) =>
+    NewPlatform.isIOS
+        ? showCupertinoDialog(
+            context: context,
+            builder: builder,
+            barrierDismissible: false,
+          )
+        : showDialog(
+            context: context,
+            builder: builder,
+            barrierDismissible: true,
+          );
 
-PageRoute platformPageRoute({required Widget Function(BuildContext) builder}) {
-  if (NewPlatform.isIOS) {
-    return CupertinoPageRoute(builder: builder);
-  }
-  return MaterialPageRoute(builder: builder);
-}
+PageRoute platformPageRoute({required Widget Function(BuildContext) builder}) =>
+    NewPlatform.isIOS
+        ? CupertinoPageRoute(builder: builder)
+        : MaterialPageRoute(builder: builder);
 
 abstract class PlatformWidget<C extends Widget, M extends Widget,
     W extends Widget?> extends StatelessWidget {

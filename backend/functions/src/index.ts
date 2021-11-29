@@ -37,7 +37,7 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
       .child(`Events/${data.gameName}/${data.id}/Permissions`)
       .transaction((transaction) => {
         // only admins may send events
-        allowSend = transaction[sender.uid].role == "admin";
+        allowSend = transaction[sender.uid]?.role == "admin";
         if (allowSend) {
           transaction[recipient.uid] = {
             "role": data.role,
@@ -180,18 +180,3 @@ export const remoteConfigToDatabase = functions.remoteConfig
       return admin.database().ref().child("config")
           .ref.set(temp.parameters);
     });
-
-// functions.pubsub.schedule("every 1 week")
-//     .onRun(async () => {
-//       const db = admin.firestore();
-//       const now = admin.firestore.Timestamp.now();
-//       const ts = admin.firestore.Timestamp
-//           .fromMillis(now.toMillis() - 86400000);
-//       const snap = await db.collection("templates")
-//           .where("sendTime", "<", ts).get();
-//       const promises: Promise<FirebaseFirestore.WriteResult>[] = [];
-//       snap.forEach((snap) => {
-//         promises.push(snap.ref.delete());
-//       });
-//       return Promise.all(promises);
-//     });

@@ -713,7 +713,7 @@ class _MatchView extends State<MatchView> {
                       event: widget.event,
                       path: matchPath(OpModeType.auto),
                       score: _score,
-                      backgroundColor: Colors.green,
+                      backgroundColor: _color.withOpacity(0.3),
                     ),
                   ) ??
               []
@@ -722,7 +722,7 @@ class _MatchView extends State<MatchView> {
   List<Widget> teleView() => !_paused || _allowView
       ? [
           Incrementor(
-            backgroundColor: Colors.blue.withOpacity(0.3),
+            backgroundColor: Colors.grey.withOpacity(0.3),
             element: incrementValue,
             onPressed: () => setState(
               () {
@@ -733,6 +733,7 @@ class _MatchView extends State<MatchView> {
               },
             ),
           ),
+          Padding(padding: EdgeInsets.all(5)),
           Incrementor(
             backgroundColor: Colors.red.withOpacity(0.3),
             element: _score?.teleScore.misses ?? ScoringElement(),
@@ -741,7 +742,6 @@ class _MatchView extends State<MatchView> {
             path: teamPath(OpModeType.tele),
             score: _score,
           ),
-          Padding(padding: EdgeInsets.all(5)),
           ..._score?.teleScore
                   .getElements()
                   .parse()
@@ -811,7 +811,7 @@ class _MatchView extends State<MatchView> {
                         event: widget.event,
                         path: matchPath(OpModeType.tele),
                         score: _score,
-                        backgroundColor: Colors.green,
+                        backgroundColor: _color.withOpacity(0.3),
                       ),
                     ) ??
                 []
@@ -866,7 +866,7 @@ class _MatchView extends State<MatchView> {
                         event: widget.event,
                         path: matchPath(OpModeType.endgame),
                         score: _score,
-                        backgroundColor: Colors.green.withOpacity(0.3),
+                        backgroundColor: _color.withOpacity(0.3),
                       ),
                     ) ??
                 []

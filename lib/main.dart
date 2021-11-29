@@ -107,19 +107,17 @@ class _TeamTrack extends State<TeamTrack> {
     visualDensity: VisualDensity.adaptivePlatformDensity,
   );
 
-  void getCurrentAppTheme() async {
-    themeChangeProvider.darkTheme =
-        await themeChangeProvider.darkThemePreference.getTheme();
-  }
+  void getCurrentAppTheme() async => themeChangeProvider.darkTheme =
+      await themeChangeProvider.darkThemePreference.getTheme();
 
   @override
-  void initState() {
+  initState() {
     super.initState();
     getCurrentAppTheme();
   }
 
   @override
-  Widget build(context) => ChangeNotifierProvider(
+  build(_) => ChangeNotifierProvider(
         create: (_) => themeChangeProvider,
         child: Consumer<DarkThemeProvider>(
           builder: (context, value, child) => MaterialApp(

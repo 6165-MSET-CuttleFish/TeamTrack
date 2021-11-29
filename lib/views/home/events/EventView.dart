@@ -15,8 +15,13 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:teamtrack/functions/Statistics.dart';
 
 class EventView extends StatefulWidget {
-  EventView({Key? key, required this.event}) : super(key: key);
+  EventView({
+    Key? key,
+    required this.event,
+    this.isPreview = false,
+  }) : super(key: key);
   final Event event;
+  final bool isPreview;
   @override
   _EventView createState() => _EventView();
 }
@@ -41,7 +46,9 @@ class _EventView extends State<EventView> {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: _tab == 0 ? PlatformText('Teams') : PlatformText('Matches'),
+          title: widget.isPreview
+              ? PlatformText(widget.event.name)
+              : (_tab == 0 ? PlatformText('Teams') : PlatformText('Matches')),
           backgroundColor: Theme.of(context).colorScheme.primary,
           actions: [
             if (_tab == 0)
