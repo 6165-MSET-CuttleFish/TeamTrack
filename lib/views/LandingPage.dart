@@ -28,13 +28,14 @@ enum Tab {
   templates,
 }
 
+var tab = Tab.events;
+
 class _LandingPageState extends State<LandingPage> {
-  var _tab = Tab.events;
   EventType? _newType;
   String? _newName;
 
   PlatformText title() {
-    switch (_tab) {
+    switch (tab) {
       case Tab.inbox:
         return PlatformText("Inbox");
       case Tab.blocked_users:
@@ -47,13 +48,13 @@ class _LandingPageState extends State<LandingPage> {
   }
 
   Widget body() {
-    switch (_tab) {
+    switch (tab) {
       case Tab.inbox:
         return Inbox();
       case Tab.blocked_users:
         return BlockList();
       case Tab.templates:
-        return TemplatesList();
+        return TemplatesList(superState: this);
       case Tab.events:
         return EventsList();
     }
@@ -121,7 +122,7 @@ class _LandingPageState extends State<LandingPage> {
             ],
           ),
           body: body(),
-          floatingActionButton: _tab == Tab.events
+          floatingActionButton: tab == Tab.events
               ? FloatingActionButton(
                   tooltip: "Add Event",
                   backgroundColor: Theme.of(context).colorScheme.primary,
@@ -247,7 +248,7 @@ class _LandingPageState extends State<LandingPage> {
                         leading: Icon(Icons.list),
                         title: PlatformText("Events"),
                         onTap: () {
-                          setState(() => _tab = Tab.events);
+                          setState(() => tab = Tab.events);
                           Navigator.of(context).pop();
                         },
                       ),
@@ -255,7 +256,7 @@ class _LandingPageState extends State<LandingPage> {
                         leading: Icon(CupertinoIcons.square_stack),
                         title: PlatformText("Templates"),
                         onTap: () {
-                          setState(() => _tab = Tab.templates);
+                          setState(() => tab = Tab.templates);
                           Navigator.of(context).pop();
                         },
                       ),
@@ -283,7 +284,7 @@ class _LandingPageState extends State<LandingPage> {
                                       ),
                                     ),
                           onTap: () {
-                            setState(() => _tab = Tab.inbox);
+                            setState(() => tab = Tab.inbox);
                             Navigator.of(context).pop();
                           },
                         ),
@@ -292,7 +293,7 @@ class _LandingPageState extends State<LandingPage> {
                           leading: Icon(Icons.people_alt),
                           title: PlatformText("Blocked Users"),
                           onTap: () {
-                            setState(() => _tab = Tab.blocked_users);
+                            setState(() => tab = Tab.blocked_users);
                             Navigator.of(context).pop();
                           },
                         ),

@@ -16,17 +16,18 @@ class NewPlatform {
 Future<void> showPlatformDialog({
   required BuildContext context,
   required Widget Function(BuildContext) builder,
+  bool? barrierDismissible,
 }) =>
     NewPlatform.isIOS
         ? showCupertinoDialog(
             context: context,
             builder: builder,
-            barrierDismissible: false,
+            barrierDismissible: barrierDismissible ?? false,
           )
         : showDialog(
             context: context,
             builder: builder,
-            barrierDismissible: true,
+            barrierDismissible: barrierDismissible ?? true,
           );
 
 PageRoute platformPageRoute({required Widget Function(BuildContext) builder}) =>

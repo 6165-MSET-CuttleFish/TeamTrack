@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:teamtrack/models/GameModel.dart';
+import 'package:teamtrack/views/LandingPage.dart' as LandingPage;
 import 'package:teamtrack/views/home/match/MatchConfig.dart';
 import 'package:teamtrack/views/home/match/MatchList.dart';
 import 'package:teamtrack/components/CheckList.dart';
@@ -192,19 +193,51 @@ class _EventView extends State<EventView> {
             : null,
         body: materialTabs()[_tab],
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: widget.event.role != Role.viewer
+        floatingActionButton: widget.isPreview
             ? FloatingActionButton(
                 backgroundColor: Theme.of(context).colorScheme.primary,
-                tooltip: _tab == 0 ? 'Add Team' : 'Add Match',
-                child: Icon(Icons.add),
-                onPressed: () async {
-                  if (_tab == 0)
-                    _teamConfig();
-                  else
-                    _matchConfig();
+                tooltip: 'Import Event',
+                child: Icon(Icons.import_export),
+                onPressed: () {
+                  showPlatformDialog(
+                    context: context,
+                    builder: (_) => PlatformAlert(
+                      title: PlatformText('Import Event'),
+                      content: PlatformText(
+                        'Are you sure?',
+                      ),
+                      actions: [
+                        PlatformDialogAction(
+                          child: PlatformText('Cancel'),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                        PlatformDialogAction(
+                          child: PlatformText('Import'),
+                          onPressed: () {
+                            dataModel.events.add(widget.event);
+                            LandingPage.tab = LandingPage.Tab.events;
+                            Navigator.of(context).pop();
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      ],
+                    ),
+                  );
                 },
               )
-            : null,
+            : widget.event.role != Role.viewer
+                ? FloatingActionButton(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    tooltip: _tab == 0 ? 'Add Team' : 'Add Match',
+                    child: Icon(Icons.add),
+                    onPressed: () {
+                      if (_tab == 0)
+                        _teamConfig();
+                      else
+                        _matchConfig();
+                    },
+                  )
+                : null,
       );
 
   void _matchConfig() async {

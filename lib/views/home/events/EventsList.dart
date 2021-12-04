@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/views/home/events/EventShare.dart';
@@ -11,7 +12,8 @@ import 'package:provider/provider.dart';
 import 'package:teamtrack/functions/Extensions.dart';
 
 class EventsList extends StatefulWidget {
-  EventsList({Key? key}) : super(key: key);
+  EventsList({Key? key, this.onTap}) : super(key: key);
+  final void Function(Event)? onTap;
   @override
   _EventsList createState() => _EventsList();
 }
@@ -52,12 +54,6 @@ class _EventsList extends State<EventsList> {
 
   Slidable eventTile(Event e) => Slidable(
         actions: [
-          if (e.shared)
-            IconSlideAction(
-              onTap: () {},
-              icon: Icons.share_location,
-              color: Colors.orange,
-            ),
           IconSlideAction(
             onTap: () => _onShare(e),
             icon: e.shared ? Icons.share : Icons.upload,
@@ -86,7 +82,7 @@ class _EventsList extends State<EventsList> {
                       child: PlatformText('Confirm'),
                       onPressed: () {
                         if (e.shared)
-                          onDelete(e);
+                          onRemove(e);
                         else
                           setState(() => dataModel.events.remove(e));
                         dataModel.saveEvents();
@@ -129,15 +125,27 @@ class _EventsList extends State<EventsList> {
                 ),
               ],
             ),
-            onTap: () {
-              Navigator.push(
-                context,
-                platformPageRoute(
-                  builder: (context) => EventView(
-                    event: e,
+            onTap: () async {
+              final map = await e.getRef()?.once();
+              e.updateLocal(
+                json.decode(
+                  json.encode(
+                    map?.value,
                   ),
                 ),
+                context,
               );
+              if (widget.onTap != null)
+                widget.onTap!(e);
+              else
+                Navigator.push(
+                  context,
+                  platformPageRoute(
+                    builder: (_) => EventView(
+                      event: e,
+                    ),
+                  ),
+                );
             },
           ),
         ),
@@ -224,17 +232,20 @@ class _EventsList extends State<EventsList> {
     }
   }
 
-  void onDelete(Event e) async {
+  void onRemove(Event e) async {
     final uid = context.read<User?>()?.uid;
-    await firebaseDatabase
-        .reference()
-        .child('Events/${e.gameName}/${e.id}/Permissions/$uid')
-        .remove();
-    dataModel.saveEvents();
+    final map = await e.getRef()?.once();
+    e.updateLocal(json.decode(json.encode(map?.value)), context);
     if (e.users
             .firstWhere((element) => element.uid == context.read<User?>()?.uid)
             .role ==
-        Role.admin) e.getRef()?.remove();
-    Navigator.of(context).pop();
+        Role.admin)
+      await e.getRef()?.remove();
+    else
+      await firebaseDatabase
+          .reference()
+          .child('Events/${e.gameName}/${e.id}/Permissions/$uid')
+          .remove();
+    dataModel.saveEvents();
   }
 }

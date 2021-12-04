@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
@@ -9,10 +10,12 @@ import 'dart:async';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/views/home/events/EventView.dart';
+import 'package:teamtrack/views/home/events/EventsList.dart';
+import 'package:provider/provider.dart';
 
 class TemplatesList extends StatefulWidget {
-  TemplatesList({Key? key}) : super(key: key);
-
+  TemplatesList({Key? key, required this.superState}) : super(key: key);
+  final State superState;
   @override
   _TemplatesListState createState() => _TemplatesListState();
 }
@@ -52,11 +55,8 @@ class _TemplatesListState extends State<TemplatesList> {
                 ),
                 onMapCreated: _onMapCreated,
                 myLocationEnabled: true,
-                mapType: MapType.normal,
-                compassEnabled: true,
                 markers: markers,
                 zoomControlsEnabled: false,
-                onTap: _addGeoPoint,
               ),
               Padding(
                 padding: const EdgeInsets.only(bottom: 50.0),
@@ -75,6 +75,13 @@ class _TemplatesListState extends State<TemplatesList> {
                         onChanged: _updateQuery,
                       ),
                     ),
+                    if (!(context.read<User?>()?.isAnonymous ?? true))
+                      FloatingActionButton(
+                        onPressed: _addGeoPoint,
+                        child: Icon(
+                          Icons.add,
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -98,24 +105,69 @@ class _TemplatesListState extends State<TemplatesList> {
       );
 
   // Set GeoLocation Data
-  Future<DocumentReference> _addGeoPoint(LatLng pos) async {
+  void _addGeoPoint() async {
+    final center = await getCenter();
     GeoFirePoint point = geo.point(
-      latitude: pos.latitude,
-      longitude: pos.longitude,
+      latitude: center.latitude,
+      longitude: center.longitude,
     );
-    final newEvent = Event.fromJson(
-      Event(
-        name: "Test Event",
-        type: EventType.local,
-        gameName: Statics.gameName,
-      ).toJson(),
+    await showModalBottomSheet(
+      context: context,
+      builder: (_) => Container(
+        child: EventsList(
+          onTap: (event) async {
+            final newEvent = Event.fromJson(
+              event.toJson(),
+            );
+            var newEventJson = newEvent.toJson();
+            newEventJson['position'] = point.data;
+            newEventJson.remove('id');
+            newEventJson.remove('shared');
+            Navigator.of(context).pop();
+            showPlatformDialog(
+              barrierDismissible: false,
+              context: context,
+              builder: (_) => PlatformAlert(
+                content: Center(
+                  child: PlatformProgressIndicator(),
+                ),
+              ),
+            );
+            final ref = await firebaseFirestore
+                .collection('templates')
+                .add(newEventJson);
+            Navigator.of(context).pop();
+            setState(
+              () => markers.add(
+                Marker(
+                  markerId: MarkerId(ref.id),
+                  position: LatLng(point.latitude, point.longitude),
+                  icon: BitmapDescriptor.defaultMarkerWithHue(
+                    BitmapDescriptor.hueBlue,
+                  ),
+                  onTap: () async {
+                    await subscription.cancel();
+                    mapController.dispose();
+                    await Navigator.push(
+                      context,
+                      platformPageRoute(builder: (_) {
+                        final event = newEvent;
+                        event.shared = false;
+                        return EventView(
+                          event: event,
+                          isPreview: true,
+                        );
+                      }),
+                    );
+                    widget.superState.setState(dataModel.saveEvents);
+                  },
+                ),
+              ),
+            );
+          },
+        ),
+      ),
     );
-    var newEventJson = newEvent.toJson();
-    newEventJson['position'] = point.data;
-    newEventJson.remove('id');
-    newEventJson.remove('shared');
-
-    return firebaseFirestore.collection('templates').add(newEventJson);
   }
 
   void _updateMarkers(List<DocumentSnapshot> documentList) async {
@@ -128,7 +180,7 @@ class _TemplatesListState extends State<TemplatesList> {
         onTap: () async {
           await subscription.cancel();
           mapController.dispose();
-          Navigator.push(
+          await Navigator.push(
             context,
             platformPageRoute(builder: (_) {
               final event =
@@ -140,6 +192,8 @@ class _TemplatesListState extends State<TemplatesList> {
               );
             }),
           );
+          await dataModel.saveEvents();
+          widget.superState.setState(() {});
         },
       );
       markers.add(marker);
