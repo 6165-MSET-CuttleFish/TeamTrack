@@ -154,6 +154,7 @@ class _TemplatesListState extends State<TemplatesList> {
                       platformPageRoute(builder: (_) {
                         final event = newEvent;
                         event.shared = false;
+                        event.role = Role.viewer;
                         return EventView(
                           event: event,
                           isPreview: true,
@@ -187,6 +188,7 @@ class _TemplatesListState extends State<TemplatesList> {
               final event =
                   Event.fromJson(document.data() as Map<String, dynamic>);
               event.shared = false;
+              event.role = Role.viewer;
               return EventView(
                 event: event,
                 isPreview: true,
