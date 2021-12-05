@@ -36,21 +36,21 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
   const senderPerms = await admin.database().ref()
       .child(`Events/${data.gameName}/${data.id}/Permissions/${sender.uid}`)
       .get();
-  allowSend = senderPerms.val() == "admin";
+  allowSend = senderPerms.val().role == "admin";
   if (!allowSend) {
     throw new functions.https.HttpsError(
         "permission-denied",
         "You do not have admin access to this document"
     );
   }
-  await admin.database().ref()
+  console.log(await admin.database().ref()
       .child(`Events/${data.gameName}/${data.id}/Permissions/${recipient.uid}`)
-      .update({
+      .set({
         "role": data.role ?? "viewer",
         "displayName": recipient.displayName,
         "email": recipient.email,
         "photoURL": recipient.photoURL,
-      });
+      }));
   const meta = {
     "id": data.id,
     "name": data.name,
