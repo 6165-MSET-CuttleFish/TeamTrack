@@ -15,10 +15,8 @@ import 'package:provider/provider.dart';
 class EventShare extends StatefulWidget {
   const EventShare({
     Key? key,
-    required this.emailController,
     required this.event,
   }) : super(key: key);
-  final TextEditingController emailController;
   final Event event;
   @override
   _EventShareState createState() => _EventShareState();
@@ -28,6 +26,7 @@ Role shareRole = Role.editor;
 
 class _EventShareState extends State<EventShare> {
   EmailContact? _emailContact;
+  final emailController = TextEditingController();
   @override
   Widget build(BuildContext context) => StreamBuilder<Database.Event>(
         stream: widget.event.getRef()?.onValue,
@@ -64,7 +63,7 @@ class _EventShareState extends State<EventShare> {
                           textInputAction: TextInputAction.done,
                           placeholder: 'Email',
                           keyboardType: TextInputType.emailAddress,
-                          controller: widget.emailController,
+                          controller: emailController,
                           autoCorrect: false,
                         ),
                       ),
@@ -97,12 +96,12 @@ class _EventShareState extends State<EventShare> {
                         onPressed: () async {
                           HapticFeedback.lightImpact();
                           if (widget.event.shared) {
-                            if (widget.emailController.text.trim().isNotEmpty) {
+                            if (emailController.text.trim().isNotEmpty) {
                               await widget.event.shareEvent(
-                                email: widget.emailController.text.trim(),
+                                email: emailController.text.trim(),
                                 role: shareRole,
                               );
-                              widget.emailController.clear();
+                              emailController.clear();
                             }
                           }
                           Navigator.pop(context);
@@ -125,6 +124,6 @@ class _EventShareState extends State<EventShare> {
       );
   void _onPressed() async {
     _emailContact = await FlutterContactPicker.pickEmailContact();
-    widget.emailController.text = _emailContact?.email?.email ?? '';
+    emailController.text = _emailContact?.email?.email ?? '';
   }
 }

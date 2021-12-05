@@ -152,7 +152,6 @@ class _EventsList extends State<EventsList> {
         actionPane: slider,
       );
 
-  TextEditingController _emailController = TextEditingController();
   void _onShare(Event e) {
     if (!(context.read<User?>()?.isAnonymous ?? true)) {
       if (!e.shared) {
@@ -206,7 +205,6 @@ class _EventsList extends State<EventsList> {
         Navigator.of(context).push(
           platformPageRoute(
             builder: (context) => EventShare(
-              emailController: _emailController,
               event: e,
             ),
           ),
