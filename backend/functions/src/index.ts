@@ -171,6 +171,7 @@ export const fetchAPI = functions.https.onCall((data, context) => {
   });
 });
 
+
 export const remoteConfigToDatabase = functions.remoteConfig
     .onUpdate(async () => {
       const temp = await admin.remoteConfig().getTemplate();
