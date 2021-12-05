@@ -4,6 +4,10 @@
 <dict>
 	<key>NSContactsUsageDescription</key>
 	<string>Need contacts for sharing events to other users</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Need location for finding events near the user</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Need location for finding events near the user</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Need location for finding events near the user</string>
 	<key>CFBundleDevelopmentRegion</key>
