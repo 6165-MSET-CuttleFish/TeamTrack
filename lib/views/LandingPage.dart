@@ -67,6 +67,7 @@ class _LandingPageState extends State<LandingPage> {
     for (var event in dataModel.events.where((e) => !e.shared)) {
       final user = context.read<User?>();
       event.author = TeamTrackUser.fromUser(user);
+      event.role = Role.admin;
     }
     return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>?>(
       stream: firebaseFirestore

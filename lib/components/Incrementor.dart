@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
+import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/models/ScoreModel.dart';
 
@@ -74,7 +75,7 @@ class _Incrementor extends State<Incrementor> {
       );
   PlatformSwitch buildSwitch() => PlatformSwitch(
         value: widget.element.asBool(),
-        onChanged: (val) async {
+        onChanged: widget.event?.role != Role.viewer ? (val) async {
           if (!(widget.event?.shared ?? false)) {
             if (val && widget.element.count < widget.element.max!())
               widget.element.count = 1;
@@ -92,78 +93,82 @@ class _Incrementor extends State<Incrementor> {
                   : 0;
               return mutableData;
             });
-        },
+        } : null,
       );
   Row buildIncrementor() => Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           RawMaterialButton(
-            onLongPress: widget.element.count > widget.element.min!()
-                ? () {
-                    showPlatformDialog(
-                      context: context,
-                      builder: (context) => PlatformAlert(
-                        title: PlatformText("Reset Field"),
-                        content: PlatformText("Are you sure?"),
-                        actions: [
-                          PlatformDialogAction(
-                            child: PlatformText("Cancel"),
-                            onPressed: () => Navigator.pop(context),
+            onLongPress: widget.event?.role != Role.viewer
+                ? (widget.element.count > widget.element.min!()
+                    ? () {
+                        showPlatformDialog(
+                          context: context,
+                          builder: (context) => PlatformAlert(
+                            title: PlatformText("Reset Field"),
+                            content: PlatformText("Are you sure?"),
+                            actions: [
+                              PlatformDialogAction(
+                                child: PlatformText("Cancel"),
+                                onPressed: () => Navigator.pop(context),
+                              ),
+                              PlatformDialogAction(
+                                child: PlatformText("Confirm"),
+                                isDestructive: true,
+                                onPressed: () async {
+                                  if (!(widget.event?.shared ?? false)) {
+                                    setState(() => widget.element.count =
+                                        widget.element.min!());
+                                    if (widget.onDecrement != null)
+                                      widget.onDecrement!();
+                                  }
+                                  widget.onPressed();
+                                  if (widget.path != null)
+                                    await widget.event
+                                        ?.getRef()
+                                        ?.child(widget.path!)
+                                        .runTransaction(
+                                      (mutableData) {
+                                        mutableData.value[widget.element.key] =
+                                            widget.element.min!();
+                                        return mutableData;
+                                      },
+                                    );
+                                  Navigator.pop(context);
+                                },
+                              )
+                            ],
                           ),
-                          PlatformDialogAction(
-                            child: PlatformText("Confirm"),
-                            isDestructive: true,
-                            onPressed: () async {
-                              if (!(widget.event?.shared ?? false)) {
-                                setState(() => widget.element.count =
-                                    widget.element.min!());
-                                if (widget.onDecrement != null)
-                                  widget.onDecrement!();
-                              }
-                              widget.onPressed();
-                              if (widget.path != null)
-                                await widget.event
-                                    ?.getRef()
-                                    ?.child(widget.path!)
-                                    .runTransaction(
-                                  (mutableData) {
-                                    mutableData.value[widget.element.key] =
-                                        widget.element.min!();
-                                    return mutableData;
-                                  },
-                                );
-                              Navigator.pop(context);
-                            },
-                          )
-                        ],
-                      ),
-                    );
-                  }
+                        );
+                      }
+                    : null)
                 : null,
-            onPressed: widget.element.count > widget.element.min!()
-                ? () async {
-                    if (!(widget.event?.shared ?? false)) {
-                      setState(widget.element.decrement);
-                      if (widget.onDecrement != null) widget.onDecrement!();
-                    }
-                    widget.onPressed();
-                    if (widget.path != null)
-                      await widget.event
-                          ?.getRef()
-                          ?.child(widget.path!)
-                          .runTransaction(
-                        (mutableData) {
-                          if (widget.mutableDecrement != null) {
-                            return widget.mutableDecrement!(mutableData);
-                          }
-                          var ref = mutableData.value[widget.element.key];
-                          if (ref > widget.element.min!())
-                            mutableData.value[widget.element.key] =
-                                (ref ?? 0) - widget.element.decrementValue;
-                          return mutableData;
-                        },
-                      );
-                  }
+            onPressed: widget.event?.role != Role.viewer
+                ? (widget.element.count > widget.element.min!()
+                    ? () async {
+                        if (!(widget.event?.shared ?? false)) {
+                          setState(widget.element.decrement);
+                          if (widget.onDecrement != null) widget.onDecrement!();
+                        }
+                        widget.onPressed();
+                        if (widget.path != null)
+                          await widget.event
+                              ?.getRef()
+                              ?.child(widget.path!)
+                              .runTransaction(
+                            (mutableData) {
+                              if (widget.mutableDecrement != null) {
+                                return widget.mutableDecrement!(mutableData);
+                              }
+                              var ref = mutableData.value[widget.element.key];
+                              if (ref > widget.element.min!())
+                                mutableData.value[widget.element.key] =
+                                    (ref ?? 0) - widget.element.decrementValue;
+                              return mutableData;
+                            },
+                          );
+                      }
+                    : null)
                 : null,
             elevation: 2.0,
             fillColor: Theme.of(context).canvasColor,
@@ -179,30 +184,32 @@ class _Incrementor extends State<Incrementor> {
             ),
           ),
           RawMaterialButton(
-            onPressed: widget.element.count < widget.element.max!()
-                ? () async {
-                    if (!(widget.event?.shared ?? false)) {
-                      widget.element.increment();
-                      if (widget.onIncrement != null) widget.onIncrement!();
-                    }
-                    widget.onPressed();
-                    if (widget.path != null)
-                      await widget.event
-                          ?.getRef()
-                          ?.child(widget.path!)
-                          .runTransaction(
-                        (mutableData) {
-                          if (widget.mutableIncrement != null) {
-                            return widget.mutableIncrement!(mutableData);
-                          }
-                          var ref = mutableData.value[widget.element.key];
-                          if (ref < widget.element.max!())
-                            mutableData.value[widget.element.key] =
-                                (ref ?? 0) + widget.element.incrementValue;
-                          return mutableData;
-                        },
-                      );
-                  }
+            onPressed: widget.event?.role != Role.viewer
+                ? (widget.element.count < widget.element.max!()
+                    ? () async {
+                        if (!(widget.event?.shared ?? false)) {
+                          widget.element.increment();
+                          if (widget.onIncrement != null) widget.onIncrement!();
+                        }
+                        widget.onPressed();
+                        if (widget.path != null)
+                          await widget.event
+                              ?.getRef()
+                              ?.child(widget.path!)
+                              .runTransaction(
+                            (mutableData) {
+                              if (widget.mutableIncrement != null) {
+                                return widget.mutableIncrement!(mutableData);
+                              }
+                              var ref = mutableData.value[widget.element.key];
+                              if (ref < widget.element.max!())
+                                mutableData.value[widget.element.key] =
+                                    (ref ?? 0) + widget.element.incrementValue;
+                              return mutableData;
+                            },
+                          );
+                      }
+                    : null)
                 : null,
             elevation: 2.0,
             fillColor: Theme.of(context).canvasColor,

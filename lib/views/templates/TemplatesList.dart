@@ -123,6 +123,7 @@ class _TemplatesListState extends State<TemplatesList> {
             newEventJson['position'] = point.data;
             newEventJson.remove('id');
             newEventJson.remove('shared');
+            newEventJson['createdAt'] = FieldValue.serverTimestamp();
             Navigator.of(context).pop();
             showPlatformDialog(
               barrierDismissible: false,

@@ -38,11 +38,6 @@ enum OpModeType {
   endgame,
   penalty,
 }
-enum UserType {
-  admin,
-  editor,
-  viewer,
-}
 
 class Event with ClusterItem {
   Event({
@@ -64,7 +59,7 @@ class Event with ClusterItem {
   Map<String, Team> teams = Map<String, Team>();
   Map<String, Match> matches = {};
   String name = "";
-  Timestamp timeStamp = Timestamp.now();
+  Timestamp createdAt = Timestamp.now();
 
   Timestamp? sendTime;
 
@@ -355,9 +350,10 @@ class Event with ClusterItem {
       shared = map['shared'] ?? true;
       id = map['id'] ?? Uuid().v4();
       try {
-        timeStamp = Timestamp(map['seconds'], map['nanoSeconds']);
+        createdAt = getTimestampFromString(
+            map['createdAt']); //Timestamp(map['seconds'], map['nanoSeconds']);
       } catch (e) {
-        timeStamp = Timestamp.now();
+        createdAt = Timestamp.now();
       }
 
       try {
@@ -398,7 +394,7 @@ class Event with ClusterItem {
     gameName = json?['gameName'] ?? Statics.gameName;
     type = getTypeFromString(json?['type']);
     statConfig.allianceTotal = type == EventType.remote;
-    name = json?['name'];
+    name = json?['name'] ?? "";
     try {
       teams = (json?['teams'] as Map)
           .map((key, value) => MapEntry(key, Team.fromJson(value, gameName)));
@@ -412,9 +408,9 @@ class Event with ClusterItem {
     shared = json?['shared'] ?? false;
     id = json?['id'] ?? Uuid().v4();
     try {
-      timeStamp = Timestamp(json?['seconds'], json?['nanoSeconds']);
+      createdAt = Timestamp(json?['seconds'], json?['nanoSeconds']);
     } catch (e) {
-      timeStamp = Timestamp.now();
+      createdAt = Timestamp.now();
     }
 
     try {
@@ -454,8 +450,8 @@ class Event with ClusterItem {
         'shared': shared,
         'id': id,
         'author': author?.toJson(),
-        'seconds': timeStamp.seconds,
-        'nanoSeconds': timeStamp.nanoseconds,
+        'seconds': createdAt.seconds,
+        'nanoSeconds': createdAt.nanoseconds,
       };
   Map<String, dynamic> toSimpleJson() => {
         'gameName': gameName,
