@@ -126,30 +126,6 @@ extension StrExt on String {
   }
 }
 
-extension usExt on UserType {
-  String toBackend() {
-    switch (this) {
-      case UserType.admin:
-        return 'editor';
-      case UserType.editor:
-        return 'temp';
-      case UserType.viewer:
-        return 'viewer';
-    }
-  }
-
-  String toRep() {
-    switch (this) {
-      case UserType.admin:
-        return 'Admin';
-      case UserType.editor:
-        return 'Editor';
-      case UserType.viewer:
-        return 'Viewer';
-    }
-  }
-}
-
 extension extOp on OpModeType {
   String toRep() {
     switch (this) {

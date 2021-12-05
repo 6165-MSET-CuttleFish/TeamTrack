@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -40,22 +41,13 @@ Dice getDiceFromString(String statusAsString) {
   return Dice.none;
 }
 
-EventType getTypeFromString(String statusAsString) {
+EventType getTypeFromString(String? statusAsString) {
   for (EventType element in EventType.values)
     if (element.toString() == statusAsString) return element;
-  return EventType.remote;
+  return EventType.local;
 }
 
-UserType? getUserTypeFromString(String userType) {
-  switch (userType) {
-    case 'editor':
-      return UserType.admin;
-    case 'temp':
-      return UserType.editor;
-    case 'viewer':
-      return UserType.viewer;
-  }
-}
+Timestamp getTimestampFromString(Map<String, dynamic>? map) => Timestamp(map?['seconds'] ?? 0, map?['nanoseconds'] ?? 0);
 
 void navigateToMatch(
   BuildContext context, {

@@ -33,27 +33,24 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
     );
   }
   let allowSend = true;
-  await admin.database().ref()
-      .child(`Events/${data.gameName}/${data.id}/Permissions`)
-      .transaction((transaction) => {
-        // only admins may send events
-        allowSend = transaction[sender.uid]?.role == "admin";
-        if (allowSend) {
-          transaction[recipient.uid] = {
-            "role": data.role,
-            "displayName": recipient.displayName,
-            "email": recipient.email,
-            "photoURL": recipient.photoURL,
-          }; // update permissions for recepient
-        }
-        return transaction;
-      });
+  const senderPerms = await admin.database().ref()
+      .child(`Events/${data.gameName}/${data.id}/Permissions/${sender.uid}`)
+      .get();
+  allowSend = senderPerms.val() == "admin";
   if (!allowSend) {
     throw new functions.https.HttpsError(
         "permission-denied",
-        "You do not have admin access to your document"
+        "You do not have admin access to this document"
     );
   }
+  await admin.database().ref()
+      .child(`Events/${data.gameName}/${data.id}/Permissions/${recipient.uid}`)
+      .update({
+        "role": data.role ?? "viewer",
+        "displayName": recipient.displayName,
+        "email": recipient.email,
+        "photoURL": recipient.photoURL,
+      });
   const meta = {
     "id": data.id,
     "name": data.name,

@@ -126,18 +126,18 @@ class _EventsList extends State<EventsList> {
               ],
             ),
             onTap: () async {
-              final map = await e.getRef()?.once();
-              e.updateLocal(
-                json.decode(
-                  json.encode(
-                    map?.value,
+              if (widget.onTap != null) {
+                final map = await e.getRef()?.once();
+                e.updateLocal(
+                  json.decode(
+                    json.encode(
+                      map?.value,
+                    ),
                   ),
-                ),
-                context,
-              );
-              if (widget.onTap != null)
+                  context,
+                );
                 widget.onTap!(e);
-              else
+              } else
                 Navigator.push(
                   context,
                   platformPageRoute(
