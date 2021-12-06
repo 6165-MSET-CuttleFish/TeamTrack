@@ -2,14 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSContactsUsageDescription</key>
-	<string>Need contacts for sharing events to other users</string>
-	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Need location for finding events near the user</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Need location for finding events near the user</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Need location for finding events near the user</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
@@ -48,6 +40,14 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSContactsUsageDescription</key>
+	<string>Need contacts for sharing events to other users</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Need location for finding events near the user</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Need location for finding events near the user</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Need location for finding events near the user</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
