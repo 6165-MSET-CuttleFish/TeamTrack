@@ -127,7 +127,6 @@ class _LandingPageState extends State<LandingPage> {
               ? FloatingActionButton(
                   tooltip: "Add Event",
                   backgroundColor: Theme.of(context).colorScheme.primary,
-                  splashColor: Theme.of(context).colorScheme.secondary,
                   child: Icon(Icons.add),
                   onPressed: _onPressed,
                 )

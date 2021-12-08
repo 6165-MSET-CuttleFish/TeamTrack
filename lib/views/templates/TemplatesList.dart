@@ -116,56 +116,78 @@ class _TemplatesListState extends State<TemplatesList> {
       builder: (_) => Container(
         child: EventsList(
           onTap: (event) async {
-            final newEvent = Event.fromJson(
-              event.toJson(),
-            );
-            var newEventJson = newEvent.toJson();
-            newEventJson['position'] = point.data;
-            newEventJson.remove('id');
-            newEventJson.remove('shared');
-            newEventJson['createdAt'] = FieldValue.serverTimestamp();
-            Navigator.of(context).pop();
             showPlatformDialog(
-              barrierDismissible: false,
-              context: context,
-              builder: (_) => PlatformAlert(
-                content: Center(
-                  child: PlatformProgressIndicator(),
-                ),
-              ),
-            );
-            final ref = await firebaseFirestore
-                .collection('templates')
-                .add(newEventJson);
-            Navigator.of(context).pop();
-            setState(
-              () => markers.add(
-                Marker(
-                  markerId: MarkerId(ref.id),
-                  position: LatLng(point.latitude, point.longitude),
-                  icon: BitmapDescriptor.defaultMarkerWithHue(
-                    BitmapDescriptor.hueBlue,
-                  ),
-                  onTap: () async {
-                    await subscription.cancel();
-                    mapController.dispose();
-                    await Navigator.push(
-                      context,
-                      platformPageRoute(builder: (_) {
-                        final event = newEvent;
-                        event.shared = false;
-                        event.role = Role.viewer;
-                        return EventView(
-                          event: event,
-                          isPreview: true,
-                        );
-                      }),
-                    );
-                    widget.superState.setState(dataModel.saveEvents);
-                  },
-                ),
-              ),
-            );
+                context: context,
+                builder: (_) => PlatformAlert(
+                      title: PlatformText('Add Event'),
+                      content: PlatformText(
+                          "Are you sure you want to publish '${event.name}'?"),
+                      actions: [
+                        PlatformDialogAction(
+                          child: Text('Cancel'),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                        PlatformDialogAction(
+                          child: Text('Add'),
+                          onPressed: () async {
+                            final newEvent = Event.fromJson(
+                              event.toJson(),
+                            );
+                            var newEventJson = newEvent.toJson();
+                            newEventJson['position'] = point.data;
+                            newEventJson.remove('id');
+                            newEventJson.remove('shared');
+                            newEventJson['createdAt'] =
+                                FieldValue.serverTimestamp();
+                            Navigator.of(context).pop();
+                            showPlatformDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (_) => PlatformAlert(
+                                content: Center(
+                                  child: PlatformProgressIndicator(),
+                                ),
+                              ),
+                            );
+                            final ref = await firebaseFirestore
+                                .collection('templates')
+                                .add(newEventJson);
+                            Navigator.of(context).pop();
+                            Navigator.of(context).pop();
+                            setState(
+                              () => markers.add(
+                                Marker(
+                                  markerId: MarkerId(ref.id),
+                                  position:
+                                      LatLng(point.latitude, point.longitude),
+                                  icon: BitmapDescriptor.defaultMarkerWithHue(
+                                    BitmapDescriptor.hueBlue,
+                                  ),
+                                  onTap: () async {
+                                    await subscription.cancel();
+                                    mapController.dispose();
+                                    await Navigator.push(
+                                      context,
+                                      platformPageRoute(builder: (_) {
+                                        final event = newEvent;
+                                        event.shared = false;
+                                        event.role = Role.viewer;
+                                        return EventView(
+                                          event: event,
+                                          isPreview: true,
+                                        );
+                                      }),
+                                    );
+                                    widget.superState
+                                        .setState(dataModel.saveEvents);
+                                  },
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ));
           },
         ),
       ),

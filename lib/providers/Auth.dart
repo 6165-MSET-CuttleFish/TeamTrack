@@ -11,7 +11,7 @@ class AuthenticationService {
   final FirebaseAuth _firebaseAuth;
   AuthenticationService(this._firebaseAuth);
   User? getUser() => _firebaseAuth.currentUser;
-  Stream<User?> get authStateChanges => _firebaseAuth.idTokenChanges();
+  Stream<User?> get authStateChanges => _firebaseAuth.userChanges();
 
   Future<void> addToken() async {
     final docRef = firebaseFirestore
@@ -122,51 +122,51 @@ class AuthenticationService {
     }
     return null;
   }
-  
+
   /// Generates a cryptographically secure random nonce, to be included in a
-/// credential request.
-String generateNonce([int length = 32]) {
-  final charset =
-      '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
-  final random = Random.secure();
-  return List.generate(length, (_) => charset[random.nextInt(charset.length)])
-      .join();
-}
+  /// credential request.
+  String generateNonce([int length = 32]) {
+    final charset =
+        '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
+    final random = Random.secure();
+    return List.generate(length, (_) => charset[random.nextInt(charset.length)])
+        .join();
+  }
 
-/// Returns the sha256 hash of [input] in hex notation.
-String sha256ofString(String input) {
-  final bytes = utf8.encode(input);
-  final digest = sha256.convert(bytes);
-  return digest.toString();
-}
+  /// Returns the sha256 hash of [input] in hex notation.
+  String sha256ofString(String input) {
+    final bytes = utf8.encode(input);
+    final digest = sha256.convert(bytes);
+    return digest.toString();
+  }
 
-Future<UserCredential> signInWithApple() async {
-  // To prevent replay attacks with the credential returned from Apple, we
-  // include a nonce in the credential request. When signing in with
-  // Firebase, the nonce in the id token returned by Apple, is expected to
-  // match the sha256 hash of `rawNonce`.
-  final rawNonce = generateNonce();
-  final nonce = sha256ofString(rawNonce);
+  Future<UserCredential> signInWithApple() async {
+    // To prevent replay attacks with the credential returned from Apple, we
+    // include a nonce in the credential request. When signing in with
+    // Firebase, the nonce in the id token returned by Apple, is expected to
+    // match the sha256 hash of `rawNonce`.
+    final rawNonce = generateNonce();
+    final nonce = sha256ofString(rawNonce);
 
-  // Request credential for the currently signed in Apple account.
-  final appleCredential = await SignInWithApple.getAppleIDCredential(
-    scopes: [
-      AppleIDAuthorizationScopes.email,
-      AppleIDAuthorizationScopes.fullName,
-    ],
-    nonce: nonce,
-  );
+    // Request credential for the currently signed in Apple account.
+    final appleCredential = await SignInWithApple.getAppleIDCredential(
+      scopes: [
+        AppleIDAuthorizationScopes.email,
+        AppleIDAuthorizationScopes.fullName,
+      ],
+      nonce: nonce,
+    );
 
-  // Create an `OAuthCredential` from the credential returned by Apple.
-  final oauthCredential = OAuthProvider("apple.com").credential(
-    idToken: appleCredential.identityToken,
-    rawNonce: rawNonce,
-  );
+    // Create an `OAuthCredential` from the credential returned by Apple.
+    final oauthCredential = OAuthProvider("apple.com").credential(
+      idToken: appleCredential.identityToken,
+      rawNonce: rawNonce,
+    );
 
-  // Sign in the user with Firebase. If the nonce we generated earlier does
-  // not match the nonce in `appleCredential.identityToken`, sign in will fail.
-  return await FirebaseAuth.instance.signInWithCredential(oauthCredential);
-}
+    // Sign in the user with Firebase. If the nonce we generated earlier does
+    // not match the nonce in `appleCredential.identityToken`, sign in will fail.
+    return await FirebaseAuth.instance.signInWithCredential(oauthCredential);
+  }
 
   Future<UserCredential?> signInWithAnonymous() async {
     if (_firebaseAuth.currentUser?.isAnonymous ?? false) return null;

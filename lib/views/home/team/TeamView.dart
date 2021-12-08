@@ -477,7 +477,7 @@ class _TeamViewState extends State<TeamView> {
                               bottomTitles: SideTitles(
                                 showTitles: true,
                                 reservedSize: 22,
-                                getTextStyles: (value) => const TextStyle(
+                                getTextStyles: (value, size) => const TextStyle(
                                     color: Color(0xff68737d),
                                     fontWeight: FontWeight.bold,
                                     fontSize: 10),
@@ -488,7 +488,7 @@ class _TeamViewState extends State<TeamView> {
                               ),
                               leftTitles: SideTitles(
                                 showTitles: true,
-                                getTextStyles: (value) => const TextStyle(
+                                getTextStyles: (value, size) => const TextStyle(
                                   color: Color(0xff67727d),
                                   fontWeight: FontWeight.bold,
                                   fontSize: 15,

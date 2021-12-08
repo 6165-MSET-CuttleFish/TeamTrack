@@ -189,7 +189,7 @@ class ScoreCard extends StatelessWidget {
                         bottomTitles: SideTitles(
                           showTitles: true,
                           reservedSize: 22,
-                          getTextStyles: (value) => const TextStyle(
+                          getTextStyles: (value, size) => const TextStyle(
                               color: Color(0xff68737d), fontSize: 10),
                           getTitles: (value) {
                             return (value + 1).toInt().toString();
@@ -198,7 +198,7 @@ class ScoreCard extends StatelessWidget {
                         ),
                         leftTitles: SideTitles(
                           showTitles: true,
-                          getTextStyles: (value) => const TextStyle(
+                          getTextStyles: (value, size) => const TextStyle(
                             color: Color(0xff67727d),
                             fontSize: 15,
                           ),
