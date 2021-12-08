@@ -264,9 +264,21 @@ class _LoginView extends State<LoginView> {
             },
             darkMode: true,
             style: AuthButtonStyle(
-                iconSize: 20,
-                textStyle: TextStyle(fontSize: 14, color: Colors.white),
-                width: size.width - 80),
+              iconSize: 20,
+              textStyle: TextStyle(fontSize: 14, color: Colors.white),
+              width: size.width - 80,
+            ),
+          ),
+          AppleAuthButton(
+            onPressed: () async {
+              await context.read<AuthenticationService>().signInWithApple();
+              if (widget.returnBack ?? false) Navigator.of(context).pop();
+            },
+            darkMode: true,
+            style: AuthButtonStyle(
+              iconSize: 20,
+              width: size.width - 80,
+            ),
           ),
           if (!(context.read<User?>()?.isAnonymous ?? false))
             EmailAuthButton(
