@@ -64,17 +64,12 @@ dependencies:
 
 dev_dependencies:
   flutter_launcher_icons: ^0.9.0
-  flutter_native_splash: ^1.3.2
   flutter_test:
     sdk: flutter
 flutter_icons:
   image_path_android: "lib/icon.jpg"
   image_path_ios: "lib/icon.jpg"
-  ios: true
-flutter_native_splash:
-  color: "#42a5f5"
-  image: "assets/images/LoadingScreen.png"
-
+  ios: true 
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
