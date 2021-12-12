@@ -3,6 +3,7 @@ import 'package:teamtrack/components/Collapsible.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:teamtrack/components/ScoreCard.dart';
 import 'package:teamtrack/models/GameModel.dart';
+import 'package:teamtrack/views/home/change/ChangeList.dart';
 import 'package:teamtrack/views/home/match/MatchList.dart';
 import 'package:teamtrack/views/home/match/MatchView.dart';
 import 'package:teamtrack/models/AppModel.dart';
@@ -167,18 +168,18 @@ class _TeamViewState extends State<TeamView> {
                 ),
               ),
             ),
-            // IconButton(
-            //   icon: Icon(Icons.list_alt),
-            //   tooltip: 'Robot Iterations',
-            //   onPressed: () => Navigator.of(context).push(
-            //     platformPageRoute(
-            //       builder: (context) => ChangeList(
-            //         team: _team,
-            //         event: widget.event,
-            //       ),
-            //     ),
-            //   ),
-            // ),
+            IconButton(
+              icon: Icon(Icons.list_alt),
+              tooltip: 'Robot Iterations',
+              onPressed: () => Navigator.of(context).push(
+                platformPageRoute(
+                  builder: (context) => ChangeList(
+                    team: _team,
+                    event: widget.event,
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
         body: StreamBuilder<DatabaseEvent>(

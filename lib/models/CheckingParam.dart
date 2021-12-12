@@ -1,0 +1,8 @@
+enum CheckingParam {
+  CYCLE_TIME,
+  AUTO,
+  TELE,
+  ENDGAME,
+  TELE_CYCLES,
+  ENDGAME_CYCLES,
+}
