@@ -1,4 +1,4 @@
-import 'package:firebase_database/firebase_database.dart' as Database;
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:teamtrack/components/Incrementor.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
@@ -95,7 +95,7 @@ class _MatchView extends State<MatchView> {
   }
 
   @override
-  Widget build(BuildContext context) => StreamBuilder<Database.Event>(
+  Widget build(BuildContext context) => StreamBuilder<DatabaseEvent>(
         stream: widget.event.getRef()?.onValue,
         builder: (context, eventHandler) {
           if (eventHandler.hasData && !eventHandler.hasError) {
@@ -184,12 +184,12 @@ class _MatchView extends State<MatchView> {
                                                       'teams/${_selectedTeam?.number}/scores/${_score?.id}')
                                                   .runTransaction(
                                                       (transaction) {
-                                                transaction.value = Score(
+                                                transaction = Score(
                                                   _match?.id ?? Uuid().v4(),
                                                   _match?.dice ?? Dice.one,
                                                   widget.event.gameName,
                                                 ).toJson();
-                                                return transaction;
+                                                return Transaction.success(transaction);
                                               });
                                             }
                                           } else {
@@ -756,43 +756,43 @@ class _MatchView extends State<MatchView> {
                       score: _score,
                       mutableIncrement: (mutableData) {
                         if (widget.match == null) {
-                          var ref = mutableData.value[e.key];
+                          var ref = (mutableData as Map?)?[e.key];
                           if (ref < e.max!())
-                            mutableData.value[e.key] =
+                            mutableData?[e.key] =
                                 (ref ?? 0) + incrementValue.count;
-                          return mutableData;
+                          return Transaction.success(mutableData);
                         }
-                        var ref = mutableData.value;
-                        if (ref[e.key] < e.max!()) {
-                          mutableData.value[e.key] =
-                              (ref[e.key] ?? 0) + e.incrementValue;
+                        var ref = mutableData as Map?;
+                        if (ref?[e.key] < e.max!()) {
+                          mutableData?[e.key] =
+                              (ref?[e.key] ?? 0) + e.incrementValue;
                           lapses.add(
                             (_time - sum).toPrecision(3),
                           );
                           sum = _time;
                           if (!_paused) {
-                            mutableData.value['CycleTimes'] = lapses;
+                            mutableData?['CycleTimes'] = lapses;
                           }
                         }
-                        return mutableData;
+                        return Transaction.success(mutableData);
                       },
                       mutableDecrement: (mutableData) {
                         if (widget.match == null) {
-                          var ref = mutableData.value[e.key];
+                          var ref = (mutableData as Map?)?[e.key];
                           if (ref < e.max!())
-                            mutableData.value[e.key] = (ref ?? 0) - 1;
-                          return mutableData;
+                            mutableData?[e.key] = (ref ?? 0) - 1;
+                          return Transaction.success(mutableData);
                         }
-                        var ref = mutableData.value;
-                        if (ref[e.key] < e.max!()) {
-                          mutableData.value[e.key] =
-                              (ref[e.key] ?? 0) - e.decrementValue;
+                        var ref = mutableData as Map?;
+                        if (ref?[e.key] < e.max!()) {
+                          mutableData?[e.key] =
+                              (ref?[e.key] ?? 0) - e.decrementValue;
                           if (!_paused) {
-                            mutableData.value['Misses'] =
-                                (ref['Misses'] ?? 0) + 1;
+                            mutableData?['Misses'] =
+                                (ref?['Misses'] ?? 0) + 1;
                           }
                         }
-                        return mutableData;
+                        return Transaction.success(mutableData);
                       },
                     ),
                   )
@@ -900,17 +900,17 @@ class _MatchView extends State<MatchView> {
       (mutableData) {
         var teamIndex;
         try {
-          mutableData.value['teams'] as Map;
+          (mutableData as Map?)?['teams'] as Map;
           teamIndex = _selectedTeam?.number;
         } catch (e) {
           teamIndex = int.parse(_selectedTeam?.number ?? '');
         }
         final scoreIndex = _score?.id;
-        var ref = mutableData.value['teams'][teamIndex]['scores'][scoreIndex]
+        var ref = (mutableData as Map?)?['teams'][teamIndex]['scores'][scoreIndex]
             ['TeleScore']['Misses'];
-        mutableData.value['teams'][teamIndex]['scores'][scoreIndex]['TeleScore']
+        mutableData?['teams'][teamIndex]['scores'][scoreIndex]['TeleScore']
             ['Misses'] = (ref ?? 0) + 1;
-        return mutableData;
+        return Transaction.success(mutableData);
       },
     );
   }

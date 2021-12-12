@@ -1,4 +1,4 @@
-import 'package:firebase_database/firebase_database.dart' as Database;
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/rendering.dart';
 import 'package:teamtrack/components/EmptyList.dart';
 import 'package:teamtrack/functions/Functions.dart';
@@ -54,7 +54,7 @@ class _MatchList extends State<MatchList> {
   }
 
   @override
-  Widget build(BuildContext context) => StreamBuilder<Database.Event>(
+  Widget build(BuildContext context) => StreamBuilder<DatabaseEvent>(
         stream: widget.event.getRef()?.onValue,
         builder: (context, eventHandler) {
           if (eventHandler.hasData && !eventHandler.hasError) {

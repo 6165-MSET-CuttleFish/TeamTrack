@@ -7,7 +7,7 @@ class UserPresence {
   static rtdbAndLocalFsPresence(app) async {
     final uid = AuthenticationService(firebaseAuth).getUser()?.uid;
     final userStatusDatabaseRef =
-        firebaseDatabase.reference().child('userStatus/$uid');
+        firebaseDatabase.ref().child('userStatus/$uid');
     final userStatusFirestoreRef =
         firebaseFirestore.collection('userStatus').doc(uid);
 
@@ -31,9 +31,9 @@ class UserPresence {
       'lastSeen': FieldValue.serverTimestamp(),
     };
 
-    firebaseDatabase.reference().child('.info/connected').onValue.listen(
+    firebaseDatabase.ref().child('.info/connected').onValue.listen(
       (event) async {
-        if (!event.snapshot.value) {
+        if (!(event.snapshot.value as bool)) {
           userStatusFirestoreRef.update(isOfflineForFirestore);
           return;
         }

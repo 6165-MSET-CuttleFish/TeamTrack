@@ -2,7 +2,7 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart' as Database;
+import 'package:firebase_database/firebase_database.dart' as Db;
 import 'package:flutter/cupertino.dart';
 import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
@@ -132,13 +132,13 @@ class Event with ClusterItem {
       for (var team in e.getTeams()) {
         if (team != null) {
           try {
-            var ref = mutableData.value as Map? ?? {};
+            var ref = mutableData as Map? ?? {};
             ref.putIfAbsent(team.number, () => team.toJson());
-            mutableData.value = ref;
+            mutableData = ref;
           } catch (e) {
             var ref;
-            if (mutableData.value != null) {
-              ref = List.from(mutableData.value)
+            if (mutableData != null) {
+              ref = List.from(mutableData as dynamic)
                   .where((element) => element != null)
                   .toList();
             } else {
@@ -147,21 +147,21 @@ class Event with ClusterItem {
             var map = Map<String, dynamic>.fromIterable(ref,
                 key: (item) => item["number"], value: (item) => item);
             map.putIfAbsent(team.number, () => team.toJson());
-            mutableData.value = map;
+            mutableData = map;
           }
           var teamIndex;
           try {
-            mutableData.value as Map;
+            mutableData as Map;
             teamIndex = team.number;
           } catch (e) {
             teamIndex = int.parse(team.number);
           }
-          var ref = mutableData.value[teamIndex]['scores'] as Map? ?? {};
+          final ref = (mutableData as Map?)?[teamIndex]['scores'] as Map? ?? {};
           ref.putIfAbsent(e.id, () => Score(e.id, e.dice, gameName).toJson());
-          mutableData.value[teamIndex]['scores'] = ref;
+          mutableData?[teamIndex]['scores'] = ref;
         }
       }
-      return mutableData;
+      return Db.Transaction.success(mutableData);
     });
     if (!shared) {
       matches[e.id] = e;
@@ -202,13 +202,13 @@ class Event with ClusterItem {
             bool allowRemove = true;
             List<String> ids;
             try {
-              var newTeams = ((mutableData.value as Map)['teams'] as Map?);
+              var newTeams = ((mutableData as Map?)?['teams'] as Map?);
               ids = (newTeams?[team.number]?['scores'] as Map<String, dynamic>?)
                       ?.keys
                       .toList() ??
                   [];
             } catch (e) {
-              var newTeams = ((mutableData.value as Map)['teams'] as List?);
+              var newTeams = ((mutableData as Map?)?['teams'] as List?);
               ids = (newTeams?.firstWhere(
                               (element) => element?['number'] == team.number,
                               orElse: () => null)?['scores']
@@ -223,18 +223,18 @@ class Event with ClusterItem {
               }
             }
             try {
-              var newTeams = ((mutableData.value as Map)['teams'] as Map?);
+              var newTeams = mutableData?['teams'] as Map?;
               newTeams?.remove(team.number);
-              mutableData.value['teams'] = newTeams;
+              mutableData?['teams'] = newTeams;
             } catch (e) {
               var newTeams = allowRemove
-                  ? ((mutableData.value as Map)['teams'] as List?)
+                  ? ((mutableData as Map)['teams'] as List?)
                       ?.where((element) => element?['number'] != team.number)
                       .toList()
-                  : (mutableData.value as Map)['teams'] as List?;
-              mutableData.value['teams'] = newTeams;
+                  : (mutableData as Map)['teams'] as List?;
+              mutableData['teams'] = newTeams;
             }
-            return mutableData;
+            return Db.Transaction.success(mutableData);
           },
         );
       }
@@ -244,13 +244,13 @@ class Event with ClusterItem {
       getRef()?.runTransaction((mutableData) {
         List<dynamic> ids = [];
         try {
-          var newTeams = ((mutableData.value as Map)['teams'] as Map?);
+          var newTeams = ((mutableData as Map)['teams'] as Map?);
           ids =
               (newTeams?[team.number]?['scores'] as Map?)?.keys.toList() ?? [];
           newTeams?.remove(team.number);
-          mutableData.value['teams'] = newTeams;
+          mutableData['teams'] = newTeams;
         } catch (e) {
-          var newTeams = ((mutableData.value as Map)['teams'] as List?);
+          var newTeams = ((mutableData as Map)['teams'] as List?);
           ids = (newTeams?.firstWhere((element) =>
                           element['number'] == team.number)?['scores']
                       as Map<String, dynamic>?)
@@ -258,14 +258,14 @@ class Event with ClusterItem {
                   .toList() ??
               [];
           newTeams?.removeWhere((element) => element['number'] == team.number);
-          mutableData.value['teams'] = newTeams;
+          mutableData['teams'] = newTeams;
         }
-        var newMatches = ((mutableData.value as Map)['matches'] as Map?);
+        var newMatches = (mutableData['matches'] as Map?);
         for (var id in ids) {
           newMatches?[id] = null;
         }
-        mutableData.value['matches'] = newMatches;
-        return mutableData;
+        mutableData['matches'] = newMatches;
+        return Db.Transaction.success(mutableData);
       });
     }
     return x;
@@ -282,25 +282,25 @@ class Event with ClusterItem {
     }
     getRef()?.runTransaction(
       (mutableData) {
-        final newMatches = ((mutableData.value as Map)['matches'] as Map);
+        final newMatches = ((mutableData as Map)['matches'] as Map);
         newMatches.removeWhere((key, value) => key == e.id);
-        mutableData.value['matches'] = newMatches;
+        mutableData['matches'] = newMatches;
         for (var team in e.getTeams()) {
           var teamIndex;
           try {
-            mutableData.value['teams'] as Map;
+            mutableData['teams'] as Map;
             teamIndex = team?.number;
           } catch (e) {
             teamIndex = int.parse(team?.number ?? '');
           }
           try {
             var tempScores =
-                (mutableData.value['teams'][teamIndex]['scores'] as Map);
+                (mutableData['teams'][teamIndex]['scores'] as Map);
             tempScores.remove(e.id);
-            mutableData.value['teams'][teamIndex]['scores'] = tempScores;
+            mutableData['teams'][teamIndex]['scores'] = tempScores;
           } catch (e) {}
         }
-        return mutableData;
+        return Db.Transaction.success(mutableData);
       },
     );
   }
@@ -384,9 +384,9 @@ class Event with ClusterItem {
     }
   }
 
-  Database.DatabaseReference? getRef() {
+  Db.DatabaseReference? getRef() {
     if (!shared) return null;
-    return firebaseDatabase.reference().child('Events/$gameName').child(id);
+    return firebaseDatabase.ref().child('Events/$gameName').child(id);
   }
 
   Event.fromJson(Map<String, dynamic>? json) {
@@ -652,9 +652,6 @@ class Match {
         'seconds': timeStamp.seconds,
         'nanoSeconds': timeStamp.nanoseconds,
       };
-  int geIndex(Database.MutableData mutableData) =>
-      (mutableData.value['matches'] as List)
-          .indexWhere((element) => element['id'] == id);
   Score? getScore(String? number) {
     if (number == red?.team1?.number)
       return red?.team1?.scores[id];

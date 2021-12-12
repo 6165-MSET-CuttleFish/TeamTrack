@@ -8,7 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
-import 'package:firebase_database/firebase_database.dart' as Database;
+import 'package:firebase_database/firebase_database.dart';
 import 'package:teamtrack/functions/Statistics.dart';
 import 'dart:convert';
 
@@ -30,7 +30,7 @@ class _TeamList extends State<TeamList> {
   final slider = SlidableStrechActionPane();
 
   @override
-  Widget build(BuildContext context) => StreamBuilder<Database.Event>(
+  Widget build(BuildContext context) => StreamBuilder<DatabaseEvent>(
         stream: widget.event.getRef()?.onValue,
         builder: (context, eventHandler) {
           if (eventHandler.hasData && !eventHandler.hasError) {

@@ -7,8 +7,8 @@ class FakeRemoteConfig {
   Map<String, dynamic>? _config;
   RemoteConfig _remoteConfig = RemoteConfig.instance;
   Future<void> fetchAndActivate() => NewPlatform.isWeb
-      ? firebaseDatabase.reference().child('config').once().then(
-            (snapshot) => _config = snapshot.value as Map<String, dynamic>,
+      ? firebaseDatabase.ref().child('config').once().then(
+            (snapshot) => _config = snapshot.snapshot.value as Map<String, dynamic>,
           )
       : _remoteConfig.fetchAndActivate();
 

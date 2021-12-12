@@ -13,7 +13,7 @@ import 'package:flutter/rendering.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:teamtrack/components/CheckList.dart';
 import 'package:uuid/uuid.dart';
-import 'package:firebase_database/firebase_database.dart' as Database;
+import 'package:firebase_database/firebase_database.dart';
 import 'dart:convert';
 import 'package:teamtrack/functions/Statistics.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -181,7 +181,7 @@ class _TeamViewState extends State<TeamView> {
             // ),
           ],
         ),
-        body: StreamBuilder<Database.Event>(
+        body: StreamBuilder<DatabaseEvent>(
           stream: widget.event.getRef()?.onValue,
           builder: (context, eventHandler) {
             _team = widget.team;
@@ -326,12 +326,12 @@ class _TeamViewState extends State<TeamView> {
                                   .getRef()
                                   ?.child('teams/${widget.team.number}')
                                   .runTransaction((mutableData) {
-                                mutableData.value['targetScore'] = Score(
+                                (mutableData as Map?)?['targetScore'] = Score(
                                   Uuid().v4(),
                                   Dice.none,
                                   widget.event.gameName,
                                 ).toJson();
-                                return mutableData;
+                                return Transaction.success(mutableData);
                               });
                               dataModel.saveEvents();
                             }

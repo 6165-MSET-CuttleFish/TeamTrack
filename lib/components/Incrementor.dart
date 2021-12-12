@@ -1,4 +1,4 @@
-import 'package:firebase_database/firebase_database.dart' as Db;
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +25,7 @@ class Incrementor extends StatefulWidget {
   final ScoringElement element;
   final void Function() onPressed;
   final void Function()? onIncrement, onDecrement;
-  final Db.MutableData Function(Db.MutableData)? mutableIncrement,
+  final Transaction Function(Object?)? mutableIncrement,
       mutableDecrement;
   final Color? backgroundColor;
   final Event? event;
@@ -65,11 +65,11 @@ class _Incrementor extends State<Incrementor> {
               for (int i = 1;
                   i < (widget.element.nestedElements?.length ?? 0);
                   i++) {
-                mutableData.value[widget.element.nestedElements?[i].key] = 0;
+                (mutableData as Map?)?[widget.element.nestedElements?[i].key] = 0;
               }
               if (val != 0)
-                mutableData.value[widget.element.nestedElements?[val].key] = 1;
-              return mutableData;
+                (mutableData as Map?)?[widget.element.nestedElements?[val].key] = 1;
+              return Transaction.success(mutableData);
             });
         },
       );
@@ -88,10 +88,10 @@ class _Incrementor extends State<Incrementor> {
                 ?.getRef()
                 ?.child(widget.path!)
                 .runTransaction((mutableData) {
-              mutableData.value[widget.element.key] = val
+              (mutableData as Map?)?[widget.element.key] = val
                   ? (widget.element.count < widget.element.max!() ? 1 : 0)
                   : 0;
-              return mutableData;
+              return Transaction.success(mutableData);
             });
         } : null,
       );
@@ -129,9 +129,9 @@ class _Incrementor extends State<Incrementor> {
                                         ?.child(widget.path!)
                                         .runTransaction(
                                       (mutableData) {
-                                        mutableData.value[widget.element.key] =
+                                        (mutableData as Map?)?[widget.element.key] =
                                             widget.element.min!();
-                                        return mutableData;
+                                        return Transaction.success(mutableData);
                                       },
                                     );
                                   Navigator.pop(context);
@@ -160,11 +160,11 @@ class _Incrementor extends State<Incrementor> {
                               if (widget.mutableDecrement != null) {
                                 return widget.mutableDecrement!(mutableData);
                               }
-                              var ref = mutableData.value[widget.element.key];
+                              var ref = (mutableData as Map?)?[widget.element.key];
                               if (ref > widget.element.min!())
-                                mutableData.value[widget.element.key] =
+                                mutableData?[widget.element.key] =
                                     (ref ?? 0) - widget.element.decrementValue;
-                              return mutableData;
+                              return Transaction.success(mutableData);
                             },
                           );
                       }
@@ -201,11 +201,11 @@ class _Incrementor extends State<Incrementor> {
                               if (widget.mutableIncrement != null) {
                                 return widget.mutableIncrement!(mutableData);
                               }
-                              var ref = mutableData.value[widget.element.key];
+                              var ref = (mutableData as Map?)?[widget.element.key];
                               if (ref < widget.element.max!())
-                                mutableData.value[widget.element.key] =
+                                mutableData?[widget.element.key] =
                                     (ref ?? 0) + widget.element.incrementValue;
-                              return mutableData;
+                              return Transaction.success(mutableData);
                             },
                           );
                       }

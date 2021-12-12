@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
-import 'package:firebase_database/firebase_database.dart' as Database;
+import 'package:firebase_database/firebase_database.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/views/home/change/ChangeConfig.dart';
 import 'dart:convert';
@@ -38,7 +38,7 @@ class _ChangeList extends State<ChangeList> {
               )
               .then((value) => setState(() {})),
         ),
-        body: StreamBuilder<Database.Event>(
+        body: StreamBuilder<DatabaseEvent>(
           stream: widget.event.getRef()?.onValue,
           builder: (context, eventHandler) {
             if (eventHandler.hasData && !eventHandler.hasError) {

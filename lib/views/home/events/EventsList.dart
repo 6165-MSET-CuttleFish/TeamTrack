@@ -131,7 +131,7 @@ class _EventsList extends State<EventsList> {
                 e.updateLocal(
                   json.decode(
                     json.encode(
-                      map?.value,
+                      map?.snapshot.value,
                     ),
                   ),
                   context,
@@ -189,7 +189,7 @@ class _EventsList extends State<EventsList> {
                   e.shared = true;
                   final json = e.toJson();
                   await firebaseDatabase
-                      .reference()
+                      .ref()
                       .child("Events/${e.gameName}/${e.id}")
                       .set(json);
                   dataModel.events.remove(e);
@@ -233,7 +233,7 @@ class _EventsList extends State<EventsList> {
   void onRemove(Event e) async {
     final uid = context.read<User?>()?.uid;
     final map = await e.getRef()?.once();
-    e.updateLocal(json.decode(json.encode(map?.value)), context);
+    e.updateLocal(json.decode(json.encode(map?.snapshot.value)), context);
     if (e.users
             .firstWhere((element) => element.uid == context.read<User?>()?.uid)
             .role ==
@@ -241,7 +241,7 @@ class _EventsList extends State<EventsList> {
       await e.getRef()?.remove();
     else
       await firebaseDatabase
-          .reference()
+          .ref()
           .child('Events/${e.gameName}/${e.id}/Permissions/$uid')
           .remove();
     dataModel.saveEvents();

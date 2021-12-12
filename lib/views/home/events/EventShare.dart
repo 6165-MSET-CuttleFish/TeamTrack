@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart' as Database;
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -28,7 +28,7 @@ class _EventShareState extends State<EventShare> {
   EmailContact? _emailContact;
   final emailController = TextEditingController();
   @override
-  Widget build(BuildContext context) => StreamBuilder<Database.Event>(
+  Widget build(BuildContext context) => StreamBuilder<DatabaseEvent>(
         stream: widget.event.getRef()?.onValue,
         builder: (context, eventHandler) {
           if (eventHandler.hasData && !eventHandler.hasError) {
