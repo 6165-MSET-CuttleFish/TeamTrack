@@ -494,7 +494,7 @@ class Alliance {
       (((team1?.scores[id]?.getScoreDivision(type).total() ?? 0) +
                   (team2?.scores[id]?.getScoreDivision(type).total() ?? 0) +
                   ((showPenalties ?? false)
-                      ? (getPenalty())
+                      ? getPenalty()
                       : 0)) +
               sharedScore.getScoreDivision(type).total())
           .clamp(0, 999);
