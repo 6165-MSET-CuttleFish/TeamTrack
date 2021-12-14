@@ -1,10 +1,8 @@
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/foundation.dart';
 import 'package:teamtrack/components/Incrementor.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/models/ScoreModel.dart';
@@ -38,7 +36,7 @@ class _MatchView extends State<MatchView> {
   final blue = Colors.blue;
   final red = CupertinoColors.systemRed;
   bool _showPenalties = true,
-      _allianceTotal = false,
+      _allianceTotal = true,
       _showRoles = false,
       _paused = true,
       _allowView = false;
@@ -189,7 +187,8 @@ class _MatchView extends State<MatchView> {
                                                   _match?.dice ?? Dice.one,
                                                   widget.event.gameName,
                                                 ).toJson();
-                                                return Transaction.success(transaction);
+                                                return Transaction.success(
+                                                    transaction);
                                               });
                                             }
                                           } else {
@@ -337,7 +336,7 @@ class _MatchView extends State<MatchView> {
                           Column(
                             children: [
                               PlatformText(
-                                (_selectedTeam?.name ?? ''),
+                                ("${_selectedTeam?.number} : ${_selectedTeam?.name ?? ''}"),
                                 style: Theme.of(context).textTheme.headline6,
                               ),
                               RawMaterialButton(
@@ -788,8 +787,7 @@ class _MatchView extends State<MatchView> {
                           mutableData?[e.key] =
                               (ref?[e.key] ?? 0) - e.decrementValue;
                           if (!_paused) {
-                            mutableData?['Misses'] =
-                                (ref?['Misses'] ?? 0) + 1;
+                            mutableData?['Misses'] = (ref?['Misses'] ?? 0) + 1;
                           }
                         }
                         return Transaction.success(mutableData);
@@ -906,8 +904,8 @@ class _MatchView extends State<MatchView> {
           teamIndex = int.parse(_selectedTeam?.number ?? '');
         }
         final scoreIndex = _score?.id;
-        var ref = (mutableData as Map?)?['teams'][teamIndex]['scores'][scoreIndex]
-            ['TeleScore']['Misses'];
+        var ref = (mutableData as Map?)?['teams'][teamIndex]['scores']
+            [scoreIndex]['TeleScore']['Misses'];
         mutableData?['teams'][teamIndex]['scores'][scoreIndex]['TeleScore']
             ['Misses'] = (ref ?? 0) + 1;
         return Transaction.success(mutableData);

@@ -294,8 +294,7 @@ class Event with ClusterItem {
             teamIndex = int.parse(team?.number ?? '');
           }
           try {
-            var tempScores =
-                (mutableData['teams'][teamIndex]['scores'] as Map);
+            var tempScores = (mutableData['teams'][teamIndex]['scores'] as Map);
             tempScores.remove(e.id);
             mutableData['teams'][teamIndex]['scores'] = tempScores;
           } catch (e) {}
@@ -493,9 +492,7 @@ class Alliance {
   int allianceTotal(bool? showPenalties, {OpModeType? type}) =>
       (((team1?.scores[id]?.getScoreDivision(type).total() ?? 0) +
                   (team2?.scores[id]?.getScoreDivision(type).total() ?? 0) +
-                  ((showPenalties ?? false)
-                      ? getPenalty()
-                      : 0)) +
+                  ((showPenalties ?? false) ? getPenalty() : 0)) +
               sharedScore.getScoreDivision(type).total())
           .clamp(0, 999);
   Alliance.fromJson(
@@ -667,6 +664,8 @@ class Match {
 class Team {
   String name = '';
   String number = '';
+  int? established;
+  String? city;
   Map<String, Score> scores = Map();
   List<Change> changes = [];
   Score? targetScore;
@@ -697,7 +696,7 @@ class Team {
       targetScore = Score.fromJson(json['targetScore'], gameName);
     try {
       changes = List<Change>.from(
-        json['changes'].map(
+        json['changes']?.map(
           (model) => Change.fromJson(model),
         ),
       );
@@ -705,6 +704,15 @@ class Team {
       changes = [];
     }
   }
+
+  void updateWithTOA(dynamic toa) {
+    if (toa == null) return;
+    name = toa['team_name_short'] ?? name;
+    name = toa['team_name_short'] ?? name;
+    established = (toa['rookie_year'] ?? this.established) as int?;
+    city = toa['city'] ?? city;
+  }
+
   Map<String, dynamic> toJson() => {
         'name': name,
         'number': number,
