@@ -3,19 +3,18 @@ import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:teamtrack/components/ScoreRangeSummary.dart';
-import 'package:teamtrack/components/ScoreSummary.dart';
 import 'package:teamtrack/models/Change.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/functions/Statistics.dart';
 
 class ChangeRow extends StatelessWidget {
-  const ChangeRow(
-      {Key? key,
-      required this.change,
-      required this.event,
-      this.onTap,
-      required this.team})
-      : super(key: key);
+  const ChangeRow({
+    Key? key,
+    required this.change,
+    required this.event,
+    this.onTap,
+    required this.team,
+  }) : super(key: key);
   final Change change;
   final Event event;
   final Team team;

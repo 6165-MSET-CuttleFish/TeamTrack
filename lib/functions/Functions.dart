@@ -47,7 +47,11 @@ EventType getTypeFromString(String? statusAsString) {
   return EventType.local;
 }
 
-Timestamp getTimestampFromString(Map<String, dynamic>? map) => Timestamp(map?['seconds'] ?? 0, map?['nanoseconds'] ?? 0);
+Timestamp? getTimestampFromString(Map<String, dynamic>? map) {
+  if (map?['seconds'] != null && map?['nanoseconds'] != null) {
+    return Timestamp(map?['seconds'], map?['nanoseconds']);
+  }
+}
 
 void navigateToMatch(
   BuildContext context, {

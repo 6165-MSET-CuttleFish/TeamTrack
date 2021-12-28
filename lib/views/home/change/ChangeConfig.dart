@@ -8,9 +8,12 @@ import 'package:uuid/uuid.dart';
 import 'package:date_format/date_format.dart';
 
 class ChangeConfig extends StatefulWidget {
-  const ChangeConfig({Key? key, this.team, this.change}) : super(key: key);
-  final Team? team;
+  const ChangeConfig(
+      {Key? key, required this.team, this.change, required this.event})
+      : super(key: key);
+  final Team team;
   final Change? change;
+  final Event event;
   @override
   _ChangeConfigState createState() => _ChangeConfigState(change);
 }
@@ -107,20 +110,23 @@ class _ChangeConfigState extends State<ChangeConfig> {
           ),
           PlatformButton(
             child: PlatformText('Save'),
-            onPressed: () {
+            onPressed: () async {
               if (widget.change == null) {
-                widget.team?.addChange(
+                widget.event.addChange(
                   Change(
                     title: controller.text,
                     startDate: Timestamp.fromDate(_startDate),
                     id: Uuid().v4(),
                   ),
+                  widget.team,
                 );
               } else {
                 widget.change?.title = controller.text;
                 widget.change?.startDate = Timestamp.fromDate(_startDate);
                 if (_finalDate != null)
                   widget.change?.endDate = Timestamp.fromDate(_finalDate!);
+                if (widget.event.shared)
+                  widget.event.addChange(widget.change!, widget.team);
               }
               controller.clear();
               _startDate = DateTime.now();

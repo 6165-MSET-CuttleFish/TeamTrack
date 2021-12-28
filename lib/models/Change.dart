@@ -18,7 +18,8 @@ class Change {
   Change.fromJson(Map<String, dynamic> json)
       : title = json['title'],
         description = json['description'],
-        startDate = getTimestampFromString(json['startDate']),
+        startDate =
+            getTimestampFromString(json['startDate']) ?? Timestamp.now(),
         endDate = getTimestampFromString(json['endDate']),
         id = json['id'];
   Map<String, dynamic> toJson() => {
