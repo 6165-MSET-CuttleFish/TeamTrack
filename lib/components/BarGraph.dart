@@ -12,6 +12,7 @@ class BarGraph extends StatelessWidget {
     this.height = 120,
     this.width = 30,
     this.title = 'Default',
+    this.units = '',
     this.percentage = 0,
   }) : super(key: key) {
     percentage = (inverted
@@ -25,13 +26,15 @@ class BarGraph extends StatelessWidget {
   double val;
   final bool inverted;
   final double height;
+  final String units;
   int percentage;
   @override
   Widget build(BuildContext context) => Column(
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
-          PlatformText(title, style: Theme.of(context).textTheme.caption),
+          PlatformText(title + units,
+              style: Theme.of(context).textTheme.caption),
           Padding(
             padding: EdgeInsets.all(2),
           ),

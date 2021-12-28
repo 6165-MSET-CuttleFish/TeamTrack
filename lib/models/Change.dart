@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:teamtrack/functions/Functions.dart';
+import 'package:teamtrack/functions/Extensions.dart';
 
 class Change {
   String title;
@@ -16,16 +18,14 @@ class Change {
   Change.fromJson(Map<String, dynamic> json)
       : title = json['title'],
         description = json['description'],
-        startDate = Timestamp(json['startSeconds'], json['startNanoSeconds']),
-        endDate = Timestamp(json['endSeconds'], json['endNanoSeconds']),
+        startDate = getTimestampFromString(json['startDate']),
+        endDate = getTimestampFromString(json['endDate']),
         id = json['id'];
   Map<String, dynamic> toJson() => {
         'title': title,
         'description': description,
-        'startSeconds': startDate.seconds,
-        'startNanoSeconds': startDate.nanoseconds,
-        'endSeconds': endDate?.seconds,
-        'endNanoSeconds': endDate?.nanoseconds,
+        'startDate': startDate.toJson(),
+        'endDate': endDate?.toJson(),
         'id': id,
       };
 }

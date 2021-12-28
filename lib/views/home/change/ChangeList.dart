@@ -6,6 +6,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/views/home/change/ChangeConfig.dart';
 import 'dart:convert';
+import 'package:teamtrack/views/home/change/ChangeRow.dart';
 
 class ChangeList extends StatefulWidget {
   ChangeList({Key? key, required this.team, required this.event})
@@ -31,11 +32,12 @@ class _ChangeList extends State<ChangeList> {
           onPressed: () => Navigator.of(context)
               .push(
                 platformPageRoute(
-                    builder: (context) => ChangeConfig(
-                          team: team,
-                        )),
+                  builder: (context) => ChangeConfig(
+                    team: team,
+                  ),
+                ),
               )
-              .then((value) => setState(() {})),
+              .then((_) => setState(() {})),
         ),
         body: StreamBuilder<DatabaseEvent>(
           stream: widget.event.getRef()?.onValue,
@@ -89,18 +91,19 @@ class _ChangeList extends State<ChangeList> {
                           },
                         )
                       ],
-                      child: Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Colors.grey,
-                            width: 1,
-                          ),
-                        ),
-                        child: ListTile(
-                          title: PlatformText(e.title),
-                          leading: PlatformText(e.startDate.toDate().toString(),
-                              style: Theme.of(context).textTheme.caption),
-                        ),
+                      child: ChangeRow(
+                        onTap: () => Navigator.of(context)
+                            .push(
+                              platformPageRoute(
+                                builder: (context) => ChangeConfig(
+                                  change: e,
+                                ),
+                              ),
+                            )
+                            .then((_) => setState(() {})),
+                        change: e,
+                        event: widget.event,
+                        team: widget.team,
                       ),
                     ),
                   )

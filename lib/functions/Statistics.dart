@@ -446,4 +446,11 @@ extension more on Iterable<ScoreDivision> {
     if (sorted.length < 2 || sorted[this.length - 2].total() == 0) return null;
     return sorted.last.total().percentIncrease(sorted[this.length - 2].total());
   }
+
+  double? totalPercentIncrease() {
+    final sorted = this.toList();
+    sorted.sort((a, b) => a.timeStamp.toDate().compareTo(b.timeStamp.toDate()));
+    if (sorted.length < 2 || sorted[0].total() == 0) return null;
+    return sorted.last.total().percentIncrease(sorted[0].total());
+  }
 }

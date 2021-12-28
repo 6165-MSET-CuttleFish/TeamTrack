@@ -1,3 +1,5 @@
+import 'package:http/http.dart' as http;
+import 'package:teamtrack/api/APIKEYS.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:teamtrack/components/Incrementor.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
@@ -79,6 +81,22 @@ class _MatchView extends State<MatchView> {
           ?.child('matches/${widget.match?.id}/activeUsers/${user?.uid}');
       ref?.set(ttuser.toJson());
       ref?.onDisconnect().remove();
+    } else {
+      _allianceTotal = false;
+      try {
+        http
+            .get(
+          Uri.parse('${APIKEYS.TOA_URL}/team/${widget.team?.number}'),
+          headers: APIKEYS.TOA_HEADER,
+        )
+            .then((value) {
+          final body = (json.decode(value.body) as List);
+          if (body.length != 0)
+            setState(() => widget.team?.updateWithTOA(body[0]));
+        });
+      } catch (e) {
+        print(e);
+      }
     }
   }
 
@@ -339,12 +357,37 @@ class _MatchView extends State<MatchView> {
                                 ("${_selectedTeam?.number} : ${_selectedTeam?.name ?? ''}"),
                                 style: Theme.of(context).textTheme.headline6,
                               ),
+                              if (_match == null)
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      if (widget.team?.city != null)
+                                        PlatformText(
+                                          "from ${widget.team?.city}",
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .caption,
+                                        ),
+                                      if (widget.team?.established != null)
+                                        PlatformText(
+                                          "est. ${widget.team?.established}",
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .caption,
+                                        ),
+                                    ],
+                                  ),
+                                ),
                               RawMaterialButton(
                                 fillColor: _allianceTotal
                                     ? _color.withOpacity(0.3)
                                     : null,
-                                onPressed: () =>
-                                    _allianceTotal = !_allianceTotal,
+                                onPressed: widget.match != null
+                                    ? () => _allianceTotal = !_allianceTotal
+                                    : null,
                                 child: Padding(
                                   padding: const EdgeInsets.only(
                                     left: 8.0,

@@ -1,6 +1,4 @@
-import 'package:http/http.dart' as http;
 import 'dart:math';
-import 'package:teamtrack/api/APIKEYS.dart';
 import 'package:teamtrack/components/Collapsible.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:teamtrack/components/ScoreCard.dart';
@@ -44,20 +42,6 @@ class _TeamViewState extends State<TeamView> {
   final teleColor = Colors.blue;
   final autoColor = Colors.green;
   final generalColor = Color.fromRGBO(230, 30, 213, 1);
-
-  @override
-  void initState() {
-    http
-        .get(
-      Uri.parse('${APIKEYS.TOA_URL}/team/${_team.number}'),
-      headers: APIKEYS.TOA_HEADER,
-    )
-        .then((value) {
-      final body = (json.decode(value.body) as List);
-      if (body.length != 0) setState(() => widget.team.updateWithTOA(body[0]));
-    });
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -152,42 +136,21 @@ class _TeamViewState extends State<TeamView> {
                 ],
               ),
         appBar: AppBar(
-          title: Row(
+          title: Column(
+            crossAxisAlignment: NewPlatform.isAndroid
+                ? CrossAxisAlignment.start
+                : CrossAxisAlignment.center,
             children: [
-              Column(
-                crossAxisAlignment: NewPlatform.isAndroid
-                    ? CrossAxisAlignment.start
-                    : CrossAxisAlignment.center,
-                children: [
-                  PlatformText(_team.name,
-                      style: widget.team.number == '6165'
-                          ? TextStyle(fontSize: 20, fontFamily: 'Revival')
-                          : null),
-                  PlatformText(
-                    _team.number,
-                    style: widget.team.number == '6165'
-                        ? TextStyle(fontSize: 12, fontFamily: 'Revival Gothic')
-                        : Theme.of(context).textTheme.caption,
-                  ),
-                ],
+              PlatformText(_team.name,
+                  style: widget.team.number == '6165'
+                      ? TextStyle(fontSize: 20, fontFamily: 'Revival')
+                      : null),
+              PlatformText(
+                _team.number,
+                style: widget.team.number == '6165'
+                    ? TextStyle(fontSize: 12, fontFamily: 'Revival Gothic')
+                    : Theme.of(context).textTheme.caption,
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  children: [
-                    if (widget.team.established != null)
-                      PlatformText(
-                        "est. ${widget.team.established}",
-                        style: Theme.of(context).textTheme.caption,
-                      ),
-                    if (widget.team.city != null)
-                      PlatformText(
-                        widget.team.city!,
-                        style: Theme.of(context).textTheme.caption,
-                      ),
-                  ],
-                ),
-              )
             ],
           ),
           backgroundColor: Theme.of(context).colorScheme.primary,

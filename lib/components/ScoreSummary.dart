@@ -7,24 +7,26 @@ class ScoreSummary extends StatelessWidget {
   const ScoreSummary({
     Key? key,
     required this.event,
-    required this.score,
+    this.score,
     this.autoMax = 0,
     this.teleMax = 0,
     this.endMax = 0,
     this.totalMax = 0,
     this.height = 60,
     this.width = 30,
+    this.auto = 0,
+    this.tele = 0,
+    this.end = 0,
+    this.total = 0,
     required this.showPenalties,
+    this.units = '',
   }) : super(key: key);
   final Event event;
   final Score? score;
-  final double autoMax;
-  final double teleMax;
-  final double endMax;
-  final double totalMax;
-  final double width;
-  final double height;
+  final double auto, tele, end, total, autoMax, teleMax, endMax, totalMax;
+  final double width, height;
   final bool showPenalties;
+  final String units;
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -34,30 +36,34 @@ class ScoreSummary extends StatelessWidget {
         BarGraph(
           height: height,
           width: width,
-          val: score?.total(showPenalties: showPenalties).toDouble() ?? 0,
+          val: score?.total(showPenalties: showPenalties).toDouble() ?? total,
           max: totalMax,
           title: 'Total',
+          units: units,
         ),
         BarGraph(
           height: height,
           width: width,
-          val: score?.autoScore.total().toDouble() ?? 0,
+          val: score?.autoScore.total().toDouble() ?? auto,
           max: autoMax,
           title: 'Autonomous',
+          units: units,
         ),
         BarGraph(
           height: height,
           width: width,
-          val: score?.teleScore.total().toDouble() ?? 0,
+          val: score?.teleScore.total().toDouble() ?? tele,
           max: teleMax,
           title: 'Tele-Op',
+          units: units,
         ),
         BarGraph(
           height: height,
           width: width,
-          val: score?.endgameScore.total().toDouble() ?? 0,
+          val: score?.endgameScore.total().toDouble() ?? end,
           max: endMax,
           title: 'Endgame',
+          units: units,
         ),
       ],
     );
