@@ -10,7 +10,6 @@ import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/models/ScoreModel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:teamtrack/components/CheckList.dart';
 import 'package:uuid/uuid.dart';
@@ -43,6 +42,7 @@ class _TeamViewState extends State<TeamView> {
   final teleColor = Colors.blue;
   final autoColor = Colors.green;
   final generalColor = Color.fromRGBO(230, 30, 213, 1);
+
   @override
   Widget build(BuildContext context) => Scaffold(
         bottomNavigationBar: NewPlatform.isIOS
@@ -141,12 +141,12 @@ class _TeamViewState extends State<TeamView> {
                 ? CrossAxisAlignment.start
                 : CrossAxisAlignment.center,
             children: [
-              PlatformText(widget.team.name,
+              PlatformText(_team.name,
                   style: widget.team.number == '6165'
                       ? TextStyle(fontSize: 20, fontFamily: 'Revival')
                       : null),
               PlatformText(
-                widget.team.number,
+                _team.number,
                 style: widget.team.number == '6165'
                     ? TextStyle(fontSize: 12, fontFamily: 'Revival Gothic')
                     : Theme.of(context).textTheme.caption,
@@ -168,18 +168,19 @@ class _TeamViewState extends State<TeamView> {
                 ),
               ),
             ),
-            IconButton(
-              icon: Icon(Icons.list_alt),
-              tooltip: 'Robot Iterations',
-              onPressed: () => Navigator.of(context).push(
-                platformPageRoute(
-                  builder: (context) => ChangeList(
-                    team: _team,
-                    event: widget.event,
+            if (widget.event.type == EventType.remote)
+              IconButton(
+                icon: Icon(Icons.list_alt),
+                tooltip: 'Robot Iterations',
+                onPressed: () => Navigator.of(context).push(
+                  platformPageRoute(
+                    builder: (context) => ChangeList(
+                      team: _team,
+                      event: widget.event,
+                    ),
                   ),
                 ),
               ),
-            ),
           ],
         ),
         body: StreamBuilder<DatabaseEvent>(

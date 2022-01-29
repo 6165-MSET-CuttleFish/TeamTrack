@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:teamtrack/models/AppModel.dart';
@@ -91,6 +92,15 @@ extension MergeExt on List<ScoringElement> {
       newList.add(element);
     }
     return newList;
+  }
+}
+
+extension TimestampExt on Timestamp {
+  Map<String, dynamic> toJson() {
+    return {
+      'seconds': this.seconds,
+      'nanoseconds': this.nanoseconds,
+    };
   }
 }
 

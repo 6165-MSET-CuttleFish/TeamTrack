@@ -126,6 +126,18 @@ class Event with ClusterItem {
     return arr;
   }
 
+  void addChange(Change change, Team team) async {
+    await getRef()
+        ?.child('teams/${team.number}/changes/${change.id}')
+        .update(change.toJson());
+    if (!shared) team.addChange(change);
+  }
+
+  void deleteChange(Change change, Team team) async {
+    await getRef()?.child('teams/${team.number}/changes/${change.id}').remove();
+    if (!shared) team.deleteChange(change);
+  }
+
   void addMatch(Match e) async {
     await getRef()?.child('matches/${e.id}').set(e.toJson());
     await getRef()?.child('teams').runTransaction((mutableData) {
@@ -294,8 +306,7 @@ class Event with ClusterItem {
             teamIndex = int.parse(team?.number ?? '');
           }
           try {
-            var tempScores =
-                (mutableData['teams'][teamIndex]['scores'] as Map);
+            var tempScores = (mutableData['teams'][teamIndex]['scores'] as Map);
             tempScores.remove(e.id);
             mutableData['teams'][teamIndex]['scores'] = tempScores;
           } catch (e) {}
@@ -350,10 +361,9 @@ class Event with ClusterItem {
       shared = map['shared'] ?? true;
       id = map['id'] ?? Uuid().v4();
       try {
-        createdAt = getTimestampFromString(
-            map['createdAt']); //Timestamp(map['seconds'], map['nanoSeconds']);
+        createdAt = getTimestampFromString(map['createdAt']) ?? Timestamp.now();
       } catch (e) {
-        createdAt = Timestamp.now();
+        createdAt = map['createdAt'];
       }
 
       try {
@@ -408,9 +418,9 @@ class Event with ClusterItem {
     shared = json?['shared'] ?? false;
     id = json?['id'] ?? Uuid().v4();
     try {
-      createdAt = Timestamp(json?['seconds'], json?['nanoSeconds']);
+      createdAt = getTimestampFromString(json?['createdAt']) ?? Timestamp.now();
     } catch (e) {
-      createdAt = Timestamp.now();
+      createdAt = json?['createdAt'];
     }
 
     try {
@@ -440,7 +450,7 @@ class Event with ClusterItem {
       match.setDice(match.dice);
     }
   }
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toJson([bool cloudFirestore = false]) => {
         'gameName': gameName,
         'name': name,
         'teams': teams
@@ -452,6 +462,7 @@ class Event with ClusterItem {
         'author': author?.toJson(),
         'seconds': createdAt.seconds,
         'nanoSeconds': createdAt.nanoseconds,
+        'createdAt': cloudFirestore ? createdAt : createdAt.toJson(),
       };
   Map<String, dynamic> toSimpleJson() => {
         'gameName': gameName,
@@ -493,9 +504,7 @@ class Alliance {
   int allianceTotal(bool? showPenalties, {OpModeType? type}) =>
       (((team1?.scores[id]?.getScoreDivision(type).total() ?? 0) +
                   (team2?.scores[id]?.getScoreDivision(type).total() ?? 0) +
-                  ((showPenalties ?? false)
-                      ? getPenalty()
-                      : 0)) +
+                  ((showPenalties ?? false) ? getPenalty() : 0)) +
               sharedScore.getScoreDivision(type).total())
           .clamp(0, 999);
   Alliance.fromJson(
@@ -631,7 +640,7 @@ class Match {
     try {
       timeStamp = Timestamp(json['seconds'], json['nanoSeconds']);
     } catch (e) {
-      timeStamp = Timestamp.now();
+      timeStamp = getTimestampFromString(json['createdAt']) ?? Timestamp.now();
     }
     activeUsers = (json['activeUsers'] as Map<String, dynamic>?)
         ?.map((key, value) => MapEntry(key, TeamTrackUser.fromJson(value, key)))
@@ -643,8 +652,7 @@ class Match {
         'blue': blue?.toJson(),
         'dice': dice.toString(),
         'id': id.toString(),
-        'seconds': timeStamp.seconds,
-        'nanoSeconds': timeStamp.nanoseconds,
+        'createdAt': timeStamp.toJson(),
       };
   Score? getScore(String? number) {
     if (number == red?.team1?.number)
@@ -667,6 +675,8 @@ class Match {
 class Team {
   String name = '';
   String number = '';
+  int? established;
+  String? city;
   Map<String, Score> scores = Map();
   List<Change> changes = [];
   Score? targetScore;
@@ -696,20 +706,29 @@ class Team {
     if (json['targetScore'] != null)
       targetScore = Score.fromJson(json['targetScore'], gameName);
     try {
-      changes = List<Change>.from(
-        json['changes'].map(
-          (model) => Change.fromJson(model),
-        ),
-      );
+      changes = (json['changes'] as Map?)
+              ?.map((key, value) => MapEntry(key, Change.fromJson(value)))
+              .values
+              .toList() ??
+          [];
     } catch (e) {
       changes = [];
     }
   }
+
+  void updateWithTOA(dynamic toa) {
+    if (toa == null) return;
+    // name = toa['team_name_short'] ?? name;
+    established = (toa['rookie_year'] ?? this.established) as int?;
+    city = toa['city'] ?? city;
+  }
+
   Map<String, dynamic> toJson() => {
         'name': name,
         'number': number,
         'scores': scores.map((key, value) => MapEntry(key, value.toJson())),
         'targetScore': targetScore?.toJson(),
-        'changes': changes.map((change) => change.toJson()).toList(),
+        'changes': Map.fromIterable(changes.map((change) => change.toJson()),
+            key: (change) => change['id']),
       };
 }

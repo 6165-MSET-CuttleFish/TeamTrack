@@ -15,19 +15,19 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 5.0.1+8
+version: 5.0.2+10
 
 environment:
   sdk: '>=2.12.0 <3.0.0'
 
 dependencies:
   http: ^0.13.4
-  provider: ^5.0.0
-  uuid: ^3.0.4
-  shared_preferences: ^2.0.6
-  fluttercontactpicker: ^4.5.1
-  url_launcher: ^6.0.6
-  date_format: ^2.0.4
+  provider: ^6.0.2
+  uuid: ^3.0.5
+  shared_preferences: ^2.0.12
+  fluttercontactpicker: ^4.6.0
+  url_launcher: ^6.0.18
+  date_format: ^2.0.5
   location: ^4.3.0
   rxdart: ^0.27.3
   google_maps_cluster_manager: ^3.0.0+1
@@ -41,17 +41,17 @@ dependencies:
   syncfusion_flutter_charts: ^19.1.67
   google_maps_flutter: ^2.1.1
 
-  firebase_core: ^1.10.5
-  firebase_messaging: ^11.1.0
-  firebase_remote_config: ^1.0.2
-  firebase_auth: ^3.3.3
-  cloud_firestore: ^2.5.3
-  cloud_functions: ^3.0.4
-  firebase_database: ^9.0.3
-  google_sign_in: ^5.1.1
-  sign_in_with_apple: ^3.0.0
+  firebase_core: ^1.12.0
+  firebase_messaging: ^11.2.6
+  firebase_remote_config: ^2.0.0
+  firebase_auth: ^3.3.6
+  cloud_firestore: ^3.1.7
+  cloud_functions: ^3.2.6
+  firebase_database: ^9.0.6
+  google_sign_in: ^5.2.3
+  sign_in_with_apple: ^3.3.0
   crypto: ^3.0.1
-  geoflutterfire: ^3.0.1
+  geoflutterfire: ^3.0.2
 
   flutter:
     sdk: flutter

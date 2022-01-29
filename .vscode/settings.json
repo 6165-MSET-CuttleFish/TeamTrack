@@ -1,5 +1,6 @@
 {
     "eslint.workingDirectories": [
       "src"
-    ]
+    ],
+    "java.configuration.updateBuildConfiguration": "automatic"
   }
