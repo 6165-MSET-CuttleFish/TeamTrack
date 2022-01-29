@@ -360,7 +360,11 @@ class Event with ClusterItem {
       }
       shared = map['shared'] ?? true;
       id = map['id'] ?? Uuid().v4();
-      createdAt = getTimestampFromString(map['createdAt']) ?? Timestamp.now();
+      try {
+        createdAt = getTimestampFromString(map['createdAt']) ?? Timestamp.now();
+      } catch (e) {
+        createdAt = map['createdAt'];
+      }
 
       try {
         author = TeamTrackUser.fromJson(map['author'], null);
@@ -413,7 +417,11 @@ class Event with ClusterItem {
     } catch (e) {}
     shared = json?['shared'] ?? false;
     id = json?['id'] ?? Uuid().v4();
-    createdAt = getTimestampFromString(json?['createdAt']) ?? Timestamp.now();
+    try {
+      createdAt = getTimestampFromString(json?['createdAt']) ?? Timestamp.now();
+    } catch (e) {
+      createdAt = json?['createdAt'];
+    }
 
     try {
       author = TeamTrackUser.fromJson(json?['author'], null);

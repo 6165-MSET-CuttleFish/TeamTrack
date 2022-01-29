@@ -96,11 +96,10 @@ class _PermissionsState extends State<Permissions> {
                               widget.currentUser?.uid != user.uid)
                           ? (newValue) {
                               HapticFeedback.lightImpact();
-                              setState(
-                                () => widget.ref
-                                    ?.child('${user.uid}/role')
-                                    .set(newValue?.toRep()),
-                              );
+                              widget.ref
+                                  ?.child('${user.uid}/role')
+                                  .set(newValue?.toRep());
+                              setState(() {});
                             }
                           : null,
                     ),
