@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/models/ScoreModel.dart';
@@ -166,18 +165,6 @@ extension extOp on OpModeType {
 
 extension DiceExtension on Dice {
   String toVal(String gameName) {
-    if (NewPlatform.isWeb) {
-      switch (this) {
-        case Dice.one:
-          return "1";
-        case Dice.two:
-          return "2";
-        case Dice.three:
-          return "3";
-        default:
-          return "All Cases";
-      }
-    }
     final skeleton = json.decode(
       remoteConfig.getString(
         gameName,

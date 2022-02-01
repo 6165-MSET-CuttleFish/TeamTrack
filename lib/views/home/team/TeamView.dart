@@ -24,9 +24,11 @@ class TeamView extends StatefulWidget {
     Key? key,
     required this.team,
     required this.event,
+    this.isSoleWindow = true,
   }) : super(key: key);
   final Team team;
   final Event event;
+  final bool isSoleWindow;
   @override
   _TeamViewState createState() => _TeamViewState(team);
 }
@@ -184,7 +186,7 @@ class _TeamViewState extends State<TeamView> {
           ],
         ),
         body: StreamBuilder<DatabaseEvent>(
-          stream: widget.event.getRef()?.onValue,
+          stream: widget.isSoleWindow ? widget.event.getRef()?.onValue : null,
           builder: (context, eventHandler) {
             _team = widget.team;
             if (eventHandler.hasData && !eventHandler.hasError) {
@@ -290,68 +292,69 @@ class _TeamViewState extends State<TeamView> {
                           ],
                         ),
                       ),
-                      Container(
-                        width: MediaQuery.of(context).size.width,
-                        child: PlatformButton(
-                          onPressed: () async {
-                            await Navigator.push(
-                              context,
-                              platformPageRoute(
-                                builder: (context) => MatchList(
-                                  event: widget.event,
-                                  team: _team,
-                                  ascending: false,
+                      if (widget.isSoleWindow)
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          child: PlatformButton(
+                            onPressed: () async {
+                              await Navigator.push(
+                                context,
+                                platformPageRoute(
+                                  builder: (context) => MatchList(
+                                    event: widget.event,
+                                    team: _team,
+                                    ascending: false,
+                                  ),
                                 ),
-                              ),
-                            );
-                            setState(() {});
-                          },
-                          color: CupertinoColors.systemGreen,
-                          child: PlatformText('Matches'),
-                        ),
-                      ),
-                      if (NewPlatform.isIOS)
-                        Padding(
-                          padding: EdgeInsets.all(5),
-                        ),
-                      Container(
-                        width: MediaQuery.of(context).size.width / 2,
-                        child: PlatformButton(
-                          onPressed: () async {
-                            if (_team.targetScore == null) {
-                              _team.targetScore = Score(
-                                Uuid().v4(),
-                                Dice.none,
-                                widget.event.gameName,
                               );
-                              await widget.event
-                                  .getRef()
-                                  ?.child('teams/${widget.team.number}')
-                                  .runTransaction((mutableData) {
-                                (mutableData as Map?)?['targetScore'] = Score(
+                              setState(() {});
+                            },
+                            color: CupertinoColors.systemGreen,
+                            child: PlatformText('Matches'),
+                          ),
+                        ),
+                      Padding(
+                        padding: EdgeInsets.all(5),
+                      ),
+                      if (widget.isSoleWindow)
+                        Container(
+                          width: MediaQuery.of(context).size.width / 2,
+                          child: PlatformButton(
+                            onPressed: () async {
+                              if (_team.targetScore == null) {
+                                _team.targetScore = Score(
                                   Uuid().v4(),
                                   Dice.none,
                                   widget.event.gameName,
-                                ).toJson();
-                                return Transaction.success(mutableData);
-                              });
-                              dataModel.saveEvents();
-                            }
-                            await Navigator.push(
-                              context,
-                              platformPageRoute(
-                                builder: (context) => MatchView(
-                                  event: widget.event,
-                                  team: _team,
+                                );
+                                await widget.event
+                                    .getRef()
+                                    ?.child('teams/${widget.team.number}')
+                                    .runTransaction((mutableData) {
+                                  (mutableData as Map?)?['targetScore'] = Score(
+                                    Uuid().v4(),
+                                    Dice.none,
+                                    widget.event.gameName,
+                                  ).toJson();
+                                  return Transaction.success(mutableData);
+                                });
+                                dataModel.saveEvents();
+                              }
+                              await Navigator.push(
+                                context,
+                                platformPageRoute(
+                                  builder: (context) => MatchView(
+                                    event: widget.event,
+                                    team: _team,
+                                  ),
                                 ),
-                              ),
-                            );
-                            setState(() {});
-                          },
-                          color: Colors.indigoAccent,
-                          child: PlatformText('Target'),
+                              );
+                              setState(() {});
+                            },
+                            color: Colors.indigoAccent,
+                            child: PlatformText('Target'),
+                          ),
                         ),
-                      ),
                       Padding(
                         padding: const EdgeInsets.only(top: 20, bottom: 10),
                         child: PlatformText(
@@ -448,7 +451,6 @@ class _TeamViewState extends State<TeamView> {
                   borderRadius: BorderRadius.all(
                     Radius.circular(18),
                   ),
-                  color: Color(0xff232d37),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.only(
@@ -462,15 +464,12 @@ class _TeamViewState extends State<TeamView> {
                               drawVerticalLine: true,
                               getDrawingHorizontalLine: (value) {
                                 return FlLine(
-                                  color: value % 10 == 0
-                                      ? Color(0xff37434d)
-                                      : Colors.transparent,
-                                  strokeWidth: value % 10 == 0 ? 1 : 0,
+                                  color: Colors.transparent,
                                 );
                               },
                               getDrawingVerticalLine: (value) {
                                 return FlLine(
-                                  color: const Color(0xff37434d),
+                                  color: Colors.transparent,
                                   strokeWidth: 1,
                                 );
                               },
@@ -498,9 +497,7 @@ class _TeamViewState extends State<TeamView> {
                                   fontSize: 15,
                                 ),
                                 getTitles: (value) {
-                                  if (value % 50 == 0)
-                                    return value.toInt().toString();
-                                  return '';
+                                  return value.toInt().toString();
                                 },
                                 reservedSize: 28,
                                 margin: 12,
@@ -533,7 +530,7 @@ class _TeamViewState extends State<TeamView> {
                                         show: true,
                                         colors: [
                                           Colors.lightGreenAccent
-                                              .withOpacity(0.2)
+                                              .withOpacity(0.5)
                                         ],
                                         cutOffY: _team.targetScore
                                             ?.total()
@@ -545,7 +542,7 @@ class _TeamViewState extends State<TeamView> {
                                     ? BarAreaData(
                                         show: true,
                                         colors: [
-                                          Colors.redAccent.withOpacity(0.2)
+                                          Colors.redAccent.withOpacity(0.5)
                                         ],
                                         cutOffY: _team.targetScore
                                             ?.total()
@@ -767,12 +764,7 @@ class _TeamViewState extends State<TeamView> {
                 ),
                 child: PlatformText(
                   'Show Cycle Times',
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: _showCycles
-                        ? Colors.white.withOpacity(0.5)
-                        : Colors.white,
-                  ),
+                  style: Theme.of(context).textTheme.button,
                   textAlign: TextAlign.center,
                 ),
                 style: ButtonStyle(

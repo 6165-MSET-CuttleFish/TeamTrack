@@ -54,20 +54,21 @@ class _ChangeConfigState extends State<ChangeConfig> {
                     ],
                   ),
                 ),
-                if (_finalDate != null) PlatformText('-'),
-                if (_finalDate != null)
-                  PlatformText(
-                    formatDate(
-                      _finalDate!,
-                      [
-                        mm,
-                        '/',
-                        dd,
-                        '/',
-                        yyyy,
-                      ],
-                    ),
-                  ),
+                PlatformText('-'),
+                PlatformText(
+                  _finalDate != null
+                      ? formatDate(
+                          _finalDate!,
+                          [
+                            mm,
+                            '/',
+                            dd,
+                            '/',
+                            yyyy,
+                          ],
+                        )
+                      : "Present",
+                ),
               ],
             ),
           ),
@@ -88,7 +89,7 @@ class _ChangeConfigState extends State<ChangeConfig> {
             color: Colors.blue,
           ),
           PlatformButton(
-            child: PlatformText('End Date'),
+            child: PlatformText('End Date (Optional)'),
             onPressed: () => showDatePicker(
               context: context,
               initialDate: _finalDate ?? DateTime.now(),
@@ -97,7 +98,7 @@ class _ChangeConfigState extends State<ChangeConfig> {
             ).then(
               (date) => setState(
                 () {
-                  if (date != null) _finalDate = date;
+                  _finalDate = date;
                 },
               ),
             ),

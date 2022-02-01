@@ -156,7 +156,7 @@ class ScoreCard extends StatelessWidget {
                   borderRadius: BorderRadius.all(
                     Radius.circular(18),
                   ),
-                  color: Color(0xff232d37),
+                  // color: Color(0xff232d37),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.only(
@@ -168,15 +168,13 @@ class ScoreCard extends StatelessWidget {
                         drawVerticalLine: true,
                         getDrawingHorizontalLine: (value) {
                           return FlLine(
-                            color: value % 10 == 0
-                                ? Color(0xff37434d)
-                                : Colors.transparent,
+                            color: Colors.transparent,
                             strokeWidth: value % 10 == 0 ? 1 : 0,
                           );
                         },
                         getDrawingVerticalLine: (value) {
                           return FlLine(
-                            color: const Color(0xff37434d),
+                            color: Colors.transparent,
                             strokeWidth: 1,
                           );
                         },
@@ -204,10 +202,7 @@ class ScoreCard extends StatelessWidget {
                             fontSize: 15,
                           ),
                           getTitles: (value) {
-                            if (value % 30 == 0) {
-                              return value.toInt().toString();
-                            }
-                            return '';
+                            return value.toInt().toString();
                           },
                           reservedSize: 28,
                           margin: 12,

@@ -171,10 +171,28 @@ export const fetchAPI = functions.https.onCall((data, context) => {
   });
 });
 
-
+// Convert remote config to realtime database json
 export const remoteConfigToDatabase = functions.remoteConfig
     .onUpdate(async () => {
       const temp = await admin.remoteConfig().getTemplate();
       return admin.database().ref().child("config")
           .ref.set(temp.parameters);
+    });
+
+// Remove old templates every week
+export const periodicTemplateRemoval = functions.pubsub
+    .schedule("every 7 days")
+    .onRun(async () => {
+      const now = new Date();
+      // eslint-disable-next-line max-len
+      const lastWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
+      return admin.firestore()
+          .collectionGroup("templates").where("createdAt", "<", lastWeek).get()
+          .then((querySnapshot) => {
+            const promises:Promise<FirebaseFirestore.WriteResult>[] = [];
+            querySnapshot.forEach((doc) => {
+              promises.push(doc.ref.delete());
+            });
+            return Promise.all(promises);
+          });
     });

@@ -12,7 +12,9 @@
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true">
         <meta-data android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDUIqXC4t82cY6jLJoVHHdeosBX9hoO8L0"/>
+            android:value="AIzaSyD3TEknuwM7GZUKjVvlO1G_UoLestiNEn8"/>
+        <meta-data android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="high_importance_channel" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
