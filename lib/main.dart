@@ -7,7 +7,6 @@ import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:teamtrack/providers/Auth.dart';
 import 'package:teamtrack/providers/Theme.dart';
 import 'package:teamtrack/views/auth/AuthenticationWrapper.dart';
-import 'package:teamtrack/providers/PushNotifications.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -15,24 +14,6 @@ import 'package:provider/provider.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  await remoteConfig.fetchAndActivate();
-  if (!NewPlatform.isWeb) {
-    final notification = PushNotifications();
-    await messaging.requestPermission(
-      alert: true,
-      announcement: false,
-      badge: true,
-      carPlay: false,
-      criticalAlert: false,
-      provisional: false,
-      sound: true,
-    );
-    await notification.initialize();
-    String? token = await notification.getToken();
-    if (token != "") {
-      dataModel.token = token;
-    }
-  }
   HttpOverrides.global = MyHttpOverrides();
   runApp(MyApp());
 }
