@@ -1,10 +1,13 @@
 import 'dart:io';
 
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
+import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/providers/Auth.dart';
+import 'package:teamtrack/providers/PushNotifications.dart';
 import 'package:teamtrack/providers/Theme.dart';
 import 'package:teamtrack/views/auth/AuthenticationWrapper.dart';
 import 'package:teamtrack/models/AppModel.dart';
@@ -14,15 +17,48 @@ import 'package:provider/provider.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await remoteConfig.fetchAndActivate();
+  Statics.gameName = remoteConfig.getString("gameName");
+  dataModel.restoreEvents();
+  if (!NewPlatform.isWeb) {
+    final settings = await messaging.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+    );
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      print('User granted permission');
+      await PushNotifications.initialize();
+      String? token = await PushNotifications.getToken();
+      if (token != "") {
+        dataModel.token = token;
+      }
+    } else if (settings.authorizationStatus ==
+        AuthorizationStatus.provisional) {
+      print('User granted provisional permission');
+      await PushNotifications.initialize();
+      String? token = await PushNotifications.getToken();
+      if (token != "") {
+        dataModel.token = token;
+      }
+    } else {
+      print('User declined or has not accepted permission');
+    }
+  }
   HttpOverrides.global = MyHttpOverrides();
   runApp(MyApp());
 }
 
-class MyHttpOverrides extends HttpOverrides{
+class MyHttpOverrides extends HttpOverrides {
   @override
-  HttpClient createHttpClient(SecurityContext? context){
+  HttpClient createHttpClient(SecurityContext? context) {
     return super.createHttpClient(context)
-      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
   }
 }
 

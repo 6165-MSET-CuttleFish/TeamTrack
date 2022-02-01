@@ -2,25 +2,27 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:teamtrack/models/AppModel.dart';
 
-const AndroidNotificationChannel channel = AndroidNotificationChannel(
+class PushNotifications {
+  static final AndroidNotificationChannel channel = AndroidNotificationChannel(
   'high_importance_channel', // id
   'High Importance Notifications', // title
-  importance: Importance.defaultImportance,
+  importance: Importance.max,
   playSound: true,
 );
 
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+static final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+
+static Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
   print('A background message just showed up :  ${message.messageId}');
   RemoteNotification? notification = message.notification;
   AndroidNotification? android = message.notification?.android;
-  AppleNotification? ios = message.notification?.apple;
-  if (notification != null) {
+  if (notification != null && android != null) {
     flutterLocalNotificationsPlugin.show(
       notification.hashCode,
       notification.title,
@@ -32,7 +34,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
             channelDescription: channel.description,
             color: Colors.blue,
             playSound: true,
-            icon: android?.smallIcon,
+            icon: android.smallIcon,
           ),
           iOS: IOSNotificationDetails(
             presentSound: true,
@@ -42,10 +44,8 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     );
   }
 }
-
-class PushNotifications {
-  initialize() async {
-    await Firebase.initializeApp();
+  static final onNotifications = BehaviorSubject<String?>();
+  static Future initialize({bool initScheduled = false}) async {
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
     await flutterLocalNotificationsPlugin
@@ -60,20 +60,24 @@ class PushNotifications {
     );
 
     var initializationSettingsAndroid =
-        AndroidInitializationSettings('mipmap/ic_launcher');
+        AndroidInitializationSettings('@mipmap/ic_launcher');
     var initializationSettingsiOS = IOSInitializationSettings();
     var initializationSettings = InitializationSettings(
         android: initializationSettingsAndroid, iOS: initializationSettingsiOS);
-    flutterLocalNotificationsPlugin.initialize(initializationSettings);
+    flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+      onSelectNotification: (payload) async {
+        onNotifications.add(payload);
+      },
+    );
 
     FirebaseMessaging.onMessage.listen(onMessage);
   }
 
-  void onMessage(RemoteMessage message) {
+  static void onMessage(RemoteMessage message) {
     print('A message just showed up : ${message.messageId}');
     RemoteNotification? notification = message.notification;
     AndroidNotification? android = message.notification?.android;
-    AppleNotification? ios = message.notification?.apple;
     if (notification != null) {
       flutterLocalNotificationsPlugin.show(
         notification.hashCode,
@@ -97,7 +101,7 @@ class PushNotifications {
     }
   }
 
-  Future<String?> getToken() async {
+  static Future<String?> getToken() async {
     return messaging.getToken();
   }
 }

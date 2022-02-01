@@ -7,6 +7,7 @@ import 'package:teamtrack/models/AppModel.dart';
 import 'package:provider/provider.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/providers/Auth.dart';
+import 'package:teamtrack/providers/PushNotifications.dart';
 import 'package:teamtrack/providers/Theme.dart';
 import 'package:teamtrack/views/auth/Login.dart';
 import 'package:teamtrack/views/home/events/EventsList.dart';
@@ -33,6 +34,15 @@ var tab = Tab.events;
 class _LandingPageState extends State<LandingPage> {
   EventType? _newType;
   String? _newName;
+
+  @override
+  void initState() {
+    super.initState();
+    PushNotifications.onNotifications.stream.listen(onClickedNotification);
+  }
+
+  void onClickedNotification(String? payload) =>
+      setState(() => tab = Tab.inbox);
 
   PlatformText title() {
     switch (tab) {

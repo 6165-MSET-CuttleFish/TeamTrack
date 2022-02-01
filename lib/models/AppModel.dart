@@ -37,7 +37,7 @@ class DataModel {
     print(coded);
   }
 
-  Future<String> restoreEvents() async {
+  void restoreEvents() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       var x = jsonDecode(prefs.getString("Events") ?? '') as List;
@@ -45,9 +45,8 @@ class DataModel {
           .map((e) => Event.fromJson(e))
           .where((element) => !element.shared)
           .toList();
-      return "Success";
     } catch (e) {
-      return "Error";
+      print(e);
     }
   }
 }
