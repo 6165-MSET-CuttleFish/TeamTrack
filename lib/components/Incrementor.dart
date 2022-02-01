@@ -23,8 +23,7 @@ class Incrementor extends StatefulWidget {
   final ScoringElement element;
   final void Function() onPressed;
   final void Function()? onIncrement, onDecrement;
-  final Transaction Function(Object?)? mutableIncrement,
-      mutableDecrement;
+  final Transaction Function(Object?)? mutableIncrement, mutableDecrement;
   final Color? backgroundColor;
   final Event? event;
   final Score? score;
@@ -63,35 +62,39 @@ class _Incrementor extends State<Incrementor> {
               for (int i = 1;
                   i < (widget.element.nestedElements?.length ?? 0);
                   i++) {
-                (mutableData as Map?)?[widget.element.nestedElements?[i].key] = 0;
+                (mutableData as Map?)?[widget.element.nestedElements?[i].key] =
+                    0;
               }
               if (val != 0)
-                (mutableData as Map?)?[widget.element.nestedElements?[val].key] = 1;
+                (mutableData
+                    as Map?)?[widget.element.nestedElements?[val].key] = 1;
               return Transaction.success(mutableData);
             });
         },
       );
   PlatformSwitch buildSwitch() => PlatformSwitch(
         value: widget.element.asBool(),
-        onChanged: widget.event?.role != Role.viewer ? (val) async {
-          if (!(widget.event?.shared ?? false)) {
-            if (val && widget.element.count < widget.element.max!())
-              widget.element.count = 1;
-            else
-              widget.element.count = 0;
-          }
-          widget.onPressed();
-          if (widget.path != null)
-            await widget.event
-                ?.getRef()
-                ?.child(widget.path!)
-                .runTransaction((mutableData) {
-              (mutableData as Map?)?[widget.element.key] = val
-                  ? (widget.element.count < widget.element.max!() ? 1 : 0)
-                  : 0;
-              return Transaction.success(mutableData);
-            });
-        } : null,
+        onChanged: widget.event?.role != Role.viewer
+            ? (val) async {
+                if (!(widget.event?.shared ?? false)) {
+                  if (val && widget.element.count < widget.element.max!())
+                    widget.element.count = 1;
+                  else
+                    widget.element.count = 0;
+                }
+                widget.onPressed();
+                if (widget.path != null)
+                  await widget.event
+                      ?.getRef()
+                      ?.child(widget.path!)
+                      .runTransaction((mutableData) {
+                    (mutableData as Map?)?[widget.element.key] = val
+                        ? (widget.element.count < widget.element.max!() ? 1 : 0)
+                        : 0;
+                    return Transaction.success(mutableData);
+                  });
+              }
+            : null,
       );
   Row buildIncrementor() => Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -127,7 +130,8 @@ class _Incrementor extends State<Incrementor> {
                                         ?.child(widget.path!)
                                         .runTransaction(
                                       (mutableData) {
-                                        (mutableData as Map?)?[widget.element.key] =
+                                        (mutableData
+                                                as Map?)?[widget.element.key] =
                                             widget.element.min!();
                                         return Transaction.success(mutableData);
                                       },
@@ -158,7 +162,8 @@ class _Incrementor extends State<Incrementor> {
                               if (widget.mutableDecrement != null) {
                                 return widget.mutableDecrement!(mutableData);
                               }
-                              var ref = (mutableData as Map?)?[widget.element.key];
+                              var ref =
+                                  (mutableData as Map?)?[widget.element.key];
                               if (ref > widget.element.min!())
                                 mutableData?[widget.element.key] =
                                     (ref ?? 0) - widget.element.decrementValue;
@@ -199,7 +204,8 @@ class _Incrementor extends State<Incrementor> {
                               if (widget.mutableIncrement != null) {
                                 return widget.mutableIncrement!(mutableData);
                               }
-                              var ref = (mutableData as Map?)?[widget.element.key];
+                              var ref =
+                                  (mutableData as Map?)?[widget.element.key];
                               if (ref < widget.element.max!())
                                 mutableData?[widget.element.key] =
                                     (ref ?? 0) + widget.element.incrementValue;

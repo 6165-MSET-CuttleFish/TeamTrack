@@ -262,14 +262,15 @@ class _LandingPageState extends State<LandingPage> {
                           Navigator.of(context).pop();
                         },
                       ),
-                      ListTile(
-                        leading: Icon(CupertinoIcons.square_stack),
-                        title: PlatformText("Templates"),
-                        onTap: () {
-                          setState(() => tab = Tab.templates);
-                          Navigator.of(context).pop();
-                        },
-                      ),
+                      if (!NewPlatform.isWeb)
+                        ListTile(
+                          leading: Icon(CupertinoIcons.square_stack),
+                          title: PlatformText("Templates"),
+                          onTap: () {
+                            setState(() => tab = Tab.templates);
+                            Navigator.of(context).pop();
+                          },
+                        ),
                       if (!(context.read<User?>()?.isAnonymous ?? true))
                         ListTile(
                           leading: Icon(Icons.inbox_rounded),
