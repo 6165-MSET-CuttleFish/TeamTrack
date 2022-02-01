@@ -52,6 +52,7 @@ dependencies:
   sign_in_with_apple: ^3.3.0
   crypto: ^3.0.1
   geoflutterfire: ^3.0.2
+  flutterfire_ui: ^0.3.2
 
   flutter:
     sdk: flutter

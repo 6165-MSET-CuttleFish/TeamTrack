@@ -162,6 +162,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.6.8"
+  desktop_webview_auth:
+    dependency: transitive
+    description:
+      name: desktop_webview_auth
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.2"
+  email_validator:
+    dependency: transitive
+    description:
+      name: email_validator
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.1"
   equatable:
     dependency: transitive
     description:
@@ -253,6 +267,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.2.0+5"
+  firebase_dynamic_links:
+    dependency: transitive
+    description:
+      name: firebase_dynamic_links
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.0.5"
+  firebase_dynamic_links_platform_interface:
+    dependency: transitive
+    description:
+      name: firebase_dynamic_links_platform_interface
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.0+5"
   firebase_messaging:
     dependency: "direct main"
     description:
@@ -307,6 +335,27 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_facebook_auth:
+    dependency: transitive
+    description:
+      name: flutter_facebook_auth
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.5.7"
+  flutter_facebook_auth_platform_interface:
+    dependency: transitive
+    description:
+      name: flutter_facebook_auth_platform_interface
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.7.1"
+  flutter_facebook_auth_web:
+    dependency: transitive
+    description:
+      name: flutter_facebook_auth_web
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.6.0+2"
   flutter_launcher_icons:
     dependency: "direct dev"
     description:
@@ -335,6 +384,11 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "5.0.0"
+  flutter_localizations:
+    dependency: transitive
+    description: flutter
+    source: sdk
+    version: "0.0.0"
   flutter_native_splash:
     dependency: "direct dev"
     description:
@@ -380,6 +434,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.6.0"
+  flutterfire_ui:
+    dependency: "direct main"
+    description:
+      name: flutterfire_ui
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.2"
   geoflutterfire:
     dependency: "direct main"
     description:
@@ -798,6 +859,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.8.0"
+  twitter_login:
+    dependency: transitive
+    description:
+      name: twitter_login
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.0.1"
   typed_data:
     dependency: transitive
     description:
