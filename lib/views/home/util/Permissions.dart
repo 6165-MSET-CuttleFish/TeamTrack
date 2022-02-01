@@ -25,52 +25,54 @@ class Permissions extends StatefulWidget {
 }
 
 class _PermissionsState extends State<Permissions> {
-  final slider = SlidableDrawerActionPane();
   @override
   Widget build(BuildContext context) => ListView(
         children: widget.users
             .map((user) => Slidable(
-                  actionPane: slider,
-                  secondaryActions: [
-                    IconSlideAction(
-                      onTap: widget.event.role == Role.admin
-                          ? () {
-                              showPlatformDialog(
-                                context: context,
-                                builder: (BuildContext context) =>
-                                    PlatformAlert(
-                                  title: PlatformText('Remove User'),
-                                  content: PlatformText('Are you sure?'),
-                                  actions: [
-                                    PlatformDialogAction(
-                                      isDefaultAction: true,
-                                      child: PlatformText('Cancel'),
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                    ),
-                                    PlatformDialogAction(
-                                      isDefaultAction: false,
-                                      isDestructive: true,
-                                      child: PlatformText('Confirm'),
-                                      onPressed: () {
-                                        setState(
-                                          () => widget.ref
-                                              ?.child('${user.uid}')
-                                              .remove(),
-                                        );
-                                        Navigator.of(context).pop();
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }
-                          : null,
-                      icon: Icons.delete,
-                      color: Colors.red,
-                    )
-                  ],
+                  endActionPane: ActionPane(
+                    // A motion is a widget used to control how the pane animates.
+                    motion: const StretchMotion(),
+                    children: [
+                      SlidableAction(
+                        onPressed: widget.event.role == Role.admin
+                            ? (_) {
+                                showPlatformDialog(
+                                  context: context,
+                                  builder: (BuildContext context) =>
+                                      PlatformAlert(
+                                    title: PlatformText('Remove User'),
+                                    content: PlatformText('Are you sure?'),
+                                    actions: [
+                                      PlatformDialogAction(
+                                        isDefaultAction: true,
+                                        child: PlatformText('Cancel'),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                      PlatformDialogAction(
+                                        isDefaultAction: false,
+                                        isDestructive: true,
+                                        child: PlatformText('Confirm'),
+                                        onPressed: () {
+                                          setState(
+                                            () => widget.ref
+                                                ?.child('${user.uid}')
+                                                .remove(),
+                                          );
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }
+                            : null,
+                        icon: Icons.delete,
+                        backgroundColor: Colors.red,
+                      )
+                    ],
+                  ),
                   child: ListTile(
                     leading: PFP(user: user),
                     title: PlatformText(

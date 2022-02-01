@@ -17,7 +17,6 @@ class Inbox extends StatefulWidget {
 }
 
 class _InboxState extends State<Inbox> {
-  final slider = SlidableStrechActionPane();
   late DocumentReference<Map<String, dynamic>> docRef;
 
   @override
@@ -35,62 +34,70 @@ class _InboxState extends State<Inbox> {
           itemBuilder: (context, index) {
             final e = dataModel.inbox[index];
             return Slidable(
-              actionPane: slider,
-              secondaryActions: [
-                IconSlideAction(
-                  icon: Icons.warning,
-                  color: Colors.yellow,
-                  onTap: () {
-                    showPlatformDialog(
-                      context: context,
-                      builder: (BuildContext context) => PlatformAlert(
-                        title: PlatformText('Block user'),
-                        content: PlatformText('Are you sure?'),
-                        actions: [
-                          PlatformDialogAction(
-                            isDefaultAction: true,
-                            child: PlatformText('Cancel'),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                          PlatformDialogAction(
-                            isDefaultAction: false,
-                            isDestructive: true,
-                            child: PlatformText('Confirm'),
-                            onPressed: () async {
-                              await firebaseFirestore.runTransaction(
-                                (transaction) async {
-                                  var snapshot = await transaction.get(docRef);
-                                  if (!snapshot.exists) {
-                                    throw Exception("User does not exist!");
-                                  }
-                                  Map newBlocks =
-                                      snapshot.data()?['blockedUsers'];
-                                  newBlocks[e.sender?.uid] = e.sender?.toJson();
-                                  Map<String, dynamic> newInbox = snapshot
-                                      .data()?["inbox"] as Map<String, dynamic>;
-                                  newInbox.removeWhere((key, value) =>
-                                      value['senderID'] == e.sender?.uid);
-                                  return transaction.update(
-                                    docRef,
-                                    {
-                                      'blockedUsers': newBlocks,
-                                      'inbox': newInbox
-                                    },
-                                  );
-                                },
-                              );
-                              Navigator.of(context).pop();
-                              setState(() {});
-                            },
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              ],
+              endActionPane: ActionPane(
+                // A motion is a widget used to control how the pane animates.
+                motion: const StretchMotion(),
+
+                // All actions are defined in the children parameter.
+                children: [
+                  SlidableAction(
+                    icon: Icons.warning,
+                    backgroundColor: Colors.yellow,
+                    onPressed: (_) {
+                      showPlatformDialog(
+                        context: context,
+                        builder: (BuildContext context) => PlatformAlert(
+                          title: PlatformText('Block user'),
+                          content: PlatformText('Are you sure?'),
+                          actions: [
+                            PlatformDialogAction(
+                              isDefaultAction: true,
+                              child: PlatformText('Cancel'),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                            PlatformDialogAction(
+                              isDefaultAction: false,
+                              isDestructive: true,
+                              child: PlatformText('Confirm'),
+                              onPressed: () async {
+                                await firebaseFirestore.runTransaction(
+                                  (transaction) async {
+                                    var snapshot =
+                                        await transaction.get(docRef);
+                                    if (!snapshot.exists) {
+                                      throw Exception("User does not exist!");
+                                    }
+                                    Map newBlocks =
+                                        snapshot.data()?['blockedUsers'];
+                                    newBlocks[e.sender?.uid] =
+                                        e.sender?.toJson();
+                                    Map<String, dynamic> newInbox =
+                                        snapshot.data()?["inbox"]
+                                            as Map<String, dynamic>;
+                                    newInbox.removeWhere((key, value) =>
+                                        value['senderID'] == e.sender?.uid);
+                                    return transaction.update(
+                                      docRef,
+                                      {
+                                        'blockedUsers': newBlocks,
+                                        'inbox': newInbox
+                                      },
+                                    );
+                                  },
+                                );
+                                Navigator.of(context).pop();
+                                setState(() {});
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
               child: Container(
                 decoration: BoxDecoration(
                   border: Border.all(

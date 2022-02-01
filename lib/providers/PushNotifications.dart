@@ -7,8 +7,7 @@ import 'package:teamtrack/models/AppModel.dart';
 const AndroidNotificationChannel channel = AndroidNotificationChannel(
   'high_importance_channel', // id
   'High Importance Notifications', // title
-  'This channel is used for important notifications.', // description
-  importance: Importance.high,
+  importance: Importance.defaultImportance,
   playSound: true,
 );
 
@@ -30,7 +29,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
           android: AndroidNotificationDetails(
             channel.id,
             channel.name,
-            channel.description,
+            channelDescription: channel.description,
             color: Colors.blue,
             playSound: true,
             icon: android?.smallIcon,
@@ -84,7 +83,7 @@ class PushNotifications {
             android: AndroidNotificationDetails(
               channel.id,
               channel.name,
-              channel.description,
+              channelDescription: channel.description,
               color: Colors.blue,
               playSound: true,
               icon: android?.smallIcon,

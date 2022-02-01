@@ -18,7 +18,6 @@ class ChangeList extends StatefulWidget {
 }
 
 class _ChangeList extends State<ChangeList> {
-  final slider = SlidableStrechActionPane();
   Team team;
   _ChangeList(this.team);
 
@@ -69,43 +68,47 @@ class _ChangeList extends State<ChangeList> {
                 children: team.changes
                     .map(
                       (change) => Slidable(
-                        actionPane: slider,
-                        secondaryActions: [
-                          IconSlideAction(
-                            icon: Icons.delete,
-                            color: Colors.red,
-                            onTap: () {
-                              showPlatformDialog(
-                                context: context,
-                                builder: (BuildContext context) =>
-                                    PlatformAlert(
-                                  title: PlatformText('Delete Change'),
-                                  content: PlatformText('Are you sure?'),
-                                  actions: [
-                                    PlatformDialogAction(
-                                      isDefaultAction: true,
-                                      child: PlatformText('Cancel'),
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                    ),
-                                    PlatformDialogAction(
-                                      isDefaultAction: false,
-                                      isDestructive: true,
-                                      child: PlatformText('Confirm'),
-                                      onPressed: () {
-                                        widget.event.deleteChange(change, team);
-                                        setState(() {});
-                                        dataModel.saveEvents();
-                                        Navigator.of(context).pop();
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          )
-                        ],
+                        endActionPane: ActionPane(
+                          // A motion is a widget used to control how the pane animates.
+                          motion: const StretchMotion(),
+                          children: [
+                            SlidableAction(
+                              icon: Icons.delete,
+                              backgroundColor: Colors.red,
+                              onPressed: (_) {
+                                showPlatformDialog(
+                                  context: context,
+                                  builder: (BuildContext context) =>
+                                      PlatformAlert(
+                                    title: PlatformText('Delete Change'),
+                                    content: PlatformText('Are you sure?'),
+                                    actions: [
+                                      PlatformDialogAction(
+                                        isDefaultAction: true,
+                                        child: PlatformText('Cancel'),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                      PlatformDialogAction(
+                                        isDefaultAction: false,
+                                        isDestructive: true,
+                                        child: PlatformText('Confirm'),
+                                        onPressed: () {
+                                          widget.event
+                                              .deleteChange(change, team);
+                                          setState(() {});
+                                          dataModel.saveEvents();
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            )
+                          ],
+                        ),
                         child: ChangeRow(
                           onTap: () => Navigator.of(context)
                               .push(

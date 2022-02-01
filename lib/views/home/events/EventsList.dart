@@ -19,14 +19,6 @@ class EventsList extends StatefulWidget {
 }
 
 class _EventsList extends State<EventsList> {
-  final slider = SlidableDrawerActionPane();
-  final secondaryActions = <Widget>[
-    IconSlideAction(
-      icon: Icons.delete,
-      color: Colors.red,
-    )
-  ];
-
   @override
   Widget build(BuildContext context) => SafeArea(
         child: ListView(
@@ -53,50 +45,60 @@ class _EventsList extends State<EventsList> {
       dataModel.remoteEvents().map(eventTile).toList();
 
   Slidable eventTile(Event e) => Slidable(
-        actions: [
-          IconSlideAction(
-            onTap: () => _onShare(e),
-            icon: e.shared ? Icons.share : Icons.upload,
-            color: Colors.blue,
-          ),
-        ],
-        secondaryActions: [
-          IconSlideAction(
-            onTap: () {
-              showPlatformDialog(
-                context: context,
-                builder: (BuildContext context) => PlatformAlert(
-                  title: PlatformText('Delete Event'),
-                  content: PlatformText('Are you sure?'),
-                  actions: [
-                    PlatformDialogAction(
-                      isDefaultAction: true,
-                      child: PlatformText('Cancel'),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                    PlatformDialogAction(
-                      isDefaultAction: false,
-                      isDestructive: true,
-                      child: PlatformText('Confirm'),
-                      onPressed: () {
-                        if (e.shared)
-                          onRemove(e);
-                        else
-                          setState(() => dataModel.events.remove(e));
-                        dataModel.saveEvents();
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
-                ),
-              );
-            },
-            icon: Icons.delete,
-            color: Colors.red,
-          )
-        ],
+        startActionPane: ActionPane(
+          // A motion is a widget used to control how the pane animates.
+          motion: const StretchMotion(),
+
+          // All actions are defined in the children parameter.
+          children: [
+            SlidableAction(
+              onPressed: (_) => _onShare(e),
+              icon: e.shared ? Icons.share : Icons.upload,
+              backgroundColor: Colors.blue,
+            ),
+          ],
+        ),
+        endActionPane: ActionPane(
+          // A motion is a widget used to control how the pane animates.
+          motion: const StretchMotion(),
+          children: [
+            SlidableAction(
+              onPressed: (_) {
+                showPlatformDialog(
+                  context: context,
+                  builder: (BuildContext context) => PlatformAlert(
+                    title: PlatformText('Delete Event'),
+                    content: PlatformText('Are you sure?'),
+                    actions: [
+                      PlatformDialogAction(
+                        isDefaultAction: true,
+                        child: PlatformText('Cancel'),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                      PlatformDialogAction(
+                        isDefaultAction: false,
+                        isDestructive: true,
+                        child: PlatformText('Confirm'),
+                        onPressed: () {
+                          if (e.shared)
+                            onRemove(e);
+                          else
+                            setState(() => dataModel.events.remove(e));
+                          dataModel.saveEvents();
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              },
+              icon: Icons.delete,
+              backgroundColor: Colors.red,
+            )
+          ],
+        ),
         child: ListTileTheme(
           iconColor: Theme.of(context).primaryColor,
           child: ListTile(
@@ -149,7 +151,6 @@ class _EventsList extends State<EventsList> {
             },
           ),
         ),
-        actionPane: slider,
       );
 
   void _onShare(Event e) {

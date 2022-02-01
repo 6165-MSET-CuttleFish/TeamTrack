@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:teamtrack/providers/Auth.dart';
-import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/providers/Theme.dart';
 import 'package:teamtrack/views/auth/AuthenticationWrapper.dart';
 import 'package:teamtrack/providers/PushNotifications.dart';
@@ -17,8 +16,6 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await remoteConfig.fetchAndActivate();
-  Statics.gameName = remoteConfig.getString("gameName");
-  await dataModel.restoreEvents();
   if (!NewPlatform.isWeb) {
     final notification = PushNotifications();
     await messaging.requestPermission(

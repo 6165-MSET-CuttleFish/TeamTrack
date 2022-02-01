@@ -30,7 +30,6 @@ class MatchList extends StatefulWidget {
 }
 
 class _MatchList extends State<MatchList> {
-  final slider = SlidableStrechActionPane();
   var scrollController = ScrollController();
   var _fabIsVisible = true;
 
@@ -248,42 +247,45 @@ class _MatchList extends State<MatchList> {
       controller: NewPlatform.isIOS ? null : scrollController,
       itemCount: matches.length,
       itemBuilder: (context, index) => Slidable(
-        actionPane: slider,
-        secondaryActions: [
-          IconSlideAction(
-            icon: Icons.delete,
-            color: Colors.red,
-            onTap: () {
-              showPlatformDialog(
-                context: context,
-                builder: (BuildContext context) => PlatformAlert(
-                  title: PlatformText('Delete Match'),
-                  content: PlatformText('Are you sure?'),
-                  actions: [
-                    PlatformDialogAction(
-                      isDefaultAction: true,
-                      child: PlatformText('Cancel'),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                    PlatformDialogAction(
-                      isDefaultAction: false,
-                      isDestructive: true,
-                      child: PlatformText('Confirm'),
-                      onPressed: () {
-                        setState(
-                          () => widget.event.deleteMatch(matches[index]),
-                        );
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ],
+        endActionPane: ActionPane(
+          // A motion is a widget used to control how the pane animates.
+          motion: const StretchMotion(),
+          children: [
+            SlidableAction(
+              icon: Icons.delete,
+              backgroundColor: Colors.red,
+              onPressed: (_) {
+                showPlatformDialog(
+                  context: context,
+                  builder: (BuildContext context) => PlatformAlert(
+                    title: PlatformText('Delete Match'),
+                    content: PlatformText('Are you sure?'),
+                    actions: [
+                      PlatformDialogAction(
+                        isDefaultAction: true,
+                        child: PlatformText('Cancel'),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                      PlatformDialogAction(
+                        isDefaultAction: false,
+                        isDestructive: true,
+                        child: PlatformText('Confirm'),
+                        onPressed: () {
+                          setState(
+                            () => widget.event.deleteMatch(matches[index]),
+                          );
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
         child: MatchRow(
           match: matches[index],
           team: widget.event.teams[widget.team?.number],

@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:teamtrack/components/PFP.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:teamtrack/models/AppModel.dart';
@@ -15,7 +14,6 @@ class BlockList extends StatefulWidget {
 }
 
 class _BlockList extends State<BlockList> {
-  final slider = SlidableStrechActionPane();
   late DocumentReference<Map<String, dynamic>> docRef;
 
   void initState() {

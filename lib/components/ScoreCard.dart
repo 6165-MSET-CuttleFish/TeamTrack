@@ -96,7 +96,7 @@ class ScoreCard extends StatelessWidget {
         )
         .maxValue();
     return CardView(
-      isActive: scoreDivisions.diceScores(dice).length >= 1,
+      isActive: scoreDivisions.diceScores(dice).length > 1,
       child: Padding(
         padding: EdgeInsets.only(left: 5, right: 5),
         child: Row(
@@ -147,7 +147,7 @@ class ScoreCard extends StatelessWidget {
                   .diceScores(dice)
                   .map((score) => score.total())
                   .removeOutliers(removeOutliers)
-                  .length >=
+                  .length >
               1
           ? AspectRatio(
               aspectRatio: 2,
@@ -183,20 +183,24 @@ class ScoreCard extends StatelessWidget {
                       ),
                       titlesData: FlTitlesData(
                         show: true,
+                        topTitles: SideTitles(showTitles: false),
+                        rightTitles: SideTitles(showTitles: false),
                         bottomTitles: SideTitles(
                           showTitles: true,
                           reservedSize: 22,
-                          getTextStyles: (value, size) => const TextStyle(
-                              color: Color(0xff68737d), fontSize: 10),
+                          getTextStyles: (value, size) =>
+                              const TextStyle(fontSize: 10),
                           getTitles: (value) {
-                            return (value + 1).toInt().toString();
+                            return (value == value.toInt()
+                                    ? (value + 1).toInt()
+                                    : "")
+                                .toString();
                           },
                           margin: 8,
                         ),
                         leftTitles: SideTitles(
                           showTitles: true,
                           getTextStyles: (value, size) => const TextStyle(
-                            color: Color(0xff67727d),
                             fontSize: 15,
                           ),
                           getTitles: (value) {

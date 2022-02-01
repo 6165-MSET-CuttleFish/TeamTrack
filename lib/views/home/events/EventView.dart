@@ -9,7 +9,6 @@ import 'package:teamtrack/functions/Extensions.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:teamtrack/functions/Statistics.dart';
@@ -27,7 +26,6 @@ class EventView extends StatefulWidget {
 }
 
 class _EventView extends State<EventView> {
-  final slider = SlidableStrechActionPane();
   OpModeType? sortingModifier;
   bool ascending = false;
   List<Widget> materialTabs() => [

@@ -5,7 +5,7 @@ import 'package:teamtrack/models/AppModel.dart';
 
 class FakeRemoteConfig {
   Map<String, dynamic>? _config;
-  RemoteConfig _remoteConfig = RemoteConfig.instance;
+  FirebaseRemoteConfig _remoteConfig = FirebaseRemoteConfig.instance;
   Future<void> fetchAndActivate() => NewPlatform.isWeb
       ? firebaseDatabase.ref().child('config').once().then(
             (snapshot) => _config = snapshot.snapshot.value as Map<String, dynamic>,

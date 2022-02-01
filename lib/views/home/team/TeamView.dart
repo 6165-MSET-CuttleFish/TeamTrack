@@ -205,7 +205,7 @@ class _TeamViewState extends State<TeamView> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Collapsible(
-                        isCollapsed: _team.scores.diceScores(_dice).length < 1,
+                        isCollapsed: _team.scores.diceScores(_dice).length <= 1,
                         child: Column(
                           children: [
                             Padding(
@@ -437,7 +437,7 @@ class _TeamViewState extends State<TeamView> {
         ),
       );
 
-  Widget _lineChart() => _team.scores.diceScores(_dice).length >= 1
+  Widget _lineChart() => _team.scores.diceScores(_dice).length > 1
       ? Stack(
           alignment: Alignment.topRight,
           children: [
@@ -457,6 +457,7 @@ class _TeamViewState extends State<TeamView> {
                       ? LineChart(
                           LineChartData(
                             gridData: FlGridData(
+                              horizontalInterval: 1.0,
                               show: true,
                               drawVerticalLine: true,
                               getDrawingHorizontalLine: (value) {
@@ -476,22 +477,23 @@ class _TeamViewState extends State<TeamView> {
                             ),
                             titlesData: FlTitlesData(
                               show: true,
+                              topTitles: SideTitles(showTitles: false),
+                              rightTitles: SideTitles(showTitles: false),
                               bottomTitles: SideTitles(
                                 showTitles: true,
                                 reservedSize: 22,
                                 getTextStyles: (value, size) => const TextStyle(
-                                    color: Color(0xff68737d),
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 10),
+                                    fontWeight: FontWeight.bold, fontSize: 10),
                                 getTitles: (value) {
-                                  return (value + 1).toInt().toString();
+                                  return value == value.toInt()
+                                      ? (value + 1).toInt().toString()
+                                      : "";
                                 },
                                 margin: 8,
                               ),
                               leftTitles: SideTitles(
                                 showTitles: true,
                                 getTextStyles: (value, size) => const TextStyle(
-                                  color: Color(0xff67727d),
                                   fontWeight: FontWeight.bold,
                                   fontSize: 15,
                                 ),
