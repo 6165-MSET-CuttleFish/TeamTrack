@@ -1,3 +1,4 @@
+import 'package:flutterfire_ui/database.dart';
 import 'package:teamtrack/components/EmptyList.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/models/StatConfig.dart';
@@ -68,11 +69,12 @@ class _TeamList extends State<TeamList> {
                 .maxValue();
           }
           if (teams.length == 0) return EmptyList();
-          return ListView.builder(
-            itemCount: teams.length,
+          return FirebaseDatabaseListView(
+            query: widget.event.getQuery('teams')!,
             itemBuilder: (context, index) => Slidable(
               child: TeamRow(
-                team: teams[index],
+                team: Team.fromJson(
+                    index.value as Map<String, dynamic>, widget.event.gameName),
                 event: widget.event,
                 sortMode: widget.sortMode,
                 statConfig: widget.statConfig,
@@ -82,7 +84,8 @@ class _TeamList extends State<TeamList> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => TeamView(
-                        team: teams[index],
+                        team: Team.fromJson(index.value as Map<String, dynamic>,
+                            widget.event.gameName),
                         event: widget.event,
                       ),
                     ),
@@ -118,7 +121,7 @@ class _TeamList extends State<TeamList> {
                               onPressed: () {
                                 String? s;
                                 setState(() {
-                                  s = widget.event.deleteTeam(teams[index]);
+                                  s = widget.event.deleteTeam(Team.fromJson(index.value as Map<String, dynamic>, widget.event.gameName));
                                 });
                                 dataModel.saveEvents();
                                 Navigator.of(context).pop();

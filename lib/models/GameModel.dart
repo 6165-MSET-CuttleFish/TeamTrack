@@ -396,7 +396,12 @@ class Event with ClusterItem {
 
   Db.DatabaseReference? getRef() {
     if (!shared) return null;
-    return firebaseDatabase.ref().child('Events/$gameName').child(id);
+    return firebaseDatabase.ref().child('Events/$gameName/$id');
+  }
+
+  Db.Query? getQuery(String key) {
+    if (!shared) return null;
+    return firebaseDatabase.ref('Events/$gameName/id').orderByChild(key);
   }
 
   Event.fromJson(Map<String, dynamic>? json) {
