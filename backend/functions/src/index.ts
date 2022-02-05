@@ -43,23 +43,23 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
         "You do not have admin access to this document"
     );
   }
-  console.log(await admin.database().ref()
+  await admin.database().ref()
       .child(`Events/${data.gameName}/${data.id}/Permissions/${recipient.uid}`)
       .set({
         "role": data.role ?? "viewer",
-        "displayName": recipient.displayName,
+        "displayName": recipient.displayName ?? null,
         "email": recipient.email,
-        "photoURL": recipient.photoURL,
-      }));
+        "photoURL": recipient.photoURL ?? null,
+      });
   const meta = {
     "id": data.id,
     "name": data.name,
     "author": data.author,
     "sender": {
       "uid": sender.uid,
-      "displayName": sender.displayName,
+      "displayName": sender.displayName ?? null,
       "email": sender.email,
-      "photoURL": sender.photoURL,
+      "photoURL": sender.photoURL ?? null,
     },
     "sendTime": admin.firestore.FieldValue.serverTimestamp(),
     "type": data.type,
@@ -113,7 +113,7 @@ export const nativizeEvent = functions.database
         "role": "admin",
         "displayName": user.displayName,
         "email": user.email,
-        "photoURL": user.photoURL,
+        "photoURL": user.photoURL ?? null,
       });
       return admin.firestore().runTransaction(async (t) => {
         const doc = await t.get(ref);
