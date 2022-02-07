@@ -97,6 +97,23 @@ class _LoginView extends State<LoginView> {
                   ),
                   Spacer(),
                   PlatformButton(
+                    color: Theme.of(context).colorScheme.primary,
+                    onPressed: () async {
+                      await showModalBottomSheet(
+                        context: context,
+                        builder: (context) => SignUpScreen(),
+                        isScrollControlled: true,
+                      );
+                      if (widget.returnBack ?? false)
+                        Navigator.of(context).pop();
+                    },
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [Icon(Icons.person), PlatformText('Sign Up')],
+                    ),
+                  ),
+                  PlatformButton(
                     child: PlatformText(
                       "Forgot Password",
                       style: TextStyle(fontSize: 14),
@@ -245,9 +262,32 @@ class _LoginView extends State<LoginView> {
           if (!(context.read<User?>()?.isAnonymous ?? false))
             PlatformButton(
               color: CupertinoColors.systemBlue,
-              onPressed: () async => await context
-                  .read<AuthenticationService>()
-                  .signInWithAnonymous(),
+              onPressed: () => showPlatformDialog(
+                context: context,
+                builder: (context) => PlatformAlert(
+                  title: PlatformText('Anonymously Sign In?'),
+                  content: PlatformText('This has limited functionality'),
+                  actions: [
+                    PlatformDialogAction(
+                      isDefaultAction: true,
+                      child: PlatformText('No'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                    PlatformDialogAction(
+                      isDestructive: true,
+                      child: PlatformText('Yes'),
+                      onPressed: () async {
+                        await context
+                            .read<AuthenticationService>()
+                            .signInWithAnonymous();
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                ),
+              ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,

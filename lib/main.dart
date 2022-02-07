@@ -30,16 +30,7 @@ Future<void> main() async {
       provisional: false,
       sound: true,
     );
-    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      print('User granted permission');
-      await PushNotifications.initialize();
-      String? token = await PushNotifications.getToken();
-      if (token != "") {
-        dataModel.token = token;
-      }
-    } else if (settings.authorizationStatus ==
-        AuthorizationStatus.provisional) {
-      print('User granted provisional permission');
+    if (settings.authorizationStatus == AuthorizationStatus.authorized || settings.authorizationStatus == AuthorizationStatus.provisional) {
       await PushNotifications.initialize();
       String? token = await PushNotifications.getToken();
       if (token != "") {

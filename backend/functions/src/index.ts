@@ -43,23 +43,23 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
         "You do not have admin access to this document"
     );
   }
-  console.log(await admin.database().ref()
+  await admin.database().ref()
       .child(`Events/${data.gameName}/${data.id}/Permissions/${recipient.uid}`)
       .set({
         "role": data.role ?? "viewer",
-        "displayName": recipient.displayName,
+        "displayName": recipient.displayName ?? null,
         "email": recipient.email,
-        "photoURL": recipient.photoURL,
-      }));
+        "photoURL": recipient.photoURL ?? null,
+      });
   const meta = {
     "id": data.id,
     "name": data.name,
     "author": data.author,
     "sender": {
       "uid": sender.uid,
-      "displayName": sender.displayName,
+      "displayName": sender.displayName ?? null,
       "email": sender.email,
-      "photoURL": sender.photoURL,
+      "photoURL": sender.photoURL ?? null,
     },
     "sendTime": admin.firestore.FieldValue.serverTimestamp(),
     "type": data.type,
@@ -111,9 +111,9 @@ export const nativizeEvent = functions.database
       const user = await admin.auth().getUser(context.auth?.uid ?? "");
       snap.ref.child("Permissions").child(context.auth?.uid ?? "").set({
         "role": "admin",
-        "displayName": user.displayName,
+        "displayName": user.displayName ?? null,
         "email": user.email,
-        "photoURL": user.photoURL,
+        "photoURL": user.photoURL ?? null,
       });
       return admin.firestore().runTransaction(async (t) => {
         const doc = await t.get(ref);
@@ -150,6 +150,7 @@ export const createUser = functions.auth.user().onCreate(async (user) => {
     events: {},
     blockedUsers: {},
     FCMtokens: [],
+    createdAt: admin.firestore.FieldValue.serverTimestamp(), // optional field
   });
 });
 
@@ -181,7 +182,7 @@ export const remoteConfigToDatabase = functions.remoteConfig
 
 // Remove old templates every week
 export const periodicTemplateRemoval = functions.pubsub
-    .schedule("every 7 days")
+    .schedule("every 1 day")
     .onRun(async () => {
       const now = new Date();
       // eslint-disable-next-line max-len
