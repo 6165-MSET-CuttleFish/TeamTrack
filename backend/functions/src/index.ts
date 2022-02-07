@@ -111,7 +111,7 @@ export const nativizeEvent = functions.database
       const user = await admin.auth().getUser(context.auth?.uid ?? "");
       snap.ref.child("Permissions").child(context.auth?.uid ?? "").set({
         "role": "admin",
-        "displayName": user.displayName,
+        "displayName": user.displayName ?? null,
         "email": user.email,
         "photoURL": user.photoURL ?? null,
       });
@@ -150,6 +150,7 @@ export const createUser = functions.auth.user().onCreate(async (user) => {
     events: {},
     blockedUsers: {},
     FCMtokens: [],
+    createdAt: admin.firestore.FieldValue.serverTimestamp(), // optional field
   });
 });
 
@@ -181,7 +182,7 @@ export const remoteConfigToDatabase = functions.remoteConfig
 
 // Remove old templates every week
 export const periodicTemplateRemoval = functions.pubsub
-    .schedule("every 7 days")
+    .schedule("every 1 day")
     .onRun(async () => {
       const now = new Date();
       // eslint-disable-next-line max-len
