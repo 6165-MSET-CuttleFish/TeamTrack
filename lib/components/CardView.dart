@@ -22,13 +22,13 @@ class _CardView extends State<CardView> {
       child: GestureDetector(
         onTap: () {
           HapticFeedback.mediumImpact();
-          if (widget.isActive) {
+          if (widget.isActive && !NewPlatform.isWeb) {
             setState(
               () {
                 _genBool = !_genBool;
               },
             );
-          } else {
+          } else if (!NewPlatform.isWeb) {
             showPlatformDialog(
               context: context,
               builder: (BuildContext context) => PlatformAlert(
@@ -51,7 +51,7 @@ class _CardView extends State<CardView> {
           }
         },
         onTapDown: (TapDownDetails details) => setState(
-          () => _isPressed = true,
+          () => _isPressed = true && !NewPlatform.isWeb,
         ),
         onTapUp: (TapUpDetails details) => setState(
           () => _isPressed = false,
@@ -83,7 +83,7 @@ class _CardView extends State<CardView> {
                 child: widget.child,
               ),
               Collapsible(
-                isCollapsed: _genBool,
+                isCollapsed: _genBool && !NewPlatform.isWeb,
                 child: Column(
                   children: [
                     Padding(
