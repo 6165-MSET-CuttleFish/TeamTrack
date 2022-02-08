@@ -7,7 +7,6 @@ admin.initializeApp();
 
 // put event in desired user's inbox
 export const shareEvent = functions.https.onCall(async (data, context) => {
-  functions.logger.info("Event share", {structuredData: true});
   if (!context.auth) { // if not authenticated
     throw new functions.https.HttpsError(
         "unauthenticated",
