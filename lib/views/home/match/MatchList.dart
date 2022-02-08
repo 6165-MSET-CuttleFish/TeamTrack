@@ -89,29 +89,30 @@ class _MatchList extends State<MatchList> {
                     ),
                   ),
                 ),
-                IconButton(
-                  icon: Icon(
-                    Icons.search,
+                if (widget.event.type != EventType.remote)
+                  IconButton(
+                    icon: Icon(
+                      Icons.search,
+                    ),
+                    onPressed: () {
+                      showSearch(
+                        context: context,
+                        delegate: MatchSearch(
+                          statConfig: widget.event.statConfig,
+                          matches: widget.event
+                              .getSortedMatches(widget.ascending)
+                              .where((e) =>
+                                  e.alliance(
+                                    widget.event.teams[widget.team?.number],
+                                  ) !=
+                                  null)
+                              .toList(),
+                          ascending: widget.ascending,
+                          event: widget.event,
+                        ),
+                      );
+                    },
                   ),
-                  onPressed: () {
-                    showSearch(
-                      context: context,
-                      delegate: MatchSearch(
-                        statConfig: widget.event.statConfig,
-                        matches: widget.event
-                            .getSortedMatches(widget.ascending)
-                            .where((e) =>
-                                e.alliance(
-                                  widget.event.teams[widget.team?.number],
-                                ) !=
-                                null)
-                            .toList(),
-                        ascending: widget.ascending,
-                        event: widget.event,
-                      ),
-                    );
-                  },
-                ),
               ],
             ),
             body: _matches(scrollController),

@@ -117,77 +117,75 @@ class _TemplatesListState extends State<TemplatesList> {
         child: EventsList(
           onTap: (event) async {
             showPlatformDialog(
-                context: context,
-                builder: (_) => PlatformAlert(
-                      title: PlatformText('Add Event'),
-                      content: PlatformText(
-                          "Are you sure you want to publish '${event.name}'?"),
-                      actions: [
-                        PlatformDialogAction(
-                          child: Text('Cancel'),
-                          onPressed: () => Navigator.pop(context),
+              context: context,
+              builder: (_) => PlatformAlert(
+                title: PlatformText('Add Event'),
+                content: PlatformText(
+                    "Are you sure you want to publish '${event.name}'?"),
+                actions: [
+                  PlatformDialogAction(
+                    child: Text('Cancel'),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                  PlatformDialogAction(
+                    child: Text('Add'),
+                    onPressed: () async {
+                      final newEvent = Event.fromJson(
+                        event.toJson(),
+                      );
+                      var newEventJson = newEvent.toJson();
+                      newEventJson['position'] = point.data;
+                      newEventJson.remove('id');
+                      newEventJson.remove('shared');
+                      newEventJson['createdAt'] = FieldValue.serverTimestamp();
+                      Navigator.of(context).pop();
+                      showPlatformDialog(
+                        barrierDismissible: false,
+                        context: context,
+                        builder: (_) => PlatformAlert(
+                          content: Center(
+                            child: PlatformProgressIndicator(),
+                          ),
                         ),
-                        PlatformDialogAction(
-                          child: Text('Add'),
-                          onPressed: () async {
-                            final newEvent = Event.fromJson(
-                              event.toJson(),
-                            );
-                            var newEventJson = newEvent.toJson();
-                            newEventJson['position'] = point.data;
-                            newEventJson.remove('id');
-                            newEventJson.remove('shared');
-                            newEventJson['createdAt'] =
-                                FieldValue.serverTimestamp();
-                            Navigator.of(context).pop();
-                            showPlatformDialog(
-                              barrierDismissible: false,
-                              context: context,
-                              builder: (_) => PlatformAlert(
-                                content: Center(
-                                  child: PlatformProgressIndicator(),
-                                ),
-                              ),
-                            );
-                            final ref = await firebaseFirestore
-                                .collection('templates')
-                                .add(newEventJson);
-                            Navigator.of(context).pop();
-                            Navigator.of(context).pop();
-                            setState(
-                              () => markers.add(
-                                Marker(
-                                  markerId: MarkerId(ref.id),
-                                  position:
-                                      LatLng(point.latitude, point.longitude),
-                                  icon: BitmapDescriptor.defaultMarkerWithHue(
-                                    BitmapDescriptor.hueBlue,
-                                  ),
-                                  onTap: () async {
-                                    await subscription.cancel();
-                                    mapController.dispose();
-                                    await Navigator.push(
-                                      context,
-                                      platformPageRoute(builder: (_) {
-                                        final event = newEvent;
-                                        event.shared = false;
-                                        event.role = Role.viewer;
-                                        return EventView(
-                                          event: event,
-                                          isPreview: true,
-                                        );
-                                      }),
-                                    );
-                                    widget.superState
-                                        .setState(dataModel.saveEvents);
-                                  },
-                                ),
-                              ),
-                            );
-                          },
+                      );
+                      final ref = await firebaseFirestore
+                          .collection('templates')
+                          .add(newEventJson);
+                      Navigator.of(context).pop();
+                      Navigator.of(context).pop();
+                      setState(
+                        () => markers.add(
+                          Marker(
+                            markerId: MarkerId(ref.id),
+                            position: LatLng(point.latitude, point.longitude),
+                            icon: BitmapDescriptor.defaultMarkerWithHue(
+                              BitmapDescriptor.hueBlue,
+                            ),
+                            onTap: () async {
+                              await subscription.cancel();
+                              mapController.dispose();
+                              await Navigator.push(
+                                context,
+                                platformPageRoute(builder: (_) {
+                                  final event = newEvent;
+                                  event.shared = false;
+                                  event.role = Role.viewer;
+                                  return EventView(
+                                    event: event,
+                                    isPreview: true,
+                                  );
+                                }),
+                              );
+                              widget.superState.setState(dataModel.saveEvents);
+                            },
+                          ),
                         ),
-                      ],
-                    ));
+                      );
+                    },
+                  ),
+                ],
+              ),
+            );
           },
         ),
       ),
@@ -195,34 +193,36 @@ class _TemplatesListState extends State<TemplatesList> {
   }
 
   void _updateMarkers(List<DocumentSnapshot> documentList) async {
-    documentList.forEach((DocumentSnapshot document) {
-      GeoPoint pos = (document.data() as Map?)?['position']['geopoint'];
-      var marker = Marker(
-        markerId: MarkerId(document.id),
-        position: LatLng(pos.latitude, pos.longitude),
-        icon: BitmapDescriptor.defaultMarker,
-        onTap: () async {
-          await subscription.cancel();
-          mapController.dispose();
-          await Navigator.push(
-            context,
-            platformPageRoute(builder: (_) {
-              final event =
-                  Event.fromJson(document.data() as Map<String, dynamic>);
-              event.shared = false;
-              event.role = Role.viewer;
-              return EventView(
-                event: event,
-                isPreview: true,
-              );
-            }),
-          );
-          await dataModel.saveEvents();
-          widget.superState.setState(() {});
-        },
-      );
-      markers.add(marker);
-    });
+    documentList.forEach(
+      (DocumentSnapshot document) {
+        GeoPoint pos = (document.data() as Map?)?['position']['geopoint'];
+        var marker = Marker(
+          markerId: MarkerId(document.id),
+          position: LatLng(pos.latitude, pos.longitude),
+          icon: BitmapDescriptor.defaultMarker,
+          onTap: () async {
+            await subscription.cancel();
+            mapController.dispose();
+            await Navigator.push(
+              context,
+              platformPageRoute(builder: (_) {
+                final event =
+                    Event.fromJson(document.data() as Map<String, dynamic>);
+                event.shared = false;
+                event.role = Role.viewer;
+                return EventView(
+                  event: event,
+                  isPreview: true,
+                );
+              }),
+            );
+            await dataModel.saveEvents();
+            widget.superState.setState(() {});
+          },
+        );
+        markers.add(marker);
+      },
+    );
   }
 
   void _startQuery() async {
@@ -236,14 +236,16 @@ class _TemplatesListState extends State<TemplatesList> {
     GeoFirePoint center = geo.point(latitude: lat ?? 0, longitude: lng ?? 0);
 
     // subscribe to query
-    subscription = radius.switchMap((rad) {
-      return geo.collection(collectionRef: ref).within(
-            center: center,
-            radius: rad,
-            field: 'position',
-            strictMode: true,
-          );
-    }).listen(_updateMarkers);
+    subscription = radius.switchMap(
+      (rad) {
+        return geo.collection(collectionRef: ref).within(
+              center: center,
+              radius: rad,
+              field: 'position',
+              strictMode: true,
+            );
+      },
+    ).listen(_updateMarkers);
   }
 
   void _updateQuery(double value) {
@@ -256,9 +258,7 @@ class _TemplatesListState extends State<TemplatesList> {
     };
     final zoom = zoomMap[value];
     mapController.moveCamera(CameraUpdate.zoomTo(zoom ?? 0));
-    setState(() {
-      radius.add(value);
-    });
+    setState(() => radius.add(value));
   }
 
   @override
