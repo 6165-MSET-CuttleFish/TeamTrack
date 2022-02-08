@@ -55,11 +55,10 @@ class _PermissionsState extends State<Permissions> {
                                         isDestructive: true,
                                         child: PlatformText('Confirm'),
                                         onPressed: () {
-                                          setState(
-                                            () => widget.ref
-                                                ?.child('${user.uid}')
-                                                .remove(),
-                                          );
+                                          widget.ref
+                                              ?.child('${user.uid}')
+                                              .remove();
+                                          setState(() => {});
                                           Navigator.of(context).pop();
                                         },
                                       ),

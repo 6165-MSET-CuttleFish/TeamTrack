@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/functions/Extensions.dart';
+import 'package:teamtrack/views/LandingPage.dart' as LandingPage;
 
 class Inbox extends StatefulWidget {
   const Inbox({Key? key}) : super(key: key);
@@ -196,6 +197,7 @@ class _InboxState extends State<Inbox> {
                                       },
                                     );
                                     Navigator.of(context).pop();
+                                    LandingPage.tab = LandingPage.Tab.events;
                                     setState(() {});
                                   },
                                 ),

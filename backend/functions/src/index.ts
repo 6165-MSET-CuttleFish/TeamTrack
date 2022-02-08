@@ -19,15 +19,18 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
       .getUser(context.auth.uid);
   const recipient = await admin
       .auth()
-      .getUserByEmail(data.email);
+      .getUserByEmail(data.email)
+      .catch(() => {
+        return null;
+      });
   if (recipient == null) { // if recipient doesn't exist
-    throw new functions.https.HttpsError(
+    return new functions.https.HttpsError(
         "invalid-argument",
         "Requested user does not exist"
     );
   }
   if (sender.uid == recipient.uid) { // if sender and recipient are the same
-    throw new functions.https.HttpsError(
+    return new functions.https.HttpsError(
         "invalid-argument",
         "Cannot send an event to yourself"
     );
@@ -38,7 +41,7 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
       .get();
   allowSend = senderPerms.val().role == "admin";
   if (!allowSend) {
-    throw new functions.https.HttpsError(
+    return new functions.https.HttpsError(
         "permission-denied",
         "You do not have admin access to this document"
     );
@@ -82,7 +85,7 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
     t.update(ref, {inbox: newInbox});
   });
   if (!allowSend) {
-    throw new functions.https.HttpsError(
+    return new functions.https.HttpsError(
         "permission-denied",
         "Unable to send event"
     );
