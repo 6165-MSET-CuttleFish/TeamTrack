@@ -31,8 +31,8 @@ class _ChangeConfigState extends State<ChangeConfig> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: PlatformText(
-            widget.change == null ? 'New Change' : widget.change!.title),
+        title:
+            Text(widget.change == null ? 'New Change' : widget.change!.title),
         backgroundColor: Theme.of(context).colorScheme.primary,
       ),
       body: ListView(
@@ -42,7 +42,7 @@ class _ChangeConfigState extends State<ChangeConfig> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                PlatformText(
+                Text(
                   formatDate(
                     _startDate,
                     [
@@ -54,8 +54,8 @@ class _ChangeConfigState extends State<ChangeConfig> {
                     ],
                   ),
                 ),
-                PlatformText('-'),
-                PlatformText(
+                Text('-'),
+                Text(
                   _finalDate != null
                       ? formatDate(
                           _finalDate!,
@@ -73,7 +73,7 @@ class _ChangeConfigState extends State<ChangeConfig> {
             ),
           ),
           PlatformButton(
-            child: PlatformText('Start Date'),
+            child: Text('Start Date'),
             onPressed: () => showDatePicker(
               context: context,
               initialDate: _startDate,
@@ -89,7 +89,7 @@ class _ChangeConfigState extends State<ChangeConfig> {
             color: Colors.blue,
           ),
           PlatformButton(
-            child: PlatformText('End Date (Optional)'),
+            child: Text('End Date (Optional)'),
             onPressed: () => showDatePicker(
               context: context,
               initialDate: _finalDate ?? DateTime.now(),
@@ -110,7 +110,7 @@ class _ChangeConfigState extends State<ChangeConfig> {
             placeholder: 'Name',
           ),
           PlatformButton(
-            child: PlatformText('Save'),
+            child: Text('Save'),
             onPressed: () async {
               if (widget.change == null) {
                 widget.event.addChange(

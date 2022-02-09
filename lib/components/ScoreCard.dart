@@ -293,7 +293,7 @@ class ScoreCard extends StatelessWidget {
                 ),
               ),
             )
-          : PlatformText(''),
+          : Text(''),
     );
   }
 }

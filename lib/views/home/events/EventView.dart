@@ -45,8 +45,8 @@ class _EventView extends State<EventView> {
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
           title: widget.isPreview
-              ? PlatformText(widget.event.name)
-              : (_tab == 0 ? PlatformText('Teams') : PlatformText('Matches')),
+              ? Text(widget.event.name)
+              : (_tab == 0 ? Text('Teams') : Text('Matches')),
           backgroundColor: Theme.of(context).colorScheme.primary,
           actions: [
             if (_tab == 0)
@@ -99,7 +99,7 @@ class _EventView extends State<EventView> {
                         (value) {
                           return DropdownMenuItem<OpModeType?>(
                             value: value,
-                            child: PlatformText((value?.toVal() ?? "Total")),
+                            child: Text((value?.toVal() ?? "Total")),
                           );
                         },
                       ).toList(),
@@ -157,7 +157,7 @@ class _EventView extends State<EventView> {
                         size: 20,
                         color: _tab == 1 ? Theme.of(context).canvasColor : null,
                       ),
-                      PlatformText(
+                      Text(
                         'Teams',
                         style: TextStyle(
                           fontSize: 10,
@@ -175,7 +175,7 @@ class _EventView extends State<EventView> {
                         size: 20,
                         color: _tab == 0 ? Theme.of(context).canvasColor : null,
                       ),
-                      PlatformText(
+                      Text(
                         'Matches',
                         style: TextStyle(
                           fontSize: 10,
@@ -199,17 +199,17 @@ class _EventView extends State<EventView> {
                   showPlatformDialog(
                     context: context,
                     builder: (_) => PlatformAlert(
-                      title: PlatformText('Import Event'),
-                      content: PlatformText(
+                      title: Text('Import Event'),
+                      content: Text(
                         'Are you sure?',
                       ),
                       actions: [
                         PlatformDialogAction(
-                          child: PlatformText('Cancel'),
+                          child: Text('Cancel'),
                           onPressed: () => Navigator.pop(context),
                         ),
                         PlatformDialogAction(
-                          child: PlatformText('Import'),
+                          child: Text('Import'),
                           onPressed: () {
                             dataModel.events.add(widget.event);
                             LandingPage.tab = LandingPage.Tab.events;
@@ -253,7 +253,7 @@ class _EventView extends State<EventView> {
     showPlatformDialog(
       context: context,
       builder: (BuildContext context) => PlatformAlert(
-        title: PlatformText('New Team'),
+        title: Text('New Team'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -281,7 +281,7 @@ class _EventView extends State<EventView> {
         actions: [
           PlatformDialogAction(
             isDefaultAction: true,
-            child: PlatformText('Cancel'),
+            child: Text('Cancel'),
             onPressed: () {
               _newName = '';
               _newNumber = '';
@@ -290,7 +290,7 @@ class _EventView extends State<EventView> {
           ),
           PlatformDialogAction(
             isDefaultAction: false,
-            child: PlatformText('Add'),
+            child: Text('Add'),
             onPressed: () {
               setState(
                 () {

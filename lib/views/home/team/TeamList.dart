@@ -101,12 +101,12 @@ class _TeamList extends State<TeamList> {
                       showPlatformDialog(
                         context: context,
                         builder: (BuildContext context) => PlatformAlert(
-                          title: PlatformText('Delete Team'),
-                          content: PlatformText('Are you sure?'),
+                          title: Text('Delete Team'),
+                          content: Text('Are you sure?'),
                           actions: [
                             PlatformDialogAction(
                               isDefaultAction: true,
-                              child: PlatformText('Cancel'),
+                              child: Text('Cancel'),
                               onPressed: () {
                                 Navigator.of(context).pop();
                               },
@@ -114,7 +114,7 @@ class _TeamList extends State<TeamList> {
                             PlatformDialogAction(
                               isDefaultAction: false,
                               isDestructive: true,
-                              child: PlatformText('Confirm'),
+                              child: Text('Confirm'),
                               onPressed: () {
                                 String? s;
                                 setState(() {
@@ -126,12 +126,12 @@ class _TeamList extends State<TeamList> {
                                   showPlatformDialog(
                                     context: context,
                                     builder: (context) => PlatformAlert(
-                                      title: PlatformText('Error'),
-                                      content: PlatformText(
-                                          'Team is present in matches'),
+                                      title: Text('Error'),
+                                      content:
+                                          Text('Team is present in matches'),
                                       actions: [
                                         PlatformDialogAction(
-                                          child: PlatformText('Okay'),
+                                          child: Text('Okay'),
                                           isDefaultAction: true,
                                           onPressed: () =>
                                               Navigator.of(context).pop(),

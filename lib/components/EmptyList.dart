@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:teamtrack/components/PlatformGraphics.dart';
 
 class EmptyList extends StatelessWidget {
   const EmptyList({Key? key}) : super(key: key);
@@ -12,7 +11,7 @@ class EmptyList extends StatelessWidget {
             Icon(
               Icons.hourglass_empty_rounded,
             ),
-            PlatformText(
+            Text(
               "No Data",
               style: Theme.of(context).textTheme.bodyText2,
             )

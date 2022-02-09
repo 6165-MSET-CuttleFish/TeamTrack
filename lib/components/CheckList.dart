@@ -36,7 +36,7 @@ class _CheckListState extends State<CheckList> {
             ),
             checkColor: Colors.black,
             tileColor: widget.statConfig.sorted ? Colors.pink : null,
-            title: PlatformText('Sort Teams'),
+            title: Text('Sort Teams'),
             secondary: Icon(Icons.sort),
           ),
         CheckboxListTile(
@@ -48,7 +48,7 @@ class _CheckListState extends State<CheckList> {
           ),
           checkColor: Colors.black,
           tileColor: widget.statConfig.removeOutliers ? Colors.green : null,
-          title: PlatformText('Remove Outliers'),
+          title: Text('Remove Outliers'),
           secondary: Icon(CupertinoIcons.arrow_branch),
         ),
         CheckboxListTile(
@@ -60,7 +60,7 @@ class _CheckListState extends State<CheckList> {
           ),
           checkColor: Colors.black,
           tileColor: widget.statConfig.showPenalties ? Colors.red : null,
-          title: PlatformText('Count Penalties'),
+          title: Text('Count Penalties'),
           secondary: Icon(CupertinoIcons.xmark_seal_fill),
         ),
         if (widget.event.type != EventType.remote)
@@ -73,8 +73,8 @@ class _CheckListState extends State<CheckList> {
             ),
             checkColor: Colors.black,
             tileColor: widget.statConfig.allianceTotal ? Colors.blue : null,
-            title: PlatformText('Alliance Total'),
-            subtitle: PlatformText('Consider alliance total as score'),
+            title: Text('Alliance Total'),
+            subtitle: Text('Consider alliance total as score'),
             secondary: Icon(Icons.stacked_line_chart),
           ),
       ],

@@ -119,9 +119,9 @@ class _TemplatesListState extends State<TemplatesList> {
             showPlatformDialog(
               context: context,
               builder: (_) => PlatformAlert(
-                title: PlatformText('Add Event'),
-                content: PlatformText(
-                    "Are you sure you want to publish '${event.name}'?"),
+                title: Text('Add Event'),
+                content:
+                    Text("Are you sure you want to publish '${event.name}'?"),
                 actions: [
                   PlatformDialogAction(
                     child: Text('Cancel'),

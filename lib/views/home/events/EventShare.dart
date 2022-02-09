@@ -42,7 +42,7 @@ class _EventShareState extends State<EventShare> {
           final currentUser = TeamTrackUser.fromUser(context.read<User?>());
           return Scaffold(
             appBar: AppBar(
-              title: PlatformText(
+              title: Text(
                 widget.event.role == Role.admin ? 'Share Event' : 'Permissions',
               ),
               backgroundColor: Theme.of(context).colorScheme.primary,
@@ -91,7 +91,7 @@ class _EventShareState extends State<EventShare> {
                     child: Container(
                       width: MediaQuery.of(context).size.width,
                       child: PlatformButton(
-                        child: PlatformText('Share'),
+                        child: Text('Share'),
                         color: Colors.green,
                         onPressed: () async {
                           HapticFeedback.lightImpact();
