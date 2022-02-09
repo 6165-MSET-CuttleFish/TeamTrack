@@ -159,18 +159,18 @@ export const deleteUser = functions.auth.user().onDelete(async (user) => {
   return admin.firestore().collection("users").doc(user.uid).delete();
 });
 
-export const fetchAPI = functions.https.onCall((data, context) => {
-  if (!context.auth) {
-    throw new functions.https.HttpsError(
-        "unauthenticated",
-        "User not logged in"
-    );
-  }
-  const url = new URL(`https://ftc-api.firstinspires.org/v2.0/2021/matches/${data.eventCode}`);
-  return fetch(url.toString(), {
-    headers: {Authorization: `Basic ${ftcAPIKey}`},
-  });
-});
+// export const fetchAPI = functions.https.onCall((data, context) => {
+//   if (!context.auth) {
+//     throw new functions.https.HttpsError(
+//         "unauthenticated",
+//         "User not logged in"
+//     );
+//   }
+//   const url = new URL(`https://ftc-api.firstinspires.org/v2.0/2021/matches/${data.eventCode}`);
+//   return fetch(url.toString(), {
+//     headers: {Authorization: `Basic ${ftcAPIKey}`},
+//   });
+// });
 
 // Convert remote config to realtime database json
 export const remoteConfigToDatabase = functions.remoteConfig
