@@ -54,7 +54,7 @@ class _TeamViewState extends State<TeamView> {
                   children: Dice.values.asMap().map(
                         (key, value) => MapEntry(
                           value,
-                          PlatformText(
+                          Text(
                             value == Dice.none
                                 ? 'All Cases'
                                 : value.toVal(
@@ -78,7 +78,7 @@ class _TeamViewState extends State<TeamView> {
                     color: _dice == Dice.one
                         ? Theme.of(context).colorScheme.primary
                         : null,
-                    child: PlatformText(Dice.one.toVal(widget.event.gameName)),
+                    child: Text(Dice.one.toVal(widget.event.gameName)),
                     onPressed: _dice != Dice.one
                         ? () {
                             setState(
@@ -96,7 +96,7 @@ class _TeamViewState extends State<TeamView> {
                     color: _dice == Dice.two
                         ? Theme.of(context).colorScheme.primary
                         : null,
-                    child: PlatformText(Dice.two.toVal(widget.event.gameName)),
+                    child: Text(Dice.two.toVal(widget.event.gameName)),
                     onPressed: _dice != Dice.two
                         ? () {
                             setState(
@@ -114,8 +114,7 @@ class _TeamViewState extends State<TeamView> {
                     color: _dice == Dice.three
                         ? Theme.of(context).colorScheme.primary
                         : null,
-                    child:
-                        PlatformText(Dice.three.toVal(widget.event.gameName)),
+                    child: Text(Dice.three.toVal(widget.event.gameName)),
                     onPressed: _dice != Dice.three
                         ? () {
                             setState(
@@ -130,7 +129,7 @@ class _TeamViewState extends State<TeamView> {
                     color: _dice == Dice.none
                         ? Theme.of(context).colorScheme.primary
                         : null,
-                    child: PlatformText('All Cases'),
+                    child: Text('All Cases'),
                     onPressed: () => setState(
                       () => _dice = Dice.none,
                     ),
@@ -143,11 +142,11 @@ class _TeamViewState extends State<TeamView> {
                 ? CrossAxisAlignment.start
                 : CrossAxisAlignment.center,
             children: [
-              PlatformText(_team.name,
+              Text(_team.name,
                   style: widget.team.number == '6165'
                       ? TextStyle(fontSize: 20, fontFamily: 'Revival')
                       : null),
-              PlatformText(
+              Text(
                 _team.number,
                 style: widget.team.number == '6165'
                     ? TextStyle(fontSize: 12, fontFamily: 'Revival Gothic')
@@ -236,7 +235,7 @@ class _TeamViewState extends State<TeamView> {
                                       color: generalColor,
                                     ),
                                   ),
-                                  child: PlatformText('Total'),
+                                  child: Text('Total'),
                                 ),
                                 FlatButton(
                                   color: _selections[1] ? autoColor : null,
@@ -245,7 +244,7 @@ class _TeamViewState extends State<TeamView> {
                                     borderRadius: BorderRadius.circular(18.0),
                                     side: BorderSide(color: autoColor),
                                   ),
-                                  child: PlatformText('Autonomous'),
+                                  child: Text('Autonomous'),
                                   onPressed: () {
                                     setState(
                                       () {
@@ -261,7 +260,7 @@ class _TeamViewState extends State<TeamView> {
                                     borderRadius: BorderRadius.circular(18.0),
                                     side: BorderSide(color: teleColor),
                                   ),
-                                  child: PlatformText('Tele-Op'),
+                                  child: Text('Tele-Op'),
                                   onPressed: () {
                                     setState(
                                       () {
@@ -277,7 +276,7 @@ class _TeamViewState extends State<TeamView> {
                                     borderRadius: BorderRadius.circular(18.0),
                                     side: BorderSide(color: endgameColor),
                                   ),
-                                  child: PlatformText('Endgame'),
+                                  child: Text('Endgame'),
                                   onPressed: () {
                                     setState(
                                       () {
@@ -310,7 +309,7 @@ class _TeamViewState extends State<TeamView> {
                               setState(() {});
                             },
                             color: CupertinoColors.systemGreen,
-                            child: PlatformText('Matches'),
+                            child: Text('Matches'),
                           ),
                         ),
                       Padding(
@@ -352,12 +351,12 @@ class _TeamViewState extends State<TeamView> {
                               setState(() {});
                             },
                             color: Colors.indigoAccent,
-                            child: PlatformText('Target'),
+                            child: Text('Target'),
                           ),
                         ),
                       Padding(
                         padding: const EdgeInsets.only(top: 20, bottom: 10),
-                        child: PlatformText(
+                        child: Text(
                           'Total',
                           style: Theme.of(context).textTheme.bodyText1,
                         ),
@@ -373,7 +372,7 @@ class _TeamViewState extends State<TeamView> {
                       ),
                       Padding(
                         padding: const EdgeInsets.only(top: 20, bottom: 10),
-                        child: PlatformText(
+                        child: Text(
                           'Autonomous',
                           style: Theme.of(context).textTheme.bodyText1,
                         ),
@@ -392,7 +391,7 @@ class _TeamViewState extends State<TeamView> {
                       ),
                       Padding(
                         padding: const EdgeInsets.only(top: 20, bottom: 10),
-                        child: PlatformText(
+                        child: Text(
                           'Tele-Op',
                           style: Theme.of(context).textTheme.bodyText1,
                         ),
@@ -411,7 +410,7 @@ class _TeamViewState extends State<TeamView> {
                       ),
                       Padding(
                         padding: const EdgeInsets.only(top: 20, bottom: 10),
-                        child: PlatformText(
+                        child: Text(
                           'Endgame',
                           style: Theme.of(context).textTheme.bodyText1,
                         ),
@@ -762,7 +761,7 @@ class _TeamViewState extends State<TeamView> {
                 onPressed: () => setState(
                   () => _showCycles = !_showCycles,
                 ),
-                child: PlatformText(
+                child: Text(
                   'Show Cycle Times',
                   style: Theme.of(context).textTheme.button,
                   textAlign: TextAlign.center,
@@ -789,5 +788,5 @@ class _TeamViewState extends State<TeamView> {
             ),
           ],
         )
-      : PlatformText('');
+      : Text('');
 }

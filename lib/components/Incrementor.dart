@@ -38,7 +38,7 @@ class _Incrementor extends State<Incrementor> {
         children: widget.element.nestedElements?.asMap().map(
                   (key, value) => MapEntry(
                     key,
-                    PlatformText(
+                    Text(
                       value.name,
                     ),
                   ),
@@ -106,15 +106,15 @@ class _Incrementor extends State<Incrementor> {
                         showPlatformDialog(
                           context: context,
                           builder: (context) => PlatformAlert(
-                            title: PlatformText("Reset Field"),
-                            content: PlatformText("Are you sure?"),
+                            title: Text("Reset Field"),
+                            content: Text("Are you sure?"),
                             actions: [
                               PlatformDialogAction(
-                                child: PlatformText("Cancel"),
+                                child: Text("Cancel"),
                                 onPressed: () => Navigator.pop(context),
                               ),
                               PlatformDialogAction(
-                                child: PlatformText("Confirm"),
+                                child: Text("Confirm"),
                                 isDestructive: true,
                                 onPressed: () async {
                                   if (!(widget.event?.shared ?? false)) {
@@ -181,7 +181,7 @@ class _Incrementor extends State<Incrementor> {
           ),
           SizedBox(
             width: 20,
-            child: PlatformText(
+            child: Text(
               widget.element.count.toString(),
               textAlign: TextAlign.center,
             ),
@@ -234,7 +234,7 @@ class _Incrementor extends State<Incrementor> {
             child: widget.element.id == null
                 ? Row(
                     children: [
-                      PlatformText(widget.element.name),
+                      Text(widget.element.name),
                       Spacer(),
                       if (!widget.element.isBool)
                         buildIncrementor()
@@ -248,7 +248,7 @@ class _Incrementor extends State<Incrementor> {
                       children: [
                         Padding(
                           padding: const EdgeInsets.all(5.0),
-                          child: PlatformText(widget.element.name),
+                          child: Text(widget.element.name),
                         ),
                         SizedBox(
                           width: MediaQuery.of(context).size.width,

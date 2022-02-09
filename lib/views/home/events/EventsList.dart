@@ -26,13 +26,13 @@ class _EventsList extends State<EventsList> {
             ExpansionTile(
               leading: Icon(CupertinoIcons.person_3),
               initiallyExpanded: true,
-              title: PlatformText('In-Person Events'),
+              title: Text('In-Person Events'),
               children: localEvents(),
             ),
             ExpansionTile(
               leading: Icon(CupertinoIcons.rectangle_stack_person_crop),
               initiallyExpanded: true,
-              title: PlatformText('Remote Events'),
+              title: Text('Remote Events'),
               children: remoteEvents(),
             ),
           ],
@@ -67,12 +67,12 @@ class _EventsList extends State<EventsList> {
                 showPlatformDialog(
                   context: context,
                   builder: (BuildContext context) => PlatformAlert(
-                    title: PlatformText('Delete Event'),
-                    content: PlatformText('Are you sure?'),
+                    title: Text('Delete Event'),
+                    content: Text('Are you sure?'),
                     actions: [
                       PlatformDialogAction(
                         isDefaultAction: true,
-                        child: PlatformText('Cancel'),
+                        child: Text('Cancel'),
                         onPressed: () {
                           Navigator.of(context).pop();
                         },
@@ -80,7 +80,7 @@ class _EventsList extends State<EventsList> {
                       PlatformDialogAction(
                         isDefaultAction: false,
                         isDestructive: true,
-                        child: PlatformText('Confirm'),
+                        child: Text('Confirm'),
                         onPressed: () {
                           if (e.shared)
                             onRemove(e);
@@ -117,11 +117,11 @@ class _EventsList extends State<EventsList> {
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                PlatformText(
+                Text(
                   e.name,
                   style: Theme.of(context).textTheme.bodyText1,
                 ),
-                PlatformText(
+                Text(
                   e.gameName.spaceBeforeCapital(),
                   style: Theme.of(context).textTheme.caption,
                 ),
@@ -159,20 +159,20 @@ class _EventsList extends State<EventsList> {
         showPlatformDialog(
           context: context,
           builder: (context) => PlatformAlert(
-            title: PlatformText('Upload Event'),
-            content: PlatformText(
+            title: Text('Upload Event'),
+            content: Text(
               'Your event will still be private',
             ),
             actions: [
               PlatformDialogAction(
-                child: PlatformText('Cancel'),
+                child: Text('Cancel'),
                 isDefaultAction: true,
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
               ),
               PlatformDialogAction(
-                child: PlatformText('Upload'),
+                child: Text('Upload'),
                 onPressed: () async {
                   showPlatformDialog(
                     context: context,
@@ -180,7 +180,7 @@ class _EventsList extends State<EventsList> {
                       content: Center(child: PlatformProgressIndicator()),
                       actions: [
                         PlatformDialogAction(
-                          child: PlatformText('Back'),
+                          child: Text('Back'),
                           isDefaultAction: true,
                           onPressed: () => Navigator.of(context).pop(),
                         ),
@@ -215,11 +215,11 @@ class _EventsList extends State<EventsList> {
       showPlatformDialog(
         context: context,
         builder: (context) => PlatformAlert(
-          title: PlatformText('Cannot Share Event'),
-          content: PlatformText('You must be logged in to share an event.'),
+          title: Text('Cannot Share Event'),
+          content: Text('You must be logged in to share an event.'),
           actions: [
             PlatformDialogAction(
-              child: PlatformText('OK'),
+              child: Text('OK'),
               isDefaultAction: true,
               onPressed: () {
                 Navigator.of(context).pop();

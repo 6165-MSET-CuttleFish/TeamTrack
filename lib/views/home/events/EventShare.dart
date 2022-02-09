@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -41,7 +42,7 @@ class _EventShareState extends State<EventShare> {
           final currentUser = TeamTrackUser.fromUser(context.read<User?>());
           return Scaffold(
             appBar: AppBar(
-              title: PlatformText(
+              title: Text(
                 widget.event.role == Role.admin ? 'Share Event' : 'Permissions',
               ),
               backgroundColor: Theme.of(context).colorScheme.primary,
@@ -90,20 +91,29 @@ class _EventShareState extends State<EventShare> {
                     child: Container(
                       width: MediaQuery.of(context).size.width,
                       child: PlatformButton(
-                        child: PlatformText('Share'),
+                        child: Text('Share'),
                         color: Colors.green,
                         onPressed: () async {
                           HapticFeedback.lightImpact();
                           if (widget.event.shared) {
                             if (emailController.text.trim().isNotEmpty) {
+                              showPlatformDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (_) => PlatformAlert(
+                                  content: Center(
+                                    child: PlatformProgressIndicator(),
+                                  ),
+                                ),
+                              );
                               await widget.event.shareEvent(
                                 email: emailController.text.trim(),
                                 role: shareRole,
                               );
                               emailController.clear();
                             }
+                            Navigator.pop(context);
                           }
-                          Navigator.pop(context);
                         },
                       ),
                     ),

@@ -45,11 +45,11 @@ class TeamRow extends StatelessWidget {
         ),
       ),
       child: ListTile(
-        title: PlatformText(
+        title: Text(
           team.name,
           style: Theme.of(context).textTheme.bodyText1,
         ),
-        leading: PlatformText(
+        leading: Text(
           team.number,
           style: Theme.of(context).textTheme.caption,
         ),

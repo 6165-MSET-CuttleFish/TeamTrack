@@ -49,10 +49,10 @@ class _BlockList extends State<BlockList> {
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                PlatformText(
+                Text(
                   e.displayName ?? 'Unknown',
                 ),
-                PlatformText(
+                Text(
                   e.email ?? '',
                 ),
               ],
@@ -66,12 +66,12 @@ class _BlockList extends State<BlockList> {
                 showPlatformDialog(
                   context: context,
                   builder: (BuildContext context) => PlatformAlert(
-                    title: PlatformText('Unblock user'),
-                    content: PlatformText('Are you sure?'),
+                    title: Text('Unblock user'),
+                    content: Text('Are you sure?'),
                     actions: [
                       PlatformDialogAction(
                         isDefaultAction: true,
-                        child: PlatformText('Cancel'),
+                        child: Text('Cancel'),
                         onPressed: () {
                           Navigator.of(context).pop();
                         },
@@ -79,7 +79,7 @@ class _BlockList extends State<BlockList> {
                       PlatformDialogAction(
                         isDefaultAction: false,
                         isDestructive: true,
-                        child: PlatformText('Confirm'),
+                        child: Text('Confirm'),
                         onPressed: () async {
                           await firebaseFirestore.runTransaction(
                             (transaction) async {
