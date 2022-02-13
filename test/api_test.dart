@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:teamtrack/api/APIKEYS.dart';
 
 void main() async {
   final seasonKey = '2021';
@@ -9,7 +8,6 @@ void main() async {
   final respon = await http.get(
     Uri.parse('$url/seasons'),
     headers: {
-      'X-TOA-Key': APIKEYS.TOA_KEY,
       'X-Application-Origin': 'TeamTrack',
       'Content-Type': 'application/json',
     },
@@ -20,7 +18,6 @@ void main() async {
   final response = await http.get(
     Uri.parse('$url/event'),
     headers: {
-      'X-TOA-Key': APIKEYS.TOA_KEY,
       'X-Application-Origin': 'TeamTrack',
       'Content-Type': 'application/json',
     },
@@ -33,7 +30,6 @@ void main() async {
   final respons = await http.get(
     Uri.parse('$url/team/8802'),
     headers: {
-      'X-TOA-Key': APIKEYS.TOA_KEY,
       'X-Application-Origin': 'TeamTrack',
       'Content-Type': 'application/json',
     },

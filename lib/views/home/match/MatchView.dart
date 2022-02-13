@@ -1,5 +1,4 @@
 import 'package:http/http.dart' as http;
-import 'package:teamtrack/api/APIKEYS.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:teamtrack/components/BarGraph.dart';
 import 'package:teamtrack/components/Incrementor.dart';
@@ -88,8 +87,7 @@ class _MatchView extends State<MatchView> {
       try {
         http
             .get(
-          Uri.parse('${APIKEYS.TOA_URL}/team/${widget.team?.number}'),
-          headers: APIKEYS.TOA_HEADER,
+          Uri.parse('/team/${widget.team?.number}'),
         )
             .then((value) {
           final body = (json.decode(value.body) as List);
