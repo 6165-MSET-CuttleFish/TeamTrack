@@ -3,7 +3,7 @@ import 'package:equations/equations.dart';
 List<double> solutions=[0.0];
 void main() {
   test("OPR6m4t", () {
-    List<List<double>> arr = [
+    List<List<double>> matchSchedule = [
       [1.0, 1.0, 0.0, 0.0],
       [0.0, 0.0, 1.0, 1.0],
       [1.0, 0.0, 1.0, 0.0],
@@ -11,7 +11,7 @@ void main() {
       [0.0, 1.0, 1.0, 0.0],
       [1.0, 0.0, 0.0, 1.0]
     ];
-    List<List<double>> arrWithoutOutliers = [
+    List<List<double>> matchResults = [
       [1.0],
       [11.0],
       [2.0],
@@ -19,7 +19,7 @@ void main() {
       [14.0],
       [2.0]
     ];
-    calculator(arr, arrWithoutOutliers, 6,4);
+    calculator(matchSchedule, matchResults, 6,4);
     if(solutions.first.toString()=="NaN") {
       expect(solutions.first.toString(), "NaN");
       return;
@@ -27,7 +27,7 @@ void main() {
     expect(solutions.first.round(), -2);
   });
   test("OPR10m8t", () {
-    List<List<double>> arr = [
+    List<List<double>> matchSchedule = [
       [1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
       [0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0],
       [1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0],
@@ -39,7 +39,7 @@ void main() {
       [1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0],
       [0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0]
     ];
-    List<List<double>> arrWithoutOutliers = [
+    List<List<double>> matchResults = [
       [1.0],
       [11.0],
       [2.0],
@@ -51,25 +51,47 @@ void main() {
       [14.0],
       [21.0]
     ];
-    calculator(arr, arrWithoutOutliers,10,8);
+    calculator(matchSchedule, matchResults,10,8);
     if(solutions.first.toString()=="NaN") {
       expect(solutions.first.toString(), "NaN");
       return;
     }
     expect(solutions.first.round(), 27);
   });
+  test("OPR5m4t", () {
+    List<List<double>> matchSchedule = [
+      [1.0, 1.0, 0.0, 0.0],
+      [1.0, 0.0, 1.0, 0.0],
+      [0.0, 1.0, 1.0, 0.0],
+      [1.0, 0.0, 0.0, 1.0],
+      [0.0, 1.0, 0.0, 1.0]
+    ];
+    List<List<double>> matchResults = [
+      [10.0],
+      [13.0],
+      [7.0],
+      [15.0],
+      [10.0]
+    ];
+    calculator(matchSchedule, matchResults,5,4);
+    if(solutions.first.toString()=="NaN") {
+      expect(solutions.first.toString(), "NaN");
+      return;
+    }
+    expect(solutions.first.round(), 8);
+  });
   test("OPR3m4t", () {
-    List<List<double>> arr = [
+    List<List<double>> matchSchedule = [
       [1.0, 1.0, 0.0, 0.0],
       [0.0, 0.0, 1.0, 1.0],
       [1.0, 0.0, 1.0, 0.0]
     ];
-    List<List<double>> arrWithoutOutliers = [
+    List<List<double>> matchResults = [
       [1.0],
       [11.0],
       [2.0]
     ];
-    calculator(arr, arrWithoutOutliers, 3,4);
+    calculator(matchSchedule, matchResults, 3,4);
     if(solutions.first.toString()=="NaN") {
       expect(solutions.first.toString(), "NaN");
       return;
@@ -79,14 +101,13 @@ void main() {
 }
 void calculator(List<List<double>> a, List<List<double>> b, int rows, int cols){
   /*
+   * input: matches, results, rows: # of matches, cols: number of teams
    * m1: teams in matches
    * m2: match results
    * m3: transposed m1
    * m4: m3*m1 (opr system)
    * m5: m3*m2 (opr results)
    */
-
-
   Matrix<double> m1 = RealMatrix.fromData(
       columns: cols,
       rows: rows,
@@ -121,4 +142,5 @@ void calculator(List<List<double>> a, List<List<double>> b, int rows, int cols){
       print(printout);
     }
   print("");
+    // Output: prints of opr calculations (no rounding) and updated solutions
 }
