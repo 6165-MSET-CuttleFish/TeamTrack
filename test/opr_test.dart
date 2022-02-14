@@ -3,6 +3,7 @@ import 'package:equations/equations.dart';
 List<double> solutions=[0.0];
 void main() {
   test("OPR6m4t", () {
+    print("Test 1: 4 teams, 6 matches");
     List<List<double>> matchSchedule = [
       [1.0, 1.0, 0.0, 0.0],
       [0.0, 0.0, 1.0, 1.0],
@@ -27,6 +28,7 @@ void main() {
     expect(solutions.first.round(), -2);
   });
   test("OPR10m8t", () {
+    print("Test 2: 8 teams, 10 matches");
     List<List<double>> matchSchedule = [
       [1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
       [0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0],
@@ -59,6 +61,7 @@ void main() {
     expect(solutions.first.round(), 27);
   });
   test("OPR5m4t", () {
+    print("Test 3: 4 teams, 5 matches");
     List<List<double>> matchSchedule = [
       [1.0, 1.0, 0.0, 0.0],
       [1.0, 0.0, 1.0, 0.0],
@@ -81,6 +84,7 @@ void main() {
     expect(solutions.first.round(), 8);
   });
   test("OPR3m4t", () {
+    print("Test 4: 4 teams, 3 matches");
     List<List<double>> matchSchedule = [
       [1.0, 1.0, 0.0, 0.0],
       [0.0, 0.0, 1.0, 1.0],
