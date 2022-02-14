@@ -1,5 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:equations/equations.dart';
+
+/* Background:
+ *  1.0 - team is playing
+ *  0.0 - team is not playing
+ */
+
 List<double> solutions=[0.0];
 void main() {
   test("OPR6m4t", () {
@@ -112,29 +118,22 @@ void calculator(List<List<double>> a, List<List<double>> b, int rows, int cols){
    * m4: m3*m1 (opr system)
    * m5: m3*m2 (opr results)
    */
-  Matrix<double> m1 = RealMatrix.fromData(
+  Matrix<double> matchschedule = RealMatrix.fromData(
       columns: cols,
       rows: rows,
       data: a
   );
 
-  Matrix<double> m2 = RealMatrix.fromData(
+  Matrix<double> matchresults = RealMatrix.fromData(
       columns: 1,
-      rows: m1.rowCount,
+      rows: matchschedule.rowCount,
       data: b
   );
 
-  Matrix<double> m3 = m1.transpose();
-
-
-  Matrix<double> m4 = m3*m1;
-  Matrix<double> m5 = m3*m2;
-
   //LUSolver formula to solve system of equations
-
   final lu = LUSolver(
-      equations: m4.toListOfList(),
-      constants: m5.toList()
+      equations: (matchschedule.transpose()*matchschedule).toListOfList(),
+      constants: (matchschedule.transpose()*matchresults).toList()
   );
   solutions = lu.solve();
 
