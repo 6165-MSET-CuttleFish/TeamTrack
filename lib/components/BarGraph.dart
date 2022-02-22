@@ -14,32 +14,50 @@ class BarGraph extends StatelessWidget {
     this.title = 'Default',
     this.units = '',
     this.percentage = 0,
+    this.vertical = true,
   }) : super(key: key) {
     percentage = (inverted
             ? (val != 0 ? (max / val).clamp(0, 1) : 1) * 100.0
             : (max != 0 ? val / max : 0) * 100.0)
         .toInt();
+    if (!vertical) {
+      double temp = width;
+      width = height;
+      height = temp;
+    }
   }
   final String title;
   double max;
-  final double width;
+  double width;
   double val;
   final bool inverted;
-  final double height;
+  double height;
   final String units;
+  final bool vertical;
   int percentage;
   @override
   Widget build(BuildContext context) => Column(
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
-          PlatformText(title + units,
-              style: Theme.of(context).textTheme.caption),
+          Container(
+            width: 74,
+            child: Center(
+              child: Text(
+                title + units,
+                style: Theme.of(context).textTheme.caption,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+              ),
+            ),
+          ),
           Padding(
             padding: EdgeInsets.all(2),
           ),
           Stack(
-            alignment: AlignmentDirectional.bottomStart,
+            alignment: vertical
+                ? AlignmentDirectional.bottomStart
+                : AlignmentDirectional.centerStart,
             children: [
               Container(
                 width: width,
@@ -50,18 +68,24 @@ class BarGraph extends StatelessWidget {
                 ),
               ),
               AnimatedContainer(
-                curve: Curves.bounceOut,
+                curve: NewPlatform.isWeb ? Curves.easeInOut : Curves.bounceOut,
                 duration: Duration(milliseconds: 600),
-                width: width,
-                height: inverted
-                    ? (val != 0 ? (max / val).clamp(0, 1) : 1) * height
-                    : (max != 0 ? (val / max).clamp(0, 1) : 0) * height,
+                width: vertical
+                    ? width
+                    : (inverted
+                        ? (val != 0 ? (max / val).clamp(0, 1) : 1) * width
+                        : (max != 0 ? (val / max).clamp(0, 1) : 0) * width),
+                height: vertical
+                    ? (inverted
+                        ? (val != 0 ? (max / val).clamp(0, 1) : 1) * height
+                        : (max != 0 ? (val / max).clamp(0, 1) : 0) * height)
+                    : height,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(60),
                   color: _colorSelect(val, max),
                 ),
                 child: Center(
-                  child: PlatformText(
+                  child: Text(
                     percentage != 0 ? percentage.toString() + '%' : '',
                     style: GoogleFonts.gugi(
                       textStyle: TextStyle(
@@ -77,7 +101,7 @@ class BarGraph extends StatelessWidget {
           Padding(
             padding: EdgeInsets.all(2),
           ),
-          PlatformText(val.toInt().toString(),
+          Text(val.toInt().toString(),
               style: Theme.of(context).textTheme.caption),
         ],
       );

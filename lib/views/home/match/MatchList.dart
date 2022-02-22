@@ -73,7 +73,7 @@ class _MatchList extends State<MatchList> {
           }
           return Scaffold(
             appBar: AppBar(
-              title: PlatformText('Matches'),
+              title: Text('Matches'),
               backgroundColor: Theme.of(context).colorScheme.primary,
               actions: [
                 IconButton(
@@ -89,29 +89,30 @@ class _MatchList extends State<MatchList> {
                     ),
                   ),
                 ),
-                IconButton(
-                  icon: Icon(
-                    Icons.search,
+                if (widget.event.type != EventType.remote)
+                  IconButton(
+                    icon: Icon(
+                      Icons.search,
+                    ),
+                    onPressed: () {
+                      showSearch(
+                        context: context,
+                        delegate: MatchSearch(
+                          statConfig: widget.event.statConfig,
+                          matches: widget.event
+                              .getSortedMatches(widget.ascending)
+                              .where((e) =>
+                                  e.alliance(
+                                    widget.event.teams[widget.team?.number],
+                                  ) !=
+                                  null)
+                              .toList(),
+                          ascending: widget.ascending,
+                          event: widget.event,
+                        ),
+                      );
+                    },
                   ),
-                  onPressed: () {
-                    showSearch(
-                      context: context,
-                      delegate: MatchSearch(
-                        statConfig: widget.event.statConfig,
-                        matches: widget.event
-                            .getSortedMatches(widget.ascending)
-                            .where((e) =>
-                                e.alliance(
-                                  widget.event.teams[widget.team?.number],
-                                ) !=
-                                null)
-                            .toList(),
-                        ascending: widget.ascending,
-                        event: widget.event,
-                      ),
-                    );
-                  },
-                ),
               ],
             ),
             body: _matches(scrollController),
@@ -126,10 +127,10 @@ class _MatchList extends State<MatchList> {
                             showPlatformDialog(
                               context: context,
                               builder: (context) => PlatformAlert(
-                                title: PlatformText('New Match'),
+                                title: Text('New Match'),
                                 actions: [
                                   PlatformDialogAction(
-                                    child: PlatformText('Cancel'),
+                                    child: Text('Cancel'),
                                     onPressed: () {
                                       setState(
                                         () {
@@ -139,7 +140,7 @@ class _MatchList extends State<MatchList> {
                                     },
                                   ),
                                   PlatformDialogAction(
-                                    child: PlatformText('Add'),
+                                    child: Text('Add'),
                                     onPressed: () {
                                       setState(
                                         () {
@@ -258,12 +259,12 @@ class _MatchList extends State<MatchList> {
                 showPlatformDialog(
                   context: context,
                   builder: (BuildContext context) => PlatformAlert(
-                    title: PlatformText('Delete Match'),
-                    content: PlatformText('Are you sure?'),
+                    title: Text('Delete Match'),
+                    content: Text('Are you sure?'),
                     actions: [
                       PlatformDialogAction(
                         isDefaultAction: true,
-                        child: PlatformText('Cancel'),
+                        child: Text('Cancel'),
                         onPressed: () {
                           Navigator.of(context).pop();
                         },
@@ -271,7 +272,7 @@ class _MatchList extends State<MatchList> {
                       PlatformDialogAction(
                         isDefaultAction: false,
                         isDestructive: true,
-                        child: PlatformText('Confirm'),
+                        child: Text('Confirm'),
                         onPressed: () {
                           setState(
                             () => widget.event.deleteMatch(matches[index]),

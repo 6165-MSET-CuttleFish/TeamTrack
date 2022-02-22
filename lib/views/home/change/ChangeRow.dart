@@ -42,8 +42,8 @@ class ChangeRow extends StatelessWidget {
         onTap: onTap,
         title: Column(
           children: [
-            PlatformText(change.title),
-            PlatformText(
+            Text(change.title),
+            Text(
               '${formatDate(
                 change.startDate.toDate(),
                 [

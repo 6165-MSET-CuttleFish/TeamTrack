@@ -39,19 +39,15 @@ abstract class PlatformWidget<C extends Widget, M extends Widget,
 
   C buildCupertinoWidget(BuildContext context);
   M buildMaterialWidget(BuildContext context);
-  W? buildWebWidget(BuildContext context) {
-    return null;
-  }
+  W? buildWebWidget(BuildContext context) => null;
 
   @override
   Widget build(BuildContext context) {
-    try {
-      if (NewPlatform.isIOS) {
-        return buildCupertinoWidget(context);
-      } else {
-        return buildMaterialWidget(context);
-      }
-    } catch (e) {
+    if (NewPlatform.isIOS) {
+      return buildCupertinoWidget(context);
+    } else if (NewPlatform.isAndroid) {
+      return buildMaterialWidget(context);
+    } else {
       return buildWebWidget(context) ?? buildMaterialWidget(context);
     }
   }

@@ -37,7 +37,7 @@ class _ChangeList extends State<ChangeList> {
         team.changes.sort((a, b) => a.startDate.compareTo(b.startDate));
         return Scaffold(
           appBar: AppBar(
-            title: PlatformText('Changes'),
+            title: Text('Changes'),
             backgroundColor: Theme.of(context).colorScheme.primary,
           ),
           floatingActionButton: FloatingActionButton(
@@ -80,12 +80,12 @@ class _ChangeList extends State<ChangeList> {
                                   context: context,
                                   builder: (BuildContext context) =>
                                       PlatformAlert(
-                                    title: PlatformText('Delete Change'),
-                                    content: PlatformText('Are you sure?'),
+                                    title: Text('Delete Change'),
+                                    content: Text('Are you sure?'),
                                     actions: [
                                       PlatformDialogAction(
                                         isDefaultAction: true,
-                                        child: PlatformText('Cancel'),
+                                        child: Text('Cancel'),
                                         onPressed: () {
                                           Navigator.of(context).pop();
                                         },
@@ -93,7 +93,7 @@ class _ChangeList extends State<ChangeList> {
                                       PlatformDialogAction(
                                         isDefaultAction: false,
                                         isDestructive: true,
-                                        child: PlatformText('Confirm'),
+                                        child: Text('Confirm'),
                                         onPressed: () {
                                           widget.event
                                               .deleteChange(change, team);

@@ -218,12 +218,12 @@ class TeleScore extends ScoreDivision {
   List<ScoringElement> getElements() => elements.values.toList();
   List<double> cycleTimes = [];
 
-  int teleCycles() {
+  int teleCycles([double engameThreshold = 90]) {
     double cycleSum = 0;
     int cycles = 0;
     for (final cycleTime in cycleTimes) {
       cycleSum += cycleTime;
-      if (cycleSum < 90) {
+      if (cycleSum < engameThreshold) {
         cycles++;
       } else {
         break;
@@ -232,7 +232,9 @@ class TeleScore extends ScoreDivision {
     return cycles;
   }
 
-  int endgameCycles() {
+  int totalCycles() => cycleTimes.length;
+
+  int endgameCycles([double engameThreshold = 90]) {
     double cycleSum = 0;
     int cycles = 0;
     for (final cycleTime in cycleTimes) {
@@ -293,6 +295,8 @@ class TeleScore extends ScoreDivision {
         teleScore.elements[key] = other.elements[key] ?? ScoringElement();
       }
     });
+    teleScore.cycleTimes = cycleTimes + other.cycleTimes;
+    teleScore.misses = misses + other.misses;
     return teleScore;
   }
 

@@ -40,12 +40,12 @@ class _PermissionsState extends State<Permissions> {
                                   context: context,
                                   builder: (BuildContext context) =>
                                       PlatformAlert(
-                                    title: PlatformText('Remove User'),
-                                    content: PlatformText('Are you sure?'),
+                                    title: Text('Remove User'),
+                                    content: Text('Are you sure?'),
                                     actions: [
                                       PlatformDialogAction(
                                         isDefaultAction: true,
-                                        child: PlatformText('Cancel'),
+                                        child: Text('Cancel'),
                                         onPressed: () {
                                           Navigator.of(context).pop();
                                         },
@@ -53,13 +53,12 @@ class _PermissionsState extends State<Permissions> {
                                       PlatformDialogAction(
                                         isDefaultAction: false,
                                         isDestructive: true,
-                                        child: PlatformText('Confirm'),
+                                        child: Text('Confirm'),
                                         onPressed: () {
-                                          setState(
-                                            () => widget.ref
-                                                ?.child('${user.uid}')
-                                                .remove(),
-                                          );
+                                          widget.ref
+                                              ?.child('${user.uid}')
+                                              .remove();
+                                          setState(() => {});
                                           Navigator.of(context).pop();
                                         },
                                       ),
@@ -75,10 +74,10 @@ class _PermissionsState extends State<Permissions> {
                   ),
                   child: ListTile(
                     leading: PFP(user: user),
-                    title: PlatformText(
+                    title: Text(
                       user.displayName ?? "Unknown",
                     ),
-                    subtitle: PlatformText(
+                    subtitle: Text(
                       user.email ?? "Unknown",
                       style: Theme.of(context).textTheme.caption,
                     ),
@@ -87,7 +86,7 @@ class _PermissionsState extends State<Permissions> {
                       items: Role.values
                           .map(
                             (e) => DropdownMenuItem<Role>(
-                              child: PlatformText(
+                              child: Text(
                                 e.name(),
                               ),
                               value: e,

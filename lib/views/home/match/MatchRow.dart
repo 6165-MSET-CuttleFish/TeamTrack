@@ -48,7 +48,7 @@ class MatchRow extends StatelessWidget {
         ),
       ),
       child: ListTile(
-        leading: PlatformText(index.toString()),
+        leading: Text(index.toString()),
         title: team != null
             ? Column(
                 mainAxisSize: MainAxisSize.min,
@@ -111,13 +111,13 @@ class MatchRow extends StatelessWidget {
   Widget matchSummary(BuildContext context) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          PlatformText(
+          Text(
             (match.red?.team1?.name ?? '?') +
                 ' & ' +
                 (match.red?.team2?.name ?? '?'),
             style: Theme.of(context).textTheme.caption,
           ),
-          PlatformText(
+          Text(
             'VS',
             style: TextStyle(
               color: Colors.red,
@@ -125,7 +125,7 @@ class MatchRow extends StatelessWidget {
               fontSize: 12,
             ),
           ),
-          PlatformText(
+          Text(
             (match.blue?.team1?.name ?? '?') +
                 ' & ' +
                 (match.blue?.team2?.name ?? '?'),
@@ -143,7 +143,7 @@ class MatchRow extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        PlatformText(
+        Text(
           match.redScore(showPenalties: true).toString(),
           style: GoogleFonts.gugi(
             fontWeight: redIsGreater ? FontWeight.bold : null,
@@ -152,8 +152,8 @@ class MatchRow extends StatelessWidget {
                 : (teamIsRed ? CupertinoColors.activeOrange : Colors.grey),
           ),
         ),
-        PlatformText(" - ", style: GoogleFonts.gugi()),
-        PlatformText(
+        Text(" - ", style: GoogleFonts.gugi()),
+        Text(
           match.blueScore(showPenalties: true).toString(),
           style: GoogleFonts.gugi(
             fontWeight: blueIsGreater ? FontWeight.bold : null,

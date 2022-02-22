@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/functions/Extensions.dart';
+import 'package:teamtrack/views/LandingPage.dart' as LandingPage;
 
 class Inbox extends StatefulWidget {
   const Inbox({Key? key}) : super(key: key);
@@ -47,12 +48,12 @@ class _InboxState extends State<Inbox> {
                       showPlatformDialog(
                         context: context,
                         builder: (BuildContext context) => PlatformAlert(
-                          title: PlatformText('Block user'),
-                          content: PlatformText('Are you sure?'),
+                          title: Text('Block user'),
+                          content: Text('Are you sure?'),
                           actions: [
                             PlatformDialogAction(
                               isDefaultAction: true,
-                              child: PlatformText('Cancel'),
+                              child: Text('Cancel'),
                               onPressed: () {
                                 Navigator.of(context).pop();
                               },
@@ -60,7 +61,7 @@ class _InboxState extends State<Inbox> {
                             PlatformDialogAction(
                               isDefaultAction: false,
                               isDestructive: true,
-                              child: PlatformText('Confirm'),
+                              child: Text('Confirm'),
                               onPressed: () async {
                                 await firebaseFirestore.runTransaction(
                                   (transaction) async {
@@ -118,18 +119,18 @@ class _InboxState extends State<Inbox> {
                           color: Theme.of(context).colorScheme.primary,
                         ),
                       ),
-                      PlatformText(e.gameName.spaceBeforeCapital())
+                      Text(e.gameName.spaceBeforeCapital())
                     ],
                   ),
                   title: Column(
                     children: [
-                      PlatformText(
+                      Text(
                         e.name,
                       ),
-                      PlatformText(
+                      Text(
                         e.sender?.displayName ?? "Guest",
                       ),
-                      PlatformText(
+                      Text(
                         e.sender?.email ?? "Suspicious Email",
                         style: TextStyle(fontSize: 12),
                       )
@@ -147,18 +148,18 @@ class _InboxState extends State<Inbox> {
                           showPlatformDialog(
                             context: context,
                             builder: (_) => PlatformAlert(
-                              title: PlatformText('Accept Event'),
-                              content: PlatformText('Are you sure?'),
+                              title: Text('Accept Event'),
+                              content: Text('Are you sure?'),
                               actions: [
                                 PlatformDialogAction(
                                   isDefaultAction: true,
-                                  child: PlatformText('Cancel'),
+                                  child: Text('Cancel'),
                                   onPressed: () {
                                     Navigator.of(context).pop();
                                   },
                                 ),
                                 PlatformDialogAction(
-                                  child: PlatformText('Confirm'),
+                                  child: Text('Confirm'),
                                   onPressed: () async {
                                     await firebaseFirestore.runTransaction(
                                       (transaction) async {
@@ -196,6 +197,7 @@ class _InboxState extends State<Inbox> {
                                       },
                                     );
                                     Navigator.of(context).pop();
+                                    LandingPage.tab = LandingPage.Tab.events;
                                     setState(() {});
                                   },
                                 ),
@@ -214,19 +216,19 @@ class _InboxState extends State<Inbox> {
                           showPlatformDialog(
                             context: context,
                             builder: (_) => PlatformAlert(
-                              title: PlatformText('Delete Event'),
-                              content: PlatformText('Are you sure?'),
+                              title: Text('Delete Event'),
+                              content: Text('Are you sure?'),
                               actions: [
                                 PlatformDialogAction(
                                   isDefaultAction: true,
-                                  child: PlatformText('Cancel'),
+                                  child: Text('Cancel'),
                                   onPressed: () {
                                     Navigator.of(context).pop();
                                   },
                                 ),
                                 PlatformDialogAction(
                                   isDestructive: true,
-                                  child: PlatformText('Confirm'),
+                                  child: Text('Confirm'),
                                   onPressed: () async {
                                     await firebaseFirestore.runTransaction(
                                       (transaction) async {
