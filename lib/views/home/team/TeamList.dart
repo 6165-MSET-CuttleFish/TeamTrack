@@ -67,11 +67,17 @@ class _TeamList extends State<TeamList> {
                 )
                 .maxValue();
           }
+          final oprs = widget.event.getOpr(
+            teams,
+            widget.event.getSortedMatches(true),
+            type: widget.sortMode,
+          );
           if (teams.length == 0) return EmptyList();
           return ListView.builder(
             itemCount: teams.length,
             itemBuilder: (context, index) => Slidable(
               child: TeamRow(
+                opr: index < oprs.length ? oprs[index] : 0.0,
                 team: teams[index],
                 event: widget.event,
                 sortMode: widget.sortMode,
@@ -217,9 +223,15 @@ class TeamSearch extends SearchDelegate<String?> {
             ),
           ].toList()
         : teams;
+    final oprs = event.getOpr(
+      teams,
+      event.getSortedMatches(true),
+      type: sortMode,
+    );
     return ListView.builder(
       itemCount: suggestionList.length,
       itemBuilder: (context, index) => TeamRow(
+        opr: oprs[index],
         statConfig: statConfig,
         team: suggestionList[index],
         event: event,

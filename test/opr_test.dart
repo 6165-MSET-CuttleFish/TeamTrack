@@ -18,15 +18,40 @@ void main() {
       [0.0, 1.0, 1.0, 0.0],
       [1.0, 0.0, 0.0, 1.0]
     ];
-    List<List<double>> matchResults = [
-      [1.0],
-      [11.0],
-      [2.0],
-      [0.0],
-      [14.0],
-      [2.0]
+    List<double> matchResults = [
+      1.0,
+      11.0,
+      2.0,
+      0.0,
+      14.0,
+      2.0
     ];
     calculator(matchSchedule, matchResults, 6,4);
+    if(solutions.first.toString()=="NaN") {
+      expect(solutions.first.toString(), "NaN");
+      return;
+    }
+    expect(solutions.first.round(), -2);
+  });
+  test("Some Teams Have Not Played Yet", () {
+    print("Test 1: 4 teams, 6 matches");
+    List<List<double>> matchSchedule = [
+      [1.0, 1.0, 0.0, 0.0, 0.0],
+      [0.0, 0.0, 1.0, 1.0, 0.0],
+      [1.0, 0.0, 1.0, 0.0, 0.0],
+      [0.0, 1.0, 0.0, 1.0, 0.0],
+      [0.0, 1.0, 1.0, 0.0, 0.0],
+      [0.0, 0.0, 0.0, 1.0, 1.0]
+    ];
+    List<double> matchResults = [
+      1.0,
+      11.0,
+      2.0,
+      0.0,
+      14.0,
+      2.0
+    ];
+    calculator(matchSchedule, matchResults, 6,5);
     if(solutions.first.toString()=="NaN") {
       expect(solutions.first.toString(), "NaN");
       return;
@@ -47,17 +72,17 @@ void main() {
       [1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0],
       [0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0]
     ];
-    List<List<double>> matchResults = [
-      [1.0],
-      [11.0],
-      [2.0],
-      [0.0],
-      [14.0],
-      [2.0],
-      [14.0],
-      [21.0],
-      [14.0],
-      [21.0]
+    List<double> matchResults = [
+      1.0,
+      11.0,
+      2.0,
+      0.0,
+      14.0,
+      2.0,
+      14.0,
+      21.0,
+      14.0,
+      21.0
     ];
     calculator(matchSchedule, matchResults,10,8);
     if(solutions.first.toString()=="NaN") {
@@ -75,12 +100,12 @@ void main() {
       [1.0, 0.0, 0.0, 1.0],
       [0.0, 1.0, 0.0, 1.0]
     ];
-    List<List<double>> matchResults = [
-      [10.0],
-      [13.0],
-      [7.0],
-      [15.0],
-      [10.0]
+    List<double> matchResults = [
+      10.0,
+      13.0,
+      7.0,
+      15.0,
+      10.0
     ];
     calculator(matchSchedule, matchResults,5,4);
     if(solutions.first.toString()=="NaN") {
@@ -96,10 +121,10 @@ void main() {
       [0.0, 0.0, 1.0, 1.0],
       [1.0, 0.0, 1.0, 0.0]
     ];
-    List<List<double>> matchResults = [
-      [1.0],
-      [11.0],
-      [2.0]
+    List<double> matchResults = [
+      1.0,
+      11.0,
+      2.0
     ];
     calculator(matchSchedule, matchResults, 3,4);
     if(solutions.first.toString()=="NaN") {
@@ -109,7 +134,7 @@ void main() {
     expect(solutions.first.round(), double.infinity);
   });
 }
-void calculator(List<List<double>> a, List<List<double>> b, int rows, int cols){
+void calculator(List<List<double>> a, List<double> b, int rows, int cols){
   /*
    * input: matches, results, rows: # of matches, cols: number of teams
    * m1: teams in matches
@@ -127,7 +152,7 @@ void calculator(List<List<double>> a, List<List<double>> b, int rows, int cols){
   Matrix<double> matchresults = RealMatrix.fromData(
       columns: 1,
       rows: matchschedule.rowCount,
-      data: b
+      data: b.map((e) => [e]).toList()
   );
 
   //LUSolver formula to solve system of equations

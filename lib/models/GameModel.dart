@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:equations/equations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart' as Db;
 import 'package:flutter/cupertino.dart';
@@ -399,6 +400,49 @@ class Event with ClusterItem {
     return firebaseDatabase.ref().child('Events/$gameName').child(id);
   }
 
+  List<double> getOpr(List<Team> teams, List<Match> matches,
+      {OpModeType? type}) {
+    List<Alliance> alliances = [];
+    for (final match in matches) {
+      if (match.red != null) alliances.add(match.red!);
+      if (match.blue != null) alliances.add(match.blue!);
+    }
+    final newTeams = teams.where((team) => team.scores.isNotEmpty).toList();
+    final mtchSched = alliances
+        .map(
+          (alliance) => newTeams
+              .map(
+                (team) => alliance.hasTeam(team) ? 1.0 : 0.0,
+              )
+              .toList(),
+        )
+        .toList();
+    final mtchResults = alliances
+        .map((alliance) => alliance
+            .allianceTotal(statConfig.showPenalties, type: type)
+            .toDouble())
+        .toList();
+    Matrix<double> matchschedule = RealMatrix.fromData(
+      columns: newTeams.length,
+      rows: alliances.length,
+      data: mtchSched,
+    );
+
+    Matrix<double> matchresults = RealMatrix.fromData(
+      columns: 1,
+      rows: matchschedule.rowCount,
+      data: mtchResults.map((e) => [e]).toList(),
+    );
+
+    //LUSolver formula to solve system of equations
+    final lu = LUSolver(
+      equations: (matchschedule.transpose() * matchschedule).toListOfList(),
+      constants: (matchschedule.transpose() * matchresults).toList(),
+    );
+    final solutions = lu.solve();
+    return solutions;
+  }
+
   Event.fromJson(Map<String, dynamic>? json) {
     role = Role.editor;
     gameName = json?['gameName'] ?? Statics.gameName;
@@ -564,6 +608,8 @@ class Match {
       return blue;
     }
   }
+
+  bool isTeamInMatch(Team? team) => alliance(team) != null;
 
   Alliance? opposingAlliance(Team? team) {
     if ((red?.team1?.equals(team) ?? false) ||

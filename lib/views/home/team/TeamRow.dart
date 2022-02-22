@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:teamtrack/components/BarGraph.dart';
 import 'package:teamtrack/components/PercentChange.dart';
-import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/functions/Statistics.dart';
 import 'package:teamtrack/models/ScoreModel.dart';
@@ -16,8 +15,10 @@ class TeamRow extends StatelessWidget {
     this.sortMode,
     this.onTap,
     required this.statConfig,
+    required this.opr,
   }) : super(key: key);
   final Team team;
+  final double opr;
   final Event event;
   final double max;
   final OpModeType? sortMode;
@@ -67,18 +68,9 @@ class TeamRow extends StatelessWidget {
               child: BarGraph(
                 height: 70,
                 width: 30,
-                val: statConfig.allianceTotal
-                    ? event.matches.values
-                        .toList()
-                        .spots(team, Dice.none, statConfig.showPenalties,
-                            type: sortMode)
-                        .removeOutliers(statConfig.removeOutliers)
-                        .map((spot) => spot.y)
-                        .mean()
-                    : team.scores.meanScore(
-                        Dice.none, statConfig.removeOutliers, sortMode),
+                val: opr,
                 max: max,
-                title: 'Mean',
+                title: 'OPR',
               ),
             ),
           ],
