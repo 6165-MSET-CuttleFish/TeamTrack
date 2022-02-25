@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -16,6 +15,7 @@ import 'package:uuid/uuid.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:teamtrack/functions/Extensions.dart';
+import 'package:teamtrack/functions/Statistics.dart';
 
 class Statics {
   static String gameName = "FreightFrenzy";
@@ -600,7 +600,7 @@ class Match {
     return [
       redScore(showPenalties: showPenalties),
       blueScore(showPenalties: showPenalties)
-    ].reduce(max);
+    ].maxValue().toInt();
   }
 
   int redScore({required bool? showPenalties}) =>
