@@ -174,36 +174,52 @@ class _MatchView extends State<MatchView> {
                   .maxValue(),
         )
         .maxValue();
-    Score('', Dice.none, event.gameName).autoScore.getElements().forEach((e) {
-      maxAutoScores[e.key ?? ''] = event.teams.values
-          .map(
-            (team) => team.scores.values
-                .map((score) => score.autoScore.elements[e.key]?.count ?? 0)
-                .maxValue(),
-          )
-          .maxValue();
-    });
-    Score('', Dice.none, event.gameName).teleScore.getElements().forEach((e) {
-      maxTeleScores[e.key ?? ''] = event.teams.values
-          .map(
-            (team) => team.scores.values
-                .map((score) => score.teleScore.elements[e.key]?.count ?? 0)
-                .maxValue(),
-          )
-          .maxValue();
-    });
-    Score('', Dice.none, event.gameName)
-        .endgameScore
-        .getElements()
-        .forEach((e) {
-      maxEndgameScores[e.key ?? ''] = event.teams.values
-          .map(
-            (team) => team.scores.values
-                .map((score) => score.endgameScore.elements[e.key]?.count ?? 0)
-                .maxValue(),
-          )
-          .maxValue();
-    });
+    Score('', Dice.none, event.gameName).autoScore.getElements().forEach(
+      (e) {
+        maxAutoScores[e.key ?? ''] = event.teams.values
+            .map(
+              (team) => team.scores.values
+                  .map((score) => score.autoScore.elements[e.key]?.count ?? 0)
+                  .maxValue(),
+            )
+            .maxValue();
+        maxAutoTargets[e.key ?? ''] = event.teams.values
+            .map((team) =>
+                team.targetScore?.autoScore.elements[e.key]?.count ?? 0)
+            .maxValue();
+      },
+    );
+    Score('', Dice.none, event.gameName).teleScore.getElements().forEach(
+      (e) {
+        maxTeleScores[e.key ?? ''] = event.teams.values
+            .map(
+              (team) => team.scores.values
+                  .map((score) => score.teleScore.elements[e.key]?.count ?? 0)
+                  .maxValue(),
+            )
+            .maxValue();
+        maxTeleTargets[e.key ?? ''] = event.teams.values
+            .map((team) =>
+                team.targetScore?.teleScore.elements[e.key]?.count ?? 0)
+            .maxValue();
+      },
+    );
+    Score('', Dice.none, event.gameName).endgameScore.getElements().forEach(
+      (e) {
+        maxEndgameScores[e.key ?? ''] = event.teams.values
+            .map(
+              (team) => team.scores.values
+                  .map(
+                      (score) => score.endgameScore.elements[e.key]?.count ?? 0)
+                  .maxValue(),
+            )
+            .maxValue();
+        maxEndgameTargets[e.key ?? ''] = event.teams.values
+            .map((team) =>
+                team.targetScore?.endgameScore.elements[e.key]?.count ?? 0)
+            .maxValue();
+      },
+    );
   }
 
   double totalMaxTotal = 0,
@@ -225,6 +241,9 @@ class _MatchView extends State<MatchView> {
   Map<String, double> maxTeleScores = {};
   Map<String, double> maxEndgameScores = {};
   Map<String, double> maxAutoScores = {};
+  Map<String, double> maxAutoTargets = {};
+  Map<String, double> maxTeleTargets = {};
+  Map<String, double> maxEndgameTargets = {};
 
   @override
   void initState() {
@@ -855,7 +874,7 @@ class _MatchView extends State<MatchView> {
             title: "Contribution",
             vertical: false,
             height: MediaQuery.of(context).size.width,
-            width: 20,
+            width: 15,
             val: _score?.autoScore.total().toDouble() ?? 0.0,
             max: _selectedAlliance?.total().autoScore.total().toDouble() ?? 0.0,
           ),
@@ -869,7 +888,9 @@ class _MatchView extends State<MatchView> {
                     event: widget.event,
                     path: teamPath(OpModeType.auto),
                     score: _score,
-                    max: maxAutoScores[e.key] ?? 0,
+                    max: widget.match != null
+                        ? maxAutoScores[e.key] ?? 0
+                        : maxAutoTargets[e.key] ?? 0,
                   ),
                 )
                 .toList() ??
@@ -895,7 +916,7 @@ class _MatchView extends State<MatchView> {
               title: "Contribution",
               vertical: false,
               height: MediaQuery.of(context).size.width,
-              width: 20,
+              width: 15,
               val: _score?.teleScore.total().toDouble() ?? 0.0,
               max: _selectedAlliance?.total().teleScore.total().toDouble() ??
                   0.0,
@@ -1019,7 +1040,9 @@ class _MatchView extends State<MatchView> {
                         }
                         return Transaction.success(mutableData);
                       },
-                      max: maxTeleScores[e.key] ?? 0,
+                      max: widget.match != null
+                          ? maxTeleScores[e.key] ?? 0
+                          : maxTeleTargets[e.key] ?? 0,
                     ),
                   )
                   .toList() ??
@@ -1071,7 +1094,7 @@ class _MatchView extends State<MatchView> {
               title: "Contribution",
               vertical: false,
               height: MediaQuery.of(context).size.width,
-              width: 20,
+              width: 15,
               val: _score?.endgameScore.total().toDouble() ?? 0.0,
               max: _selectedAlliance?.total().endgameScore.total().toDouble() ??
                   0.0,
@@ -1086,7 +1109,9 @@ class _MatchView extends State<MatchView> {
                       event: widget.event,
                       path: teamPath(OpModeType.endgame),
                       score: _score,
-                      max: maxEndgameScores[e.key] ?? 0,
+                      max: widget.match != null
+                          ? maxEndgameScores[e.key] ?? 0
+                          : maxEndgameTargets[e.key] ?? 0,
                     ),
                   )
                   .toList() ??

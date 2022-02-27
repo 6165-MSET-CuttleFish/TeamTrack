@@ -254,7 +254,7 @@ class _Incrementor extends State<Incrementor> {
                         max: widget.max,
                         vertical: false,
                         height: MediaQuery.of(context).size.width,
-                        width: 10,
+                        width: 4,
                         compressed: true,
                         showPercentage: false,
                       ),
