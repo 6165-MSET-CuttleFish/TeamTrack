@@ -174,6 +174,52 @@ class _MatchView extends State<MatchView> {
                   .maxValue(),
         )
         .maxValue();
+    Score('', Dice.none, event.gameName).autoScore.getElements().forEach(
+      (e) {
+        maxAutoScores[e.key ?? ''] = event.teams.values
+            .map(
+              (team) => team.scores.values
+                  .map((score) => score.autoScore.elements[e.key]?.count ?? 0)
+                  .maxValue(),
+            )
+            .maxValue();
+        maxAutoTargets[e.key ?? ''] = event.teams.values
+            .map((team) =>
+                team.targetScore?.autoScore.elements[e.key]?.count ?? 0)
+            .maxValue();
+      },
+    );
+    Score('', Dice.none, event.gameName).teleScore.getElements().forEach(
+      (e) {
+        maxTeleScores[e.key ?? ''] = event.teams.values
+            .map(
+              (team) => team.scores.values
+                  .map((score) => score.teleScore.elements[e.key]?.count ?? 0)
+                  .maxValue(),
+            )
+            .maxValue();
+        maxTeleTargets[e.key ?? ''] = event.teams.values
+            .map((team) =>
+                team.targetScore?.teleScore.elements[e.key]?.count ?? 0)
+            .maxValue();
+      },
+    );
+    Score('', Dice.none, event.gameName).endgameScore.getElements().forEach(
+      (e) {
+        maxEndgameScores[e.key ?? ''] = event.teams.values
+            .map(
+              (team) => team.scores.values
+                  .map(
+                      (score) => score.endgameScore.elements[e.key]?.count ?? 0)
+                  .maxValue(),
+            )
+            .maxValue();
+        maxEndgameTargets[e.key ?? ''] = event.teams.values
+            .map((team) =>
+                team.targetScore?.endgameScore.elements[e.key]?.count ?? 0)
+            .maxValue();
+      },
+    );
   }
 
   double totalMaxTotal = 0,
@@ -192,6 +238,12 @@ class _MatchView extends State<MatchView> {
       endgameCyclesMaxTotal = 0,
       missesInd = 0,
       missesTotal = 0;
+  Map<String, double> maxTeleScores = {};
+  Map<String, double> maxEndgameScores = {};
+  Map<String, double> maxAutoScores = {};
+  Map<String, double> maxAutoTargets = {};
+  Map<String, double> maxTeleTargets = {};
+  Map<String, double> maxEndgameTargets = {};
 
   @override
   void initState() {
@@ -517,167 +569,55 @@ class _MatchView extends State<MatchView> {
                                       ],
                                     ),
                                   ),
-                                Material(
-                                  color: Colors.transparent,
-                                  child: ExpansionTile(
-                                    leading: widget.event.type ==
-                                            EventType.remote
-                                        ? null
-                                        : Checkbox(
-                                            checkColor:
-                                                Theme.of(context).canvasColor,
-                                            fillColor:
-                                                MaterialStateProperty.all(
-                                                    Theme.of(context)
-                                                        .colorScheme
-                                                        .primary),
-                                            value: _allianceTotal,
-                                            onChanged: (_) =>
-                                                _allianceTotal = _ ?? false,
-                                          ),
-                                    title: Text(
-                                      'Score Breakdown',
-                                      style: TextStyle(fontSize: 16),
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      top: 5.0, bottom: 5.0),
+                                  child: RawMaterialButton(
+                                    fillColor: _allianceTotal &&
+                                            widget.event.type !=
+                                                EventType.remote
+                                        ? _color.withOpacity(0.3)
+                                        : null,
+                                    onPressed: (widget.match != null &&
+                                            widget.event.type !=
+                                                EventType.remote)
+                                        ? () => _allianceTotal = !_allianceTotal
+                                        : null,
+                                    child: ScoreSummary(
+                                      event: widget.event,
+                                      score: (widget.event.type ==
+                                                      EventType.remote &&
+                                                  widget.match != null) ||
+                                              _allianceTotal
+                                          ? _selectedAlliance?.total()
+                                          : _score,
+                                      autoMax: (widget.event.type ==
+                                                      EventType.remote &&
+                                                  widget.match != null) ||
+                                              _allianceTotal
+                                          ? autoMaxTotal
+                                          : autoMaxInd,
+                                      teleMax: (widget.event.type ==
+                                                      EventType.remote &&
+                                                  widget.match != null) ||
+                                              _allianceTotal
+                                          ? teleMaxTotal
+                                          : teleMaxInd,
+                                      endMax: (widget.event.type ==
+                                                      EventType.remote &&
+                                                  widget.match != null) ||
+                                              _allianceTotal
+                                          ? endgameMaxTotal
+                                          : endgameMaxInd,
+                                      totalMax: (widget.event.type ==
+                                                      EventType.remote &&
+                                                  widget.match != null) ||
+                                              _allianceTotal
+                                          ? totalMaxTotal
+                                          : totalMaxInd,
+                                      showPenalties: _showPenalties,
+                                      height: 40,
                                     ),
-                                    children: [
-                                      Container(
-                                        color: (_allianceTotal &&
-                                                widget.event.type !=
-                                                    EventType.remote)
-                                            ? _color.withOpacity(0.3)
-                                            : null,
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(
-                                            left: 8.0,
-                                            right: 8.0,
-                                            top: 8.0,
-                                          ),
-                                          child: Column(
-                                            children: [
-                                              ScoreSummary(
-                                                event: widget.event,
-                                                score: (widget.event.type ==
-                                                                EventType
-                                                                    .remote &&
-                                                            widget.match !=
-                                                                null) ||
-                                                        _allianceTotal
-                                                    ? _selectedAlliance?.total()
-                                                    : _score,
-                                                autoMax: (widget.event.type ==
-                                                                EventType
-                                                                    .remote &&
-                                                            widget.match !=
-                                                                null) ||
-                                                        _allianceTotal
-                                                    ? autoMaxTotal
-                                                    : autoMaxInd,
-                                                teleMax: (widget.event.type ==
-                                                                EventType
-                                                                    .remote &&
-                                                            widget.match !=
-                                                                null) ||
-                                                        _allianceTotal
-                                                    ? teleMaxTotal
-                                                    : teleMaxInd,
-                                                endMax: (widget.event.type ==
-                                                                EventType
-                                                                    .remote &&
-                                                            widget.match !=
-                                                                null) ||
-                                                        _allianceTotal
-                                                    ? endgameMaxTotal
-                                                    : endgameMaxInd,
-                                                totalMax: (widget.event.type ==
-                                                                EventType
-                                                                    .remote &&
-                                                            widget.match !=
-                                                                null) ||
-                                                        _allianceTotal
-                                                    ? totalMaxTotal
-                                                    : totalMaxInd,
-                                                showPenalties: _showPenalties,
-                                                height: 40,
-                                              ),
-                                              Padding(
-                                                  padding: EdgeInsets.all(8.0)),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  BarGraph(
-                                                    height: 40,
-                                                    title: "Total Cycles",
-                                                    val: _score?.teleScore
-                                                            .totalCycles()
-                                                            .toDouble() ??
-                                                        0.0,
-                                                    max: (widget.event.type ==
-                                                                    EventType
-                                                                        .remote &&
-                                                                widget.match !=
-                                                                    null) ||
-                                                            _allianceTotal
-                                                        ? cyclesMaxTotal
-                                                        : cyclesMaxInd,
-                                                  ),
-                                                  BarGraph(
-                                                    height: 40,
-                                                    title: "Tele-Op Cycles",
-                                                    val: _score?.teleScore
-                                                            .teleCycles()
-                                                            .toDouble() ??
-                                                        0.0,
-                                                    max: (widget.event.type ==
-                                                                    EventType
-                                                                        .remote &&
-                                                                widget.match !=
-                                                                    null) ||
-                                                            _allianceTotal
-                                                        ? teleCyclesMaxTotal
-                                                        : teleCyclesMaxInd,
-                                                  ),
-                                                  BarGraph(
-                                                    height: 40,
-                                                    title: "Endgame Cycles",
-                                                    val: _score?.teleScore
-                                                            .endgameCycles()
-                                                            .toDouble() ??
-                                                        0.0,
-                                                    max: (widget.event.type ==
-                                                                    EventType
-                                                                        .remote &&
-                                                                widget.match !=
-                                                                    null) ||
-                                                            _allianceTotal
-                                                        ? endgameCyclesMaxTotal
-                                                        : endgameCyclesMaxInd,
-                                                  ),
-                                                  BarGraph(
-                                                    height: 40,
-                                                    title: "Misses",
-                                                    val: _score?.teleScore
-                                                            .misses.count
-                                                            .toDouble() ??
-                                                        0.0,
-                                                    max: (widget.event.type ==
-                                                                    EventType
-                                                                        .remote &&
-                                                                widget.match !=
-                                                                    null) ||
-                                                            _allianceTotal
-                                                        ? missesTotal
-                                                        : missesInd,
-                                                    inverted: true,
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ],
                                   ),
                                 ),
                               ],
@@ -929,6 +869,15 @@ class _MatchView extends State<MatchView> {
       'matches/${widget.match?.id}/${allianceColor()}/sharedScore/${OpModeType.endgame.toRep()}';
 
   List<Widget> autoView() => [
+        if (widget.event.type != EventType.remote && _match != null)
+          BarGraph(
+            title: "Contribution",
+            vertical: false,
+            height: MediaQuery.of(context).size.width,
+            width: 15,
+            val: _score?.autoScore.total().toDouble() ?? 0.0,
+            max: _selectedAlliance?.total().autoScore.total().toDouble() ?? 0.0,
+          ),
         ..._score?.autoScore
                 .getElements()
                 .parse()
@@ -939,6 +888,9 @@ class _MatchView extends State<MatchView> {
                     event: widget.event,
                     path: teamPath(OpModeType.auto),
                     score: _score,
+                    max: widget.match != null
+                        ? maxAutoScores[e.key] ?? 0
+                        : maxAutoTargets[e.key] ?? 0,
                   ),
                 )
                 .toList() ??
@@ -955,31 +907,67 @@ class _MatchView extends State<MatchView> {
                     ),
                   ) ??
               [],
-        RawMaterialButton(
-          fillColor: _allianceTotal ? _color.withOpacity(0.3) : null,
-          onPressed: widget.match != null
-              ? () => _allianceTotal = !_allianceTotal
-              : null,
-          child: BarGraph(
-            title: "Autonomous",
-            vertical: false,
-            height: MediaQuery.of(context).size.width,
-            val: (widget.event.type == EventType.remote &&
-                        widget.match != null) ||
-                    _allianceTotal
-                ? _selectedAlliance?.total().autoScore.total().toDouble() ?? 0.0
-                : _score?.autoScore.total().toDouble() ?? 0.0,
-            max: (widget.event.type == EventType.remote &&
-                        widget.match != null) ||
-                    _allianceTotal
-                ? autoMaxTotal
-                : autoMaxInd,
-          ),
-        )
       ];
 
   List<Widget> teleView() => !_paused || _allowView
       ? [
+          if (widget.event.type != EventType.remote && _match != null)
+            BarGraph(
+              title: "Contribution",
+              vertical: false,
+              height: MediaQuery.of(context).size.width,
+              width: 15,
+              val: _score?.teleScore.total().toDouble() ?? 0.0,
+              max: _selectedAlliance?.total().teleScore.total().toDouble() ??
+                  0.0,
+            ),
+          if (widget.event.type == EventType.remote && _match != null)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                BarGraph(
+                  height: 40,
+                  title: "Total Cycles",
+                  val: _score?.teleScore.totalCycles().toDouble() ?? 0.0,
+                  max: (widget.event.type == EventType.remote &&
+                              widget.match != null) ||
+                          _allianceTotal
+                      ? cyclesMaxTotal
+                      : cyclesMaxInd,
+                ),
+                BarGraph(
+                  height: 40,
+                  title: "Tele-Op Cycles",
+                  val: _score?.teleScore.teleCycles().toDouble() ?? 0.0,
+                  max: (widget.event.type == EventType.remote &&
+                              widget.match != null) ||
+                          _allianceTotal
+                      ? teleCyclesMaxTotal
+                      : teleCyclesMaxInd,
+                ),
+                BarGraph(
+                  height: 40,
+                  title: "Endgame Cycles",
+                  val: _score?.teleScore.endgameCycles().toDouble() ?? 0.0,
+                  max: (widget.event.type == EventType.remote &&
+                              widget.match != null) ||
+                          _allianceTotal
+                      ? endgameCyclesMaxTotal
+                      : endgameCyclesMaxInd,
+                ),
+                BarGraph(
+                  height: 40,
+                  title: "Misses",
+                  val: _score?.teleScore.misses.count.toDouble() ?? 0.0,
+                  max: (widget.event.type == EventType.remote &&
+                              widget.match != null) ||
+                          _allianceTotal
+                      ? missesTotal
+                      : missesInd,
+                  inverted: true,
+                ),
+              ],
+            ),
           Incrementor(
             backgroundColor: Colors.grey.withOpacity(0.3),
             element: incrementValue,
@@ -1052,6 +1040,9 @@ class _MatchView extends State<MatchView> {
                         }
                         return Transaction.success(mutableData);
                       },
+                      max: widget.match != null
+                          ? maxTeleScores[e.key] ?? 0
+                          : maxTeleTargets[e.key] ?? 0,
                     ),
                   )
                   .toList() ??
@@ -1073,28 +1064,6 @@ class _MatchView extends State<MatchView> {
                       ),
                     ) ??
                 [],
-          RawMaterialButton(
-            fillColor: _allianceTotal ? _color.withOpacity(0.3) : null,
-            onPressed: widget.match != null
-                ? () => _allianceTotal = !_allianceTotal
-                : null,
-            child: BarGraph(
-              title: "Tele-Op",
-              vertical: false,
-              height: MediaQuery.of(context).size.width,
-              val: (widget.event.type == EventType.remote &&
-                          widget.match != null) ||
-                      _allianceTotal
-                  ? _selectedAlliance?.total().teleScore.total().toDouble() ??
-                      0.0
-                  : _score?.teleScore.total().toDouble() ?? 0.0,
-              max: (widget.event.type == EventType.remote &&
-                          widget.match != null) ||
-                      _allianceTotal
-                  ? teleMaxTotal
-                  : teleMaxInd,
-            ),
-          )
         ]
       : [
           Material(
@@ -1120,6 +1089,16 @@ class _MatchView extends State<MatchView> {
 
   List<Widget> endView() => !_paused || _allowView
       ? [
+          if (widget.event.type != EventType.remote && _match != null)
+            BarGraph(
+              title: "Contribution",
+              vertical: false,
+              height: MediaQuery.of(context).size.width,
+              width: 15,
+              val: _score?.endgameScore.total().toDouble() ?? 0.0,
+              max: _selectedAlliance?.total().endgameScore.total().toDouble() ??
+                  0.0,
+            ),
           ..._score?.endgameScore
                   .getElements()
                   .parse()
@@ -1130,6 +1109,9 @@ class _MatchView extends State<MatchView> {
                       event: widget.event,
                       path: teamPath(OpModeType.endgame),
                       score: _score,
+                      max: widget.match != null
+                          ? maxEndgameScores[e.key] ?? 0
+                          : maxEndgameTargets[e.key] ?? 0,
                     ),
                   )
                   .toList() ??
@@ -1150,32 +1132,6 @@ class _MatchView extends State<MatchView> {
                       ),
                     ) ??
                 [],
-          RawMaterialButton(
-            fillColor: _allianceTotal ? _color.withOpacity(0.3) : null,
-            onPressed: widget.match != null
-                ? () => _allianceTotal = !_allianceTotal
-                : null,
-            child: BarGraph(
-              title: "Endgame",
-              vertical: false,
-              height: MediaQuery.of(context).size.width,
-              val: (widget.event.type == EventType.remote &&
-                          widget.match != null) ||
-                      _allianceTotal
-                  ? _selectedAlliance
-                          ?.total()
-                          .endgameScore
-                          .total()
-                          .toDouble() ??
-                      0.0
-                  : _score?.endgameScore.total().toDouble() ?? 0.0,
-              max: (widget.event.type == EventType.remote &&
-                          widget.match != null) ||
-                      _allianceTotal
-                  ? endgameMaxTotal
-                  : endgameMaxInd,
-            ),
-          )
         ]
       : [
           Material(

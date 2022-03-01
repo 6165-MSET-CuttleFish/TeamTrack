@@ -473,16 +473,17 @@ class Penalty extends ScoreDivision {
 
 /// This class is used to represent a Scoring Element of FTC events.
 class ScoringElement {
-  ScoringElement(
-      {this.name = '',
-      this.count = 0,
-      this.value = 1,
-      this.min,
-      this.max,
-      this.isBool = false,
-      this.key,
-      this.id,
-      this.nestedElements}) {
+  ScoringElement({
+    this.name = '',
+    this.count = 0,
+    this.value = 1,
+    this.min,
+    this.max,
+    this.isBool = false,
+    this.key,
+    this.id,
+    this.nestedElements,
+  }) {
     setStuff();
   }
   String name;

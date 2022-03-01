@@ -1,6 +1,4 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/models/ScoreModel.dart';
 import 'package:teamtrack/components/BarGraph.dart';
@@ -214,16 +212,20 @@ class ScoreCard extends StatelessWidget {
                             color: const Color(0xff37434d), width: 1),
                       ),
                       minY: [
-                        scoreDivisions.minScore(dice, removeOutliers),
-                        targetScore?.total().toDouble() ?? 0.0
-                      ].reduce(min),
+                        event.teams.minScore(
+                          dice,
+                          event.statConfig.removeOutliers,
+                          type,
+                        ),
+                        team.targetScore?.getScoreDivision(type).total() ?? 0,
+                      ].minValue(),
                       maxY: [
                         event.matches.values
                             .toList()
                             .maxAllianceScore(type: type, dice: dice)
                             .toDouble(),
-                        targetScore?.total().toDouble() ?? 0.0
-                      ].reduce(max),
+                        team.targetScore?.getScoreDivision(type).total() ?? 0
+                      ].maxValue(),
                       lineBarsData: [
                         if (matches != null)
                           LineChartBarData(

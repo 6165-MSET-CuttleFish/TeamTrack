@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:teamtrack/components/Collapsible.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:teamtrack/components/ScoreCard.dart';
@@ -521,7 +520,7 @@ class _TeamViewState extends State<TeamView> {
                                       null,
                                     ),
                               _team.targetScore?.total().toDouble() ?? 0.0
-                            ].reduce(max),
+                            ].maxValue(),
                             lineBarsData: [
                               LineChartBarData(
                                 belowBarData: _team.targetScore != null

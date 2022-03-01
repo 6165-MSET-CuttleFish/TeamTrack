@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
-import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:teamtrack/components/ScoreRangeSummary.dart';
 import 'package:teamtrack/models/Change.dart';
 import 'package:teamtrack/models/GameModel.dart';

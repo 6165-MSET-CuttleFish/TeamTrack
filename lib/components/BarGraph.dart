@@ -15,6 +15,8 @@ class BarGraph extends StatelessWidget {
     this.units = '',
     this.percentage = 0,
     this.vertical = true,
+    this.compressed = false,
+    this.showPercentage = true,
   }) : super(key: key) {
     percentage = (inverted
             ? (val != 0 ? (max / val).clamp(0, 1) : 1) * 100.0
@@ -26,6 +28,8 @@ class BarGraph extends StatelessWidget {
       height = temp;
     }
   }
+  final bool compressed;
+  final bool showPercentage;
   final String title;
   double max;
   double width;
@@ -40,20 +44,22 @@ class BarGraph extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: 74,
-            child: Center(
-              child: Text(
-                title + units,
-                style: Theme.of(context).textTheme.caption,
-                textAlign: TextAlign.center,
-                maxLines: 2,
+          if (!compressed)
+            Container(
+              width: 74,
+              child: Center(
+                child: Text(
+                  title + units,
+                  style: Theme.of(context).textTheme.caption,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                ),
               ),
             ),
-          ),
-          Padding(
-            padding: EdgeInsets.all(2),
-          ),
+          if (!compressed)
+            Padding(
+              padding: EdgeInsets.all(2),
+            ),
           Stack(
             alignment: vertical
                 ? AlignmentDirectional.bottomStart
@@ -84,25 +90,29 @@ class BarGraph extends StatelessWidget {
                   borderRadius: BorderRadius.circular(60),
                   color: _colorSelect(val, max),
                 ),
-                child: Center(
-                  child: Text(
-                    percentage != 0 ? percentage.toString() + '%' : '',
-                    style: GoogleFonts.gugi(
-                      textStyle: TextStyle(
-                        fontSize: 10,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-                ),
+                child: showPercentage
+                    ? Center(
+                        child: Text(
+                          percentage != 0 ? percentage.toString() + '%' : '',
+                          style: GoogleFonts.gugi(
+                            textStyle: TextStyle(
+                              fontSize: 10,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      )
+                    : null,
               ),
             ],
           ),
-          Padding(
-            padding: EdgeInsets.all(2),
-          ),
-          Text(val.toInt().toString(),
-              style: Theme.of(context).textTheme.caption),
+          if (!compressed)
+            Padding(
+              padding: EdgeInsets.all(2),
+            ),
+          if (!compressed)
+            Text(val.toInt().toString(),
+                style: Theme.of(context).textTheme.caption),
         ],
       );
 

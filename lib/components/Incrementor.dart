@@ -1,6 +1,7 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:teamtrack/components/BarGraph.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/models/GameModel.dart';
@@ -19,6 +20,7 @@ class Incrementor extends StatefulWidget {
     this.mutableIncrement,
     this.mutableDecrement,
     this.path,
+    this.max = 0,
   }) : super(key: key);
   final ScoringElement element;
   final void Function() onPressed;
@@ -28,6 +30,7 @@ class Incrementor extends StatefulWidget {
   final Event? event;
   final Score? score;
   final String? path;
+  final double max;
   @override
   State<StatefulWidget> createState() => _Incrementor();
 }
@@ -229,35 +232,49 @@ class _Incrementor extends State<Incrementor> {
       color: widget.backgroundColor,
       child: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 5),
-            child: widget.element.id == null
-                ? Row(
-                    children: [
-                      Text(widget.element.name),
-                      Spacer(),
-                      if (!widget.element.isBool)
-                        buildIncrementor()
-                      else
-                        buildSwitch()
-                    ],
-                  )
-                : Padding(
-                    padding: const EdgeInsets.only(bottom: 10.0),
-                    child: Column(
+          widget.element.id == null
+              ? Column(
+                  children: [
+                    Row(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.all(5.0),
+                          padding: const EdgeInsets.only(left: 5.0),
                           child: Text(widget.element.name),
                         ),
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width,
-                          child: buildPicker(),
-                        )
+                        Spacer(),
+                        if (!widget.element.isBool)
+                          buildIncrementor()
+                        else
+                          buildSwitch()
                       ],
                     ),
+                    if (widget.max != 0 && !widget.element.isBool)
+                      BarGraph(
+                        val: widget.element.count.toDouble(),
+                        max: widget.max,
+                        vertical: false,
+                        height: MediaQuery.of(context).size.width,
+                        width: 4,
+                        compressed: true,
+                        showPercentage: false,
+                      ),
+                  ],
+                )
+              : Padding(
+                  padding: const EdgeInsets.only(bottom: 10.0),
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: Text(widget.element.name),
+                      ),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width,
+                        child: buildPicker(),
+                      )
+                    ],
                   ),
-          ),
+                ),
           Divider(
             height: 3,
             thickness: 2,

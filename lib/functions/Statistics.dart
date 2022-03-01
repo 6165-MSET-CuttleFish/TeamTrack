@@ -154,7 +154,7 @@ extension MatchExtensions on List<Match> {
   double maxScore(bool showPenalties) => this
       .toList()
       .map((e) => e.getMaxScoreVal(showPenalties: showPenalties))
-      .reduce(max)
+      .maxValue()
       .toDouble();
 }
 
@@ -250,7 +250,15 @@ extension TeamsExtension on Map<String, Team> {
     return this
         .values
         .map((e) => e.scores.maxScore(dice, removeOutliers, type))
-        .reduce(max);
+        .maxValue();
+  }
+
+  double minScore(Dice? dice, bool removeOutliers, OpModeType? type) {
+    if (this.length == 0) return 0;
+    return this
+        .values
+        .map((e) => e.scores.minScore(dice, removeOutliers, type))
+        .minValue();
   }
 
   double maxMeanScore(Dice? dice, bool removeOutliers, OpModeType? type) {
@@ -258,7 +266,7 @@ extension TeamsExtension on Map<String, Team> {
     return this
         .values
         .map((e) => e.scores.meanScore(dice ?? Dice.none, removeOutliers, type))
-        .reduce(max);
+        .maxValue();
   }
 
   double maxMedianScore(Dice? dice, bool removeOutliers, OpModeType? type) {
@@ -268,7 +276,7 @@ extension TeamsExtension on Map<String, Team> {
         .map((e) =>
             e.scores.medianScore(dice ?? Dice.none, removeOutliers, type))
         .toList();
-    return x.reduce(max);
+    return x.maxValue();
   }
 
   double lowestStandardDeviationScore(
@@ -291,7 +299,7 @@ extension ScoreDivExtension on List<ScoreDivision> {
     return arr
         .map((e) => e.total().toDouble())
         .removeOutliers(removeOutliers)
-        .reduce(max)
+        .maxValue()
         .toDouble();
   }
 
@@ -310,7 +318,7 @@ extension ScoreDivExtension on List<ScoreDivision> {
     return arr
         .map((e) => e.total().toDouble())
         .removeOutliers(removeOutliers)
-        .reduce(min)
+        .minValue()
         .toDouble();
   }
 
@@ -377,7 +385,7 @@ extension ScoresExtension on Map<String, Score> {
     return 0;
   }
 
-  double minScore(Dice dice, bool removeOutliers, OpModeType? type) {
+  double minScore(Dice? dice, bool removeOutliers, OpModeType? type) {
     final arr = this.diceScores(dice);
     if (arr.length == 0) return 0;
     var temp = arr
