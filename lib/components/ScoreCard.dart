@@ -93,7 +93,22 @@ class ScoreCard extends StatelessWidget {
               .maxValue(),
         )
         .maxValue();
-    return CardView(
+    final maxY = [
+      event.matches.values
+          .toList()
+          .maxAllianceScore(type: type, dice: dice)
+          .toDouble(),
+      team.targetScore?.getScoreDivision(type).total() ?? 0
+    ].maxValue();
+    final minY = [
+      event.teams.minScore(
+        dice,
+        event.statConfig.removeOutliers,
+        type,
+      ),
+      team.targetScore?.getScoreDivision(type).total() ?? 0,
+    ].minValue();
+    final card = CardView(
       isActive: scoreDivisions.diceScores(dice).length > 1,
       child: Padding(
         padding: EdgeInsets.only(left: 5, right: 5),
@@ -211,21 +226,8 @@ class ScoreCard extends StatelessWidget {
                         border: Border.all(
                             color: const Color(0xff37434d), width: 1),
                       ),
-                      minY: [
-                        event.teams.minScore(
-                          dice,
-                          event.statConfig.removeOutliers,
-                          type,
-                        ),
-                        team.targetScore?.getScoreDivision(type).total() ?? 0,
-                      ].minValue(), // TODO: If minY == maxY, shit breaks
-                      maxY: [
-                        event.matches.values
-                            .toList()
-                            .maxAllianceScore(type: type, dice: dice)
-                            .toDouble(),
-                        team.targetScore?.getScoreDivision(type).total() ?? 0
-                      ].maxValue(),
+                      minY: minY == maxY ? null : minY,
+                      maxY: minY == maxY ? minY + 20 : maxY,
                       lineBarsData: [
                         if (matches != null)
                           LineChartBarData(
@@ -297,5 +299,6 @@ class ScoreCard extends StatelessWidget {
             )
           : Text(''),
     );
+    return card;
   }
 }

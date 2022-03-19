@@ -69,19 +69,35 @@ class _Incrementor extends State<Incrementor> {
               for (int i = 1;
                   i < (widget.element.nestedElements?.length ?? 0);
                   i++) {
-                (mutableData as Map?)?[widget.element.nestedElements?[i].key] =
-                    {
-                  'count': 0,
-                  'misses': 0,
-                };
+                var ref = (mutableData
+                    as Map?)?[widget.element.nestedElements?[i].key];
+                if (ref is Map) {
+                  mutableData?[widget.element.nestedElements?[i].key] = {
+                    'count': 0,
+                    'misses': 0,
+                  };
+                } else {
+                  mutableData?[widget.element.nestedElements?[i].key] = 0;
+                }
               }
               if (widget.element.count != 0) {
-                (mutableData as Map?)?[widget.element
-                    .nestedElements?[widget.element.count].key]['misses'] = 1;
+                var ref = (mutableData as Map?)?[
+                    widget.element.nestedElements?[widget.element.count].key];
+                if (ref is Map && val == 0) {
+                  mutableData?[widget.element
+                      .nestedElements?[widget.element.count].key]['misses'] = 1;
+                }
               }
-              if (val != 0)
-                (mutableData as Map?)?[widget.element.nestedElements?[val].key]
-                    ['count'] = 1;
+              if (val != 0) {
+                var ref = (mutableData
+                    as Map?)?[widget.element.nestedElements?[val].key];
+                if (ref is Map) {
+                  mutableData?[widget.element.nestedElements?[val].key]
+                      ['count'] = 1;
+                } else {
+                  mutableData?[widget.element.nestedElements?[val].key] = 1;
+                }
+              }
               return Transaction.success(mutableData);
             });
         },
@@ -105,14 +121,25 @@ class _Incrementor extends State<Incrementor> {
                       ?.getRef()
                       ?.child(widget.path!)
                       .runTransaction((mutableData) {
-                    (mutableData as Map?)?[widget.element.key]['count'] = val
-                        ? (widget.element.count < widget.element.max!() ? 1 : 0)
-                        : 0;
-                    (mutableData)?[widget.element.key]['misses'] =
-                        mutableData[widget.element.key]['count'] ==
-                                widget.element.min!()
-                            ? 1
-                            : 0;
+                    var ref = (mutableData as Map?)?[widget.element.key];
+                    if (ref is Map) {
+                      mutableData?[widget.element.key]['count'] = val
+                          ? (widget.element.count < widget.element.max!()
+                              ? 1
+                              : 0)
+                          : 0;
+                      mutableData?[widget.element.key]['misses'] =
+                          mutableData[widget.element.key]['count'] ==
+                                  widget.element.min!()
+                              ? 1
+                              : 0;
+                    } else {
+                      mutableData?[widget.element.key] = val
+                          ? (widget.element.count < widget.element.max!()
+                              ? 1
+                              : 0)
+                          : 0;
+                    }
                     return Transaction.success(mutableData);
                   });
               }
@@ -122,6 +149,42 @@ class _Incrementor extends State<Incrementor> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           RawMaterialButton(
+            onLongPress: widget.event?.role != Role.viewer
+                ? (widget.element.count > widget.element.min!()
+                    ? () async {
+                        if (!(widget.event?.shared ?? false)) {
+                          widget.element.misses--;
+                          setState(widget.element.decrement);
+                          if (widget.onDecrement != null) widget.onDecrement!();
+                        }
+                        widget.onPressed();
+                        if (widget.path != null)
+                          await widget.event
+                              ?.getRef()
+                              ?.child(widget.path!)
+                              .runTransaction(
+                            (mutableData) {
+                              if (widget.mutableDecrement != null) {
+                                return widget.mutableDecrement!(mutableData);
+                              }
+                              var ref =
+                                  (mutableData as Map?)?[widget.element.key];
+                              if (ref is Map) {
+                                if (ref['count'] > widget.element.min!())
+                                  mutableData?[widget.element.key]['count'] =
+                                      ref['count'] -
+                                          widget.element.decrementValue;
+                              } else {
+                                if (ref > widget.element.min!())
+                                  mutableData?[widget.element.key] =
+                                      ref - widget.element.decrementValue;
+                              }
+                              return Transaction.success(mutableData);
+                            },
+                          );
+                      }
+                    : null)
+                : null,
             onPressed: widget.event?.role != Role.viewer
                 ? (widget.element.count > widget.element.min!()
                     ? () async {
@@ -141,10 +204,22 @@ class _Incrementor extends State<Incrementor> {
                               }
                               var ref =
                                   (mutableData as Map?)?[widget.element.key];
-                              if (ref > widget.element.min!())
-                                mutableData?[widget.element.key]['count'] =
-                                    (ref is Map ? ref['count'] : ref) -
-                                        widget.element.decrementValue;
+                              if (ref is Map) {
+                                if (ref['count'] > widget.element.min!()) {
+                                  mutableData?[widget.element.key]['count'] =
+                                      ref['count'] -
+                                          widget.element.decrementValue;
+                                  mutableData?[widget.element.key]['misses'] =
+                                      ref['misses'] + 1;
+                                }
+                              } else {
+                                if (ref > widget.element.min!()) {
+                                  mutableData?[widget.element.key] =
+                                      ref - widget.element.decrementValue;
+                                  mutableData?[widget.element.key]['misses'] =
+                                      1;
+                                }
+                              }
                               return Transaction.success(mutableData);
                             },
                           );
@@ -184,10 +259,16 @@ class _Incrementor extends State<Incrementor> {
                               }
                               var ref =
                                   (mutableData as Map?)?[widget.element.key];
-                              if (ref < widget.element.max!())
-                                mutableData?[widget.element.key]['count'] =
-                                    (ref is Map ? ref['count'] : ref) +
-                                        widget.element.incrementValue;
+                              if (ref is Map) {
+                                if (ref['count'] < widget.element.max!())
+                                  mutableData?[widget.element.key]['count'] =
+                                      ref['count'] +
+                                          widget.element.incrementValue;
+                              } else {
+                                if (ref < widget.element.max!())
+                                  mutableData?[widget.element.key] =
+                                      ref + widget.element.incrementValue;
+                              }
                               return Transaction.success(mutableData);
                             },
                           );
@@ -238,10 +319,36 @@ class _Incrementor extends State<Incrementor> {
                                   ?.child(widget.path!)
                                   .runTransaction(
                                 (mutableData) {
-                                  (mutableData as Map?)?[widget.element.key] = {
-                                    'count': widget.element.min!(),
-                                    'misses': 0,
-                                  };
+                                  if (widget.element.isBool &&
+                                      widget.element.nestedElements != null) {
+                                    for (final nestedElement
+                                        in widget.element.nestedElements!) {
+                                      if (nestedElement.key != null) {
+                                        final ref = (mutableData
+                                            as Map?)?[nestedElement.key];
+                                        if (ref is Map) {
+                                          mutableData?[nestedElement.key]
+                                              ['misses'] = 0;
+                                          mutableData?[nestedElement.key]
+                                              ['count'] = 0;
+                                        } else {
+                                          mutableData?[nestedElement.key] = 0;
+                                        }
+                                      }
+                                    }
+                                    return Transaction.success(mutableData);
+                                  }
+                                  final ref = (mutableData
+                                      as Map?)?[widget.element.key];
+                                  if (ref is Map) {
+                                    mutableData?[widget.element.key] = {
+                                      'count': widget.element.min!(),
+                                      'misses': 0,
+                                    };
+                                  } else {
+                                    mutableData?[widget.element.key] =
+                                        widget.element.min!();
+                                  }
                                   return Transaction.success(mutableData);
                                 },
                               );
@@ -279,8 +386,27 @@ class _Incrementor extends State<Incrementor> {
                                   ?.getRef()
                                   ?.child(widget.path!)
                                   .runTransaction((mutableData) {
-                                (mutableData as Map?)?[widget.element.key]
-                                    ['misses'] = 0;
+                                if (widget.element.isBool &&
+                                    widget.element.nestedElements != null) {
+                                  for (final nestedElement
+                                      in widget.element.nestedElements!) {
+                                    if (nestedElement.key != null) {
+                                      final ref = (mutableData
+                                          as Map?)?[nestedElement.key];
+                                      if (ref is Map) {
+                                        mutableData?[nestedElement.key]
+                                            ['misses'] = 0;
+                                      }
+                                    }
+                                  }
+                                  return Transaction.success(mutableData);
+                                }
+                                final ref =
+                                    (mutableData as Map?)?[widget.element.key];
+                                if (ref is Map) {
+                                  mutableData?[widget.element.key]['misses'] =
+                                      0;
+                                }
                                 return Transaction.success(mutableData);
                               });
                             Navigator.pop(context);

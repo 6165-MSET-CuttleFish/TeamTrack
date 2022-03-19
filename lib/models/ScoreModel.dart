@@ -360,7 +360,7 @@ class AutoScore extends ScoreDivision {
     maxSet();
   }
   Map<String, dynamic> toJson() =>
-      elements.map((key, value) => MapEntry(key, value.count));
+      elements.map((key, value) => MapEntry(key, value.toJson()));
 }
 
 /// This class is used to represent the teleop score structure of traditional and remote FTC events.
