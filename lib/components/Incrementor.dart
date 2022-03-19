@@ -37,7 +37,7 @@ class Incrementor extends StatefulWidget {
 
 class _Incrementor extends State<Incrementor> {
   CupertinoSegmentedControl buildPicker() => CupertinoSegmentedControl<int>(
-        groupValue: widget.element.count,
+        groupValue: widget.element.didAttempt() ? widget.element.count : null,
         children: widget.element.nestedElements?.asMap().map(
                   (key, value) => MapEntry(
                     key,
@@ -53,8 +53,12 @@ class _Incrementor extends State<Incrementor> {
                 i < (widget.element.nestedElements?.length ?? 0);
                 i++) {
               widget.element.nestedElements?[i].count = 0;
+              widget.element.nestedElements?[i].misses = 0;
             }
             widget.element.nestedElements?[val].count = 1;
+            if (widget.element.count != 0) {
+              widget.element.nestedElements?[widget.element.count].misses = 1;
+            }
           }
           widget.onPressed();
           if (widget.path != null)
@@ -66,11 +70,18 @@ class _Incrementor extends State<Incrementor> {
                   i < (widget.element.nestedElements?.length ?? 0);
                   i++) {
                 (mutableData as Map?)?[widget.element.nestedElements?[i].key] =
-                    0;
+                    {
+                  'count': 0,
+                  'misses': 0,
+                };
+              }
+              if (widget.element.count != 0) {
+                (mutableData as Map?)?[widget.element
+                    .nestedElements?[widget.element.count].key]['misses'] = 1;
               }
               if (val != 0)
-                (mutableData
-                    as Map?)?[widget.element.nestedElements?[val].key] = 1;
+                (mutableData as Map?)?[widget.element.nestedElements?[val].key]
+                    ['count'] = 1;
               return Transaction.success(mutableData);
             });
         },
@@ -80,10 +91,13 @@ class _Incrementor extends State<Incrementor> {
         onChanged: widget.event?.role != Role.viewer
             ? (val) async {
                 if (!(widget.event?.shared ?? false)) {
-                  if (val && widget.element.count < widget.element.max!())
+                  if (val && widget.element.count < widget.element.max!()) {
                     widget.element.count = 1;
-                  else
+                    widget.element.misses = 0;
+                  } else {
                     widget.element.count = 0;
+                    widget.element.misses = 1;
+                  }
                 }
                 widget.onPressed();
                 if (widget.path != null)
@@ -91,9 +105,14 @@ class _Incrementor extends State<Incrementor> {
                       ?.getRef()
                       ?.child(widget.path!)
                       .runTransaction((mutableData) {
-                    (mutableData as Map?)?[widget.element.key] = val
+                    (mutableData as Map?)?[widget.element.key]['count'] = val
                         ? (widget.element.count < widget.element.max!() ? 1 : 0)
                         : 0;
+                    (mutableData)?[widget.element.key]['misses'] =
+                        mutableData[widget.element.key]['count'] ==
+                                widget.element.min!()
+                            ? 1
+                            : 0;
                     return Transaction.success(mutableData);
                   });
               }
@@ -103,51 +122,6 @@ class _Incrementor extends State<Incrementor> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           RawMaterialButton(
-            onLongPress: widget.event?.role != Role.viewer
-                ? (widget.element.count > widget.element.min!()
-                    ? () {
-                        showPlatformDialog(
-                          context: context,
-                          builder: (context) => PlatformAlert(
-                            title: Text("Reset Field"),
-                            content: Text("Are you sure?"),
-                            actions: [
-                              PlatformDialogAction(
-                                child: Text("Cancel"),
-                                onPressed: () => Navigator.pop(context),
-                              ),
-                              PlatformDialogAction(
-                                child: Text("Confirm"),
-                                isDestructive: true,
-                                onPressed: () async {
-                                  if (!(widget.event?.shared ?? false)) {
-                                    setState(() => widget.element.count =
-                                        widget.element.min!());
-                                    if (widget.onDecrement != null)
-                                      widget.onDecrement!();
-                                  }
-                                  widget.onPressed();
-                                  if (widget.path != null)
-                                    await widget.event
-                                        ?.getRef()
-                                        ?.child(widget.path!)
-                                        .runTransaction(
-                                      (mutableData) {
-                                        (mutableData
-                                                as Map?)?[widget.element.key] =
-                                            widget.element.min!();
-                                        return Transaction.success(mutableData);
-                                      },
-                                    );
-                                  Navigator.pop(context);
-                                },
-                              )
-                            ],
-                          ),
-                        );
-                      }
-                    : null)
-                : null,
             onPressed: widget.event?.role != Role.viewer
                 ? (widget.element.count > widget.element.min!()
                     ? () async {
@@ -168,8 +142,9 @@ class _Incrementor extends State<Incrementor> {
                               var ref =
                                   (mutableData as Map?)?[widget.element.key];
                               if (ref > widget.element.min!())
-                                mutableData?[widget.element.key] =
-                                    (ref ?? 0) - widget.element.decrementValue;
+                                mutableData?[widget.element.key]['count'] =
+                                    (ref is Map ? ref['count'] : ref) -
+                                        widget.element.decrementValue;
                               return Transaction.success(mutableData);
                             },
                           );
@@ -210,8 +185,9 @@ class _Incrementor extends State<Incrementor> {
                               var ref =
                                   (mutableData as Map?)?[widget.element.key];
                               if (ref < widget.element.max!())
-                                mutableData?[widget.element.key] =
-                                    (ref ?? 0) + widget.element.incrementValue;
+                                mutableData?[widget.element.key]['count'] =
+                                    (ref is Map ? ref['count'] : ref) +
+                                        widget.element.incrementValue;
                               return Transaction.success(mutableData);
                             },
                           );
@@ -228,58 +204,174 @@ class _Incrementor extends State<Incrementor> {
       );
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: widget.backgroundColor,
-      child: Column(
-        children: [
-          widget.element.id == null
-              ? Column(
-                  children: [
-                    Row(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(left: 5.0),
-                          child: Text(widget.element.name),
+    return RawMaterialButton(
+      onLongPress: widget.event?.role != Role.viewer
+          ? (widget.element.count > widget.element.min!() ||
+                  widget.element.misses > 0
+              ? () {
+                  showPlatformDialog(
+                    context: context,
+                    builder: (context) => PlatformAlert(
+                      title: Text("Reset Field"),
+                      content: Text("Are you sure?"),
+                      actions: [
+                        PlatformDialogAction(
+                          child: Text("Cancel"),
+                          onPressed: () => Navigator.pop(context),
                         ),
-                        Spacer(),
-                        if (!widget.element.isBool)
-                          buildIncrementor()
-                        else
-                          buildSwitch()
+                        PlatformDialogAction(
+                          child: Text("Confirm"),
+                          isDestructive: true,
+                          onPressed: () async {
+                            if (!(widget.event?.shared ?? false)) {
+                              setState(() {
+                                widget.element.count = widget.element.min!();
+                                widget.element.misses = 0;
+                              });
+                              if (widget.onDecrement != null)
+                                widget.onDecrement!();
+                            }
+                            widget.onPressed();
+                            if (widget.path != null)
+                              await widget.event
+                                  ?.getRef()
+                                  ?.child(widget.path!)
+                                  .runTransaction(
+                                (mutableData) {
+                                  (mutableData as Map?)?[widget.element.key] = {
+                                    'count': widget.element.min!(),
+                                    'misses': 0,
+                                  };
+                                  return Transaction.success(mutableData);
+                                },
+                              );
+                            Navigator.pop(context);
+                          },
+                        )
                       ],
                     ),
-                    if (widget.max != 0 && !widget.element.isBool)
-                      BarGraph(
-                        val: widget.element.count.toDouble(),
-                        max: widget.max,
-                        vertical: false,
-                        height: MediaQuery.of(context).size.width,
-                        width: 4,
-                        compressed: true,
-                        showPercentage: false,
+                  );
+                }
+              : null)
+          : null,
+      onPressed: widget.event?.role != Role.viewer
+          ? (widget.element.misses > 0
+              ? () => showPlatformDialog(
+                    context: context,
+                    builder: (_) => PlatformAlert(
+                      title: Text('Reset Misses'),
+                      content: Text('Are you sure?'),
+                      actions: [
+                        PlatformDialogAction(
+                          child: Text('Cancel'),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                        PlatformDialogAction(
+                          child: Text('Confirm'),
+                          isDestructive: true,
+                          onPressed: () async {
+                            if (!(widget.event?.shared ?? false)) {
+                              setState(() => widget.element.misses = 0);
+                            }
+                            widget.onPressed();
+                            if (widget.path != null)
+                              await widget.event
+                                  ?.getRef()
+                                  ?.child(widget.path!)
+                                  .runTransaction((mutableData) {
+                                (mutableData as Map?)?[widget.element.key]
+                                    ['misses'] = 0;
+                                return Transaction.success(mutableData);
+                              });
+                            Navigator.pop(context);
+                          },
+                        )
+                      ],
+                    ),
+                  )
+              : null)
+          : null,
+      fillColor:
+          widget.element.didAttempt() ? Colors.green.withOpacity(0.3) : null,
+      child: Container(
+        color: widget.backgroundColor,
+        child: Column(
+          children: [
+            if (!widget.element.isBool &&
+                widget.element.id != null &&
+                widget.element.nestedElements != null)
+              ExpansionTile(
+                title: Text(widget.element.name),
+                initiallyExpanded: true,
+                children: widget.element.nestedElements!
+                    .map(
+                      (e) => Incrementor(
+                        element: e,
+                        onPressed: widget.onPressed,
                       ),
-                  ],
-                )
-              : Padding(
-                  padding: const EdgeInsets.only(bottom: 10.0),
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(5.0),
-                        child: Text(widget.element.name),
+                    )
+                    .toList(),
+              )
+            else
+              widget.element.nestedElements == null ||
+                      (widget.element.nestedElements?.length ?? 0) == 0
+                  ? Column(
+                      children: [
+                        Row(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(left: 5.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(widget.element.name),
+                                  Text(
+                                    "Missed: ${widget.element.misses}",
+                                    style: Theme.of(context).textTheme.caption,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Spacer(),
+                            if (!widget.element.isBool)
+                              buildIncrementor()
+                            else
+                              buildSwitch()
+                          ],
+                        ),
+                        if (widget.max != 0 && !widget.element.isBool)
+                          BarGraph(
+                            val: widget.element.count.toDouble(),
+                            max: widget.max,
+                            vertical: false,
+                            height: MediaQuery.of(context).size.width,
+                            width: 4,
+                            compressed: true,
+                            showPercentage: false,
+                          ),
+                      ],
+                    )
+                  : Padding(
+                      padding: const EdgeInsets.only(bottom: 10.0),
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(5.0),
+                            child: Text(widget.element.name),
+                          ),
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width,
+                            child: buildPicker(),
+                          )
+                        ],
                       ),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width,
-                        child: buildPicker(),
-                      )
-                    ],
-                  ),
-                ),
-          Divider(
-            height: 3,
-            thickness: 2,
-          ),
-        ],
+                    ),
+            Divider(
+              height: 3,
+              thickness: 2,
+            ),
+          ],
+        ),
       ),
     );
   }

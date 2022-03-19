@@ -4,6 +4,168 @@ import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/models/GameModel.dart';
 
 /// This class is used to represent the scoring structure of traditional and remote FTC events.
+Map<String, dynamic> absRef = {
+  "AutoScore": {
+    "DuckDelivered": {
+      "name": "Duck Delivered",
+      "min": 0,
+      "max": 1,
+      "value": 10,
+      "isBool": true
+    },
+    "PartialParkStorage": {
+      "name": "Partial",
+      "id": "Storage Park",
+      "min": 0,
+      "maxIsReference": true,
+      "max": {"total": 1, "reference": "FullParkStorage"},
+      "value": 3,
+      "isBool": true
+    },
+    "FullParkStorage": {
+      "name": "Full",
+      "id": "Storage Park",
+      "min": 0,
+      "maxIsReference": true,
+      "max": {"total": 1, "reference": "PartialParkStorage"},
+      "value": 6,
+      "isBool": true
+    },
+    "PartialParkWarehouse": {
+      "name": "Partial",
+      "id": "Warehouse Park",
+      "min": 0,
+      "maxIsReference": true,
+      "max": {"total": 1, "reference": "FullParkWarehouse"},
+      "value": 5,
+      "isBool": true
+    },
+    "FullParkWarehouse": {
+      "name": "Full",
+      "id": "Warehouse Park",
+      "min": 0,
+      "maxIsReference": true,
+      "max": {"total": 1, "reference": "PartialParkWarehouse"},
+      "value": 10,
+      "isBool": true
+    },
+    "FreightInStorage": {
+      "name": "Storage Freight",
+      "min": 0,
+      "max": 999,
+      "value": 2
+    },
+    "FreightInHub": {"name": "Hub Freight", "min": 0, "max": 999, "value": 6},
+    "DuckLevelBonus": {
+      "name": "Duck",
+      "id": "Bonus",
+      "min": 0,
+      "maxIsReference": true,
+      "max": {"total": 1, "reference": "ShippingLevelBonus"},
+      "value": 10,
+      "isBool": true
+    },
+    "ShippingLevelBonus": {
+      "name": "Team Element",
+      "id": "Bonus",
+      "min": 0,
+      "maxIsReference": true,
+      "max": {"total": 1, "reference": "DuckLevelBonus"},
+      "value": 20,
+      "isBool": true
+    }
+  },
+  "TeleScore": {
+    "sharedFreight": {
+      "name": "Freight in Shared Hub",
+      "min": 0,
+      "max": 999,
+      "value": 4
+    },
+    "lvl3": {
+      "name": "Level 3",
+      "min": 0,
+      "max": 999,
+      "value": 6,
+      "id": "Alliance Hub"
+    },
+    "lvl2": {
+      "name": "Level 2",
+      "min": 0,
+      "max": 999,
+      "value": 4,
+      "id": "Alliance Hub"
+    },
+    "lvl1": {
+      "name": "Level 1",
+      "min": 0,
+      "max": 999,
+      "value": 2,
+      "id": "Alliance Hub"
+    },
+    "storageFreight": {
+      "name": "Freight in Storage Unit",
+      "min": 0,
+      "max": 999,
+      "value": 1
+    }
+  },
+  "EndgameScore": {
+    "DucksDelivered": {
+      "name": "Ducks Delivered",
+      "min": 0,
+      "max": 10,
+      "value": 6
+    },
+    "PartialWarehouseParked": {
+      "name": "Partial",
+      "id": "Warehouse Park",
+      "min": 0,
+      "maxIsReference": true,
+      "max": {"total": 1, "reference": "FullWarehouseParked"},
+      "value": 3,
+      "isBool": true
+    },
+    "FullWarehouseParked": {
+      "name": "Full",
+      "id": "Warehouse Park",
+      "min": 0,
+      "maxIsReference": true,
+      "max": {"total": 1, "reference": "PartialWarehouseParked"},
+      "value": 6,
+      "isBool": true
+    },
+    "Element": {
+      "name": "Team Element Capped",
+      "min": 0,
+      "max": 1,
+      "value": 15,
+      "isBool": true
+    }
+  },
+  "Dice": {"1": "Left", "2": "Middle", "3": "Right", "name": "Barcode"},
+  "Alliance": {
+    "AutoScore": {},
+    "TeleScore": {},
+    "EndgameScore": {
+      "AllianceHubBalanced": {
+        "name": "Alliance Hub Balanced",
+        "min": 0,
+        "max": 1,
+        "value": 10,
+        "isBool": true
+      },
+      "SharedHubTipped": {
+        "name": "Shared Hub Tipped",
+        "min": 0,
+        "max": 1,
+        "value": 20,
+        "isBool": true
+      }
+    }
+  }
+};
+
 class Score extends ScoreDivision implements Comparable<Score> {
   late TeleScore teleScore;
   late AutoScore autoScore;
@@ -14,9 +176,7 @@ class Score extends ScoreDivision implements Comparable<Score> {
   late Dice dice;
   bool isAllianceScore;
   Score(this.id, this.dice, this.gameName, {this.isAllianceScore = false}) {
-    var ref = isAllianceScore
-        ? json.decode(remoteConfig.getString(gameName))['Alliance']
-        : json.decode(remoteConfig.getString(gameName));
+    var ref = isAllianceScore ? absRef['Alliance'] : absRef;
     teleScore = TeleScore(ref['TeleScore']);
     autoScore = AutoScore(ref['AutoScore']);
     endgameScore = EndgameScore(ref['EndgameScore']);
@@ -86,20 +246,20 @@ class Score extends ScoreDivision implements Comparable<Score> {
 
   Score.fromJson(Map<String, dynamic> map, this.gameName,
       {this.isAllianceScore = false}) {
-    var ref = isAllianceScore
-        ? json.decode(remoteConfig.getString(gameName))['Alliance']
-        : json.decode(remoteConfig.getString(gameName));
-    autoScore = map['AutoScore'] != null
+    Map<String, dynamic> ref = isAllianceScore ? absRef['Alliance'] : absRef;
+    autoScore = map['AutoScore'] != null && (map['AutoScore'] as Map).isNotEmpty
         ? AutoScore.fromJson(map['AutoScore'], ref['AutoScore'])
         : AutoScore(ref['AutoScore']);
-    teleScore = map['TeleScore'] != null
+    teleScore = map['TeleScore'] != null && (map['TeleScore'] as Map).isNotEmpty
         ? TeleScore.fromJson(map['TeleScore'], ref['TeleScore'])
         : TeleScore(ref['TeleScore']);
-    endgameScore = map['EndgameScore'] != null
-        ? EndgameScore.fromJson(map['EndgameScore'], ref['EndgameScore'])
-        : EndgameScore(ref['EndgameScore']);
+    endgameScore =
+        map['EndgameScore'] != null && (map['EndgameScore'] as Map).isNotEmpty
+            ? EndgameScore.fromJson(map['EndgameScore'], ref['EndgameScore'])
+            : EndgameScore(ref['EndgameScore']);
     penalties = Penalty.fromJson(map['Penalty']);
     id = map['id'];
+    setDice(Dice.one, Timestamp.now());
   }
   Map<String, dynamic> toJson() => {
         'AutoScore': autoScore.toJson(),
@@ -135,7 +295,7 @@ class AutoScore extends ScoreDivision {
     elements[key]?.count = n;
   }
 
-  Map<String, dynamic> ref;
+  dynamic ref;
   List<ScoringElement> getElements() => elements.values.toList();
   Dice getDice() => dice;
   AutoScore(this.ref) {
@@ -187,7 +347,8 @@ class AutoScore extends ScoreDivision {
       (e) {
         elements[e] = ScoringElement(
           name: ref[e]['name'] ?? e,
-          count: map[e] ?? 0,
+          count: map[e] is Map ? map[e]['count'] : map[e],
+          misses: map[e] is Map ? map[e]['misses'] : 0,
           min: () => ref[e]['min'] ?? 0,
           value: ref[e]['value'] ?? 1,
           isBool: ref[e]['isBool'] ?? false,
@@ -249,7 +410,7 @@ class TeleScore extends ScoreDivision {
   ScoringElement misses =
       ScoringElement(name: "Misses", value: 1, key: 'Misses');
   Dice getDice() => dice;
-  Map<String, dynamic> ref;
+  dynamic ref;
   TeleScore(this.ref) {
     ref.keys.forEach(
       (e) {
@@ -305,7 +466,8 @@ class TeleScore extends ScoreDivision {
       (e) {
         elements[e] = ScoringElement(
           name: ref[e]['name'] ?? e,
-          count: map[e] ?? 0,
+          count: map[e] is Map ? map[e]['count'] : map[e],
+          misses: map[e] is Map ? map[e]['misses'] : 0,
           min: () => ref[e]['min'] ?? 0,
           value: ref[e]['value'] ?? 1,
           isBool: ref[e]['isBool'] ?? false,
@@ -322,13 +484,17 @@ class TeleScore extends ScoreDivision {
       cycleTimes = [];
     }
     misses = ScoringElement(
-        name: 'Misses', count: map['Misses'] ?? 0, key: 'Misses', value: 1);
+      name: 'Misses',
+      count: map['Misses'] is Map ? map['Misses']['count'] : map['Misses'],
+      key: 'Misses',
+      value: 1,
+    );
 
     maxSet();
   }
   Map<String, dynamic> toJson() => {
-        ...elements.map((key, value) => MapEntry(key, value.count)),
-        'Misses': misses.count,
+        ...elements.map((key, value) => MapEntry(key, value.toJson())),
+        'Misses': misses.toJson(),
         'CycleTimes': json.encode(cycleTimes),
       };
 }
@@ -345,7 +511,7 @@ class EndgameScore extends ScoreDivision {
   late Dice dice;
   Map<String, ScoringElement> elements = Map();
   List<ScoringElement> getElements() => elements.values.toList();
-  Map<String, dynamic> ref;
+  dynamic ref;
   Dice getDice() => dice;
   EndgameScore(this.ref) {
     ref.keys.forEach(
@@ -400,7 +566,8 @@ class EndgameScore extends ScoreDivision {
       (e) {
         elements[e] = ScoringElement(
           name: ref[e]['name'] ?? e,
-          count: json[e] ?? 0,
+          count: json[e] is Map ? json[e]['count'] : json[e],
+          misses: json[e] is Map ? json[e]['misses'] : 0,
           min: () => ref[e]['min'] ?? 0,
           value: ref[e]['value'] ?? 1,
           isBool: ref[e]['isBool'] ?? false,
@@ -412,7 +579,7 @@ class EndgameScore extends ScoreDivision {
     maxSet();
   }
   Map<String, dynamic> toJson() =>
-      elements.map((key, value) => MapEntry(key, value.count));
+      elements.map((key, value) => MapEntry(key, value.toJson()));
 }
 
 /// This class is used to represent the penalty structure of traditional and remote FTC events.
@@ -456,18 +623,20 @@ class Penalty extends ScoreDivision {
       : majorPenalty = ScoringElement(
           name: 'Major Penalty',
           value: -30,
-          count: json['major'],
+          count: json['major'] is Map ? json['major']['count'] : json['major'],
+          misses: json['major'] is Map ? json['major']['misses'] : 0,
           key: 'major',
         ),
         minorPenalty = ScoringElement(
           name: 'Minor Penalty',
           value: -10,
-          count: json['minor'],
+          count: json['minor'] is Map ? json['minor']['count'] : json['minor'],
+          misses: json['minor'] is Map ? json['minor']['misses'] : 0,
           key: 'minor',
         );
   Map<String, dynamic> toJson() => {
-        'major': majorPenalty.count,
-        'minor': minorPenalty.count,
+        'major': majorPenalty.toJson(),
+        'minor': minorPenalty.toJson(),
       };
 }
 
@@ -476,6 +645,7 @@ class ScoringElement {
   ScoringElement({
     this.name = '',
     this.count = 0,
+    this.misses = 0,
     this.value = 1,
     this.min,
     this.max,
@@ -489,6 +659,7 @@ class ScoringElement {
   String name;
   String? key;
   int count;
+  int misses;
   int value;
   String? id;
   List<ScoringElement>? nestedElements;
@@ -507,6 +678,10 @@ class ScoringElement {
 
   int scoreValue() => count * value;
 
+  bool didAttempt() => misses > 0 || count > 0;
+
+  int totalAttempted() => count + misses;
+
   void increment() {
     if (count < max!()) {
       count += incrementValue;
@@ -518,12 +693,19 @@ class ScoringElement {
     if (count > min!()) {
       count -= decrementValue;
       count = count.clamp(min!(), max!());
+      misses++;
     }
   }
+
+  Map<String, dynamic> toJson() => {
+        'count': count,
+        'misses': misses,
+      };
 
   ScoringElement operator +(ScoringElement other) {
     return ScoringElement(
       count: other.count + count,
+      misses: other.misses + misses,
       value: value,
       key: other.key,
       name: name,
@@ -546,4 +728,5 @@ abstract class ScoreDivision {
   List<ScoringElement> getElements(); // get the scoring elements
   late Timestamp timeStamp; // the time stamp of the Score object
   void reset(); // reset the scoring elements
+  bool robotDisconnected = false; // whether the robot disconnected
 }

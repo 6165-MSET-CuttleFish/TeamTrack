@@ -80,12 +80,17 @@ extension MergeExt on List<ScoringElement> {
           ),
         );
         conglomerates[element.id!]?.nestedElements?.add(element);
+        conglomerates[element.id!]?.isBool = element.isBool;
       }
     }
     for (ScoringElement element in conglomerates.values) {
       for (int i = 0; i < (element.nestedElements?.length ?? 0); i++) {
-        if (element.nestedElements?[i].count == 1) {
+        if (element.nestedElements?[i].count == 1 && element.isBool) {
           element.count = i;
+        } else if (!(conglomerates[element.id!]?.isBool ?? true)) {
+          conglomerates[element.id!]
+              ?.nestedElements
+              ?.removeWhere((element) => element.id == null);
         }
       }
       newList.add(element);

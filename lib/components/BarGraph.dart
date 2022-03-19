@@ -20,7 +20,7 @@ class BarGraph extends StatelessWidget {
   }) : super(key: key) {
     percentage = (inverted
             ? (val != 0 ? (max / val).clamp(0, 1) : 1) * 100.0
-            : (max != 0 ? val / max : 0) * 100.0)
+            : (max != 0 ? (val / max).clamp(0, 1) : 0) * 100.0)
         .toInt();
     if (!vertical) {
       double temp = width;

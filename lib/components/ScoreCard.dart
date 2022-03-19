@@ -218,7 +218,7 @@ class ScoreCard extends StatelessWidget {
                           type,
                         ),
                         team.targetScore?.getScoreDivision(type).total() ?? 0,
-                      ].minValue(),
+                      ].minValue(), // TODO: If minY == maxY, shit breaks
                       maxY: [
                         event.matches.values
                             .toList()

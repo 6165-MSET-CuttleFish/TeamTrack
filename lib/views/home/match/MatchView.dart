@@ -867,34 +867,46 @@ class _MatchView extends State<MatchView> {
 
   String matchPath(OpModeType opModeType) =>
       'matches/${widget.match?.id}/${allianceColor()}/sharedScore/${OpModeType.endgame.toRep()}';
-
   List<Widget> autoView() => [
         if (widget.event.type != EventType.remote && _match != null)
-          BarGraph(
-            title: "Contribution",
-            vertical: false,
-            height: MediaQuery.of(context).size.width,
-            width: 15,
-            val: _score?.autoScore.total().toDouble() ?? 0.0,
-            max: _selectedAlliance?.total().autoScore.total().toDouble() ?? 0.0,
+          RawMaterialButton(
+            onPressed: () => setState(() {
+              _score?.autoScore.robotDisconnected =
+                  !(_score?.autoScore.robotDisconnected ?? false);
+            }),
+            fillColor: (_score?.autoScore.robotDisconnected ?? false)
+                ? Colors.yellow.withOpacity(0.3)
+                : null,
+            child: BarGraph(
+              title: "Contribution",
+              vertical: false,
+              height: MediaQuery.of(context).size.width,
+              width: 15,
+              val: _score?.autoScore.total().toDouble() ?? 0.0,
+              max: _selectedAlliance?.total().autoScore.total().toDouble() ??
+                  0.0,
+            ),
           ),
-        ..._score?.autoScore
-                .getElements()
-                .parse()
-                .map(
-                  (e) => Incrementor(
-                    element: e,
-                    onPressed: stateSetter,
-                    event: widget.event,
-                    path: teamPath(OpModeType.auto),
-                    score: _score,
-                    max: widget.match != null
-                        ? maxAutoScores[e.key] ?? 0
-                        : maxAutoTargets[e.key] ?? 0,
-                  ),
-                )
-                .toList() ??
-            [],
+        if (_score?.autoScore.robotDisconnected ?? false)
+          Center(child: Text("Robot Disconnected")),
+        if (!(_score?.autoScore.robotDisconnected ?? false))
+          ..._score?.autoScore
+                  .getElements()
+                  .parse()
+                  .map(
+                    (e) => Incrementor(
+                      element: e,
+                      onPressed: stateSetter,
+                      event: widget.event,
+                      path: teamPath(OpModeType.auto),
+                      score: _score,
+                      max: widget.match != null
+                          ? maxAutoScores[e.key] ?? 0
+                          : maxAutoTargets[e.key] ?? 0,
+                    ),
+                  )
+                  .toList() ??
+              [],
         if (widget.match != null)
           ..._selectedAlliance?.sharedScore.autoScore.getElements().parse().map(
                     (e) => Incrementor(
@@ -974,7 +986,9 @@ class _MatchView extends State<MatchView> {
             onPressed: () => setState(
               () {
                 _score?.teleScore.getElements().forEach((element) {
-                  element.incrementValue = incrementValue.count;
+                  if (!element.isBool) {
+                    element.incrementValue = incrementValue.count;
+                  }
                   stateSetter();
                 });
               },
