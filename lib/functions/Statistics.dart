@@ -37,11 +37,18 @@ double standardDeviation(List<num> arr) {
 
 extension Arithmetic on Iterable<num?> {
   double mean() {
-    if (this.length == 0) return 0;
-    return (this.reduce((value, element) =>
-                (value?.toDouble() ?? 0) + (element?.toDouble() ?? 0)) ??
-            0) /
-        this.length;
+    try {
+      if (length == 0) return 0.0;
+      if (length == 1) return this.first?.toDouble() ?? 0.0;
+      return ((reduce((value, element) =>
+                      (value?.toDouble() ?? 0) + (element?.toDouble() ?? 0)) ??
+                  0.0) /
+              length)
+          .toDouble();
+    } catch (e) {
+      print(e);
+      return 0.0;
+    }
   }
 
   List<FlSpot> spots() {

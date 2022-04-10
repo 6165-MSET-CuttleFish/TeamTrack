@@ -434,6 +434,14 @@ class _Incrementor extends State<Incrementor> {
                       (e) => Incrementor(
                         element: e,
                         onPressed: widget.onPressed,
+                        path: widget.path,
+                        event: widget.event,
+                        backgroundColor: widget.backgroundColor,
+                        onDecrement: widget.onDecrement,
+                        onIncrement: widget.onIncrement,
+                        mutableDecrement: widget.mutableDecrement,
+                        mutableIncrement: widget.mutableIncrement,
+                        max: widget.max,
                       ),
                     )
                     .toList(),

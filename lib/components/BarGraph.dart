@@ -49,7 +49,7 @@ class BarGraph extends StatelessWidget {
               width: 74,
               child: Center(
                 child: Text(
-                  title + units,
+                  title,
                   style: Theme.of(context).textTheme.caption,
                   textAlign: TextAlign.center,
                   maxLines: 2,
@@ -111,7 +111,7 @@ class BarGraph extends StatelessWidget {
               padding: EdgeInsets.all(2),
             ),
           if (!compressed)
-            Text(val.toInt().toString(),
+            Text(val.toInt().toString() + units,
                 style: Theme.of(context).textTheme.caption),
         ],
       );

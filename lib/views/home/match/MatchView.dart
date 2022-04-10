@@ -1015,45 +1015,45 @@ class _MatchView extends State<MatchView> {
                       event: widget.event,
                       path: teamPath(OpModeType.tele),
                       score: _score,
-                      mutableIncrement: (mutableData) {
-                        if (widget.match == null) {
-                          var ref = (mutableData as Map?)?[e.key];
-                          if (ref < e.max!())
-                            mutableData?[e.key] =
-                                (ref ?? 0) + incrementValue.count;
-                          return Transaction.success(mutableData);
-                        }
-                        var ref = mutableData as Map?;
-                        if (ref?[e.key] < e.max!()) {
-                          mutableData?[e.key] =
-                              (ref?[e.key] ?? 0) + e.incrementValue;
-                          lapses.add(
-                            (_time - sum).toPrecision(3),
-                          );
-                          sum = _time;
-                          if (!_paused) {
-                            mutableData?['CycleTimes'] = lapses;
-                          }
-                        }
-                        return Transaction.success(mutableData);
-                      },
-                      mutableDecrement: (mutableData) {
-                        if (widget.match == null) {
-                          var ref = (mutableData as Map?)?[e.key];
-                          if (ref < e.max!())
-                            mutableData?[e.key] = (ref ?? 0) - 1;
-                          return Transaction.success(mutableData);
-                        }
-                        var ref = mutableData as Map?;
-                        if (ref?[e.key] < e.max!()) {
-                          mutableData?[e.key] =
-                              (ref?[e.key] ?? 0) - e.decrementValue;
-                          if (!_paused) {
-                            mutableData?['Misses'] = (ref?['Misses'] ?? 0) + 1;
-                          }
-                        }
-                        return Transaction.success(mutableData);
-                      },
+                      // mutableIncrement: (mutableData) {
+                      //   if (widget.match == null) {
+                      //     var ref = (mutableData as Map?)?[e.key];
+                      //     if (ref < e.max!())
+                      //       mutableData?[e.key] =
+                      //           (ref ?? 0) + incrementValue.count;
+                      //     return Transaction.success(mutableData);
+                      //   }
+                      //   var ref = mutableData as Map?;
+                      //   if (ref?[e.key] < e.max!()) {
+                      //     mutableData?[e.key] =
+                      //         (ref?[e.key] ?? 0) + e.incrementValue;
+                      //     lapses.add(
+                      //       (_time - sum).toPrecision(3),
+                      //     );
+                      //     sum = _time;
+                      //     if (!_paused) {
+                      //       mutableData?['CycleTimes'] = lapses;
+                      //     }
+                      //   }
+                      //   return Transaction.success(mutableData);
+                      // },
+                      // mutableDecrement: (mutableData) {
+                      //   if (widget.match == null) {
+                      //     var ref = (mutableData as Map?)?[e.key];
+                      //     if (ref < e.max!())
+                      //       mutableData?[e.key] = (ref ?? 0) - 1;
+                      //     return Transaction.success(mutableData);
+                      //   }
+                      //   var ref = mutableData as Map?;
+                      //   if (ref?[e.key] < e.max!()) {
+                      //     mutableData?[e.key] =
+                      //         (ref?[e.key] ?? 0) - e.decrementValue;
+                      //     if (!_paused) {
+                      //       mutableData?['Misses'] = (ref?['Misses'] ?? 0) + 1;
+                      //     }
+                      //   }
+                      //   return Transaction.success(mutableData);
+                      // },
                       max: widget.match != null
                           ? maxTeleScores[e.key] ?? 0
                           : maxTeleTargets[e.key] ?? 0,

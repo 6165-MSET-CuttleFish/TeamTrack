@@ -1,6 +1,7 @@
 import 'package:teamtrack/components/Collapsible.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:teamtrack/components/ScoreCard.dart';
+import 'package:teamtrack/components/ScoringElementStats.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/views/home/change/ChangeList.dart';
 import 'package:teamtrack/views/home/match/MatchList.dart';
@@ -43,6 +44,34 @@ class _TeamViewState extends State<TeamView> {
   final teleColor = Colors.blue;
   final autoColor = Colors.green;
   final generalColor = Color.fromRGBO(230, 30, 213, 1);
+
+  Score? maxScore;
+  Score? teamMaxScore;
+
+  @override
+  void initState() {
+    maxScore = Score('', Dice.none, widget.event.gameName);
+    maxScore?.getElements().forEach(
+      (element) {
+        element.count = widget.event.teams.values
+            .map(
+              (team) => team.scores.values
+                  .map(
+                    (score) => score
+                        .getElements()
+                        .firstWhere((e) => e.key == element.key)
+                        .countFactoringAttempted(),
+                  )
+                  .whereType<int>()
+                  .median()
+                  .toInt(),
+            )
+            .maxValue()
+            .toInt();
+      },
+    );
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -195,6 +224,23 @@ class _TeamViewState extends State<TeamView> {
                 context,
               );
               _team = widget.event.teams[widget.team.number] ?? Team.nullTeam();
+              teamMaxScore = Score('', Dice.none, widget.event.gameName);
+              teamMaxScore?.getElements().forEach(
+                (element) {
+                  element.count = _team.scores.values
+                      .map(
+                        (score) => score
+                            .getElements()
+                            .firstWhere((e) => e.key == element.key,
+                                orElse: () => ScoringElement())
+                            .countFactoringAttempted(),
+                      )
+                      .whereType<int>()
+                      .toList()
+                      .median()
+                      .toInt();
+                },
+              );
             }
             return ListView(
               children: [
@@ -387,6 +433,26 @@ class _TeamViewState extends State<TeamView> {
                         dice: _dice,
                         removeOutliers: widget.event.statConfig.removeOutliers,
                         matches: widget.event.getSortedMatches(true),
+                        elements: Column(
+                          children: teamMaxScore?.autoScore
+                                  .getElements()
+                                  .parse()
+                                  .map(
+                                    (element) => ScoringElementStats(
+                                      element: element,
+                                      maxElement: maxScore?.autoScore
+                                              .getElements()
+                                              .parse()
+                                              .firstWhere(
+                                                (e) => e.key == element.key,
+                                                orElse: () => ScoringElement(),
+                                              ) ??
+                                          element,
+                                    ),
+                                  )
+                                  .toList() ??
+                              [],
+                        ),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(top: 20, bottom: 10),
@@ -406,6 +472,26 @@ class _TeamViewState extends State<TeamView> {
                         dice: _dice,
                         removeOutliers: widget.event.statConfig.removeOutliers,
                         matches: widget.event.getSortedMatches(true),
+                        elements: Column(
+                          children: teamMaxScore?.teleScore
+                                  .getElements()
+                                  .parse()
+                                  .map(
+                                    (element) => ScoringElementStats(
+                                      element: element,
+                                      maxElement: maxScore?.teleScore
+                                              .getElements()
+                                              .parse()
+                                              .firstWhere(
+                                                (e) => e.key == element.key,
+                                                orElse: () => ScoringElement(),
+                                              ) ??
+                                          element,
+                                    ),
+                                  )
+                                  .toList() ??
+                              [],
+                        ),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(top: 20, bottom: 10),
@@ -425,6 +511,26 @@ class _TeamViewState extends State<TeamView> {
                         dice: _dice,
                         removeOutliers: widget.event.statConfig.removeOutliers,
                         matches: widget.event.getSortedMatches(true),
+                        elements: Column(
+                          children: teamMaxScore?.endgameScore
+                                  .getElements()
+                                  .parse()
+                                  .map(
+                                    (element) => ScoringElementStats(
+                                      element: element,
+                                      maxElement: maxScore?.endgameScore
+                                              .getElements()
+                                              .parse()
+                                              .firstWhere(
+                                                (e) => e.key == element.key,
+                                                orElse: () => ScoringElement(),
+                                              ) ??
+                                          element,
+                                    ),
+                                  )
+                                  .toList() ??
+                              [],
+                        ),
                       ),
                       Padding(
                         padding: EdgeInsets.all(130),

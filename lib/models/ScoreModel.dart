@@ -171,6 +171,11 @@ class Score extends ScoreDivision implements Comparable<Score> {
   late AutoScore autoScore;
   late EndgameScore endgameScore;
   Penalty penalties = Penalty();
+  Map<String, bool> defendedTeamNumbers = {};
+  List<Team> defendedTeams(Event event) => defendedTeamNumbers.keys
+      .map((number) => event.teams[number])
+      .whereType<Team>()
+      .toList();
   String id = '';
   String gameName;
   late Dice dice;
@@ -259,6 +264,14 @@ class Score extends ScoreDivision implements Comparable<Score> {
             : EndgameScore(ref['EndgameScore']);
     penalties = Penalty.fromJson(map['Penalty']);
     id = map['id'];
+    autoScore.robotDisconnected = map['autoDc'] ?? false;
+    teleScore.robotDisconnected = map['teleDc'] ?? false;
+    endgameScore.robotDisconnected = map['endDc'] ?? false;
+    try {
+      defendedTeamNumbers = map['defendedTeams'] ?? {};
+    } catch (e) {
+      defendedTeamNumbers = {};
+    }
     setDice(Dice.one, Timestamp.now());
   }
   Map<String, dynamic> toJson() => {
@@ -267,6 +280,10 @@ class Score extends ScoreDivision implements Comparable<Score> {
         'EndgameScore': endgameScore.toJson(),
         'Penalty': penalties.toJson(),
         'id': id.toString(),
+        'autoDC': autoScore.robotDisconnected,
+        'teleDC': teleScore.robotDisconnected,
+        'endgameDC': endgameScore.robotDisconnected,
+        'defendedTeams': defendedTeamNumbers,
       };
 
   @override
@@ -682,6 +699,9 @@ class ScoringElement {
 
   int totalAttempted() => count + misses;
 
+  int? countFactoringAttempted() =>
+      (count + misses) == 0 ? null : (count + misses);
+
   void increment() {
     if (count < max!()) {
       count += incrementValue;
@@ -729,4 +749,12 @@ abstract class ScoreDivision {
   late Timestamp timeStamp; // the time stamp of the Score object
   void reset(); // reset the scoring elements
   bool robotDisconnected = false; // whether the robot disconnected
+  int? getScoringElementCount(String? key) {
+    if (key == null) return total();
+    final scoringElement = getElements().firstWhere(
+      (e) => e.key == key,
+      orElse: () => ScoringElement(),
+    );
+    if (scoringElement.didAttempt()) return scoringElement.count;
+  }
 }

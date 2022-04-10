@@ -79,8 +79,11 @@ extension MergeExt on List<ScoringElement> {
             ],
           ),
         );
-        conglomerates[element.id!]?.nestedElements?.add(element);
-        conglomerates[element.id!]?.isBool = element.isBool;
+        final bigElement = conglomerates[element.id!];
+        bigElement?.nestedElements?.add(element);
+        bigElement?.count += element.count;
+        bigElement?.misses = element.misses;
+        bigElement?.isBool = element.isBool;
       }
     }
     for (ScoringElement element in conglomerates.values) {
