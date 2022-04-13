@@ -501,11 +501,11 @@ class Alliance {
     return returnVal;
   }
 
-  int allianceTotal(bool? showPenalties, {OpModeType? type}) =>
-      (((team1?.scores[id]?.getScoreDivision(type).total() ?? 0) +
-                  (team2?.scores[id]?.getScoreDivision(type).total() ?? 0) +
+  int allianceTotal(bool? showPenalties, {OpModeType? type, String? element}) =>
+      (((team1?.scores[id]?.getScoreDivision(type).getScoringElementCount(element) ?? 0) +
+                  (team2?.scores[id]?.getScoreDivision(type).getScoringElementCount(element) ?? 0) +
                   ((showPenalties ?? false) ? getPenalty() : 0)) +
-              sharedScore.getScoreDivision(type).total())
+              (sharedScore.getScoreDivision(type).getScoringElementCount(element) ?? 0))
           .clamp(0, 999);
   Alliance.fromJson(
     Map<String, dynamic> json,

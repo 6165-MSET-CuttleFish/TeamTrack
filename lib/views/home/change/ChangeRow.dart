@@ -24,12 +24,12 @@ class ChangeRow extends StatelessWidget {
         score.timeStamp.compareTo(change.startDate) >= 0 &&
         score.timeStamp.compareTo(change.endDate ?? Timestamp.now()) <= 0);
     final autoIncrease =
-        scores.map((score) => score.autoScore).totalPercentIncrease() ?? 0;
+        scores.map((score) => score.autoScore).totalPercentIncrease(null) ?? 0;
     final teleIncrease =
-        scores.map((score) => score.teleScore).totalPercentIncrease() ?? 0;
+        scores.map((score) => score.teleScore).totalPercentIncrease(null) ?? 0;
     final endgameIncrease =
-        scores.map((score) => score.endgameScore).totalPercentIncrease() ?? 0;
-    final totalIncrease = scores.totalPercentIncrease() ?? 0;
+        scores.map((score) => score.endgameScore).totalPercentIncrease(null) ?? 0;
+    final totalIncrease = scores.totalPercentIncrease(null) ?? 0;
     return Container(
       decoration: BoxDecoration(
         border: Border.all(

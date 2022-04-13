@@ -24,7 +24,7 @@ class ScoringElementStats extends StatelessWidget {
               Material(
                 child: ExpansionTile(
                   leading: Text(element.name),
-                  title: buildIntegerGraph(context),
+                  title: buildNestedGraph(context),
                   children: element.nestedElements!
                       .map(
                         (e) => ScoringElementStats(
@@ -60,6 +60,14 @@ class ScoringElementStats extends StatelessWidget {
   BarGraph buildIntegerGraph(BuildContext context) => BarGraph(
         val: element.count.toDouble(),
         max: maxElement.count.toDouble(),
+        width: 20,
+        height: 60,
+        title: "Median",
+        vertical: false,
+      );
+  BarGraph buildNestedGraph(BuildContext context) => BarGraph(
+        val: element.scoreValue().toDouble(),
+        max: maxElement.scoreValue().toDouble(),
         width: 20,
         height: 60,
         title: "Median",

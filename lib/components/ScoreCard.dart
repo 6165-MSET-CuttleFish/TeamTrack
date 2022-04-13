@@ -122,7 +122,7 @@ class ScoreCard extends StatelessWidget {
                   ? scoreDivisions.meanScore(dice, removeOutliers)
                   : allianceTotals?.mean() ?? 0,
               max: !allianceTotal
-                  ? event.teams.maxMeanScore(dice, removeOutliers, type)
+                  ? event.teams.maxMeanScore(dice, removeOutliers, type, null)
                   : maxAllianceMean,
               title: 'Mean',
             ),
@@ -131,7 +131,7 @@ class ScoreCard extends StatelessWidget {
                   ? scoreDivisions.medianScore(dice, removeOutliers)
                   : allianceTotals?.median() ?? 0,
               max: !allianceTotal
-                  ? event.teams.maxMedianScore(dice, removeOutliers, type)
+                  ? event.teams.maxMedianScore(dice, removeOutliers, type, null)
                   : maxAllianceMedian,
               title: 'Median',
             ),
@@ -150,7 +150,7 @@ class ScoreCard extends StatelessWidget {
                   : allianceTotals?.standardDeviation() ?? 0,
               max: !allianceTotal
                   ? event.teams
-                      .lowestStandardDeviationScore(dice, removeOutliers, type)
+                      .lowestStandardDeviationScore(dice, removeOutliers, type, null)
                   : maxAllianceDeviation,
               inverted: true,
               title: 'Deviation',

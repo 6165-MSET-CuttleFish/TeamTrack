@@ -17,9 +17,11 @@ class TeamList extends StatefulWidget {
     required this.event,
     required this.sortMode,
     required this.statConfig,
+    required this.elementSort,
   }) : super(key: key);
   final Event event;
   final OpModeType? sortMode;
+  final String? elementSort;
   final StatConfig statConfig;
   @override
   State<StatefulWidget> createState() => _TeamList();
@@ -49,10 +51,15 @@ class _TeamList extends State<TeamList> {
             Dice.none,
             widget.statConfig.removeOutliers,
             widget.sortMode,
+            widget.elementSort,
           );
           final teams = widget.statConfig.sorted
-              ? widget.event.teams.sortedTeams(widget.sortMode,
-                  widget.statConfig, widget.event.matches.values.toList())
+              ? widget.event.teams.sortedTeams(
+                  widget.sortMode,
+                  widget.elementSort,
+                  widget.statConfig,
+                  widget.event.matches.values.toList(),
+                )
               : widget.event.teams.orderedTeams();
           if (widget.statConfig.allianceTotal) {
             max = teams
@@ -76,6 +83,7 @@ class _TeamList extends State<TeamList> {
                 event: widget.event,
                 sortMode: widget.sortMode,
                 statConfig: widget.statConfig,
+                elementSort: widget.elementSort,
                 max: max,
                 onTap: () async {
                   await Navigator.push(
@@ -155,14 +163,14 @@ class _TeamList extends State<TeamList> {
 }
 
 class TeamSearch extends SearchDelegate<String?> {
-  TeamSearch({
-    required this.teams,
-    required this.event,
-    this.sortMode,
-    required this.statConfig,
-  }) {
-    max = event.teams
-        .maxMeanScore(Dice.none, statConfig.removeOutliers, sortMode);
+  TeamSearch(
+      {required this.teams,
+      required this.event,
+      this.sortMode,
+      required this.statConfig,
+      required this.elementSort}) {
+    max = event.teams.maxMeanScore(
+        Dice.none, statConfig.removeOutliers, sortMode, elementSort);
     final teams = event.teams.values;
     if (statConfig.allianceTotal) {
       max = teams
@@ -179,6 +187,7 @@ class TeamSearch extends SearchDelegate<String?> {
   }
   late double max;
   OpModeType? sortMode;
+  String? elementSort;
   List<Team> teams;
   Event event;
   StatConfig statConfig;
@@ -225,6 +234,7 @@ class TeamSearch extends SearchDelegate<String?> {
         event: event,
         max: max,
         sortMode: sortMode,
+        elementSort: elementSort,
         onTap: () async {
           close(context, null);
           await Navigator.push(

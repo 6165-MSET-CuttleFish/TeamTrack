@@ -60,7 +60,7 @@ extension ExTeam on Team? {
 }
 
 extension MergeExt on List<ScoringElement> {
-  List<ScoringElement> parse() {
+  List<ScoringElement> parse({bool putNone = true}) {
     List<ScoringElement> newList = [];
     Map<String, ScoringElement> conglomerates = {};
     for (ScoringElement element in this) {
@@ -71,19 +71,23 @@ extension MergeExt on List<ScoringElement> {
           element.id!,
           () => ScoringElement(
             id: element.id,
+            key: element.id,
             name: element.id ?? "",
             nestedElements: [
-              ScoringElement(
-                name: "None",
-              ),
+              if (putNone)
+                ScoringElement(
+                  name: "None",
+                ),
             ],
           ),
         );
         final bigElement = conglomerates[element.id!];
         bigElement?.nestedElements?.add(element);
         bigElement?.count += element.count;
-        bigElement?.misses = element.misses;
+        bigElement?.misses += element.misses;
         bigElement?.isBool = element.isBool;
+        bigElement?.totalValue =
+            (bigElement.totalValue ?? 0) + element.scoreValue();
       }
     }
     for (ScoringElement element in conglomerates.values) {

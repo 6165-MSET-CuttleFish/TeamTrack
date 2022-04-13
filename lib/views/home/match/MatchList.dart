@@ -214,7 +214,7 @@ class _MatchList extends State<MatchList> {
               .removeOutliers(widget.event.statConfig.removeOutliers)
               .map((spot) => spot.y)
               .maxValue()
-          : widget.team?.scores.maxScore(Dice.none, false, OpModeType.auto) ??
+          : widget.team?.scores.maxScore(Dice.none, false, OpModeType.auto, null) ??
               0;
       teleMax = widget.event.statConfig.allianceTotal
           ? widget.event.matches.values
@@ -223,7 +223,7 @@ class _MatchList extends State<MatchList> {
               .removeOutliers(widget.event.statConfig.removeOutliers)
               .map((spot) => spot.y)
               .maxValue()
-          : widget.team?.scores.maxScore(Dice.none, false, OpModeType.tele) ??
+          : widget.team?.scores.maxScore(Dice.none, false, OpModeType.tele, null) ??
               0;
       endMax = widget.event.statConfig.allianceTotal
           ? widget.event.matches.values
@@ -233,7 +233,7 @@ class _MatchList extends State<MatchList> {
               .map((spot) => spot.y)
               .maxValue()
           : widget.team?.scores
-                  .maxScore(Dice.none, false, OpModeType.endgame) ??
+                  .maxScore(Dice.none, false, OpModeType.endgame, null) ??
               0;
       totalMax = widget.event.statConfig.allianceTotal
           ? widget.event.matches.values
@@ -242,7 +242,7 @@ class _MatchList extends State<MatchList> {
               .removeOutliers(widget.event.statConfig.removeOutliers)
               .map((spot) => spot.y)
               .maxValue()
-          : widget.team?.scores.maxScore(Dice.none, false, null) ?? 0;
+          : widget.team?.scores.maxScore(Dice.none, false, null, null) ?? 0;
     }
     return ListView.builder(
       controller: NewPlatform.isIOS ? null : scrollController,

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/models/GameModel.dart';
+import 'package:teamtrack/functions/Extensions.dart';
 
 /// This class is used to represent the scoring structure of traditional and remote FTC events.
 Map<String, dynamic> absRef = {
@@ -76,12 +77,7 @@ Map<String, dynamic> absRef = {
     }
   },
   "TeleScore": {
-    "sharedFreight": {
-      "name": "Freight in Shared Hub",
-      "min": 0,
-      "max": 999,
-      "value": 4
-    },
+    "sharedFreight": {"name": "Shared Hub", "min": 0, "max": 999, "value": 4},
     "lvl3": {
       "name": "Level 3",
       "min": 0,
@@ -103,12 +99,7 @@ Map<String, dynamic> absRef = {
       "value": 2,
       "id": "Alliance Hub"
     },
-    "storageFreight": {
-      "name": "Freight in Storage Unit",
-      "min": 0,
-      "max": 999,
-      "value": 1
-    }
+    "storageFreight": {"name": "Storage Unit", "min": 0, "max": 999, "value": 1}
   },
   "EndgameScore": {
     "DucksDelivered": {
@@ -493,20 +484,6 @@ class TeleScore extends ScoreDivision {
         );
       },
     );
-    try {
-      cycleTimes = List<num>.from(json.decode(map['CycleTimes'].toString()))
-          .map((e) => e.toDouble())
-          .toList();
-    } catch (e) {
-      cycleTimes = [];
-    }
-    misses = ScoringElement(
-      name: 'Misses',
-      count: map['Misses'] is Map ? map['Misses']['count'] : map['Misses'],
-      key: 'Misses',
-      value: 1,
-    );
-
     maxSet();
   }
   Map<String, dynamic> toJson() => {
@@ -670,6 +647,7 @@ class ScoringElement {
     this.key,
     this.id,
     this.nestedElements,
+    this.totalValue,
   }) {
     setStuff();
   }
@@ -678,6 +656,7 @@ class ScoringElement {
   int count;
   int misses;
   int value;
+  int? totalValue;
   String? id;
   List<ScoringElement>? nestedElements;
   bool isBool;
@@ -693,14 +672,14 @@ class ScoringElement {
     if (max == null) max = () => 999;
   }
 
-  int scoreValue() => count * value;
+  int scoreValue() => totalValue ?? (count * value);
 
   bool didAttempt() => misses > 0 || count > 0;
 
   int totalAttempted() => count + misses;
 
   int? countFactoringAttempted() =>
-      (count + misses) == 0 ? null : (count + misses);
+      didAttempt() ? count : null;
 
   void increment() {
     if (count < max!()) {
@@ -751,10 +730,10 @@ abstract class ScoreDivision {
   bool robotDisconnected = false; // whether the robot disconnected
   int? getScoringElementCount(String? key) {
     if (key == null) return total();
-    final scoringElement = getElements().firstWhere(
-      (e) => e.key == key,
-      orElse: () => ScoringElement(),
-    );
-    if (scoringElement.didAttempt()) return scoringElement.count;
+    final scoringElement = this.getElements().parse().firstWhere(
+          (e) => e.key == key,
+          orElse: () => ScoringElement(),
+        );
+    if (scoringElement.didAttempt()) return scoringElement.scoreValue();
   }
 }

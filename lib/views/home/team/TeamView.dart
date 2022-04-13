@@ -55,16 +55,29 @@ class _TeamViewState extends State<TeamView> {
       (element) {
         element.count = widget.event.teams.values
             .map(
-              (team) => team.scores.values
-                  .map(
-                    (score) => score
-                        .getElements()
-                        .firstWhere((e) => e.key == element.key)
-                        .countFactoringAttempted(),
-                  )
-                  .whereType<int>()
-                  .median()
-                  .toInt(),
+              (team) => !element.isBool
+                  ? team.scores.values
+                      .map(
+                        (score) => score
+                            .getElements()
+                            .firstWhere((e) => e.key == element.key,
+                                orElse: () => ScoringElement())
+                            .countFactoringAttempted(),
+                      )
+                      .whereType<int>()
+                      .median()
+                      .toInt()
+                  : team.scores.values
+                      .map(
+                        (score) => score
+                            .getElements()
+                            .firstWhere((e) => e.key == element.key,
+                                orElse: () => ScoringElement())
+                            .countFactoringAttempted(),
+                      )
+                      .whereType<int>()
+                      .accuracy()
+                      .toInt(),
             )
             .maxValue()
             .toInt();
@@ -227,18 +240,30 @@ class _TeamViewState extends State<TeamView> {
               teamMaxScore = Score('', Dice.none, widget.event.gameName);
               teamMaxScore?.getElements().forEach(
                 (element) {
-                  element.count = _team.scores.values
-                      .map(
-                        (score) => score
-                            .getElements()
-                            .firstWhere((e) => e.key == element.key,
-                                orElse: () => ScoringElement())
-                            .countFactoringAttempted(),
-                      )
-                      .whereType<int>()
-                      .toList()
-                      .median()
-                      .toInt();
+                  element.count = !element.isBool
+                      ? _team.scores.values
+                          .map(
+                            (score) => score
+                                .getElements()
+                                .firstWhere((e) => e.key == element.key,
+                                    orElse: () => ScoringElement())
+                                .countFactoringAttempted(),
+                          )
+                          .whereType<int>()
+                          .toList()
+                          .median()
+                          .toInt()
+                      : _team.scores.values
+                          .map(
+                            (score) => score
+                                .getElements()
+                                .firstWhere((e) => e.key == element.key,
+                                    orElse: () => ScoringElement())
+                                .countFactoringAttempted(),
+                          )
+                          .whereType<int>()
+                          .accuracy()
+                          .toInt();
                 },
               );
             }
@@ -436,13 +461,13 @@ class _TeamViewState extends State<TeamView> {
                         elements: Column(
                           children: teamMaxScore?.autoScore
                                   .getElements()
-                                  .parse()
+                                  .parse(putNone: false)
                                   .map(
                                     (element) => ScoringElementStats(
                                       element: element,
                                       maxElement: maxScore?.autoScore
                                               .getElements()
-                                              .parse()
+                                              .parse(putNone: false)
                                               .firstWhere(
                                                 (e) => e.key == element.key,
                                                 orElse: () => ScoringElement(),

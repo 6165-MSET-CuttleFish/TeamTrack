@@ -83,6 +83,7 @@ class _MatchView extends State<MatchView> {
                   Dice.none,
                   false,
                   null,
+                  null,
                 ),
         )
         .maxValue();
@@ -99,6 +100,7 @@ class _MatchView extends State<MatchView> {
                   Dice.none,
                   false,
                   OpModeType.auto,
+                  null
                 ),
         )
         .maxValue();
@@ -115,6 +117,7 @@ class _MatchView extends State<MatchView> {
                   Dice.none,
                   false,
                   OpModeType.tele,
+                  null
                 ),
         )
         .maxValue();
@@ -131,6 +134,7 @@ class _MatchView extends State<MatchView> {
                   Dice.none,
                   false,
                   OpModeType.endgame,
+                  null
                 ),
         )
         .maxValue();
@@ -993,15 +997,6 @@ class _MatchView extends State<MatchView> {
                 });
               },
             ),
-          ),
-          Padding(padding: EdgeInsets.all(5)),
-          Incrementor(
-            backgroundColor: Colors.red.withOpacity(0.3),
-            element: _score?.teleScore.misses ?? ScoringElement(),
-            onPressed: stateSetter,
-            event: widget.event,
-            path: teamPath(OpModeType.tele),
-            score: _score,
           ),
           ..._score?.teleScore
                   .getElements()
