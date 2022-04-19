@@ -650,7 +650,7 @@ class _TeamViewState extends State<TeamView> {
                                       widget.event.statConfig.removeOutliers,
                                       null,
                                     ),
-                              _team.targetScore?.total().toDouble() ?? 0.0
+                              _team.targetScore?.total()?.toDouble() ?? 0.0
                             ].maxValue(),
                             lineBarsData: [
                               LineChartBarData(
@@ -663,7 +663,7 @@ class _TeamViewState extends State<TeamView> {
                                         ],
                                         cutOffY: _team.targetScore
                                             ?.total()
-                                            .toDouble(),
+                                            ?.toDouble(),
                                         applyCutOffY: true,
                                       )
                                     : null,
@@ -675,7 +675,7 @@ class _TeamViewState extends State<TeamView> {
                                         ],
                                         cutOffY: _team.targetScore
                                             ?.total()
-                                            .toDouble(),
+                                            ?.toDouble(),
                                         applyCutOffY: true,
                                       )
                                     : null,

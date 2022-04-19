@@ -244,7 +244,7 @@ class ScoreCard extends StatelessWidget {
                                               .withOpacity(0.5)
                                         ],
                                         cutOffY:
-                                            targetScore?.total().toDouble(),
+                                            targetScore?.total()?.toDouble(),
                                         applyCutOffY: true,
                                       )
                                     : null,
@@ -255,7 +255,7 @@ class ScoreCard extends StatelessWidget {
                                           Colors.redAccent.withOpacity(0.5)
                                         ],
                                         cutOffY:
-                                            targetScore?.total().toDouble(),
+                                            targetScore?.total()?.toDouble(),
                                         applyCutOffY: true,
                                       )
                                     : null,
@@ -281,7 +281,7 @@ class ScoreCard extends StatelessWidget {
                                       colors: [
                                         Colors.lightGreenAccent.withOpacity(0.5)
                                       ],
-                                      cutOffY: targetScore?.total().toDouble(),
+                                      cutOffY: targetScore?.total()?.toDouble(),
                                       applyCutOffY: true,
                                     )
                                   : null,
@@ -291,7 +291,7 @@ class ScoreCard extends StatelessWidget {
                                       colors: [
                                         Colors.redAccent.withOpacity(0.5)
                                       ],
-                                      cutOffY: targetScore?.total().toDouble(),
+                                      cutOffY: targetScore?.total()?.toDouble(),
                                       applyCutOffY: true,
                                     )
                                   : null,

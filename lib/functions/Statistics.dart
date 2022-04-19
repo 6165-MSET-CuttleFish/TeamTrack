@@ -135,7 +135,7 @@ extension moreArithmetic on num {
 
 extension MatchExtensions on List<Match> {
   List<FlSpot> spots(Team team, Dice dice, bool showPenalties,
-      {OpModeType? type, String? element}) {
+      {OpModeType? type, ScoringElement? element}) {
     List<FlSpot> val = [];
     final arr =
         (dice != Dice.none ? this.where((e) => e.dice == dice) : this).toList();
@@ -183,10 +183,16 @@ extension SpotExtensions on List<FlSpot> {
 }
 
 extension ListScore on List<Score> {
-  List<FlSpot> spots(OpModeType? type, {bool? showPenalties}) {
+  List<FlSpot> spots(OpModeType? type,
+      {bool? showPenalties, bool markDisconnect = false}) {
     final list = this
         .map(
-            (e) => e.getScoreDivision(type).total(showPenalties: showPenalties))
+          (e) => e.getScoreDivision(type).total(
+                showPenalties: showPenalties,
+                markDisconnect: markDisconnect,
+              ),
+        )
+        .whereType<int>()
         .toList();
     List<FlSpot> val = [];
     for (int i = 0; i < list.length; i++) {
@@ -219,7 +225,7 @@ extension TeamsExtension on Map<String, Team> {
     return arr;
   }
 
-  List<Team> sortedTeams(OpModeType? type, String? element,
+  List<Team> sortedTeams(OpModeType? type, ScoringElement? element,
       StatConfig statConfig, List<Match> matches) {
     List<Team> val = [];
     for (Team team in this.values) {
@@ -250,15 +256,22 @@ extension TeamsExtension on Map<String, Team> {
               ((score) => score.getScoreDivision(type)),
             )
             .toList()
-            .meanScore(Dice.none, statConfig.removeOutliers, element: element)
+            .meanScore(
+              Dice.none,
+              statConfig.removeOutliers,
+              element: element,
+            )
             .compareTo(
               a.scores.values
                   .map(
                     ((score) => score.getScoreDivision(type)),
                   )
                   .toList()
-                  .meanScore(Dice.none, statConfig.removeOutliers,
-                      element: element),
+                  .meanScore(
+                    Dice.none,
+                    statConfig.removeOutliers,
+                    element: element,
+                  ),
             ),
       );
     }
@@ -281,8 +294,8 @@ extension TeamsExtension on Map<String, Team> {
         .minValue();
   }
 
-  double maxMeanScore(
-      Dice? dice, bool removeOutliers, OpModeType? type, String? element) {
+  double maxMeanScore(Dice? dice, bool removeOutliers, OpModeType? type,
+      ScoringElement? element) {
     if (this.length == 0) return 1;
     return this
         .values
@@ -291,8 +304,8 @@ extension TeamsExtension on Map<String, Team> {
         .maxValue();
   }
 
-  double maxMedianScore(
-      Dice? dice, bool removeOutliers, OpModeType? type, String? element) {
+  double maxMedianScore(Dice? dice, bool removeOutliers, OpModeType? type,
+      ScoringElement? element) {
     if (this.length == 0) return 1;
     var x = this
         .values
@@ -302,8 +315,8 @@ extension TeamsExtension on Map<String, Team> {
     return x.maxValue();
   }
 
-  double lowestStandardDeviationScore(
-      Dice? dice, bool removeOutliers, OpModeType? type, String? element) {
+  double lowestStandardDeviationScore(Dice? dice, bool removeOutliers,
+      OpModeType? type, ScoringElement? element) {
     if (this.length == 0) return 1;
     final arr = this
         .values
@@ -317,30 +330,30 @@ extension TeamsExtension on Map<String, Team> {
 extension ScoreDivExtension on List<ScoreDivision> {
   List<FlSpot> spots() => this.map((e) => e.total()).spots();
 
-  double maxScore(Dice dice, bool removeOutliers) {
+  double maxScore(Dice dice, bool removeOutliers, {String? element}) {
     final arr = this.diceScores(dice);
     if (arr.length == 0) return 0;
     return arr
-        .map((e) => e.total().toDouble())
+        .map((e) => e.getScoringElementCount(element)?.toDouble())
         .removeOutliers(removeOutliers)
         .maxValue()
         .toDouble();
   }
 
-  double medianScore(Dice dice, bool removeOutliers) {
+  double medianScore(Dice dice, bool removeOutliers, {String? element}) {
     final arr = this.diceScores(dice);
     if (arr.length == 0) return 0;
     return arr
-        .map((e) => e.total().toDouble())
+        .map((e) => e.getScoringElementCount(element)?.toDouble())
         .removeOutliers(removeOutliers)
         .median();
   }
 
-  double minScore(Dice dice, bool removeOutliers) {
+  double minScore(Dice dice, bool removeOutliers, {String? element}) {
     final arr = this.diceScores(dice);
     if (arr.length == 0) return 0;
     return arr
-        .map((e) => e.total().toDouble())
+        .map((e) => e.getScoringElementCount(element)?.toDouble())
         .removeOutliers(removeOutliers)
         .minValue()
         .toDouble();
@@ -353,7 +366,7 @@ extension ScoreDivExtension on List<ScoreDivision> {
     return func(
       arr
           .map(
-            (e) => e.total().toDouble(),
+            (e) => e.total()?.toDouble(),
           )
           .removeOutliers(
             removeOutliers,
@@ -361,11 +374,11 @@ extension ScoreDivExtension on List<ScoreDivision> {
     );
   }
 
-  double meanScore(Dice dice, bool removeOutliers, {String? element}) {
+  double meanScore(Dice dice, bool removeOutliers, {ScoringElement? element}) {
     final arr = this.diceScores(dice);
     if (arr.length == 0) return 0;
     return arr
-        .map((e) => e.getScoringElementCount(element)?.toDouble())
+        .map((e) => e.getScoringElementCount(element?.key)?.toDouble())
         .removeOutliers(removeOutliers)
         .mean();
   }
@@ -374,7 +387,7 @@ extension ScoreDivExtension on List<ScoreDivision> {
     final arr = this.diceScores(dice);
     if (arr.length == 0) return 0;
     return arr
-        .map((e) => e.total().toDouble())
+        .map((e) => e.total()?.toDouble())
         .removeOutliers(removeOutliers)
         .standardDeviation();
   }
@@ -383,7 +396,7 @@ extension ScoreDivExtension on List<ScoreDivision> {
     final arr = this.diceScores(dice);
     if (arr.length == 0) return 0;
     return arr
-        .map((e) => e.total().toDouble())
+        .map((e) => e.total()?.toDouble())
         .removeOutliers(removeOutliers)
         .standardDeviation();
   }
@@ -421,34 +434,37 @@ extension ScoresExtension on Map<String, Score> {
     return 0;
   }
 
-  double meanScore(
-      Dice dice, bool removeOutliers, OpModeType? type, String? element) {
+  double meanScore(Dice dice, bool removeOutliers, OpModeType? type,
+      ScoringElement? element) {
     final arr = this.diceScores(dice);
     if (arr.length == 0) return 0;
     var temp = arr
-        .map((e) => e.getScoreDivision(type).getScoringElementCount(element))
+        .map((e) =>
+            e.getScoreDivision(type).getScoringElementCount(element?.key))
         .removeOutliers(removeOutliers);
     if (temp.length != 0) return temp.mean();
     return 0;
   }
 
-  double medianScore(
-      Dice dice, bool removeOutliers, OpModeType? type, String? element) {
+  double medianScore(Dice dice, bool removeOutliers, OpModeType? type,
+      ScoringElement? element) {
     final arr = this.diceScores(dice);
     if (arr.length == 0) return 0;
     var temp = arr
-        .map((e) => e.getScoreDivision(type).getScoringElementCount(element))
+        .map((e) =>
+            e.getScoreDivision(type).getScoringElementCount(element?.key))
         .removeOutliers(removeOutliers);
     if (temp.length != 0) return temp.median();
     return 0;
   }
 
-  double standardDeviationScore(
-      Dice? dice, bool removeOutliers, OpModeType? type, String? element) {
+  double standardDeviationScore(Dice? dice, bool removeOutliers,
+      OpModeType? type, ScoringElement? element) {
     final arr = this.diceScores(dice);
     if (arr.length == 0) return 0;
     var temp = arr
-        .map((e) => e.getScoreDivision(type).getScoringElementCount(element))
+        .map((e) =>
+            e.getScoreDivision(type).getScoringElementCount(element?.key))
         .removeOutliers(removeOutliers);
     if (temp.length != 0) return temp.standardDeviation();
     return 0;
@@ -471,20 +487,20 @@ extension ScoresExtension on Map<String, Score> {
       return null;
     return sorted.last
         .total()
-        .percentIncrease(sorted[this.values.length - 2].total());
+        ?.percentIncrease(sorted[this.values.length - 2].total() ?? 0);
   }
 }
 
 extension more on Iterable<ScoreDivision> {
-  double? percentIncrease(String? element) {
+  double? percentIncrease(ScoringElement? element) {
     final sorted = this.toList();
     sorted.sort((a, b) => a.timeStamp.toDate().compareTo(b.timeStamp.toDate()));
     if (sorted.length < 2 ||
-        sorted[this.length - 2].getScoringElementCount(element) == 0)
+        sorted[this.length - 2].getScoringElementCount(element?.key) == 0)
       return null;
     return sorted.last
-        .getScoringElementCount(element)
-        ?.percentIncrease(sorted[this.length - 2].total());
+        .getScoringElementCount(element?.key)
+        ?.percentIncrease(sorted[this.length - 2].total() ?? 0);
   }
 
   double? totalPercentIncrease(String? element) {
@@ -494,6 +510,6 @@ extension more on Iterable<ScoreDivision> {
       return null;
     return sorted.last
         .getScoringElementCount(element)
-        ?.percentIncrease(sorted[0].total());
+        ?.percentIncrease(sorted[0].total() ?? 0);
   }
 }

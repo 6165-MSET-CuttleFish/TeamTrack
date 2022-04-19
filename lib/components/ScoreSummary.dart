@@ -36,7 +36,7 @@ class ScoreSummary extends StatelessWidget {
         BarGraph(
           height: height,
           width: width,
-          val: score?.total(showPenalties: showPenalties).toDouble() ?? total,
+          val: score?.total(showPenalties: showPenalties)?.toDouble() ?? total,
           max: totalMax,
           title: 'Total',
           units: units,
@@ -44,7 +44,7 @@ class ScoreSummary extends StatelessWidget {
         BarGraph(
           height: height,
           width: width,
-          val: score?.autoScore.total().toDouble() ?? auto,
+          val: score?.autoScore.total()?.toDouble() ?? auto,
           max: autoMax,
           title: 'Autonomous',
           units: units,
@@ -52,7 +52,7 @@ class ScoreSummary extends StatelessWidget {
         BarGraph(
           height: height,
           width: width,
-          val: score?.teleScore.total().toDouble() ?? tele,
+          val: score?.teleScore.total()?.toDouble() ?? tele,
           max: teleMax,
           title: 'Tele-Op',
           units: units,
@@ -60,7 +60,7 @@ class ScoreSummary extends StatelessWidget {
         BarGraph(
           height: height,
           width: width,
-          val: score?.endgameScore.total().toDouble() ?? end,
+          val: score?.endgameScore.total()?.toDouble() ?? end,
           max: endMax,
           title: 'Endgame',
           units: units,

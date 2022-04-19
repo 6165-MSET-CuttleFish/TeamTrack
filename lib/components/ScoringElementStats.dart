@@ -15,7 +15,7 @@ class ScoringElementStats extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 5.0, right: 5.0),
+      padding: const EdgeInsets.only(left: 5.0, right: 5.0, bottom: 5.0),
       child: Container(
         color: backgroundColor,
         child: Column(
@@ -66,8 +66,8 @@ class ScoringElementStats extends StatelessWidget {
         vertical: false,
       );
   BarGraph buildNestedGraph(BuildContext context) => BarGraph(
-        val: element.scoreValue().toDouble(),
-        max: maxElement.scoreValue().toDouble(),
+        val: element.count.toDouble(),
+        max: maxElement.count.toDouble(),
         width: 20,
         height: 60,
         title: "Median",

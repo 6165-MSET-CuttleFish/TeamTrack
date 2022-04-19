@@ -1,5 +1,6 @@
 import 'package:teamtrack/components/EmptyList.dart';
 import 'package:teamtrack/models/GameModel.dart';
+import 'package:teamtrack/models/ScoreModel.dart';
 import 'package:teamtrack/models/StatConfig.dart';
 import 'package:teamtrack/views/home/team/TeamRow.dart';
 import 'package:teamtrack/views/home/team/TeamView.dart';
@@ -21,7 +22,7 @@ class TeamList extends StatefulWidget {
   }) : super(key: key);
   final Event event;
   final OpModeType? sortMode;
-  final String? elementSort;
+  final ScoringElement? elementSort;
   final StatConfig statConfig;
   @override
   State<StatefulWidget> createState() => _TeamList();
@@ -70,7 +71,7 @@ class _TeamList extends State<TeamList> {
                           type: widget.sortMode)
                       .removeOutliers(widget.statConfig.removeOutliers)
                       .map((spot) => spot.y)
-                      .mean(),
+                      .median(),
                 )
                 .maxValue();
           }
@@ -168,7 +169,7 @@ class TeamSearch extends SearchDelegate<String?> {
       required this.event,
       this.sortMode,
       required this.statConfig,
-      required this.elementSort}) {
+      required this.elementSort,}) {
     max = event.teams.maxMeanScore(
         Dice.none, statConfig.removeOutliers, sortMode, elementSort);
     final teams = event.teams.values;
@@ -187,7 +188,7 @@ class TeamSearch extends SearchDelegate<String?> {
   }
   late double max;
   OpModeType? sortMode;
-  String? elementSort;
+  ScoringElement? elementSort;
   List<Team> teams;
   Event event;
   StatConfig statConfig;

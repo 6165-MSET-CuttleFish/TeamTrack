@@ -186,7 +186,11 @@ class Score extends ScoreDivision implements Comparable<Score> {
         ...((showPenalties ?? false) ? penalties.getElements() : [])
       ];
   @override
-  int total({bool? showPenalties}) {
+  int? total({bool? showPenalties, bool markDisconnect = false}) {
+    bool disconnected = autoScore.robotDisconnected ||
+        teleScore.robotDisconnected ||
+        endgameScore.robotDisconnected;
+    if (disconnected && markDisconnect) return null;
     final list = getElements(showPenalties: showPenalties)
         .map((e) => e.scoreValue())
         .toList();
@@ -278,7 +282,7 @@ class Score extends ScoreDivision implements Comparable<Score> {
       };
 
   @override
-  int compareTo(Score other) => total().compareTo(other.total());
+  int compareTo(Score other) => (total() ?? 0).compareTo(other.total() ?? 0);
 }
 
 extension scoreList on Map<String, Score> {
@@ -601,7 +605,7 @@ class Penalty extends ScoreDivision {
   List<ScoringElement> getElements() => [majorPenalty, minorPenalty];
 
   @override
-  int total({bool? showPenalties}) => getElements()
+  int total({bool? showPenalties, bool markDisconnect = false}) => getElements()
       .map((e) => e.scoreValue())
       .reduce((value, element) => value + element);
 
@@ -678,8 +682,9 @@ class ScoringElement {
 
   int totalAttempted() => count + misses;
 
-  int? countFactoringAttempted() =>
-      didAttempt() ? count : null;
+  int? countFactoringAttempted() => didAttempt() ? count : null;
+
+  int? scoreValueFactoringAttempted() => didAttempt() ? scoreValue() : null;
 
   void increment() {
     if (count < max!()) {
@@ -716,24 +721,29 @@ class ScoringElement {
 }
 
 abstract class ScoreDivision {
-  int total({bool? showPenalties}) => getElements().length == 0
-      ? 0
-      : getElements()
-          .map((e) => e
-              .scoreValue()) // map scoring elements to an array of their score values
-          .reduce((value, element) => value + element) // sum the array
-          .clamp(0, 999); // clamp the sum to a min of 0 and a max of 999
+  int? total({bool? showPenalties, bool markDisconnect = true}) =>
+      (markDisconnect && robotDisconnected)
+          ? null
+          : getElements().length == 0
+              ? 0
+              : getElements()
+                  .map((e) => e
+                      .scoreValue()) // map scoring elements to an array of their score values
+                  .reduce((value, element) => value + element) // sum the array
+                  .clamp(
+                      0, 999); // clamp the sum to a min of 0 and a max of 999
   Dice getDice(); // get the dice object
   List<ScoringElement> getElements(); // get the scoring elements
   late Timestamp timeStamp; // the time stamp of the Score object
   void reset(); // reset the scoring elements
   bool robotDisconnected = false; // whether the robot disconnected
   int? getScoringElementCount(String? key) {
-    if (key == null) return total();
+    if (key == null && !robotDisconnected) return total();
     final scoringElement = this.getElements().parse().firstWhere(
           (e) => e.key == key,
           orElse: () => ScoringElement(),
         );
-    if (scoringElement.didAttempt()) return scoringElement.scoreValue();
+    if (scoringElement.didAttempt() && !robotDisconnected)
+      return scoringElement.scoreValue();
   }
 }

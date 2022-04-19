@@ -28,7 +28,7 @@ class EventView extends StatefulWidget {
 
 class _EventView extends State<EventView> {
   OpModeType? sortingModifier;
-  String? elementSort;
+  ScoringElement? elementSort;
   bool ascending = false;
   List<Widget> materialTabs() => [
         TeamList(
@@ -117,8 +117,7 @@ class _EventView extends State<EventView> {
                                           title: Text(e?.name ?? "Total"),
                                           onTap: () {
                                             HapticFeedback.lightImpact();
-                                            setState(
-                                                () => elementSort = e?.key);
+                                            setState(() => elementSort = e);
                                             Navigator.pop(context);
                                           },
                                         ),
@@ -136,7 +135,7 @@ class _EventView extends State<EventView> {
                             (value) {
                               return DropdownMenuItem<OpModeType?>(
                                 value: value,
-                                child: Text((value?.toVal() ?? "Total")),
+                                child: Text(value?.toVal() ?? "Total"),
                               );
                             },
                           ).toList(),

@@ -22,7 +22,7 @@ class TeamRow extends StatelessWidget {
   final Event event;
   final double max;
   final OpModeType? sortMode;
-  final String? elementSort;
+  final ScoringElement? elementSort;
   final void Function()? onTap;
   final StatConfig statConfig;
 
@@ -39,14 +39,7 @@ class TeamRow extends StatelessWidget {
                 (key, value) => MapEntry(key, value.getScoreDivision(sortMode)))
             .values
             .percentIncrease(elementSort);
-    final elementName = Score("", Dice.none, event.gameName)
-        .getScoreDivision(sortMode)
-        .getElements()
-        .parse()
-        .firstWhere((element) => element.key == elementSort,
-            orElse: () => ScoringElement())
-        .name
-        .toString();
+    final elementName = elementSort?.name ?? "";
     return Container(
       decoration: BoxDecoration(
         border: Border.all(
