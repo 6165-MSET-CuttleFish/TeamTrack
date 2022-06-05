@@ -64,7 +64,7 @@ class _LandingPageState extends State<LandingPage> {
       case Tab.blocked_users:
         return BlockList();
       case Tab.templates:
-        return TemplatesList(superState: this);
+        return TemplatesList();
       case Tab.events:
         return EventsList();
     }

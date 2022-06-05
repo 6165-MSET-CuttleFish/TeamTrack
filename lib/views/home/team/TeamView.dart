@@ -112,13 +112,13 @@ class _TeamViewState extends State<TeamView> {
             : ButtonBar(
                 alignment: MainAxisAlignment.center,
                 children: [
-                  OutlineButton(
-                    disabledTextColor: Theme.of(context).colorScheme.primary,
+                  OutlinedButton(
+/*                    disabledTextColor: Theme.of(context).colorScheme.primary,
                     highlightedBorderColor: Theme.of(context).splashColor,
                     disabledBorderColor: Theme.of(context).colorScheme.primary,
                     color: _dice == Dice.one
                         ? Theme.of(context).colorScheme.primary
-                        : null,
+                        : null,*/
                     child: Text(Dice.one.toVal(widget.event.gameName)),
                     onPressed: _dice != Dice.one
                         ? () {
@@ -130,13 +130,13 @@ class _TeamViewState extends State<TeamView> {
                           }
                         : null,
                   ),
-                  OutlineButton(
-                    disabledTextColor: Theme.of(context).colorScheme.primary,
+                  OutlinedButton(
+/*                    disabledTextColor: Theme.of(context).colorScheme.primary,
                     highlightedBorderColor: Theme.of(context).splashColor,
                     disabledBorderColor: Theme.of(context).colorScheme.primary,
                     color: _dice == Dice.two
                         ? Theme.of(context).colorScheme.primary
-                        : null,
+                        : null,*/
                     child: Text(Dice.two.toVal(widget.event.gameName)),
                     onPressed: _dice != Dice.two
                         ? () {
@@ -148,13 +148,13 @@ class _TeamViewState extends State<TeamView> {
                           }
                         : null,
                   ),
-                  OutlineButton(
-                    disabledTextColor: Theme.of(context).colorScheme.primary,
+                  OutlinedButton(
+/*                    disabledTextColor: Theme.of(context).colorScheme.primary,
                     highlightedBorderColor: Theme.of(context).splashColor,
                     disabledBorderColor: Theme.of(context).colorScheme.primary,
                     color: _dice == Dice.three
                         ? Theme.of(context).colorScheme.primary
-                        : null,
+                        : null,*/
                     child: Text(Dice.three.toVal(widget.event.gameName)),
                     onPressed: _dice != Dice.three
                         ? () {
