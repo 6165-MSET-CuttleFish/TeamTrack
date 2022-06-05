@@ -38,7 +38,7 @@ dependencies:
   fl_chart: ^0.41.0
   flutter_slidable: ^1.2.0
   auth_buttons: ^2.0.4
-  syncfusion_flutter_charts: ^19.1.67
+  syncfusion_flutter_charts: ^20.1.58+1
   google_maps_flutter: ^2.1.1
 
   firebase_core: ^1.12.0
