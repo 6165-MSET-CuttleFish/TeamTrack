@@ -676,9 +676,23 @@ class ScoringElement {
     if (max == null) max = () => 999;
   }
 
-  int scoreValue() => totalValue ?? (count * value);
+  int scoreValue() {
+    if (nestedElements != null) {
+      return nestedElements!
+          .map((e) => e.scoreValue())
+          .reduce((value, element) => value + element);
+    }
+    return totalValue ?? (count * value);
+  }
 
-  bool didAttempt() => misses > 0 || count > 0;
+  bool didAttempt() =>
+      misses > 0 ||
+      count > 0 ||
+      (nestedElements?.reduce((value, element) {
+            if (element.didAttempt()) value.count = 1;
+            return value;
+          }).didAttempt() ??
+          false);
 
   int totalAttempted() => count + misses;
 

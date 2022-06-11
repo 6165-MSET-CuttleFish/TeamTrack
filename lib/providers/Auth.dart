@@ -13,6 +13,7 @@ class AuthenticationService {
   User? getUser() => _firebaseAuth.currentUser;
   Stream<User?> get authStateChanges => _firebaseAuth.userChanges();
 
+  // add fcm token to cloud firestore user document
   Future<void> addToken() async {
     final docRef = firebaseFirestore
         .collection('users')
@@ -27,6 +28,7 @@ class AuthenticationService {
     });
   }
 
+  // remove fcm token from cloud firestore user document
   Future<void> removeToken() async {
     final docRef = firebaseFirestore
         .collection('users')
@@ -40,6 +42,7 @@ class AuthenticationService {
     });
   }
 
+  // sign in with email and password
   Future<String?> signIn({
     required String email,
     required String password,
@@ -54,6 +57,7 @@ class AuthenticationService {
     }
   }
 
+  // deal with forgotten passwords
   Future<String?> forgotPassword({required String email}) async {
     try {
       await _firebaseAuth.sendPasswordResetEmail(email: email);
@@ -63,6 +67,7 @@ class AuthenticationService {
     }
   }
 
+  // sign up with email, password, and a display name
   Future<String?> signUp({
     required String email,
     required String password,

@@ -417,10 +417,14 @@ class _Incrementor extends State<Incrementor> {
                   )
               : null)
           : null,
-      fillColor:
-          widget.element.didAttempt() ? Colors.green.withOpacity(0.3) : null,
       child: Container(
-        color: widget.backgroundColor,
+        color: widget.element.nestedElements == null
+            ? widget.backgroundColor == null
+                ? widget.element.didAttempt()
+                    ? Colors.green.withOpacity(0.3)
+                    : null
+                : widget.backgroundColor
+            : null,
         child: Column(
           children: [
             if (!widget.element.isBool &&
@@ -429,22 +433,31 @@ class _Incrementor extends State<Incrementor> {
               ExpansionTile(
                 title: Text(widget.element.name),
                 initiallyExpanded: true,
-                children: widget.element.nestedElements!
-                    .map(
-                      (e) => Incrementor(
-                        element: e,
-                        onPressed: widget.onPressed,
-                        path: widget.path,
-                        event: widget.event,
-                        backgroundColor: widget.backgroundColor,
-                        onDecrement: widget.onDecrement,
-                        onIncrement: widget.onIncrement,
-                        mutableDecrement: widget.mutableDecrement,
-                        mutableIncrement: widget.mutableIncrement,
-                        max: widget.max,
-                      ),
-                    )
-                    .toList(),
+                children: [
+                  BarGraph(
+                    val: widget.element.scoreValue().toDouble(),
+                    max: widget.max,
+                    vertical: false,
+                    height: MediaQuery.of(context).size.width,
+                    width: 4,
+                    compressed: true,
+                    showPercentage: false,
+                  ),
+                  ...widget.element.nestedElements!
+                      .map(
+                        (e) => Incrementor(
+                          element: e,
+                          onPressed: widget.onPressed,
+                          path: widget.path,
+                          event: widget.event,
+                          onDecrement: widget.onDecrement,
+                          onIncrement: widget.onIncrement,
+                          mutableDecrement: widget.mutableDecrement,
+                          mutableIncrement: widget.mutableIncrement,
+                        ),
+                      )
+                      .toList()
+                ],
               )
             else
               widget.element.nestedElements == null ||
@@ -475,7 +488,7 @@ class _Incrementor extends State<Incrementor> {
                         ),
                         if (widget.max != 0 && !widget.element.isBool)
                           BarGraph(
-                            val: widget.element.count.toDouble(),
+                            val: widget.element.scoreValue().toDouble(),
                             max: widget.max,
                             vertical: false,
                             height: MediaQuery.of(context).size.width,

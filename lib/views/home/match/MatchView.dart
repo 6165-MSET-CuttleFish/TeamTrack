@@ -163,49 +163,87 @@ class _MatchView extends State<MatchView> {
                   .maxValue(),
         )
         .maxValue();
-    Score('', Dice.none, event.gameName).autoScore.getElements().forEach(
+    Score('', Dice.none, event.gameName)
+        .autoScore
+        .getElements()
+        .parse(putNone: false)
+        .forEach(
       (e) {
         maxAutoScores[e.key ?? ''] = event.teams.values
             .map(
               (team) => team.scores.values
-                  .map((score) => score.autoScore.elements[e.key]?.count ?? 0)
+                  .map((score) => score.autoScore
+                      .getElements()
+                      .parse()
+                      .firstWhere((element) => element.key == e.key,
+                          orElse: () => ScoringElement())
+                      .scoreValue())
                   .maxValue(),
             )
             .maxValue();
         maxAutoTargets[e.key ?? ''] = event.teams.values
-            .map((team) =>
-                team.targetScore?.autoScore.elements[e.key]?.count ?? 0)
+            .map((team) => team.targetScore?.autoScore
+                .getElements()
+                .parse()
+                .firstWhere((element) => element.key == e.key,
+                    orElse: () => ScoringElement())
+                .scoreValue())
             .maxValue();
       },
     );
-    Score('', Dice.none, event.gameName).teleScore.getElements().forEach(
+    Score('', Dice.none, event.gameName)
+        .teleScore
+        .getElements()
+        .parse(putNone: false)
+        .forEach(
       (e) {
         maxTeleScores[e.key ?? ''] = event.teams.values
             .map(
               (team) => team.scores.values
-                  .map((score) => score.teleScore.elements[e.key]?.count ?? 0)
+                  .map((score) => score.teleScore
+                      .getElements()
+                      .parse()
+                      .firstWhere((element) => element.key == e.key,
+                          orElse: () => ScoringElement())
+                      .scoreValue())
                   .maxValue(),
             )
             .maxValue();
         maxTeleTargets[e.key ?? ''] = event.teams.values
-            .map((team) =>
-                team.targetScore?.teleScore.elements[e.key]?.count ?? 0)
+            .map((team) => team.targetScore?.teleScore
+                .getElements()
+                .parse()
+                .firstWhere((element) => element.key == e.key,
+                    orElse: () => ScoringElement())
+                .scoreValue())
             .maxValue();
       },
     );
-    Score('', Dice.none, event.gameName).endgameScore.getElements().forEach(
+    Score('', Dice.none, event.gameName)
+        .endgameScore
+        .getElements()
+        .parse(putNone: false)
+        .forEach(
       (e) {
         maxEndgameScores[e.key ?? ''] = event.teams.values
             .map(
               (team) => team.scores.values
-                  .map(
-                      (score) => score.endgameScore.elements[e.key]?.count ?? 0)
+                  .map((score) => score.endgameScore
+                      .getElements()
+                      .parse()
+                      .firstWhere((element) => element.key == e.key,
+                          orElse: () => ScoringElement())
+                      .scoreValue())
                   .maxValue(),
             )
             .maxValue();
         maxEndgameTargets[e.key ?? ''] = event.teams.values
-            .map((team) =>
-                team.targetScore?.endgameScore.elements[e.key]?.count ?? 0)
+            .map((team) => team.targetScore?.endgameScore
+                .getElements()
+                .parse()
+                .firstWhere((element) => element.key == e.key,
+                    orElse: () => ScoringElement())
+                .scoreValue())
             .maxValue();
       },
     );
@@ -830,6 +868,7 @@ class _MatchView extends State<MatchView> {
     if (_match?.type == EventType.remote) return _selectedAlliance;
     if (_selectedAlliance == _match?.red) return _match?.blue;
     if (_selectedAlliance == _match?.blue) return _match?.red;
+    return null;
   }
 
   ListView viewSelect() {

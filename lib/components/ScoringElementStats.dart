@@ -20,37 +20,17 @@ class ScoringElementStats extends StatelessWidget {
         color: backgroundColor,
         child: Column(
           children: [
-            if (element.id != null && element.nestedElements != null)
-              Material(
-                child: ExpansionTile(
-                  leading: Text(element.name),
-                  title: buildNestedGraph(context),
-                  children: element.nestedElements!
-                      .map(
-                        (e) => ScoringElementStats(
-                          element: e,
-                          maxElement: maxElement.nestedElements?.firstWhere(
-                                (element) => element.key == e.key,
-                                orElse: () => maxElement,
-                              ) ??
-                              maxElement,
-                        ),
-                      )
-                      .toList(),
-                ),
-              )
-            else
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(element.name),
-                  Spacer(),
-                  if (!element.isBool)
-                    buildIntegerGraph(context)
-                  else
-                    buildAccuracyGraph(context)
-                ],
-              )
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(element.name),
+                Spacer(),
+                if (!element.isBool)
+                  buildIntegerGraph(context)
+                else
+                  buildAccuracyGraph(context)
+              ],
+            )
           ],
         ),
       ),
@@ -58,21 +38,22 @@ class ScoringElementStats extends StatelessWidget {
   }
 
   BarGraph buildIntegerGraph(BuildContext context) => BarGraph(
-        val: element.count.toDouble(),
-        max: maxElement.count.toDouble(),
+        val: element.scoreValue().toDouble(),
+        max: maxElement.scoreValue().toDouble(),
         width: 20,
         height: 60,
         title: "Median",
+        units: ' pts',
         vertical: false,
       );
-  BarGraph buildNestedGraph(BuildContext context) => BarGraph(
-        val: element.count.toDouble(),
-        max: maxElement.count.toDouble(),
-        width: 20,
-        height: 60,
-        title: "Median",
-        vertical: false,
-      );
+  // BarGraph buildNestedGraph(BuildContext context) => BarGraph(
+  //       val: element.scoreValue().toDouble(),
+  //       max: maxElement.scoreValue().toDouble(),
+  //       width: 20,
+  //       height: 60,
+  //       title: "Median",
+  //       vertical: false,
+  //     );
   BarGraph buildAccuracyGraph(BuildContext context) => BarGraph(
         val: element.count.toDouble(),
         max: maxElement.count.toDouble(),

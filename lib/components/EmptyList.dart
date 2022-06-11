@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Class to display an empty list
 class EmptyList extends StatelessWidget {
   const EmptyList({Key? key}) : super(key: key);
 

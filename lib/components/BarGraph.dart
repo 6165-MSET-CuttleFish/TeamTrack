@@ -1,3 +1,4 @@
+// Class for the BarGraph component which can represent singular proportions
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -12,9 +13,9 @@ class BarGraph extends StatelessWidget {
     this.height = 120,
     this.width = 30,
     this.title = 'Default',
-    this.units = '',
+    this.units = '', // units of measurement
     this.percentage = 0,
-    this.vertical = true,
+    this.vertical = true, // vertical or horizontal bar
     this.compressed = false,
     this.showPercentage = true,
   }) : super(key: key) {

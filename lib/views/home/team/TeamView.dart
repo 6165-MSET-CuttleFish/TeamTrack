@@ -605,31 +605,43 @@ class _TeamViewState extends State<TeamView> {
                             ),
                             titlesData: FlTitlesData(
                               show: true,
-                              topTitles: SideTitles(showTitles: false),
-                              rightTitles: SideTitles(showTitles: false),
-                              bottomTitles: SideTitles(
-                                showTitles: true,
-                                reservedSize: 22,
-                                getTextStyles: (value, size) => const TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 10),
-                                getTitles: (value) {
-                                  return value == value.toInt()
-                                      ? (value + 1).toInt().toString()
-                                      : "";
-                                },
-                                margin: 8,
-                              ),
-                              leftTitles: SideTitles(
-                                showTitles: true,
-                                getTextStyles: (value, size) => const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15,
+                              bottomTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                                  showTitles: true,
+                                  getTitlesWidget: (value, titleMeta) {
+                                    return Text(
+                                        value == value.toInt()
+                                            ? (value + 1).toInt().toString()
+                                            : "",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 10));
+                                  },
                                 ),
-                                getTitles: (value) {
-                                  return value.toInt().toString();
-                                },
-                                reservedSize: 28,
-                                margin: 12,
+                              ),
+                              leftTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                                  showTitles: true,
+                                  // getTitlesWidget: (value, titleMeta) {
+                                  //   return Text(value.toInt().toString(),
+                                  //       style: TextStyle(
+                                  //         fontWeight: FontWeight.bold,
+                                  //         fontSize: 15,
+                                  //       ));
+                                  // },
+                                  reservedSize: 35,
+                                  //interval: 15,
+                                ),
+                              ),
+                              topTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                                  showTitles: false,
+                                ),
+                              ),
+                              rightTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                                  showTitles: false,
+                                ),
                               ),
                             ),
                             borderData: FlBorderData(
@@ -657,10 +669,8 @@ class _TeamViewState extends State<TeamView> {
                                 belowBarData: _team.targetScore != null
                                     ? BarAreaData(
                                         show: true,
-                                        colors: [
-                                          Colors.lightGreenAccent
-                                              .withOpacity(0.5)
-                                        ],
+                                        color: Colors.lightGreenAccent
+                                            .withOpacity(0.5),
                                         cutOffY: _team.targetScore
                                             ?.total()
                                             ?.toDouble(),
@@ -670,9 +680,8 @@ class _TeamViewState extends State<TeamView> {
                                 aboveBarData: _team.targetScore != null
                                     ? BarAreaData(
                                         show: true,
-                                        colors: [
-                                          Colors.redAccent.withOpacity(0.5)
-                                        ],
+                                        color:
+                                            Colors.redAccent.withOpacity(0.5),
                                         cutOffY: _team.targetScore
                                             ?.total()
                                             ?.toDouble(),
@@ -707,9 +716,7 @@ class _TeamViewState extends State<TeamView> {
                                           widget
                                               .event.statConfig.removeOutliers,
                                         ),
-                                colors: [
-                                  generalColor,
-                                ],
+                                color: generalColor,
                                 isCurved: true,
                                 isStrokeCapRound: true,
                                 preventCurveOverShooting: true,
@@ -737,9 +744,7 @@ class _TeamViewState extends State<TeamView> {
                                           widget
                                               .event.statConfig.removeOutliers,
                                         ),
-                                colors: [
-                                  autoColor,
-                                ],
+                                color: autoColor,
                                 isCurved: true,
                                 isStrokeCapRound: true,
                                 preventCurveOverShooting: true,
@@ -769,9 +774,7 @@ class _TeamViewState extends State<TeamView> {
                                           widget
                                               .event.statConfig.removeOutliers,
                                         ),
-                                colors: [
-                                  teleColor,
-                                ],
+                                color: teleColor,
                                 isCurved: true,
                                 isStrokeCapRound: true,
                                 preventCurveOverShooting: true,
@@ -799,9 +802,7 @@ class _TeamViewState extends State<TeamView> {
                                           widget
                                               .event.statConfig.removeOutliers,
                                         ),
-                                colors: [
-                                  endgameColor,
-                                ],
+                                color: endgameColor,
                                 isCurved: true,
                                 isStrokeCapRound: true,
                                 preventCurveOverShooting: true,

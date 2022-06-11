@@ -214,7 +214,8 @@ class _MatchList extends State<MatchList> {
               .removeOutliers(widget.event.statConfig.removeOutliers)
               .map((spot) => spot.y)
               .maxValue()
-          : widget.team?.scores.maxScore(Dice.none, false, OpModeType.auto, null) ??
+          : widget.team?.scores
+                  .maxScore(Dice.none, false, OpModeType.auto, null) ??
               0;
       teleMax = widget.event.statConfig.allianceTotal
           ? widget.event.matches.values
@@ -223,7 +224,8 @@ class _MatchList extends State<MatchList> {
               .removeOutliers(widget.event.statConfig.removeOutliers)
               .map((spot) => spot.y)
               .maxValue()
-          : widget.team?.scores.maxScore(Dice.none, false, OpModeType.tele, null) ??
+          : widget.team?.scores
+                  .maxScore(Dice.none, false, OpModeType.tele, null) ??
               0;
       endMax = widget.event.statConfig.allianceTotal
           ? widget.event.matches.values
