@@ -44,14 +44,16 @@ class Event with ClusterItem {
     required this.name,
     required this.type,
     required this.gameName,
+    this.event_key='none',
     this.role = Role.editor,
   });
 
+  String event_key='none';
   String id = Uuid().v4();
   StatConfig statConfig = StatConfig();
 
   TeamTrackUser? author;
-
+bool matchesloaded = false;
   String gameName = Statics.gameName;
   Role role = Role.editor;
   bool shared = false;
@@ -88,7 +90,23 @@ class Event with ClusterItem {
       },
     );
   }
-
+String getKey(){
+    return event_key;
+}
+bool hasKey(){
+    if(event_key!='none'&&event_key!=''){
+      return true;
+    }
+    else{
+      return false;
+    }
+}
+void loadIn(){
+    matchesloaded = true;
+}
+bool isloaded(){
+    return matchesloaded;
+}
   void addTeam(Team newTeam) async {
     await getRef()
         ?.child('teams/${newTeam.number}')
@@ -105,6 +123,15 @@ class Event with ClusterItem {
       arr.sort((a, b) => b.timeStamp.compareTo(a.timeStamp));
     return arr;
   }
+  List<Match> getAllMatches(T) {
+    var arr = <Match>[];
+    final matches = getSortedMatches(true);
+    for (var match in matches) {
+        arr.add(match);
+    }
+    return arr;
+  }
+
 
   TeamTrackUser getTTUserFromUser(User? user) {
     return TeamTrackUser(
@@ -321,6 +348,7 @@ class Event with ClusterItem {
       gameName = map['gameName'] ?? Statics.gameName;
       type = getTypeFromString(map['type']);
       name = map['name'];
+
       try {
         teams = (map['teams'] as Map)
             .map((key, value) => MapEntry(key, Team.fromJson(value, gameName)));
@@ -405,6 +433,7 @@ class Event with ClusterItem {
     type = getTypeFromString(json?['type']);
     statConfig.allianceTotal = type == EventType.remote;
     name = json?['name'] ?? "";
+    event_key = json?['event_key']??"none";
     try {
       teams = (json?['teams'] as Map)
           .map((key, value) => MapEntry(key, Team.fromJson(value, gameName)));
@@ -463,6 +492,7 @@ class Event with ClusterItem {
         'seconds': createdAt.seconds,
         'nanoSeconds': createdAt.nanoseconds,
         'createdAt': cloudFirestore ? createdAt : createdAt.toJson(),
+         'event_key': event_key,
       };
   Map<String, dynamic> toSimpleJson() => {
         'gameName': gameName,

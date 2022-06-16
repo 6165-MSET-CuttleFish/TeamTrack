@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/services.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/models/ScoreModel.dart';
@@ -13,6 +15,8 @@ import 'package:flutter/material.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:teamtrack/functions/Statistics.dart';
+
+import '../../../api/APIKEYS.dart';
 
 class EventView extends StatefulWidget {
   EventView({
@@ -43,7 +47,19 @@ class _EventView extends State<EventView> {
         ),
       ];
   int _tab = 0;
-
+  List bod = [];
+  _getMatches() async {
+    APIKEYS.getMatches(widget.event.getKey()).then((response) {
+      setState(() {
+        bod = (json.decode(response.body).toList());
+        //print(bod);
+      });
+    });
+  }
+  initState() {
+    _getMatches();
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
@@ -65,6 +81,64 @@ class _EventView extends State<EventView> {
                   ),
                 ),
               ),
+            if(_tab!=0&&widget.event.hasKey()&&!widget.event.isloaded())
+            IconButton(
+              icon: Icon(Icons.refresh),
+              tooltip: 'Reload Matches',
+              onPressed: ()
+              {
+   print(widget.event.getKey());
+                _getMatches();
+                for(var x in bod) {
+
+               setState( () {
+                widget.event.addMatch(
+                  Match(
+                    Alliance(
+                      widget.event.teams
+                          .findAdd(
+                          x['participants'][0]['team']['team_number']
+                              .toString(),
+                          x['participants'][0]['team']['team_name_short']
+                              .toString(), widget.event),
+                      widget.event.teams
+                          .findAdd(
+                          x['participants'][1]['team']['team_number']
+                              .toString(),
+                          x['participants'][1]['team']['team_name_short']
+                              .toString(), widget.event),
+                      widget.event.type,
+                      widget.event.gameName,
+                    ),
+                    Alliance(
+                      widget.event.teams
+                          .findAdd(
+                          x['participants'][2]['team']['team_number']
+                              .toString(),
+                          x['participants'][2]['team']['team_name_short']
+                              .toString(), widget.event),
+                      widget.event.teams
+                          .findAdd(
+                          x['participants'][3]['team']['team_number']
+                              .toString(),
+                          x['participants'][3]['team']['team_name_short']
+                              .toString(), widget.event),
+                      widget.event.type,
+                      widget.event.gameName,
+                    ),
+                    widget.event.type,
+                  ),
+                );
+              });
+               setState((){});
+               //   dataModel.saveEvents();
+                }
+   if(bod.length>0){
+     widget.event.loadIn();
+   }
+              }
+
+            ),
             _tab != 0
                 ? IconButton(
                     tooltip: "Sort",
@@ -286,7 +360,6 @@ class _EventView extends State<EventView> {
     );
     setState(() {});
   }
-
   String _newName = '';
   String _newNumber = '';
   void _teamConfig() {

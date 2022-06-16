@@ -46,7 +46,7 @@ class _TemplatesList extends State<TemplatesList> {
   onSearch(String search) {
     setState(() {
       bodvis =
-          bod.where((element) => element['event_name'].toString().toLowerCase().indexOf(search.toLowerCase())!=-1)
+          bod.where((element) => element['event_name'].toString().toLowerCase().indexOf(search.toLowerCase())!=-1).where((element) => element['venue'].toString()!='Virtual').where((element) => element['venue'].toString()!='Remote').where((element) => element['venue'].toString()!='Remote Event').where((element) => element['event_name'].toString().toLowerCase().indexOf('remote'.toLowerCase())==-1)
               .toList();
     });
   }
@@ -79,7 +79,7 @@ class _TemplatesList extends State<TemplatesList> {
           ),
         ),
       ), body: Container(
-      child:ListView.builder(
+      child:bod.isEmpty ? Center(child: PlatformProgressIndicator()):bodvis.isEmpty ? Center(child: Text('No Results Found')):ListView.builder(
         itemCount: bodvis.length,
         itemBuilder: (context, index) {
           return Card(
