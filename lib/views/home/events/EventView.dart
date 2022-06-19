@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:teamtrack/models/GameModel.dart';
+import 'package:teamtrack/models/ScoreModel.dart';
 import 'package:teamtrack/views/LandingPage.dart' as LandingPage;
 import 'package:teamtrack/views/home/match/MatchConfig.dart';
 import 'package:teamtrack/views/home/match/MatchList.dart';
@@ -27,12 +28,14 @@ class EventView extends StatefulWidget {
 
 class _EventView extends State<EventView> {
   OpModeType? sortingModifier;
+  ScoringElement? elementSort;
   bool ascending = false;
   List<Widget> materialTabs() => [
         TeamList(
           event: widget.event,
           sortMode: sortingModifier,
           statConfig: widget.event.statConfig,
+          elementSort: elementSort,
         ),
         MatchList(
           event: widget.event,
@@ -77,32 +80,67 @@ class _EventView extends State<EventView> {
                     },
                   )
                 : Center(
-                    child: DropdownButton<OpModeType?>(
-                      value: sortingModifier,
-                      icon: Icon(Icons.sort),
-                      iconSize: 24,
-                      elevation: 16,
-                      underline: Container(
-                        height: 0.5,
-                        color: Colors.deepPurple,
-                      ),
-                      onChanged: (newValue) {
-                        HapticFeedback.lightImpact();
-                        setState(() => sortingModifier = newValue);
-                      },
-                      items: [
-                        null,
-                        OpModeType.auto,
-                        OpModeType.tele,
-                        OpModeType.endgame,
-                      ].map<DropdownMenuItem<OpModeType?>>(
-                        (value) {
-                          return DropdownMenuItem<OpModeType?>(
-                            value: value,
-                            child: Text((value?.toVal() ?? "Total")),
-                          );
-                        },
-                      ).toList(),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        DropdownButton<OpModeType?>(
+                          value: sortingModifier,
+                          icon: Icon(Icons.sort),
+                          iconSize: 24,
+                          elevation: 16,
+                          underline: Container(
+                            height: 0.5,
+                            color: Colors.deepPurple,
+                          ),
+                          onChanged: (newValue) {
+                            HapticFeedback.lightImpact();
+                            setState(() {
+                              elementSort = null;
+                              sortingModifier = newValue;
+                            });
+                            if (sortingModifier != null)
+                              showModalBottomSheet(
+                                context: context,
+                                builder: (_) => Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    null,
+                                    if (sortingModifier != null)
+                                      ...Score("", Dice.none,
+                                              widget.event.gameName)
+                                          .getScoreDivision(sortingModifier)
+                                          .getElements()
+                                          .parse()
+                                  ]
+                                      .map(
+                                        (e) => ListTile(
+                                          title: Text(e?.name ?? "Total"),
+                                          onTap: () {
+                                            HapticFeedback.lightImpact();
+                                            setState(() => elementSort = e);
+                                            Navigator.pop(context);
+                                          },
+                                        ),
+                                      )
+                                      .toList(),
+                                ),
+                              );
+                          },
+                          items: [
+                            null,
+                            OpModeType.auto,
+                            OpModeType.tele,
+                            OpModeType.endgame,
+                          ].map<DropdownMenuItem<OpModeType?>>(
+                            (value) {
+                              return DropdownMenuItem<OpModeType?>(
+                                value: value,
+                                child: Text(value?.toVal() ?? "Total"),
+                              );
+                            },
+                          ).toList(),
+                        ),
+                      ],
                     ),
                   ),
             IconButton(
@@ -115,9 +153,11 @@ class _EventView extends State<EventView> {
                   delegate: _tab == 0
                       ? TeamSearch(
                           statConfig: widget.event.statConfig,
+                          elementSort: elementSort,
                           teams: widget.event.statConfig.sorted
                               ? widget.event.teams.sortedTeams(
                                   sortingModifier,
+                                  elementSort,
                                   widget.event.statConfig,
                                   widget.event.matches.values.toList(),
                                 )

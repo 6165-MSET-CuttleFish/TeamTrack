@@ -83,6 +83,7 @@ class _MatchView extends State<MatchView> {
                   Dice.none,
                   false,
                   null,
+                  null,
                 ),
         )
         .maxValue();
@@ -95,11 +96,7 @@ class _MatchView extends State<MatchView> {
         .map(
           (e) => _match == null
               ? e.targetScore?.autoScore.total()
-              : e.scores.maxScore(
-                  Dice.none,
-                  false,
-                  OpModeType.auto,
-                ),
+              : e.scores.maxScore(Dice.none, false, OpModeType.auto, null),
         )
         .maxValue();
     teleMaxTotal = event.matches.values
@@ -111,11 +108,7 @@ class _MatchView extends State<MatchView> {
         .map(
           (e) => _match == null
               ? e.targetScore?.teleScore.total()
-              : e.scores.maxScore(
-                  Dice.none,
-                  false,
-                  OpModeType.tele,
-                ),
+              : e.scores.maxScore(Dice.none, false, OpModeType.tele, null),
         )
         .maxValue();
     endgameMaxTotal = event.matches.values
@@ -127,11 +120,7 @@ class _MatchView extends State<MatchView> {
         .map(
           (e) => _match == null
               ? e.targetScore?.endgameScore.total()
-              : e.scores.maxScore(
-                  Dice.none,
-                  false,
-                  OpModeType.endgame,
-                ),
+              : e.scores.maxScore(Dice.none, false, OpModeType.endgame, null),
         )
         .maxValue();
     cyclesMaxTotal = event.matches.values
@@ -174,49 +163,87 @@ class _MatchView extends State<MatchView> {
                   .maxValue(),
         )
         .maxValue();
-    Score('', Dice.none, event.gameName).autoScore.getElements().forEach(
+    Score('', Dice.none, event.gameName)
+        .autoScore
+        .getElements()
+        .parse(putNone: false)
+        .forEach(
       (e) {
         maxAutoScores[e.key ?? ''] = event.teams.values
             .map(
               (team) => team.scores.values
-                  .map((score) => score.autoScore.elements[e.key]?.count ?? 0)
+                  .map((score) => score.autoScore
+                      .getElements()
+                      .parse()
+                      .firstWhere((element) => element.key == e.key,
+                          orElse: () => ScoringElement())
+                      .scoreValue())
                   .maxValue(),
             )
             .maxValue();
         maxAutoTargets[e.key ?? ''] = event.teams.values
-            .map((team) =>
-                team.targetScore?.autoScore.elements[e.key]?.count ?? 0)
+            .map((team) => team.targetScore?.autoScore
+                .getElements()
+                .parse()
+                .firstWhere((element) => element.key == e.key,
+                    orElse: () => ScoringElement())
+                .scoreValue())
             .maxValue();
       },
     );
-    Score('', Dice.none, event.gameName).teleScore.getElements().forEach(
+    Score('', Dice.none, event.gameName)
+        .teleScore
+        .getElements()
+        .parse(putNone: false)
+        .forEach(
       (e) {
         maxTeleScores[e.key ?? ''] = event.teams.values
             .map(
               (team) => team.scores.values
-                  .map((score) => score.teleScore.elements[e.key]?.count ?? 0)
+                  .map((score) => score.teleScore
+                      .getElements()
+                      .parse()
+                      .firstWhere((element) => element.key == e.key,
+                          orElse: () => ScoringElement())
+                      .scoreValue())
                   .maxValue(),
             )
             .maxValue();
         maxTeleTargets[e.key ?? ''] = event.teams.values
-            .map((team) =>
-                team.targetScore?.teleScore.elements[e.key]?.count ?? 0)
+            .map((team) => team.targetScore?.teleScore
+                .getElements()
+                .parse()
+                .firstWhere((element) => element.key == e.key,
+                    orElse: () => ScoringElement())
+                .scoreValue())
             .maxValue();
       },
     );
-    Score('', Dice.none, event.gameName).endgameScore.getElements().forEach(
+    Score('', Dice.none, event.gameName)
+        .endgameScore
+        .getElements()
+        .parse(putNone: false)
+        .forEach(
       (e) {
         maxEndgameScores[e.key ?? ''] = event.teams.values
             .map(
               (team) => team.scores.values
-                  .map(
-                      (score) => score.endgameScore.elements[e.key]?.count ?? 0)
+                  .map((score) => score.endgameScore
+                      .getElements()
+                      .parse()
+                      .firstWhere((element) => element.key == e.key,
+                          orElse: () => ScoringElement())
+                      .scoreValue())
                   .maxValue(),
             )
             .maxValue();
         maxEndgameTargets[e.key ?? ''] = event.teams.values
-            .map((team) =>
-                team.targetScore?.endgameScore.elements[e.key]?.count ?? 0)
+            .map((team) => team.targetScore?.endgameScore
+                .getElements()
+                .parse()
+                .firstWhere((element) => element.key == e.key,
+                    orElse: () => ScoringElement())
+                .scoreValue())
             .maxValue();
       },
     );
@@ -544,6 +571,8 @@ class _MatchView extends State<MatchView> {
                                 Text(
                                   ("${_selectedTeam?.number} : ${_selectedTeam?.name ?? ''}"),
                                   style: Theme.of(context).textTheme.headline6,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                                 if (_match == null)
                                   Padding(
@@ -839,6 +868,7 @@ class _MatchView extends State<MatchView> {
     if (_match?.type == EventType.remote) return _selectedAlliance;
     if (_selectedAlliance == _match?.red) return _match?.blue;
     if (_selectedAlliance == _match?.blue) return _match?.red;
+    return null;
   }
 
   ListView viewSelect() {
@@ -867,34 +897,65 @@ class _MatchView extends State<MatchView> {
 
   String matchPath(OpModeType opModeType) =>
       'matches/${widget.match?.id}/${allianceColor()}/sharedScore/${OpModeType.endgame.toRep()}';
-
   List<Widget> autoView() => [
         if (widget.event.type != EventType.remote && _match != null)
-          BarGraph(
-            title: "Contribution",
-            vertical: false,
-            height: MediaQuery.of(context).size.width,
-            width: 15,
-            val: _score?.autoScore.total().toDouble() ?? 0.0,
-            max: _selectedAlliance?.total().autoScore.total().toDouble() ?? 0.0,
+          RawMaterialButton(
+            onPressed: () {
+              setState(() {
+                _score?.autoScore.robotDisconnected =
+                    !(_score?.autoScore.robotDisconnected ?? false);
+              });
+              widget.event
+                  .getRef()
+                  ?.child(teamPath(OpModeType.auto))
+                  .parent
+                  ?.update(
+                {'autoDc': _score?.autoScore.robotDisconnected ?? false},
+              );
+            },
+            fillColor: (_score?.autoScore.robotDisconnected ?? false)
+                ? Colors.yellow.withOpacity(0.3)
+                : null,
+            child: BarGraph(
+              title: "Contribution",
+              vertical: false,
+              height: MediaQuery.of(context).size.width,
+              width: 15,
+              val: _score?.autoScore.total(markDisconnect: false)?.toDouble() ??
+                  0.0,
+              max: _selectedAlliance
+                      ?.total()
+                      .autoScore
+                      .total(markDisconnect: false)
+                      ?.toDouble() ??
+                  0.0,
+            ),
           ),
-        ..._score?.autoScore
-                .getElements()
-                .parse()
-                .map(
-                  (e) => Incrementor(
-                    element: e,
-                    onPressed: stateSetter,
-                    event: widget.event,
-                    path: teamPath(OpModeType.auto),
-                    score: _score,
-                    max: widget.match != null
-                        ? maxAutoScores[e.key] ?? 0
-                        : maxAutoTargets[e.key] ?? 0,
-                  ),
-                )
-                .toList() ??
-            [],
+        if (_score?.autoScore.robotDisconnected ?? false)
+          Column(
+            children: [
+              Icon(Icons.warning),
+              Center(child: Text("Robot Disconnected")),
+            ],
+          ),
+        if (!(_score?.autoScore.robotDisconnected ?? false))
+          ..._score?.autoScore
+                  .getElements()
+                  .parse()
+                  .map(
+                    (e) => Incrementor(
+                      element: e,
+                      onPressed: stateSetter,
+                      event: widget.event,
+                      path: teamPath(OpModeType.auto),
+                      score: _score,
+                      max: widget.match != null
+                          ? maxAutoScores[e.key] ?? 0
+                          : maxAutoTargets[e.key] ?? 0,
+                    ),
+                  )
+                  .toList() ??
+              [],
         if (widget.match != null)
           ..._selectedAlliance?.sharedScore.autoScore.getElements().parse().map(
                     (e) => Incrementor(
@@ -912,61 +973,39 @@ class _MatchView extends State<MatchView> {
   List<Widget> teleView() => !_paused || _allowView
       ? [
           if (widget.event.type != EventType.remote && _match != null)
-            BarGraph(
-              title: "Contribution",
-              vertical: false,
-              height: MediaQuery.of(context).size.width,
-              width: 15,
-              val: _score?.teleScore.total().toDouble() ?? 0.0,
-              max: _selectedAlliance?.total().teleScore.total().toDouble() ??
-                  0.0,
-            ),
-          if (widget.event.type == EventType.remote && _match != null)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                BarGraph(
-                  height: 40,
-                  title: "Total Cycles",
-                  val: _score?.teleScore.totalCycles().toDouble() ?? 0.0,
-                  max: (widget.event.type == EventType.remote &&
-                              widget.match != null) ||
-                          _allianceTotal
-                      ? cyclesMaxTotal
-                      : cyclesMaxInd,
-                ),
-                BarGraph(
-                  height: 40,
-                  title: "Tele-Op Cycles",
-                  val: _score?.teleScore.teleCycles().toDouble() ?? 0.0,
-                  max: (widget.event.type == EventType.remote &&
-                              widget.match != null) ||
-                          _allianceTotal
-                      ? teleCyclesMaxTotal
-                      : teleCyclesMaxInd,
-                ),
-                BarGraph(
-                  height: 40,
-                  title: "Endgame Cycles",
-                  val: _score?.teleScore.endgameCycles().toDouble() ?? 0.0,
-                  max: (widget.event.type == EventType.remote &&
-                              widget.match != null) ||
-                          _allianceTotal
-                      ? endgameCyclesMaxTotal
-                      : endgameCyclesMaxInd,
-                ),
-                BarGraph(
-                  height: 40,
-                  title: "Misses",
-                  val: _score?.teleScore.misses.count.toDouble() ?? 0.0,
-                  max: (widget.event.type == EventType.remote &&
-                              widget.match != null) ||
-                          _allianceTotal
-                      ? missesTotal
-                      : missesInd,
-                  inverted: true,
-                ),
-              ],
+            RawMaterialButton(
+              onPressed: () {
+                setState(() {
+                  _score?.teleScore.robotDisconnected =
+                      !(_score?.teleScore.robotDisconnected ?? false);
+                });
+                widget.event
+                    .getRef()
+                    ?.child(teamPath(OpModeType.tele))
+                    .parent
+                    ?.update(
+                  {'teleDc': _score?.teleScore.robotDisconnected ?? false},
+                );
+              },
+              fillColor: (_score?.autoScore.robotDisconnected ?? false)
+                  ? Colors.yellow.withOpacity(0.3)
+                  : null,
+              child: BarGraph(
+                title: "Contribution",
+                vertical: false,
+                height: MediaQuery.of(context).size.width,
+                width: 15,
+                val: _score?.teleScore
+                        .total(markDisconnect: false)
+                        ?.toDouble() ??
+                    0.0,
+                max: _selectedAlliance
+                        ?.total()
+                        .teleScore
+                        .total(markDisconnect: false)
+                        ?.toDouble() ??
+                    0.0,
+              ),
             ),
           Incrementor(
             backgroundColor: Colors.grey.withOpacity(0.3),
@@ -974,79 +1013,81 @@ class _MatchView extends State<MatchView> {
             onPressed: () => setState(
               () {
                 _score?.teleScore.getElements().forEach((element) {
-                  element.incrementValue = incrementValue.count;
+                  if (!element.isBool) {
+                    element.incrementValue = incrementValue.count;
+                  }
                   stateSetter();
                 });
               },
             ),
           ),
-          Padding(padding: EdgeInsets.all(5)),
-          Incrementor(
-            backgroundColor: Colors.red.withOpacity(0.3),
-            element: _score?.teleScore.misses ?? ScoringElement(),
-            onPressed: stateSetter,
-            event: widget.event,
-            path: teamPath(OpModeType.tele),
-            score: _score,
-          ),
-          ..._score?.teleScore
-                  .getElements()
-                  .parse()
-                  .map(
-                    (e) => Incrementor(
-                      element: e,
-                      onPressed: stateSetter,
-                      onDecrement: widget.match != null ? increaseMisses : null,
-                      onIncrement: _paused ? null : onIncrement,
-                      event: widget.event,
-                      path: teamPath(OpModeType.tele),
-                      score: _score,
-                      mutableIncrement: (mutableData) {
-                        if (widget.match == null) {
-                          var ref = (mutableData as Map?)?[e.key];
-                          if (ref < e.max!())
-                            mutableData?[e.key] =
-                                (ref ?? 0) + incrementValue.count;
-                          return Transaction.success(mutableData);
-                        }
-                        var ref = mutableData as Map?;
-                        if (ref?[e.key] < e.max!()) {
-                          mutableData?[e.key] =
-                              (ref?[e.key] ?? 0) + e.incrementValue;
-                          lapses.add(
-                            (_time - sum).toPrecision(3),
-                          );
-                          sum = _time;
-                          if (!_paused) {
-                            mutableData?['CycleTimes'] = lapses;
-                          }
-                        }
-                        return Transaction.success(mutableData);
-                      },
-                      mutableDecrement: (mutableData) {
-                        if (widget.match == null) {
-                          var ref = (mutableData as Map?)?[e.key];
-                          if (ref < e.max!())
-                            mutableData?[e.key] = (ref ?? 0) - 1;
-                          return Transaction.success(mutableData);
-                        }
-                        var ref = mutableData as Map?;
-                        if (ref?[e.key] < e.max!()) {
-                          mutableData?[e.key] =
-                              (ref?[e.key] ?? 0) - e.decrementValue;
-                          if (!_paused) {
-                            mutableData?['Misses'] = (ref?['Misses'] ?? 0) + 1;
-                          }
-                        }
-                        return Transaction.success(mutableData);
-                      },
-                      max: widget.match != null
-                          ? maxTeleScores[e.key] ?? 0
-                          : maxTeleTargets[e.key] ?? 0,
-                    ),
-                  )
-                  .toList() ??
-              [],
+          if (_score?.teleScore.robotDisconnected ?? false)
+            Column(
+              children: [
+                Icon(Icons.warning),
+                Center(child: Text("Robot Disconnected")),
+              ],
+            ),
+          if (!(_score?.teleScore.robotDisconnected ?? false))
+            ..._score?.teleScore
+                    .getElements()
+                    .parse()
+                    .map(
+                      (e) => Incrementor(
+                        element: e,
+                        onPressed: stateSetter,
+                        onDecrement:
+                            widget.match != null ? increaseMisses : null,
+                        onIncrement: _paused ? null : onIncrement,
+                        event: widget.event,
+                        path: teamPath(OpModeType.tele),
+                        score: _score,
+                        // mutableIncrement: (mutableData) {
+                        //   if (widget.match == null) {
+                        //     var ref = (mutableData as Map?)?[e.key];
+                        //     if (ref < e.max!())
+                        //       mutableData?[e.key] =
+                        //           (ref ?? 0) + incrementValue.count;
+                        //     return Transaction.success(mutableData);
+                        //   }
+                        //   var ref = mutableData as Map?;
+                        //   if (ref?[e.key] < e.max!()) {
+                        //     mutableData?[e.key] =
+                        //         (ref?[e.key] ?? 0) + e.incrementValue;
+                        //     lapses.add(
+                        //       (_time - sum).toPrecision(3),
+                        //     );
+                        //     sum = _time;
+                        //     if (!_paused) {
+                        //       mutableData?['CycleTimes'] = lapses;
+                        //     }
+                        //   }
+                        //   return Transaction.success(mutableData);
+                        // },
+                        // mutableDecrement: (mutableData) {
+                        //   if (widget.match == null) {
+                        //     var ref = (mutableData as Map?)?[e.key];
+                        //     if (ref < e.max!())
+                        //       mutableData?[e.key] = (ref ?? 0) - 1;
+                        //     return Transaction.success(mutableData);
+                        //   }
+                        //   var ref = mutableData as Map?;
+                        //   if (ref?[e.key] < e.max!()) {
+                        //     mutableData?[e.key] =
+                        //         (ref?[e.key] ?? 0) - e.decrementValue;
+                        //     if (!_paused) {
+                        //       mutableData?['Misses'] = (ref?['Misses'] ?? 0) + 1;
+                        //     }
+                        //   }
+                        //   return Transaction.success(mutableData);
+                        // },
+                        max: widget.match != null
+                            ? maxTeleScores[e.key] ?? 0
+                            : maxTeleTargets[e.key] ?? 0,
+                      ),
+                    )
+                    .toList() ??
+                [],
           if (widget.match != null)
             ..._selectedAlliance?.sharedScore.teleScore
                     .getElements()
@@ -1090,32 +1131,65 @@ class _MatchView extends State<MatchView> {
   List<Widget> endView() => !_paused || _allowView
       ? [
           if (widget.event.type != EventType.remote && _match != null)
-            BarGraph(
-              title: "Contribution",
-              vertical: false,
-              height: MediaQuery.of(context).size.width,
-              width: 15,
-              val: _score?.endgameScore.total().toDouble() ?? 0.0,
-              max: _selectedAlliance?.total().endgameScore.total().toDouble() ??
-                  0.0,
+            RawMaterialButton(
+              onPressed: () {
+                setState(() {
+                  _score?.endgameScore.robotDisconnected =
+                      !(_score?.endgameScore.robotDisconnected ?? false);
+                });
+                widget.event
+                    .getRef()
+                    ?.child(teamPath(OpModeType.endgame))
+                    .parent
+                    ?.update(
+                  {'endDc': _score?.endgameScore.robotDisconnected ?? false},
+                );
+              },
+              fillColor: (_score?.autoScore.robotDisconnected ?? false)
+                  ? Colors.yellow.withOpacity(0.3)
+                  : null,
+              child: BarGraph(
+                title: "Contribution",
+                vertical: false,
+                height: MediaQuery.of(context).size.width,
+                width: 15,
+                val: _score?.endgameScore
+                        .total(markDisconnect: false)
+                        ?.toDouble() ??
+                    0.0,
+                max: _selectedAlliance
+                        ?.total()
+                        .endgameScore
+                        .total(markDisconnect: false)
+                        ?.toDouble() ??
+                    0.0,
+              ),
             ),
-          ..._score?.endgameScore
-                  .getElements()
-                  .parse()
-                  .map(
-                    (e) => Incrementor(
-                      element: e,
-                      onPressed: stateSetter,
-                      event: widget.event,
-                      path: teamPath(OpModeType.endgame),
-                      score: _score,
-                      max: widget.match != null
-                          ? maxEndgameScores[e.key] ?? 0
-                          : maxEndgameTargets[e.key] ?? 0,
-                    ),
-                  )
-                  .toList() ??
-              [],
+          if (_score?.endgameScore.robotDisconnected ?? false)
+            Column(
+              children: [
+                Icon(Icons.warning),
+                Center(child: Text("Robot Disconnected")),
+              ],
+            ),
+          if (!(_score?.endgameScore.robotDisconnected ?? false))
+            ..._score?.endgameScore
+                    .getElements()
+                    .parse()
+                    .map(
+                      (e) => Incrementor(
+                        element: e,
+                        onPressed: stateSetter,
+                        event: widget.event,
+                        path: teamPath(OpModeType.endgame),
+                        score: _score,
+                        max: widget.match != null
+                            ? maxEndgameScores[e.key] ?? 0
+                            : maxEndgameTargets[e.key] ?? 0,
+                      ),
+                    )
+                    .toList() ??
+                [],
           Padding(padding: EdgeInsets.all(5)),
           if (widget.match != null)
             ..._selectedAlliance?.sharedScore.endgameScore

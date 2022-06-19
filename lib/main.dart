@@ -30,7 +30,8 @@ Future<void> main() async {
       provisional: false,
       sound: true,
     );
-    if (settings.authorizationStatus == AuthorizationStatus.authorized || settings.authorizationStatus == AuthorizationStatus.provisional) {
+    if (settings.authorizationStatus == AuthorizationStatus.authorized ||
+        settings.authorizationStatus == AuthorizationStatus.provisional) {
       await PushNotifications.initialize();
       String? token = await PushNotifications.getToken();
       if (token != "") {

@@ -18,6 +18,7 @@ class ScoreCard extends StatelessWidget {
     required this.removeOutliers,
     this.matches,
     required this.allianceTotal,
+    this.elements,
   }) : super(key: key) {
     switch (type) {
       case OpModeType.auto:
@@ -43,6 +44,7 @@ class ScoreCard extends StatelessWidget {
   ScoreDivision? targetScore;
   final bool removeOutliers;
   final List<Match>? matches;
+  final Widget? elements;
   @override
   Widget build(BuildContext context) {
     final allianceTotals = matches
@@ -93,6 +95,21 @@ class ScoreCard extends StatelessWidget {
               .maxValue(),
         )
         .maxValue();
+    final maxY = [
+      event.matches.values
+          .toList()
+          .maxAllianceScore(type: type, dice: dice)
+          .toDouble(),
+      team.targetScore?.getScoreDivision(type).total() ?? 0
+    ].maxValue();
+    final minY = [
+      event.teams.minScore(
+        dice,
+        event.statConfig.removeOutliers,
+        type,
+      ),
+      team.targetScore?.getScoreDivision(type).total() ?? 0,
+    ].minValue();
     return CardView(
       isActive: scoreDivisions.diceScores(dice).length > 1,
       child: Padding(
@@ -105,7 +122,7 @@ class ScoreCard extends StatelessWidget {
                   ? scoreDivisions.meanScore(dice, removeOutliers)
                   : allianceTotals?.mean() ?? 0,
               max: !allianceTotal
-                  ? event.teams.maxMeanScore(dice, removeOutliers, type)
+                  ? event.teams.maxMeanScore(dice, removeOutliers, type, null)
                   : maxAllianceMean,
               title: 'Mean',
             ),
@@ -114,7 +131,7 @@ class ScoreCard extends StatelessWidget {
                   ? scoreDivisions.medianScore(dice, removeOutliers)
                   : allianceTotals?.median() ?? 0,
               max: !allianceTotal
-                  ? event.teams.maxMedianScore(dice, removeOutliers, type)
+                  ? event.teams.maxMedianScore(dice, removeOutliers, type, null)
                   : maxAllianceMedian,
               title: 'Median',
             ),
@@ -132,8 +149,8 @@ class ScoreCard extends StatelessWidget {
                   ? scoreDivisions.standardDeviationScore(dice, removeOutliers)
                   : allianceTotals?.standardDeviation() ?? 0,
               max: !allianceTotal
-                  ? event.teams
-                      .lowestStandardDeviationScore(dice, removeOutliers, type)
+                  ? event.teams.lowestStandardDeviationScore(
+                      dice, removeOutliers, type, null)
                   : maxAllianceDeviation,
               inverted: true,
               title: 'Deviation',
@@ -147,153 +164,159 @@ class ScoreCard extends StatelessWidget {
                   .removeOutliers(removeOutliers)
                   .length >
               1
-          ? AspectRatio(
-              aspectRatio: 2,
-              child: Container(
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(18),
-                  ),
-                  // color: Color(0xff232d37),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                      right: 50.0, left: 12.0, top: 24, bottom: 12),
-                  child: LineChart(
-                    LineChartData(
-                      gridData: FlGridData(
-                        show: true,
-                        drawVerticalLine: true,
-                        getDrawingHorizontalLine: (value) {
-                          return FlLine(
-                            color: Colors.transparent,
-                            strokeWidth: value % 10 == 0 ? 1 : 0,
-                          );
-                        },
-                        getDrawingVerticalLine: (value) {
-                          return FlLine(
-                            color: Colors.transparent,
-                            strokeWidth: 1,
-                          );
-                        },
+          ? Column(
+              children: [
+                elements ?? Container(),
+                AspectRatio(
+                  aspectRatio: 2,
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(18),
                       ),
-                      titlesData: FlTitlesData(
-                        show: true,
-                        topTitles: SideTitles(showTitles: false),
-                        rightTitles: SideTitles(showTitles: false),
-                        bottomTitles: SideTitles(
-                          showTitles: true,
-                          reservedSize: 22,
-                          getTextStyles: (value, size) =>
-                              const TextStyle(fontSize: 10),
-                          getTitles: (value) {
-                            return (value == value.toInt()
-                                    ? (value + 1).toInt()
-                                    : "")
-                                .toString();
-                          },
-                          margin: 8,
-                        ),
-                        leftTitles: SideTitles(
-                          showTitles: true,
-                          getTextStyles: (value, size) => const TextStyle(
-                            fontSize: 15,
+                      // color: Color(0xff232d37),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          right: 50.0, left: 12.0, top: 24, bottom: 12),
+                      child: LineChart(
+                        LineChartData(
+                          gridData: FlGridData(
+                            show: true,
+                            drawVerticalLine: true,
+                            getDrawingHorizontalLine: (value) {
+                              return FlLine(
+                                color: Colors.transparent,
+                                strokeWidth: value % 10 == 0 ? 1 : 0,
+                              );
+                            },
+                            getDrawingVerticalLine: (value) {
+                              return FlLine(
+                                color: Colors.transparent,
+                                strokeWidth: 1,
+                              );
+                            },
                           ),
-                          getTitles: (value) {
-                            return value.toInt().toString();
-                          },
-                          reservedSize: 28,
-                          margin: 12,
-                        ),
-                      ),
-                      borderData: FlBorderData(
-                        show: true,
-                        border: Border.all(
-                            color: const Color(0xff37434d), width: 1),
-                      ),
-                      minY: [
-                        event.teams.minScore(
-                          dice,
-                          event.statConfig.removeOutliers,
-                          type,
-                        ),
-                        team.targetScore?.getScoreDivision(type).total() ?? 0,
-                      ].minValue(),
-                      maxY: [
-                        event.matches.values
-                            .toList()
-                            .maxAllianceScore(type: type, dice: dice)
-                            .toDouble(),
-                        team.targetScore?.getScoreDivision(type).total() ?? 0
-                      ].maxValue(),
-                      lineBarsData: [
-                        if (matches != null)
-                          LineChartBarData(
-                            belowBarData: team.targetScore != null
-                                ? BarAreaData(
-                                    show: true,
-                                    colors: [
-                                      Colors.lightGreenAccent.withOpacity(0.5)
-                                    ],
-                                    cutOffY: targetScore?.total().toDouble(),
-                                    applyCutOffY: true,
-                                  )
-                                : null,
-                            aboveBarData: team.targetScore != null
-                                ? BarAreaData(
-                                    show: true,
-                                    colors: [Colors.redAccent.withOpacity(0.5)],
-                                    cutOffY: targetScore?.total().toDouble(),
-                                    applyCutOffY: true,
-                                  )
-                                : null,
-                            spots: matches
-                                ?.where(
-                                  (e) => e.dice == dice || dice == Dice.none,
-                                )
-                                .toList()
-                                .spots(team, dice, false, type: type)
-                                .removeOutliers(removeOutliers),
-                            colors: [
-                              Color.fromRGBO(255, 166, 0, 1),
-                            ],
-                            isCurved: true,
-                            preventCurveOverShooting: true,
-                            barWidth: 5,
+                          titlesData: FlTitlesData(
+                            show: true,
+                            bottomTitles: AxisTitles(
+                              sideTitles: SideTitles(
+                                //reservedSize: 22,
+                                getTitlesWidget: (value, titleMeta) {
+                                  return Text(
+                                      (value == value.toInt()
+                                              ? (value + 1).toInt()
+                                              : "")
+                                          .toString(),
+                                      style: TextStyle(fontSize: 10));
+                                },
+                                //interval: 8,
+                                showTitles: true,
+                              ),
+                            ),
+                            topTitles: AxisTitles(
+                              sideTitles: SideTitles(
+                                showTitles: false,
+                              ),
+                            ),
+                            rightTitles: AxisTitles(
+                              sideTitles: SideTitles(
+                                showTitles: false,
+                              ),
+                            ),
+                            leftTitles: AxisTitles(
+                              sideTitles: SideTitles(
+                                getTitlesWidget: (value, titleMeta) {
+                                  return Text(
+                                    value.toInt().toString(),
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                    ),
+                                  );
+                                },
+                                reservedSize: 35,
+                                //interval: 12,
+                                showTitles: true,
+                              ),
+                            ),
                           ),
-                        LineChartBarData(
-                          belowBarData: team.targetScore != null
-                              ? BarAreaData(
-                                  show: true,
-                                  colors: [
-                                    Colors.lightGreenAccent.withOpacity(0.5)
-                                  ],
-                                  cutOffY: targetScore?.total().toDouble(),
-                                  applyCutOffY: true,
-                                )
-                              : null,
-                          aboveBarData: team.targetScore != null
-                              ? BarAreaData(
-                                  show: true,
-                                  colors: [Colors.redAccent.withOpacity(0.5)],
-                                  cutOffY: targetScore?.total().toDouble(),
-                                  applyCutOffY: true,
-                                )
-                              : null,
-                          spots: scoreDivisions
-                              .diceScores(dice)
-                              .spots()
-                              .removeOutliers(removeOutliers),
-                          colors: [type.getColor()],
-                          isCurved: true,
-                          preventCurveOverShooting: true,
-                          barWidth: 5,
+                          borderData: FlBorderData(
+                            show: true,
+                            border: Border.all(
+                                color: const Color(0xff37434d), width: 1),
+                          ),
+                          minY: minY == maxY ? null : minY,
+                          maxY: minY == maxY ? minY + 20 : maxY,
+                          lineBarsData: [
+                            if (matches != null)
+                              LineChartBarData(
+                                belowBarData: team.targetScore != null
+                                    ? BarAreaData(
+                                        show: true,
+                                        color: Colors.lightGreenAccent
+                                            .withOpacity(0.5),
+                                        cutOffY:
+                                            targetScore?.total()?.toDouble(),
+                                        applyCutOffY: true,
+                                      )
+                                    : null,
+                                aboveBarData: team.targetScore != null
+                                    ? BarAreaData(
+                                        show: true,
+                                        color:
+                                            Colors.redAccent.withOpacity(0.5),
+                                        cutOffY:
+                                            targetScore?.total()?.toDouble(),
+                                        applyCutOffY: true,
+                                      )
+                                    : null,
+                                spots: matches
+                                    ?.where(
+                                      (e) =>
+                                          e.dice == dice || dice == Dice.none,
+                                    )
+                                    .toList()
+                                    .spots(team, dice, false, type: type)
+                                    .removeOutliers(removeOutliers),
+                                color: Color.fromRGBO(255, 166, 0, 1),
+                                isCurved: true,
+                                preventCurveOverShooting: true,
+                                barWidth: 5,
+                              ),
+                            LineChartBarData(
+                              belowBarData: team.targetScore != null
+                                  ? BarAreaData(
+                                      show: true,
+                                      color: Colors.lightGreenAccent
+                                          .withOpacity(0.5),
+                                      cutOffY: targetScore?.total()?.toDouble(),
+                                      applyCutOffY: true,
+                                    )
+                                  : null,
+                              aboveBarData: team.targetScore != null
+                                  ? BarAreaData(
+                                      show: true,
+                                      color: Colors.redAccent.withOpacity(0.5),
+                                      cutOffY: targetScore?.total()?.toDouble(),
+                                      applyCutOffY: true,
+                                    )
+                                  : null,
+                              spots: scoreDivisions
+                                  .diceScores(dice)
+                                  .spots()
+                                  .removeOutliers(removeOutliers),
+                              color: type.getColor(),
+                              isCurved: true,
+                              preventCurveOverShooting: true,
+                              barWidth: 5,
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
-              ),
+              ],
             )
           : Text(''),
     );

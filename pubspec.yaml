@@ -34,11 +34,11 @@ dependencies:
 
   google_fonts: ^2.1.0
   curved_navigation_bar: ^1.0.1
-  assorted_layout_widgets: ^5.2.1
-  fl_chart: ^0.41.0
+  assorted_layout_widgets: ^6.0.0
+  fl_chart: ^0.51.0
   flutter_slidable: ^1.2.0
   auth_buttons: ^2.0.4
-  syncfusion_flutter_charts: ^19.1.67
+  syncfusion_flutter_charts: ^20.1.58+1
   google_maps_flutter: ^2.1.1
 
   firebase_core: ^1.12.0
@@ -49,7 +49,7 @@ dependencies:
   cloud_functions: ^3.2.6
   firebase_database: ^9.0.6
   google_sign_in: ^5.2.3
-  sign_in_with_apple: ^3.3.0
+  sign_in_with_apple: ^4.0.0
   crypto: ^3.0.1
   geoflutterfire: ^3.0.2
 

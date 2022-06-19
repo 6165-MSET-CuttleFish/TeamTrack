@@ -5,6 +5,7 @@ import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/functions/Statistics.dart';
 import 'package:teamtrack/models/ScoreModel.dart';
 import 'package:teamtrack/models/StatConfig.dart';
+import 'package:teamtrack/functions/Extensions.dart';
 
 class TeamRow extends StatelessWidget {
   const TeamRow({
@@ -15,11 +16,13 @@ class TeamRow extends StatelessWidget {
     this.sortMode,
     this.onTap,
     required this.statConfig,
+    required this.elementSort,
   }) : super(key: key);
   final Team team;
   final Event event;
   final double max;
   final OpModeType? sortMode;
+  final ScoringElement? elementSort;
   final void Function()? onTap;
   final StatConfig statConfig;
 
@@ -30,12 +33,13 @@ class TeamRow extends StatelessWidget {
             .getMatches(team)
             .map((e) => e.alliance(team)?.total())
             .whereType<Score>()
-            .percentIncrease()
+            .percentIncrease(elementSort)
         : team.scores
             .map(
                 (key, value) => MapEntry(key, value.getScoreDivision(sortMode)))
             .values
-            .percentIncrease();
+            .percentIncrease(elementSort);
+    final elementName = elementSort?.name ?? "";
     return Container(
       decoration: BoxDecoration(
         border: Border.all(
@@ -44,9 +48,12 @@ class TeamRow extends StatelessWidget {
         ),
       ),
       child: ListTile(
-        title: Text(
-          team.name,
-          style: Theme.of(context).textTheme.bodyText1,
+        title: SizedBox(
+          width: 200,
+          child: Text(
+            team.name,
+            style: Theme.of(context).textTheme.bodyText1,
+          ),
         ),
         leading: Text(
           team.number,
@@ -55,7 +62,16 @@ class TeamRow extends StatelessWidget {
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (percentIncrease != null) PercentChange(percentIncrease),
+            if (elementName.isNotEmpty)
+              SizedBox(
+                width: 50,
+                child: Text(
+                  elementName,
+                  style: Theme.of(context).textTheme.caption,
+                ),
+              ),
+            if (percentIncrease != null && elementName.isEmpty)
+              PercentChange(percentIncrease),
             Padding(
               padding: EdgeInsets.all(
                 10,
@@ -69,13 +85,22 @@ class TeamRow extends StatelessWidget {
                 val: statConfig.allianceTotal
                     ? event.matches.values
                         .toList()
-                        .spots(team, Dice.none, statConfig.showPenalties,
-                            type: sortMode)
+                        .spots(
+                          team,
+                          Dice.none,
+                          statConfig.showPenalties,
+                          type: sortMode,
+                          element: elementSort,
+                        )
                         .removeOutliers(statConfig.removeOutliers)
                         .map((spot) => spot.y)
                         .mean()
                     : team.scores.meanScore(
-                        Dice.none, statConfig.removeOutliers, sortMode),
+                        Dice.none,
+                        statConfig.removeOutliers,
+                        sortMode,
+                        elementSort,
+                      ),
                 max: max,
                 title: 'Mean',
               ),

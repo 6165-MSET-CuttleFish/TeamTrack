@@ -60,7 +60,7 @@ extension ExTeam on Team? {
 }
 
 extension MergeExt on List<ScoringElement> {
-  List<ScoringElement> parse() {
+  List<ScoringElement> parse({bool putNone = true}) {
     List<ScoringElement> newList = [];
     Map<String, ScoringElement> conglomerates = {};
     for (ScoringElement element in this) {
@@ -71,21 +71,36 @@ extension MergeExt on List<ScoringElement> {
           element.id!,
           () => ScoringElement(
             id: element.id,
+            key: element.id,
             name: element.id ?? "",
             nestedElements: [
-              ScoringElement(
-                name: "None",
-              ),
+              if (putNone)
+                ScoringElement(
+                  name: "None",
+                ),
             ],
           ),
         );
-        conglomerates[element.id!]?.nestedElements?.add(element);
+        final bigElement = conglomerates[element.id!];
+        bigElement?.nestedElements?.add(element);
+        bigElement?.count += element.count;
+        bigElement?.misses += element.misses;
+        bigElement?.isBool = element.isBool;
+        bigElement?.totalValue =
+            (bigElement.totalValue ?? 0) + element.scoreValue();
       }
     }
     for (ScoringElement element in conglomerates.values) {
       for (int i = 0; i < (element.nestedElements?.length ?? 0); i++) {
-        if (element.nestedElements?[i].count == 1) {
+        if (element.nestedElements?[i].misses == 1 && element.isBool) {
+          element.misses = 1;
+        }
+        if (element.nestedElements?[i].count == 1 && element.isBool) {
           element.count = i;
+        } else if (!(conglomerates[element.id!]?.isBool ?? true)) {
+          conglomerates[element.id!]
+              ?.nestedElements
+              ?.removeWhere((element) => element.id == null);
         }
       }
       newList.add(element);

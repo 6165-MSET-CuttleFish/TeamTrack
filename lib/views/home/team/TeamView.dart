@@ -1,6 +1,7 @@
 import 'package:teamtrack/components/Collapsible.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:teamtrack/components/ScoreCard.dart';
+import 'package:teamtrack/components/ScoringElementStats.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/views/home/change/ChangeList.dart';
 import 'package:teamtrack/views/home/match/MatchList.dart';
@@ -44,6 +45,47 @@ class _TeamViewState extends State<TeamView> {
   final autoColor = Colors.green;
   final generalColor = Color.fromRGBO(230, 30, 213, 1);
 
+  Score? maxScore;
+  Score? teamMaxScore;
+
+  @override
+  void initState() {
+    maxScore = Score('', Dice.none, widget.event.gameName);
+    maxScore?.getElements().forEach(
+      (element) {
+        element.count = widget.event.teams.values
+            .map(
+              (team) => !element.isBool
+                  ? team.scores.values
+                      .map(
+                        (score) => score
+                            .getElements()
+                            .firstWhere((e) => e.key == element.key,
+                                orElse: () => ScoringElement())
+                            .countFactoringAttempted(),
+                      )
+                      .whereType<int>()
+                      .median()
+                      .toInt()
+                  : team.scores.values
+                      .map(
+                        (score) => score
+                            .getElements()
+                            .firstWhere((e) => e.key == element.key,
+                                orElse: () => ScoringElement())
+                            .countFactoringAttempted(),
+                      )
+                      .whereType<int>()
+                      .accuracy()
+                      .toInt(),
+            )
+            .maxValue()
+            .toInt();
+      },
+    );
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
         bottomNavigationBar: NewPlatform.isIOS
@@ -70,13 +112,13 @@ class _TeamViewState extends State<TeamView> {
             : ButtonBar(
                 alignment: MainAxisAlignment.center,
                 children: [
-                  OutlineButton(
-                    disabledTextColor: Theme.of(context).colorScheme.primary,
-                    highlightedBorderColor: Theme.of(context).splashColor,
-                    disabledBorderColor: Theme.of(context).colorScheme.primary,
-                    color: _dice == Dice.one
-                        ? Theme.of(context).colorScheme.primary
-                        : null,
+                  OutlinedButton(
+                    style: ButtonStyle(
+                      backgroundColor: _dice == Dice.one
+                          ? MaterialStateProperty.all(
+                              Theme.of(context).colorScheme.primary)
+                          : null,
+                    ),
                     child: Text(Dice.one.toVal(widget.event.gameName)),
                     onPressed: _dice != Dice.one
                         ? () {
@@ -88,13 +130,13 @@ class _TeamViewState extends State<TeamView> {
                           }
                         : null,
                   ),
-                  OutlineButton(
-                    disabledTextColor: Theme.of(context).colorScheme.primary,
-                    highlightedBorderColor: Theme.of(context).splashColor,
-                    disabledBorderColor: Theme.of(context).colorScheme.primary,
-                    color: _dice == Dice.two
-                        ? Theme.of(context).colorScheme.primary
-                        : null,
+                  OutlinedButton(
+                    style: ButtonStyle(
+                      backgroundColor: _dice == Dice.two
+                          ? MaterialStateProperty.all(
+                              Theme.of(context).colorScheme.primary)
+                          : null,
+                    ),
                     child: Text(Dice.two.toVal(widget.event.gameName)),
                     onPressed: _dice != Dice.two
                         ? () {
@@ -106,13 +148,13 @@ class _TeamViewState extends State<TeamView> {
                           }
                         : null,
                   ),
-                  OutlineButton(
-                    disabledTextColor: Theme.of(context).colorScheme.primary,
-                    highlightedBorderColor: Theme.of(context).splashColor,
-                    disabledBorderColor: Theme.of(context).colorScheme.primary,
-                    color: _dice == Dice.three
-                        ? Theme.of(context).colorScheme.primary
-                        : null,
+                  OutlinedButton(
+                    style: ButtonStyle(
+                      backgroundColor: _dice == Dice.three
+                          ? MaterialStateProperty.all(
+                              Theme.of(context).colorScheme.primary)
+                          : null,
+                    ),
                     child: Text(Dice.three.toVal(widget.event.gameName)),
                     onPressed: _dice != Dice.three
                         ? () {
@@ -195,6 +237,35 @@ class _TeamViewState extends State<TeamView> {
                 context,
               );
               _team = widget.event.teams[widget.team.number] ?? Team.nullTeam();
+              teamMaxScore = Score('', Dice.none, widget.event.gameName);
+              teamMaxScore?.getElements().forEach(
+                (element) {
+                  element.count = !element.isBool
+                      ? _team.scores.values
+                          .map(
+                            (score) => score
+                                .getElements()
+                                .firstWhere((e) => e.key == element.key,
+                                    orElse: () => ScoringElement())
+                                .countFactoringAttempted(),
+                          )
+                          .whereType<int>()
+                          .toList()
+                          .median()
+                          .toInt()
+                      : _team.scores.values
+                          .map(
+                            (score) => score
+                                .getElements()
+                                .firstWhere((e) => e.key == element.key,
+                                    orElse: () => ScoringElement())
+                                .countFactoringAttempted(),
+                          )
+                          .whereType<int>()
+                          .accuracy()
+                          .toInt();
+                },
+              );
             }
             return ListView(
               children: [
@@ -387,6 +458,26 @@ class _TeamViewState extends State<TeamView> {
                         dice: _dice,
                         removeOutliers: widget.event.statConfig.removeOutliers,
                         matches: widget.event.getSortedMatches(true),
+                        elements: Column(
+                          children: teamMaxScore?.autoScore
+                                  .getElements()
+                                  .parse(putNone: false)
+                                  .map(
+                                    (element) => ScoringElementStats(
+                                      element: element,
+                                      maxElement: maxScore?.autoScore
+                                              .getElements()
+                                              .parse(putNone: false)
+                                              .firstWhere(
+                                                (e) => e.key == element.key,
+                                                orElse: () => ScoringElement(),
+                                              ) ??
+                                          element,
+                                    ),
+                                  )
+                                  .toList() ??
+                              [],
+                        ),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(top: 20, bottom: 10),
@@ -406,6 +497,26 @@ class _TeamViewState extends State<TeamView> {
                         dice: _dice,
                         removeOutliers: widget.event.statConfig.removeOutliers,
                         matches: widget.event.getSortedMatches(true),
+                        elements: Column(
+                          children: teamMaxScore?.teleScore
+                                  .getElements()
+                                  .parse()
+                                  .map(
+                                    (element) => ScoringElementStats(
+                                      element: element,
+                                      maxElement: maxScore?.teleScore
+                                              .getElements()
+                                              .parse()
+                                              .firstWhere(
+                                                (e) => e.key == element.key,
+                                                orElse: () => ScoringElement(),
+                                              ) ??
+                                          element,
+                                    ),
+                                  )
+                                  .toList() ??
+                              [],
+                        ),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(top: 20, bottom: 10),
@@ -425,6 +536,26 @@ class _TeamViewState extends State<TeamView> {
                         dice: _dice,
                         removeOutliers: widget.event.statConfig.removeOutliers,
                         matches: widget.event.getSortedMatches(true),
+                        elements: Column(
+                          children: teamMaxScore?.endgameScore
+                                  .getElements()
+                                  .parse()
+                                  .map(
+                                    (element) => ScoringElementStats(
+                                      element: element,
+                                      maxElement: maxScore?.endgameScore
+                                              .getElements()
+                                              .parse()
+                                              .firstWhere(
+                                                (e) => e.key == element.key,
+                                                orElse: () => ScoringElement(),
+                                              ) ??
+                                          element,
+                                    ),
+                                  )
+                                  .toList() ??
+                              [],
+                        ),
                       ),
                       Padding(
                         padding: EdgeInsets.all(130),
@@ -474,31 +605,43 @@ class _TeamViewState extends State<TeamView> {
                             ),
                             titlesData: FlTitlesData(
                               show: true,
-                              topTitles: SideTitles(showTitles: false),
-                              rightTitles: SideTitles(showTitles: false),
-                              bottomTitles: SideTitles(
-                                showTitles: true,
-                                reservedSize: 22,
-                                getTextStyles: (value, size) => const TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 10),
-                                getTitles: (value) {
-                                  return value == value.toInt()
-                                      ? (value + 1).toInt().toString()
-                                      : "";
-                                },
-                                margin: 8,
-                              ),
-                              leftTitles: SideTitles(
-                                showTitles: true,
-                                getTextStyles: (value, size) => const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15,
+                              bottomTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                                  showTitles: true,
+                                  getTitlesWidget: (value, titleMeta) {
+                                    return Text(
+                                        value == value.toInt()
+                                            ? (value + 1).toInt().toString()
+                                            : "",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 10));
+                                  },
                                 ),
-                                getTitles: (value) {
-                                  return value.toInt().toString();
-                                },
-                                reservedSize: 28,
-                                margin: 12,
+                              ),
+                              leftTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                                  showTitles: true,
+                                  // getTitlesWidget: (value, titleMeta) {
+                                  //   return Text(value.toInt().toString(),
+                                  //       style: TextStyle(
+                                  //         fontWeight: FontWeight.bold,
+                                  //         fontSize: 15,
+                                  //       ));
+                                  // },
+                                  reservedSize: 35,
+                                  //interval: 15,
+                                ),
+                              ),
+                              topTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                                  showTitles: false,
+                                ),
+                              ),
+                              rightTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                                  showTitles: false,
+                                ),
                               ),
                             ),
                             borderData: FlBorderData(
@@ -519,32 +662,29 @@ class _TeamViewState extends State<TeamView> {
                                       widget.event.statConfig.removeOutliers,
                                       null,
                                     ),
-                              _team.targetScore?.total().toDouble() ?? 0.0
+                              _team.targetScore?.total()?.toDouble() ?? 0.0
                             ].maxValue(),
                             lineBarsData: [
                               LineChartBarData(
                                 belowBarData: _team.targetScore != null
                                     ? BarAreaData(
                                         show: true,
-                                        colors: [
-                                          Colors.lightGreenAccent
-                                              .withOpacity(0.5)
-                                        ],
+                                        color: Colors.lightGreenAccent
+                                            .withOpacity(0.5),
                                         cutOffY: _team.targetScore
                                             ?.total()
-                                            .toDouble(),
+                                            ?.toDouble(),
                                         applyCutOffY: true,
                                       )
                                     : null,
                                 aboveBarData: _team.targetScore != null
                                     ? BarAreaData(
                                         show: true,
-                                        colors: [
-                                          Colors.redAccent.withOpacity(0.5)
-                                        ],
+                                        color:
+                                            Colors.redAccent.withOpacity(0.5),
                                         cutOffY: _team.targetScore
                                             ?.total()
-                                            .toDouble(),
+                                            ?.toDouble(),
                                         applyCutOffY: true,
                                       )
                                     : null,
@@ -576,9 +716,7 @@ class _TeamViewState extends State<TeamView> {
                                           widget
                                               .event.statConfig.removeOutliers,
                                         ),
-                                colors: [
-                                  generalColor,
-                                ],
+                                color: generalColor,
                                 isCurved: true,
                                 isStrokeCapRound: true,
                                 preventCurveOverShooting: true,
@@ -606,9 +744,7 @@ class _TeamViewState extends State<TeamView> {
                                           widget
                                               .event.statConfig.removeOutliers,
                                         ),
-                                colors: [
-                                  autoColor,
-                                ],
+                                color: autoColor,
                                 isCurved: true,
                                 isStrokeCapRound: true,
                                 preventCurveOverShooting: true,
@@ -638,9 +774,7 @@ class _TeamViewState extends State<TeamView> {
                                           widget
                                               .event.statConfig.removeOutliers,
                                         ),
-                                colors: [
-                                  teleColor,
-                                ],
+                                color: teleColor,
                                 isCurved: true,
                                 isStrokeCapRound: true,
                                 preventCurveOverShooting: true,
@@ -668,9 +802,7 @@ class _TeamViewState extends State<TeamView> {
                                           widget
                                               .event.statConfig.removeOutliers,
                                         ),
-                                colors: [
-                                  endgameColor,
-                                ],
+                                color: endgameColor,
                                 isCurved: true,
                                 isStrokeCapRound: true,
                                 preventCurveOverShooting: true,
@@ -753,38 +885,38 @@ class _TeamViewState extends State<TeamView> {
                 ),
               ),
             ),
-            SizedBox(
-              width: 45,
-              height: 90,
-              child: OutlinedButton(
-                onPressed: () => setState(
-                  () => _showCycles = !_showCycles,
-                ),
-                child: Text(
-                  'Show Cycle Times',
-                  style: Theme.of(context).textTheme.button,
-                  textAlign: TextAlign.center,
-                ),
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(
-                    _showCycles
-                        ? Colors.grey.withOpacity(0.3)
-                        : Colors.cyan.withOpacity(0.3),
-                  ),
-                  shape: MaterialStateProperty.all(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(20),
-                      ),
-                    ),
-                  ),
-                  alignment: Alignment.center,
-                  padding: MaterialStateProperty.all(
-                    EdgeInsets.all(0),
-                  ),
-                ),
-              ),
-            ),
+            // SizedBox(
+            //   width: 45,
+            //   height: 90,
+            //   child: OutlinedButton(
+            //     onPressed: () => setState(
+            //       () => _showCycles = !_showCycles,
+            //     ),
+            //     child: Text(
+            //       'Show Cycle Times',
+            //       style: Theme.of(context).textTheme.button,
+            //       textAlign: TextAlign.center,
+            //     ),
+            //     style: ButtonStyle(
+            //       backgroundColor: MaterialStateProperty.all(
+            //         _showCycles
+            //             ? Colors.grey.withOpacity(0.3)
+            //             : Colors.cyan.withOpacity(0.3),
+            //       ),
+            //       shape: MaterialStateProperty.all(
+            //         RoundedRectangleBorder(
+            //           borderRadius: BorderRadius.all(
+            //             Radius.circular(20),
+            //           ),
+            //         ),
+            //       ),
+            //       alignment: Alignment.center,
+            //       padding: MaterialStateProperty.all(
+            //         EdgeInsets.all(0),
+            //       ),
+            //     ),
+            //   ),
+            // ),
           ],
         )
       : Text('');

@@ -26,12 +26,14 @@ enum EventType {
   local,
   remote,
 }
+
 enum Dice {
   one,
   two,
   three,
   none,
 }
+
 enum OpModeType {
   auto,
   tele,
@@ -501,11 +503,21 @@ class Alliance {
     return returnVal;
   }
 
-  int allianceTotal(bool? showPenalties, {OpModeType? type}) =>
-      (((team1?.scores[id]?.getScoreDivision(type).total() ?? 0) +
-                  (team2?.scores[id]?.getScoreDivision(type).total() ?? 0) +
+  int allianceTotal(bool? showPenalties,
+          {OpModeType? type, ScoringElement? element}) =>
+      (((team1?.scores[id]
+                          ?.getScoreDivision(type)
+                          .getScoringElementCount(element?.key) ??
+                      0) +
+                  (team2?.scores[id]
+                          ?.getScoreDivision(type)
+                          .getScoringElementCount(element?.key) ??
+                      0) +
                   ((showPenalties ?? false) ? getPenalty() : 0)) +
-              sharedScore.getScoreDivision(type).total())
+              (sharedScore
+                      .getScoreDivision(type)
+                      .getScoringElementCount(element?.key) ??
+                  0))
           .clamp(0, 999);
   Alliance.fromJson(
     Map<String, dynamic> json,
@@ -563,6 +575,7 @@ class Match {
         (blue?.team2?.equals(team) ?? false)) {
       return blue;
     }
+    return null;
   }
 
   Alliance? opposingAlliance(Team? team) {
@@ -573,6 +586,7 @@ class Match {
         (blue?.team2?.equals(team) ?? false)) {
       return red;
     }
+    return null;
   }
 
   List<Team?> getTeams() => [red?.team1, red?.team2, blue?.team1, blue?.team2];
@@ -662,6 +676,7 @@ class Match {
     else if (number == blue?.team1?.number)
       return blue?.team1?.scores[id];
     else if (number == blue?.team2?.number) return blue?.team2?.scores[id];
+    return null;
   }
 
   Score? getAllianceScore(String? number) {
@@ -669,6 +684,7 @@ class Match {
       return red?.total();
     else if (number == blue?.team1?.number || number == blue?.team2?.number)
       return blue?.total();
+    return null;
   }
 }
 
