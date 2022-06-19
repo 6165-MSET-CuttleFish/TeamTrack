@@ -51,6 +51,7 @@ Timestamp? getTimestampFromString(Map<String, dynamic>? map) {
   if (map?['seconds'] != null && map?['nanoseconds'] != null) {
     return Timestamp(map?['seconds'], map?['nanoseconds']);
   }
+  return null;
 }
 
 void navigateToMatch(

@@ -885,38 +885,38 @@ class _TeamViewState extends State<TeamView> {
                 ),
               ),
             ),
-            SizedBox(
-              width: 45,
-              height: 90,
-              child: OutlinedButton(
-                onPressed: () => setState(
-                  () => _showCycles = !_showCycles,
-                ),
-                child: Text(
-                  'Show Cycle Times',
-                  style: Theme.of(context).textTheme.button,
-                  textAlign: TextAlign.center,
-                ),
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(
-                    _showCycles
-                        ? Colors.grey.withOpacity(0.3)
-                        : Colors.cyan.withOpacity(0.3),
-                  ),
-                  shape: MaterialStateProperty.all(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(20),
-                      ),
-                    ),
-                  ),
-                  alignment: Alignment.center,
-                  padding: MaterialStateProperty.all(
-                    EdgeInsets.all(0),
-                  ),
-                ),
-              ),
-            ),
+            // SizedBox(
+            //   width: 45,
+            //   height: 90,
+            //   child: OutlinedButton(
+            //     onPressed: () => setState(
+            //       () => _showCycles = !_showCycles,
+            //     ),
+            //     child: Text(
+            //       'Show Cycle Times',
+            //       style: Theme.of(context).textTheme.button,
+            //       textAlign: TextAlign.center,
+            //     ),
+            //     style: ButtonStyle(
+            //       backgroundColor: MaterialStateProperty.all(
+            //         _showCycles
+            //             ? Colors.grey.withOpacity(0.3)
+            //             : Colors.cyan.withOpacity(0.3),
+            //       ),
+            //       shape: MaterialStateProperty.all(
+            //         RoundedRectangleBorder(
+            //           borderRadius: BorderRadius.all(
+            //             Radius.circular(20),
+            //           ),
+            //         ),
+            //       ),
+            //       alignment: Alignment.center,
+            //       padding: MaterialStateProperty.all(
+            //         EdgeInsets.all(0),
+            //       ),
+            //     ),
+            //   ),
+            // ),
           ],
         )
       : Text('');

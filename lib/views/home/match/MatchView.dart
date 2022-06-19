@@ -1007,53 +1007,6 @@ class _MatchView extends State<MatchView> {
                     0.0,
               ),
             ),
-          if (widget.event.type == EventType.remote && _match != null)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                BarGraph(
-                  height: 40,
-                  title: "Total Cycles",
-                  val: _score?.teleScore.totalCycles().toDouble() ?? 0.0,
-                  max: (widget.event.type == EventType.remote &&
-                              widget.match != null) ||
-                          _allianceTotal
-                      ? cyclesMaxTotal
-                      : cyclesMaxInd,
-                ),
-                BarGraph(
-                  height: 40,
-                  title: "Tele-Op Cycles",
-                  val: _score?.teleScore.teleCycles().toDouble() ?? 0.0,
-                  max: (widget.event.type == EventType.remote &&
-                              widget.match != null) ||
-                          _allianceTotal
-                      ? teleCyclesMaxTotal
-                      : teleCyclesMaxInd,
-                ),
-                BarGraph(
-                  height: 40,
-                  title: "Endgame Cycles",
-                  val: _score?.teleScore.endgameCycles().toDouble() ?? 0.0,
-                  max: (widget.event.type == EventType.remote &&
-                              widget.match != null) ||
-                          _allianceTotal
-                      ? endgameCyclesMaxTotal
-                      : endgameCyclesMaxInd,
-                ),
-                BarGraph(
-                  height: 40,
-                  title: "Misses",
-                  val: _score?.teleScore.misses.count.toDouble() ?? 0.0,
-                  max: (widget.event.type == EventType.remote &&
-                              widget.match != null) ||
-                          _allianceTotal
-                      ? missesTotal
-                      : missesInd,
-                  inverted: true,
-                ),
-              ],
-            ),
           Incrementor(
             backgroundColor: Colors.grey.withOpacity(0.3),
             element: incrementValue,

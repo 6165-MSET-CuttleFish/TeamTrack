@@ -43,6 +43,9 @@ class _Incrementor extends State<Incrementor> {
                     key,
                     Text(
                       value.name,
+                      style: TextStyle(
+                        color: value.misses != 0 ? Colors.red : null,
+                      ),
                     ),
                   ),
                 ) ??
@@ -418,13 +421,13 @@ class _Incrementor extends State<Incrementor> {
               : null)
           : null,
       child: Container(
-        color: widget.element.nestedElements == null
-            ? widget.backgroundColor == null
+        color: widget.element.nestedElements != null && !widget.element.isBool
+            ? null
+            : widget.backgroundColor == null
                 ? widget.element.didAttempt()
                     ? Colors.green.withOpacity(0.3)
                     : null
-                : widget.backgroundColor
-            : null,
+                : widget.backgroundColor,
         child: Column(
           children: [
             if (!widget.element.isBool &&
@@ -472,10 +475,12 @@ class _Incrementor extends State<Incrementor> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(widget.element.name),
-                                  Text(
-                                    "Missed: ${widget.element.misses}",
-                                    style: Theme.of(context).textTheme.caption,
-                                  ),
+                                  if (widget.backgroundColor == null)
+                                    Text(
+                                      "Missed: ${widget.element.misses}",
+                                      style:
+                                          Theme.of(context).textTheme.caption,
+                                    ),
                                 ],
                               ),
                             ),

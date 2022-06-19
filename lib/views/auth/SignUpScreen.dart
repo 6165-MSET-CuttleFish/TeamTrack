@@ -52,6 +52,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     if (val?.trim().isEmpty ?? true) {
                       return "Please enter your name";
                     }
+                    return null;
                   },
                   placeholder: "Name",
                   keyboardType: TextInputType.name,
@@ -64,6 +65,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     if (val?.trim().isEmpty ?? true) {
                       return "Please enter your email";
                     }
+                    return null;
                   },
                 ),
                 PlatformFormField(
@@ -74,6 +76,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     if (val?.trim().isEmpty ?? true) {
                       return "Please enter your password";
                     }
+                    return null;
                   },
                   obscureText: true,
                 ),
@@ -86,6 +89,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     } else if (val != passwordController.text) {
                       return "Passwords don't match";
                     }
+                    return null;
                   },
                   placeholder: "Confirm password",
                   obscureText: true,

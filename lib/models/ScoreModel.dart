@@ -172,7 +172,9 @@ class Score extends ScoreDivision implements Comparable<Score> {
   late Dice dice;
   bool isAllianceScore;
   Score(this.id, this.dice, this.gameName, {this.isAllianceScore = false}) {
-    var ref = isAllianceScore ? absRef['Alliance'] : absRef;
+    var ref = isAllianceScore
+        ? json.decode(remoteConfig.getString(gameName))['Alliance']
+        : json.decode(remoteConfig.getString(gameName));
     teleScore = TeleScore(ref['TeleScore']);
     autoScore = AutoScore(ref['AutoScore']);
     endgameScore = EndgameScore(ref['EndgameScore']);
@@ -246,7 +248,10 @@ class Score extends ScoreDivision implements Comparable<Score> {
 
   Score.fromJson(Map<String, dynamic> map, this.gameName,
       {this.isAllianceScore = false}) {
-    Map<String, dynamic> ref = isAllianceScore ? absRef['Alliance'] : absRef;
+    var ref = isAllianceScore
+        ? json.decode(remoteConfig.getString(gameName))['Alliance']
+        : json.decode(remoteConfig.getString(gameName));
+    //Map<String, dynamic> ref = isAllianceScore ? absRef['Alliance'] : absRef;
     autoScore = map['AutoScore'] != null && (map['AutoScore'] as Map).isNotEmpty
         ? AutoScore.fromJson(map['AutoScore'], ref['AutoScore'])
         : AutoScore(ref['AutoScore']);
@@ -759,5 +764,6 @@ abstract class ScoreDivision {
         );
     if (scoringElement.didAttempt() && !robotDisconnected)
       return scoringElement.scoreValue();
+    return null;
   }
 }
