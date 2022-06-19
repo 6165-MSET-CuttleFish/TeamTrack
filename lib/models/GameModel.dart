@@ -22,7 +22,6 @@ class Statics {
 }
 
 enum EventType {
-  live,
   local,
   remote,
 }
@@ -53,7 +52,6 @@ class Event with ClusterItem {
   StatConfig statConfig = StatConfig();
 
   TeamTrackUser? author;
-bool matchesloaded = false;
   String gameName = Statics.gameName;
   Role role = Role.editor;
   bool shared = false;
@@ -100,12 +98,6 @@ bool hasKey(){
     else{
       return false;
     }
-}
-void loadIn(){
-    matchesloaded = true;
-}
-bool isloaded(){
-    return matchesloaded;
 }
   void addTeam(Team newTeam) async {
     await getRef()
@@ -569,7 +561,7 @@ class Alliance {
 }
 
 class Match {
-  EventType type = EventType.live;
+  EventType type = EventType.local;
   Dice dice = Dice.one;
   Alliance? red;
   Alliance? blue;
