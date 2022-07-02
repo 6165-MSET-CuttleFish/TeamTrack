@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/models/ScoreModel.dart';
 import 'package:teamtrack/views/LandingPage.dart' as LandingPage;
@@ -103,10 +104,14 @@ class _EventView extends State<EventView> {
                   icon: Icon(Icons.refresh),
                   tooltip: 'Reload Matches',
                   onPressed: () async {
-                    print(widget.event.getKey());
+                    //print(widget.event.getKey());
                     await _getMatches();
                     int p = 1;
+                    print(bod.toString());
+                    List<Match> bruh = widget.event.getSortedMatches(ascending);
+
                     for (var x in bod) {
+
                       if (widget.event.matches.length < p) {
                         setState(() {
                           widget.event.addMatch(
@@ -152,10 +157,15 @@ class _EventView extends State<EventView> {
                           );
                         });
                         setState(() {});
-                        dataModel.saveEvents();
+
+                      }
+                      if(widget.event.matches.length>p-1) {
+                        bruh[widget.event.matches.length - p].setAPIScore(x['red_score'], x['blue_score']);
                       }
                       p++;
                     }
+
+                    dataModel.saveEvents();
                   }),
             _tab != 0
                 ? IconButton(

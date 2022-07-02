@@ -139,12 +139,16 @@ class MatchRow extends StatelessWidget {
     bool redIsGreater = redScore > blueScore;
     bool blueIsGreater = blueScore > redScore;
     bool teamIsRed = match.alliance(team) == match.red;
-    return Row(
+    return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
           match.redScore(showPenalties: true).toString(),
           style: GoogleFonts.gugi(
+            fontSize: 17,
             fontWeight: redIsGreater ? FontWeight.bold : null,
             color: team == null
                 ? (redIsGreater ? CupertinoColors.systemRed : Colors.grey)
@@ -156,12 +160,28 @@ class MatchRow extends StatelessWidget {
           match.blueScore(showPenalties: true).toString(),
           style: GoogleFonts.gugi(
             fontWeight: blueIsGreater ? FontWeight.bold : null,
+            fontSize: 17,
             color: team == null
                 ? (blueIsGreater ? Colors.blue : Colors.grey)
                 : (!teamIsRed ? CupertinoColors.activeOrange : Colors.grey),
           ),
         ),
       ],
+    ),
+      Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            match.getRedAPI() !=-1 ? match.getRedAPI().toString()+' - '+match.getBlueAPI().toString() : 'Not on API',
+            style: GoogleFonts.gugi(
+              fontWeight: redIsGreater ? FontWeight.bold : null,
+              fontSize:match.getRedAPI() ==-1 ? 10.5:12,
+              color: match.getRedAPI() ==-1 ?Colors.amber:Colors.green,
+            ),
+          ),
+        ],
+      )
+    ]
     );
   }
 }
