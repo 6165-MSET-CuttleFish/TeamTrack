@@ -239,14 +239,14 @@ extension TeamsExtension on Map<String, Team> {
                 type: type, element: element)
             .removeOutliers(statConfig.removeOutliers)
             .map((spot) => spot.y)
-            .mean();
+            .median();
         final allianceTotalsA = matches
             .toList()
             .spots(a, Dice.none, statConfig.showPenalties,
                 type: type, element: element)
             .removeOutliers(statConfig.removeOutliers)
             .map((spot) => spot.y)
-            .mean();
+            .median();
         return allianceTotalsB.compareTo(allianceTotalsA);
       });
     } else {
@@ -256,7 +256,7 @@ extension TeamsExtension on Map<String, Team> {
               ((score) => score.getScoreDivision(type)),
             )
             .toList()
-            .meanScore(
+            .medianScore(
               Dice.none,
               statConfig.removeOutliers,
               element: element,
@@ -267,7 +267,7 @@ extension TeamsExtension on Map<String, Team> {
                     ((score) => score.getScoreDivision(type)),
                   )
                   .toList()
-                  .meanScore(
+                  .medianScore(
                     Dice.none,
                     statConfig.removeOutliers,
                     element: element,
@@ -340,20 +340,21 @@ extension ScoreDivExtension on List<ScoreDivision> {
         .toDouble();
   }
 
-  double medianScore(Dice dice, bool removeOutliers, {String? element}) {
+  double medianScore(Dice dice, bool removeOutliers,
+      {ScoringElement? element}) {
     final arr = this.diceScores(dice);
     if (arr.length == 0) return 0;
     return arr
-        .map((e) => e.getScoringElementCount(element)?.toDouble())
+        .map((e) => e.getScoringElementCount(element?.key)?.toDouble())
         .removeOutliers(removeOutliers)
         .median();
   }
 
-  double minScore(Dice dice, bool removeOutliers, {String? element}) {
+  double minScore(Dice dice, bool removeOutliers, {ScoringElement? element}) {
     final arr = this.diceScores(dice);
     if (arr.length == 0) return 0;
     return arr
-        .map((e) => e.getScoringElementCount(element)?.toDouble())
+        .map((e) => e.getScoringElementCount(element?.key)?.toDouble())
         .removeOutliers(removeOutliers)
         .minValue()
         .toDouble();

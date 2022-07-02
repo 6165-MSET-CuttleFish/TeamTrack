@@ -94,15 +94,15 @@ class TeamRow extends StatelessWidget {
                         )
                         .removeOutliers(statConfig.removeOutliers)
                         .map((spot) => spot.y)
-                        .mean()
-                    : team.scores.meanScore(
+                        .median()
+                    : team.scores.medianScore(
                         Dice.none,
                         statConfig.removeOutliers,
                         sortMode,
                         elementSort,
                       ),
                 max: max,
-                title: 'Mean',
+                title: 'Median',
               ),
             ),
           ],

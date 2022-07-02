@@ -19,6 +19,7 @@ class ScoreCard extends StatelessWidget {
     this.matches,
     required this.allianceTotal,
     this.elements,
+    required this.title,
   }) : super(key: key) {
     switch (type) {
       case OpModeType.auto:
@@ -41,6 +42,7 @@ class ScoreCard extends StatelessWidget {
   final Event event;
   final bool allianceTotal;
   final OpModeType? type;
+  final String title;
   ScoreDivision? targetScore;
   final bool removeOutliers;
   final List<Match>? matches;
@@ -110,52 +112,63 @@ class ScoreCard extends StatelessWidget {
       ),
       team.targetScore?.getScoreDivision(type).total() ?? 0,
     ].minValue();
+    final stats = Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        BarGraph(
+          val: !allianceTotal
+              ? scoreDivisions.meanScore(dice, removeOutliers)
+              : allianceTotals?.mean() ?? 0,
+          max: !allianceTotal
+              ? event.teams.maxMeanScore(dice, removeOutliers, type, null)
+              : maxAllianceMean,
+          title: 'Mean',
+        ),
+        BarGraph(
+          val: !allianceTotal
+              ? scoreDivisions.medianScore(dice, removeOutliers)
+              : allianceTotals?.median() ?? 0,
+          max: !allianceTotal
+              ? event.teams.maxMedianScore(dice, removeOutliers, type, null)
+              : maxAllianceMedian,
+          title: 'Median',
+        ),
+        BarGraph(
+          val: !allianceTotal
+              ? scoreDivisions.maxScore(dice, removeOutliers)
+              : allianceTotals?.maxValue() ?? 0,
+          max: !allianceTotal
+              ? event.teams.maxScore(dice, removeOutliers, type)
+              : maxAllianceBest,
+          title: 'Best',
+        ),
+        BarGraph(
+          val: !allianceTotal
+              ? scoreDivisions.standardDeviationScore(dice, removeOutliers)
+              : allianceTotals?.standardDeviation() ?? 0,
+          max: !allianceTotal
+              ? event.teams.lowestStandardDeviationScore(
+                  dice, removeOutliers, type, null)
+              : maxAllianceDeviation,
+          inverted: true,
+          title: 'Deviation',
+        ),
+      ],
+    );
     return CardView(
-      isActive: scoreDivisions.diceScores(dice).length > 1,
+      hero: stats,
+      tag: title,
+      isActive: scoreDivisions
+              .diceScores(dice)
+              .map((score) => score.total())
+              .removeOutliers(removeOutliers)
+              .length >
+          1,
       child: Padding(
         padding: EdgeInsets.only(left: 5, right: 5),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            BarGraph(
-              val: !allianceTotal
-                  ? scoreDivisions.meanScore(dice, removeOutliers)
-                  : allianceTotals?.mean() ?? 0,
-              max: !allianceTotal
-                  ? event.teams.maxMeanScore(dice, removeOutliers, type, null)
-                  : maxAllianceMean,
-              title: 'Mean',
-            ),
-            BarGraph(
-              val: !allianceTotal
-                  ? scoreDivisions.medianScore(dice, removeOutliers)
-                  : allianceTotals?.median() ?? 0,
-              max: !allianceTotal
-                  ? event.teams.maxMedianScore(dice, removeOutliers, type, null)
-                  : maxAllianceMedian,
-              title: 'Median',
-            ),
-            BarGraph(
-              val: !allianceTotal
-                  ? scoreDivisions.maxScore(dice, removeOutliers)
-                  : allianceTotals?.maxValue() ?? 0,
-              max: !allianceTotal
-                  ? event.teams.maxScore(dice, removeOutliers, type)
-                  : maxAllianceBest,
-              title: 'Best',
-            ),
-            BarGraph(
-              val: !allianceTotal
-                  ? scoreDivisions.standardDeviationScore(dice, removeOutliers)
-                  : allianceTotals?.standardDeviation() ?? 0,
-              max: !allianceTotal
-                  ? event.teams.lowestStandardDeviationScore(
-                      dice, removeOutliers, type, null)
-                  : maxAllianceDeviation,
-              inverted: true,
-              title: 'Deviation',
-            ),
-          ],
+        child: Hero(
+          tag: title,
+          child: stats,
         ),
       ),
       collapsed: scoreDivisions

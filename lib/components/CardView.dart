@@ -3,13 +3,22 @@ import 'package:teamtrack/components/Collapsible.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:teamtrack/models/GameModel.dart';
 
 class CardView extends StatefulWidget {
-  CardView({Key? key, this.child, this.collapsed, this.isActive = true})
-      : super(key: key);
-  final Widget? child;
-  final Widget? collapsed;
+  CardView({
+    Key? key,
+    required this.child,
+    required this.collapsed,
+    this.isActive = true,
+    required this.hero,
+    required this.tag,
+  }) : super(key: key);
+  final Widget child;
+  final Widget hero;
+  final Widget collapsed;
   final bool isActive;
+  final String tag;
   @override
   State<StatefulWidget> createState() => _CardView();
 }
@@ -24,15 +33,37 @@ class _CardView extends State<CardView> {
         onTap: () {
           HapticFeedback.mediumImpact();
           if (widget.isActive) {
-            setState(
-              () {
-                _genBool = !_genBool;
-              },
+            // setState(
+            //   () => _genBool = !_genBool,
+            // );
+            Navigator.of(context).push(
+              platformPageRoute(
+                builder: (context) => Scaffold(
+                  body: CustomScrollView(
+                    slivers: [
+                      SliverAppBar(
+                        expandedHeight: 200,
+                        stretch: true,
+                        flexibleSpace: FlexibleSpaceBar(
+                          background: Hero(
+                            tag: widget.tag,
+                            child: widget.hero,
+                          ),
+                          title: Text(widget.tag),
+                        ),
+                      ),
+                      SliverFillRemaining(
+                        child: widget.collapsed,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             );
           } else {
             showPlatformDialog(
               context: context,
-              builder: (BuildContext context) => PlatformAlert(
+              builder: (context) => PlatformAlert(
                 title: Text('Not Enough Data'),
                 content: Text(
                   'Add more scores',
@@ -83,17 +114,17 @@ class _CardView extends State<CardView> {
                 height: getHeight(),
                 child: widget.child,
               ),
-              Collapsible(
-                isCollapsed: _genBool,
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(bottom: 50),
-                    ),
-                    widget.collapsed!
-                  ],
-                ),
-              )
+              // Collapsible(
+              //   isCollapsed: _genBool,
+              //   child: Column(
+              //     children: [
+              //       Padding(
+              //         padding: EdgeInsets.only(bottom: 50),
+              //       ),
+              //       widget.collapsed
+              //     ],
+              //   ),
+              // )
             ],
           ),
         ),

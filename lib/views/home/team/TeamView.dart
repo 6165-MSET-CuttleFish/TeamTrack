@@ -439,6 +439,7 @@ class _TeamViewState extends State<TeamView> {
                         dice: _dice,
                         removeOutliers: widget.event.statConfig.removeOutliers,
                         matches: widget.event.getSortedMatches(true),
+                        title: 'Total',
                       ),
                       Padding(
                         padding: const EdgeInsets.only(top: 20, bottom: 10),
@@ -448,6 +449,7 @@ class _TeamViewState extends State<TeamView> {
                         ),
                       ),
                       ScoreCard(
+                        title: 'Autonomous',
                         allianceTotal: widget.event.statConfig.allianceTotal,
                         team: _team,
                         event: widget.event,
@@ -487,6 +489,7 @@ class _TeamViewState extends State<TeamView> {
                         ),
                       ),
                       ScoreCard(
+                        title: 'Tele-Op',
                         allianceTotal: widget.event.statConfig.allianceTotal,
                         team: _team,
                         event: widget.event,
@@ -526,6 +529,7 @@ class _TeamViewState extends State<TeamView> {
                         ),
                       ),
                       ScoreCard(
+                        title: 'Endgame',
                         allianceTotal: widget.event.statConfig.allianceTotal,
                         team: _team,
                         event: widget.event,
