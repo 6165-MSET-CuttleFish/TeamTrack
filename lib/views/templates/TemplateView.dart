@@ -81,7 +81,7 @@ class _TemplateView extends State<TemplateView> {
             Text('Type: ' + data[0]['event_type_key']),
             data[0]['division_name']?.let((that) => Text('Division: ' +that.toString())),
             Expanded(
-              child:  ListView.builder(
+              child: bod.isEmpty ? Center(child:Text('No Teams Loaded Yet')) :ListView.builder(
                   itemCount: bod.length,
                   itemBuilder: (context, index) {
                     return Card(

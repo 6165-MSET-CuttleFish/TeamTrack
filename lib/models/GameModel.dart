@@ -124,7 +124,6 @@ bool hasKey(){
     return arr;
   }
 
-
   TeamTrackUser getTTUserFromUser(User? user) {
     return TeamTrackUser(
       displayName: user?.displayName,
@@ -340,7 +339,7 @@ bool hasKey(){
       gameName = map['gameName'] ?? Statics.gameName;
       type = getTypeFromString(map['type']);
       name = map['name'];
-
+      event_key = map['event_key']??"none";
       try {
         teams = (map['teams'] as Map)
             .map((key, value) => MapEntry(key, Team.fromJson(value, gameName)));
@@ -568,7 +567,8 @@ class Match {
   String id = '';
   List<TeamTrackUser>? activeUsers;
   Timestamp timeStamp = Timestamp.now();
-
+  int apiRed = -1;
+  int apiBlue = -1;
   Match(this.red, this.blue, this.type) {
     id = Uuid().v4();
     timeStamp = Timestamp.now();
@@ -627,7 +627,16 @@ class Match {
         " - " +
         blueScore(showPenalties: showPenalties).toString();
   }
-
+  void setAPIScore(int red, int blue){
+    apiRed = red;
+    apiBlue = blue;
+  }
+  int getRedAPI(){
+    return apiRed;
+  }
+  int getBlueAPI(){
+    return apiBlue;
+  }
   int getMaxScoreVal({required bool? showPenalties}) {
     return [
       redScore(showPenalties: showPenalties),
