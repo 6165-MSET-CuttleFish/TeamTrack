@@ -76,6 +76,7 @@ class _MatchList extends State<MatchList> {
               title: Text('Matches'),
               backgroundColor: Theme.of(context).colorScheme.primary,
               actions: [
+
                 IconButton(
                   icon: Icon(Icons.settings),
                   tooltip: 'Configure',

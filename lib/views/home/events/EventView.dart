@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/models/ScoreModel.dart';
@@ -13,6 +16,19 @@ import 'package:flutter/material.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:teamtrack/functions/Statistics.dart';
+import 'dart:convert';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:teamtrack/models/GameModel.dart';
+import 'package:teamtrack/views/home/events/EventShare.dart';
+import 'package:teamtrack/models/AppModel.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:teamtrack/components/PlatformGraphics.dart';
+import 'package:teamtrack/views/home/events/EventView.dart';
+import 'package:provider/provider.dart';
+import 'package:teamtrack/functions/Extensions.dart';
+import '../../../api/APIKEYS.dart';
 
 class EventView extends StatefulWidget {
   EventView({
@@ -22,6 +38,7 @@ class EventView extends StatefulWidget {
   }) : super(key: key);
   final Event event;
   final bool isPreview;
+
   @override
   _EventView createState() => _EventView();
 }
@@ -30,6 +47,7 @@ class _EventView extends State<EventView> {
   OpModeType? sortingModifier;
   ScoringElement? elementSort;
   bool ascending = false;
+
   List<Widget> materialTabs() => [
         TeamList(
           event: widget.event,
@@ -43,6 +61,15 @@ class _EventView extends State<EventView> {
         ),
       ];
   int _tab = 0;
+  List bod = [];
+
+  _getMatches() async {
+    final response = await APIKEYS.getMatches(widget.event.getKey());
+    setState(() {
+      bod = (json.decode(response.body).toList());
+      //print(bod);
+    });
+  }
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -65,6 +92,71 @@ class _EventView extends State<EventView> {
                   ),
                 ),
               ),
+            if (_tab == 0)
+              IconButton(
+                icon: Icon(widget.event.shared ? Icons.share : Icons.upload),
+                tooltip: 'Share',
+                onPressed: () => _onShare(widget.event),
+              ),
+            if (_tab != 0 && widget.event.hasKey())
+              IconButton(
+                  icon: Icon(Icons.refresh),
+                  tooltip: 'Reload Matches',
+                  onPressed: () async {
+                    print(widget.event.getKey());
+                    await _getMatches();
+                    int p = 1;
+                    for (var x in bod) {
+                      if (widget.event.matches.length < p) {
+                        setState(() {
+                          widget.event.addMatch(
+                            Match(
+                              Alliance(
+                                widget.event.teams.findAdd(
+                                    x['participants'][0]['team']['team_number']
+                                        .toString(),
+                                    x['participants'][0]['team']
+                                            ['team_name_short']
+                                        .toString(),
+                                    widget.event),
+                                widget.event.teams.findAdd(
+                                    x['participants'][1]['team']['team_number']
+                                        .toString(),
+                                    x['participants'][1]['team']
+                                            ['team_name_short']
+                                        .toString(),
+                                    widget.event),
+                                widget.event.type,
+                                widget.event.gameName,
+                              ),
+                              Alliance(
+                                widget.event.teams.findAdd(
+                                    x['participants'][2]['team']['team_number']
+                                        .toString(),
+                                    x['participants'][2]['team']
+                                            ['team_name_short']
+                                        .toString(),
+                                    widget.event),
+                                widget.event.teams.findAdd(
+                                    x['participants'][3]['team']['team_number']
+                                        .toString(),
+                                    x['participants'][3]['team']
+                                            ['team_name_short']
+                                        .toString(),
+                                    widget.event),
+                                widget.event.type,
+                                widget.event.gameName,
+                              ),
+                              widget.event.type,
+                            ),
+                          );
+                        });
+                        setState(() {});
+                        dataModel.saveEvents();
+                      }
+                      p++;
+                    }
+                  }),
             _tab != 0
                 ? IconButton(
                     tooltip: "Sort",
@@ -289,6 +381,7 @@ class _EventView extends State<EventView> {
 
   String _newName = '';
   String _newNumber = '';
+
   void _teamConfig() {
     showPlatformDialog(
       context: context,
@@ -352,5 +445,83 @@ class _EventView extends State<EventView> {
         ],
       ),
     );
+  }
+
+  void _onShare(Event e) {
+    if (!(context.read<User?>()?.isAnonymous ?? true)) {
+      if (!e.shared) {
+        showPlatformDialog(
+          context: context,
+          builder: (context) => PlatformAlert(
+            title: Text('Upload Event'),
+            content: Text(
+              'Your event will still be private',
+            ),
+            actions: [
+              PlatformDialogAction(
+                child: Text('Cancel'),
+                isDefaultAction: true,
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              PlatformDialogAction(
+                child: Text('Upload'),
+                onPressed: () async {
+                  showPlatformDialog(
+                    context: context,
+                    builder: (_) => PlatformAlert(
+                      content: Center(child: PlatformProgressIndicator()),
+                      actions: [
+                        PlatformDialogAction(
+                          child: Text('Back'),
+                          isDefaultAction: true,
+                          onPressed: () => Navigator.of(context).pop(),
+                        ),
+                      ],
+                    ),
+                  );
+                  e.shared = true;
+                  final json = e.toJson();
+                  await firebaseDatabase
+                      .ref()
+                      .child("Events/${e.gameName}/${e.id}")
+                      .set(json);
+                  dataModel.events.remove(e);
+                  setState(() => dataModel.saveEvents);
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        );
+      } else {
+        Navigator.of(context).push(
+          platformPageRoute(
+            builder: (context) => EventShare(
+              event: e,
+            ),
+          ),
+        );
+      }
+    } else {
+      showPlatformDialog(
+        context: context,
+        builder: (context) => PlatformAlert(
+          title: Text('Cannot Share Event'),
+          content: Text('You must be logged in to share an event.'),
+          actions: [
+            PlatformDialogAction(
+              child: Text('OK'),
+              isDefaultAction: true,
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        ),
+      );
+    }
   }
 }

@@ -27,8 +27,6 @@ class DataModel {
   List<Event> remoteEvents() =>
       allEvents().where((e) => e.type == EventType.remote).toList();
 
-  List<Event> liveEvents() =>
-      allEvents().where((e) => e.type == EventType.live).toList();
 
   Future<void> saveEvents() async {
     final coded = events.map((e) => e.toJson()).toList();

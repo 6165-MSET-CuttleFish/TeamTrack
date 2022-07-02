@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/models/ScoreModel.dart';
-
+extension ObjectExt<T> on T {
+  R let<R>(R Function(T that) op) => op(this);
+}
 extension RoleExtension on Role {
   // getter for showing to the user
   String name() {
