@@ -1,20 +1,8 @@
 import 'dart:convert';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:location/location.dart';
-import 'package:geoflutterfire/geoflutterfire.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:rxdart/rxdart.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
-import 'dart:async';
-import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/models/GameModel.dart';
-import 'package:teamtrack/views/home/events/EventView.dart';
-import 'package:teamtrack/views/home/events/EventsList.dart';
-import 'package:provider/provider.dart';
-import 'package:http/http.dart' as http;
 import '../../api/APIKEYS.dart';
 import 'TemplateView.dart';
 class TemplatesList extends StatefulWidget {

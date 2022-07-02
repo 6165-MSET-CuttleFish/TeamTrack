@@ -4,8 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart' as Db;
 import 'package:flutter/cupertino.dart';
 import 'package:geoflutterfire/geoflutterfire.dart';
-import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:teamtrack/functions/Functions.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/models/Change.dart';
@@ -40,7 +38,7 @@ enum OpModeType {
   penalty,
 }
 
-class Event with ClusterItem {
+class Event {
   Event({
     required this.name,
     required this.type,
@@ -67,9 +65,6 @@ class Event with ClusterItem {
 
   TeamTrackUser? sender;
   GeoFirePoint? loc;
-
-  @override
-  LatLng get location => LatLng(loc?.latitude ?? 0, loc?.longitude ?? 0);
 
   List<TeamTrackUser> users = [];
 
