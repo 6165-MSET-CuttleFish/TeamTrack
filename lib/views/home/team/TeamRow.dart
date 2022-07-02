@@ -105,6 +105,7 @@ class TeamRow extends StatelessWidget {
                 title: 'Median',
               ),
             ),
+            Icon(Icons.navigate_next)
           ],
         ),
         onTap: onTap,
