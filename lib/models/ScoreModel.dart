@@ -208,6 +208,8 @@ class Score extends ScoreDivision implements Comparable<Score> {
         return teleScore;
       case OpModeType.endgame:
         return endgameScore;
+      case OpModeType.penalty:
+        return penalties;
       default:
         return this;
     }
@@ -366,6 +368,7 @@ class AutoScore extends ScoreDivision {
           name: ref[e]['name'] ?? e,
           count: map[e] is Map ? map[e]['count'] : map[e],
           misses: map[e] is Map ? map[e]['misses'] : 0,
+          cycleTimes: map[e] is Map ? map[e]['cycleTimes'] ?? [] : [],
           min: () => ref[e]['min'] ?? 0,
           value: ref[e]['value'] ?? 1,
           isBool: ref[e]['isBool'] ?? false,
@@ -485,6 +488,7 @@ class TeleScore extends ScoreDivision {
           name: ref[e]['name'] ?? e,
           count: map[e] is Map ? map[e]['count'] : map[e],
           misses: map[e] is Map ? map[e]['misses'] : 0,
+          cycleTimes: map[e] is Map ? map[e]['cycleTimes'] ?? [] : [],
           min: () => ref[e]['min'] ?? 0,
           value: ref[e]['value'] ?? 1,
           isBool: ref[e]['isBool'] ?? false,
@@ -495,11 +499,8 @@ class TeleScore extends ScoreDivision {
     );
     maxSet();
   }
-  Map<String, dynamic> toJson() => {
-        ...elements.map((key, value) => MapEntry(key, value.toJson())),
-        'Misses': misses.toJson(),
-        'CycleTimes': json.encode(cycleTimes),
-      };
+  Map<String, dynamic> toJson() =>
+      elements.map((key, value) => MapEntry(key, value.toJson()));
 }
 
 /// This class is used to represent the endgame score structure of traditional and remote FTC events.
@@ -571,6 +572,7 @@ class EndgameScore extends ScoreDivision {
           name: ref[e]['name'] ?? e,
           count: json[e] is Map ? json[e]['count'] : json[e],
           misses: json[e] is Map ? json[e]['misses'] : 0,
+          cycleTimes: json[e] is Map ? json[e]['cycleTimes'] ?? [] : [],
           min: () => ref[e]['min'] ?? 0,
           value: ref[e]['value'] ?? 1,
           isBool: ref[e]['isBool'] ?? false,
@@ -627,14 +629,12 @@ class Penalty extends ScoreDivision {
           name: 'Major Penalty',
           value: -30,
           count: json['major'] is Map ? json['major']['count'] : json['major'],
-          misses: json['major'] is Map ? json['major']['misses'] : 0,
           key: 'major',
         ),
         minorPenalty = ScoringElement(
           name: 'Minor Penalty',
           value: -10,
           count: json['minor'] is Map ? json['minor']['count'] : json['minor'],
-          misses: json['minor'] is Map ? json['minor']['misses'] : 0,
           key: 'minor',
         );
   Map<String, dynamic> toJson() => {
@@ -649,6 +649,7 @@ class ScoringElement {
     this.name = '',
     this.count = 0,
     this.misses = 0,
+    this.cycleTimes = const [],
     this.value = 1,
     this.min,
     this.max,
@@ -667,6 +668,7 @@ class ScoringElement {
   int value;
   int? totalValue;
   String? id;
+  List<double> cycleTimes;
   List<ScoringElement>? nestedElements;
   bool isBool;
   late int Function()? min = () => 0;
@@ -723,6 +725,7 @@ class ScoringElement {
   Map<String, dynamic> toJson() => {
         'count': count,
         'misses': misses,
+        'cycleTimes': cycleTimes,
       };
 
   ScoringElement operator +(ScoringElement other) {

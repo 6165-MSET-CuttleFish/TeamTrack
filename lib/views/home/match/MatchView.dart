@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:teamtrack/api/APIKEYS.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -17,6 +18,7 @@ import 'package:teamtrack/components/ScoreSummary.dart';
 import 'package:teamtrack/components/UsersRow.dart';
 import 'package:uuid/uuid.dart';
 import 'package:teamtrack/functions/Extensions.dart';
+import 'package:provider/provider.dart';
 
 class MatchView extends StatefulWidget {
   MatchView({Key? key, this.match, this.team, required this.event})
@@ -32,7 +34,6 @@ class MatchView extends StatefulWidget {
 class _MatchView extends State<MatchView> {
   Team? _selectedTeam;
   Alliance? _selectedAlliance;
-  Color _color = CupertinoColors.systemRed;
   Score? _score;
   int _view = 0;
   Match? _match;
@@ -56,19 +57,15 @@ class _MatchView extends State<MatchView> {
       _allowView = true;
       _score = team?.targetScore;
       _selectedTeam = team;
-      _color = CupertinoColors.systemGreen;
     } else {
       _selectedTeam = _match?.red?.team1;
       if (team != null) {
         _selectedTeam = team;
         if (_match?.alliance(team) == _match?.blue) {
           _selectedAlliance = _match?.red;
-          _color = Colors.blue;
         }
       }
       _score = _selectedTeam?.scores[_match?.id];
-      if (_match?.type == EventType.remote)
-        _color = CupertinoColors.systemGreen;
     }
     totalMaxTotal = event.matches.values
         .map((element) => [element.red, element.blue])
@@ -271,6 +268,7 @@ class _MatchView extends State<MatchView> {
   Map<String, double> maxAutoTargets = {};
   Map<String, double> maxTeleTargets = {};
   Map<String, double> maxEndgameTargets = {};
+  String? previouslyCycledElement;
 
   @override
   void initState() {
@@ -281,7 +279,7 @@ class _MatchView extends State<MatchView> {
       final ref = widget.event
           .getRef()
           ?.child('matches/${widget.match?.id}/activeUsers/${user?.uid}');
-      ref?.set(ttuser.toJson());
+      ref?.set(ttuser.toJson(widget.match?.red?.team1?.number));
       ref?.onDisconnect().remove();
     } else {
       _allianceTotal = false;
@@ -328,9 +326,7 @@ class _MatchView extends State<MatchView> {
             }
             _selectedTeam = widget.event.teams[_selectedTeam?.number];
             _selectedAlliance = _match?.red;
-            if (_color == CupertinoColors.systemRed)
-              _selectedAlliance = _match?.red;
-            else if (_color == Colors.blue) _selectedAlliance = _match?.blue;
+            _selectedAlliance = _match?.alliance(_selectedTeam);
             if (widget.match == null) {
               _score = _selectedTeam?.targetScore;
             } else {
@@ -365,16 +361,19 @@ class _MatchView extends State<MatchView> {
                   length: 3,
                   child: Scaffold(
                     appBar: AppBar(
-                      backgroundColor: _color,
+                      backgroundColor: getAllianceColor(),
                       title: AnimatedSwitcher(
                         duration: const Duration(milliseconds: 500),
                         child: (_match?.activeUsers?.isNotEmpty ?? false)
                             ? RawMaterialButton(
                                 onPressed: () => _showRoles = !_showRoles,
                                 splashColor: Colors.transparent,
-                                child: UsersRow(
-                                  users: _match?.activeUsers ?? [],
-                                  showRole: _showRoles,
+                                child: Hero(
+                                  tag: _match?.id ?? '',
+                                  child: UsersRow(
+                                    users: _match?.activeUsers ?? [],
+                                    showRole: _showRoles,
+                                  ),
                                 ),
                               )
                             : Text("Match Stats"),
@@ -449,7 +448,7 @@ class _MatchView extends State<MatchView> {
                                 icon: Icon(Icons.stop),
                                 onPressed: () => setState(
                                   () {
-                                    lapses = [];
+                                    lapses.clear();
                                     sum = 0;
                                     _paused = true;
                                     _time = 0;
@@ -465,7 +464,7 @@ class _MatchView extends State<MatchView> {
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           colors: [
-                            _color,
+                            getAllianceColor(),
                             for (int i = 0; i < 6; i++)
                               Theme.of(context).canvasColor,
                             if (_time > 90)
@@ -568,6 +567,16 @@ class _MatchView extends State<MatchView> {
                               buttonRow(),
                             Column(
                               children: [
+                                UsersRow(
+                                  users: _match?.activeUsers
+                                          ?.where((user) =>
+                                              user.watchingTeam ==
+                                              _selectedTeam?.number)
+                                          .toList() ??
+                                      [],
+                                  showRole: true,
+                                  size: 20,
+                                ),
                                 Text(
                                   ("${_selectedTeam?.number} : ${_selectedTeam?.name ?? ''}"),
                                   style: Theme.of(context).textTheme.headline6,
@@ -605,7 +614,7 @@ class _MatchView extends State<MatchView> {
                                     fillColor: _allianceTotal &&
                                             widget.event.type !=
                                                 EventType.remote
-                                        ? _color.withOpacity(0.3)
+                                        ? getAllianceColor().withOpacity(0.3)
                                         : null,
                                     onPressed: (widget.match != null &&
                                             widget.event.type !=
@@ -673,7 +682,10 @@ class _MatchView extends State<MatchView> {
                                           .map(
                                             (e) => Incrementor(
                                               element: e,
-                                              onPressed: stateSetter,
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                              onPressed: () =>
+                                                  stateSetter(e.key),
                                               event: widget.event,
                                               path:
                                                   teamPath(OpModeType.penalty),
@@ -764,102 +776,61 @@ class _MatchView extends State<MatchView> {
         },
       );
 
-  void stateSetter() {
+  void stateSetter([String? key]) {
     HapticFeedback.mediumImpact();
     dataModel.saveEvents();
+    if (key != null) previouslyCycledElement = key;
+  }
+
+  Color getAllianceColor() {
+    if (_match != null && widget.event.type == EventType.local) {
+      if (_selectedAlliance == _match?.red)
+        return red;
+      else
+        return blue;
+    }
+    return CupertinoColors.systemGreen;
   }
 
   Row buttonRow() {
+    final teams = _match?.getTeams().toList() ?? [];
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        SizedBox(
-          child: PlatformButton(
-            child: Text(
-              _match?.red?.team1?.number ?? '?',
-              style: TextStyle(
-                color: _selectedTeam == _match?.red?.team1 ? Colors.grey : red,
-              ),
-            ),
-            onPressed: _selectedTeam == _match?.red?.team1
-                ? null
-                : () => setState(
-                      () {
-                        _selectedTeam = _match?.red?.team1;
-                        _selectedAlliance = _match?.red;
-                        _color = red;
-                        _score = _selectedTeam?.scores[_match?.id];
-                        incrementValue.count =
-                            _score?.teleScore.getElements()[0].incrementValue ??
-                                1;
-                      },
-                    ),
-          ),
-        ),
-        SizedBox(
-          child: PlatformButton(
-            child: Text(
-              _match?.red?.team2?.number ?? '?',
-              style: TextStyle(
-                color: _selectedTeam == _match?.red?.team2 ? Colors.grey : red,
-              ),
-            ),
-            onPressed: _selectedTeam == _match?.red?.team2
-                ? null
-                : () => setState(
-                      () {
-                        _selectedTeam = _match?.red?.team2;
-                        _selectedAlliance = _match?.red;
-                        _color = red;
-                        _score = _selectedTeam?.scores[_match?.id];
-                      },
-                    ),
-          ),
-        ),
-        SizedBox(
-          child: PlatformButton(
-            child: Text(
-              _match?.blue?.team1?.number ?? '?',
-              style: TextStyle(
-                  color: _selectedTeam == _match?.blue?.team1
+        for (final team in teams)
+          SizedBox(
+            child: PlatformButton(
+              child: Text(
+                team?.number ?? '?',
+                style: TextStyle(
+                  color: _selectedTeam == team
                       ? Colors.grey
-                      : blue),
+                      : _match?.alliance(team) == _match?.red
+                          ? red
+                          : blue,
+                ),
+              ),
+              onPressed: _selectedTeam == team
+                  ? null
+                  : () => setState(
+                        () {
+                          _selectedTeam = team;
+                          _selectedAlliance = _match?.alliance(team);
+                          _score = _selectedTeam?.scores[_match?.id];
+                          incrementValue.count = _score?.teleScore
+                                  .getElements()[0]
+                                  .incrementValue ??
+                              1;
+                          final user = context.read<User?>();
+                          widget.event
+                              .getRef()
+                              ?.child(
+                                  'matches/${widget.match?.id}/activeUsers/${user?.uid}/watchingTeam')
+                              .set(_selectedTeam?.number);
+                        },
+                      ),
             ),
-            onPressed: _selectedTeam == _match?.blue?.team1
-                ? null
-                : () {
-                    setState(
-                      () {
-                        _selectedTeam = _match?.blue?.team1;
-                        _selectedAlliance = _match?.blue;
-                        _color = blue;
-                        _score = _selectedTeam?.scores[_match?.id];
-                      },
-                    );
-                  },
           ),
-        ),
-        SizedBox(
-          child: PlatformButton(
-            child: Text(
-              _match?.blue?.team2?.number ?? '?',
-              style: TextStyle(
-                  color: _selectedTeam == _match?.blue?.team2
-                      ? Colors.grey
-                      : blue),
-            ),
-            onPressed: _selectedTeam == _match?.blue?.team2
-                ? null
-                : () => setState(
-                      () {
-                        _selectedTeam = _match?.blue?.team2;
-                        _selectedAlliance = _match?.blue;
-                        _color = blue;
-                        _score = _selectedTeam?.scores[_match?.id];
-                      },
-                    ),
-          ),
-        )
       ],
     );
   }
@@ -945,7 +916,7 @@ class _MatchView extends State<MatchView> {
                   .map(
                     (e) => Incrementor(
                       element: e,
-                      onPressed: stateSetter,
+                      onPressed: () => stateSetter(e.key),
                       event: widget.event,
                       path: teamPath(OpModeType.auto),
                       score: _score,
@@ -960,11 +931,11 @@ class _MatchView extends State<MatchView> {
           ..._selectedAlliance?.sharedScore.autoScore.getElements().parse().map(
                     (e) => Incrementor(
                       element: e,
-                      onPressed: stateSetter,
+                      onPressed: () => stateSetter(e.key),
                       event: widget.event,
                       path: matchPath(OpModeType.auto),
                       score: _score,
-                      backgroundColor: _color.withOpacity(0.3),
+                      backgroundColor: getAllianceColor().withOpacity(0.3),
                     ),
                   ) ??
               [],
@@ -1035,52 +1006,29 @@ class _MatchView extends State<MatchView> {
                     .map(
                       (e) => Incrementor(
                         element: e,
-                        onPressed: stateSetter,
-                        onDecrement:
-                            widget.match != null ? increaseMisses : null,
+                        onPressed: () => stateSetter(e.key),
                         onIncrement: _paused ? null : onIncrement,
                         event: widget.event,
                         path: teamPath(OpModeType.tele),
                         score: _score,
-                        // mutableIncrement: (mutableData) {
-                        //   if (widget.match == null) {
-                        //     var ref = (mutableData as Map?)?[e.key];
-                        //     if (ref < e.max!())
-                        //       mutableData?[e.key] =
-                        //           (ref ?? 0) + incrementValue.count;
-                        //     return Transaction.success(mutableData);
-                        //   }
-                        //   var ref = mutableData as Map?;
-                        //   if (ref?[e.key] < e.max!()) {
-                        //     mutableData?[e.key] =
-                        //         (ref?[e.key] ?? 0) + e.incrementValue;
-                        //     lapses.add(
-                        //       (_time - sum).toPrecision(3),
-                        //     );
-                        //     sum = _time;
-                        //     if (!_paused) {
-                        //       mutableData?['CycleTimes'] = lapses;
-                        //     }
-                        //   }
-                        //   return Transaction.success(mutableData);
-                        // },
-                        // mutableDecrement: (mutableData) {
-                        //   if (widget.match == null) {
-                        //     var ref = (mutableData as Map?)?[e.key];
-                        //     if (ref < e.max!())
-                        //       mutableData?[e.key] = (ref ?? 0) - 1;
-                        //     return Transaction.success(mutableData);
-                        //   }
-                        //   var ref = mutableData as Map?;
-                        //   if (ref?[e.key] < e.max!()) {
-                        //     mutableData?[e.key] =
-                        //         (ref?[e.key] ?? 0) - e.decrementValue;
-                        //     if (!_paused) {
-                        //       mutableData?['Misses'] = (ref?['Misses'] ?? 0) + 1;
-                        //     }
-                        //   }
-                        //   return Transaction.success(mutableData);
-                        // },
+                        mutableIncrement: (mutableData) {
+                          if (widget.match == null) return;
+                          var ref = (mutableData as Map?)?[e.key];
+                          if (ref is Map) {
+                            if (ref[e.key] < e.max!()) {
+                              mutableData?[e.key] =
+                                  (ref[e.key] ?? 0) + e.incrementValue;
+                              lapses.add(
+                                (_time - sum).toPrecision(3),
+                              );
+                              sum = _time;
+                              if (!_paused &&
+                                  previouslyCycledElement == e.key) {
+                                mutableData?[e.key]?['cycleTimes'] = lapses;
+                              }
+                            }
+                          }
+                        },
                         max: widget.match != null
                             ? maxTeleScores[e.key] ?? 0
                             : maxTeleTargets[e.key] ?? 0,
@@ -1095,13 +1043,11 @@ class _MatchView extends State<MatchView> {
                     .map(
                       (e) => Incrementor(
                         element: e,
-                        onPressed: stateSetter,
-                        onDecrement:
-                            widget.match != null ? increaseMisses : null,
+                        onPressed: () => stateSetter(e.key),
                         event: widget.event,
                         path: matchPath(OpModeType.tele),
                         score: _score,
-                        backgroundColor: _color.withOpacity(0.3),
+                        backgroundColor: getAllianceColor().withOpacity(0.3),
                       ),
                     ) ??
                 [],
@@ -1179,7 +1125,7 @@ class _MatchView extends State<MatchView> {
                     .map(
                       (e) => Incrementor(
                         element: e,
-                        onPressed: stateSetter,
+                        onPressed: () => stateSetter(e.key),
                         event: widget.event,
                         path: teamPath(OpModeType.endgame),
                         score: _score,
@@ -1198,11 +1144,11 @@ class _MatchView extends State<MatchView> {
                     .map(
                       (e) => Incrementor(
                         element: e,
-                        onPressed: stateSetter,
+                        onPressed: () => stateSetter(e.key),
                         event: widget.event,
                         path: matchPath(OpModeType.endgame),
                         score: _score,
-                        backgroundColor: _color.withOpacity(0.3),
+                        backgroundColor: getAllianceColor().withOpacity(0.3),
                       ),
                     ) ??
                 [],
@@ -1230,26 +1176,6 @@ class _MatchView extends State<MatchView> {
         ];
   ScoringElement incrementValue = ScoringElement(
       name: 'Increment Value', min: () => 1, count: 1, key: null);
-  void increaseMisses() async {
-    if (!widget.event.shared) _score?.teleScore.misses.count++;
-    widget.event.getRef()?.runTransaction(
-      (mutableData) {
-        var teamIndex;
-        try {
-          (mutableData as Map?)?['teams'] as Map;
-          teamIndex = _selectedTeam?.number;
-        } catch (e) {
-          teamIndex = int.parse(_selectedTeam?.number ?? '');
-        }
-        final scoreIndex = _score?.id;
-        var ref = (mutableData as Map?)?['teams'][teamIndex]['scores']
-            [scoreIndex]['TeleScore']['Misses'];
-        mutableData?['teams'][teamIndex]['scores'][scoreIndex]['TeleScore']
-            ['Misses'] = (ref ?? 0) + 1;
-        return Transaction.success(mutableData);
-      },
-    );
-  }
 
   void onIncrement() {
     lapses.add(

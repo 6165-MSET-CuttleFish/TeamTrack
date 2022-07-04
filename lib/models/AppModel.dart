@@ -81,12 +81,12 @@ class TeamTrackUser {
         displayName = user?.displayName,
         photoURL = user?.photoURL,
         uid = user?.uid;
-  Map<String, String?> toJson() => {
+  Map<String, String?> toJson([String? teamNumber]) => {
         'role': role.toRep(),
         'email': email,
         'displayName': displayName,
         'photoURL': photoURL,
-        'watchingTeam': watchingTeam,
+        'watchingTeam': teamNumber ?? watchingTeam,
       };
 }
 

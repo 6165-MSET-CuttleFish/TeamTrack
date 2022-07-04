@@ -25,7 +25,7 @@ class Incrementor extends StatefulWidget {
   final ScoringElement element;
   final void Function() onPressed;
   final void Function()? onIncrement, onDecrement;
-  final Transaction Function(Object?)? mutableIncrement, mutableDecrement;
+  final void Function(Object?)? mutableIncrement, mutableDecrement;
   final Color? backgroundColor;
   final Event? event;
   final Score? score;
@@ -168,7 +168,7 @@ class _Incrementor extends State<Incrementor> {
                               .runTransaction(
                             (mutableData) {
                               if (widget.mutableDecrement != null) {
-                                return widget.mutableDecrement!(mutableData);
+                                 widget.mutableDecrement!(mutableData);
                               }
                               var ref =
                                   (mutableData as Map?)?[widget.element.key];
@@ -203,7 +203,7 @@ class _Incrementor extends State<Incrementor> {
                               .runTransaction(
                             (mutableData) {
                               if (widget.mutableDecrement != null) {
-                                return widget.mutableDecrement!(mutableData);
+                                widget.mutableDecrement!(mutableData);
                               }
                               var ref =
                                   (mutableData as Map?)?[widget.element.key];
@@ -219,8 +219,6 @@ class _Incrementor extends State<Incrementor> {
                                 if (ref > widget.element.min!()) {
                                   mutableData?[widget.element.key] =
                                       ref - widget.element.decrementValue;
-                                  mutableData?[widget.element.key]['misses'] =
-                                      1;
                                 }
                               }
                               return Transaction.success(mutableData);
@@ -258,7 +256,7 @@ class _Incrementor extends State<Incrementor> {
                               .runTransaction(
                             (mutableData) {
                               if (widget.mutableIncrement != null) {
-                                return widget.mutableIncrement!(mutableData);
+                                widget.mutableIncrement!(mutableData);
                               }
                               var ref =
                                   (mutableData as Map?)?[widget.element.key];
@@ -425,7 +423,7 @@ class _Incrementor extends State<Incrementor> {
             ? null
             : widget.backgroundColor == null
                 ? widget.element.didAttempt()
-                    ? Colors.green.withOpacity(0.3)
+                    ? CupertinoColors.activeOrange.withOpacity(0.3)
                     : null
                 : widget.backgroundColor,
         child: Column(

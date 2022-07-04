@@ -5,7 +5,6 @@ import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/functions/Statistics.dart';
 import 'package:teamtrack/models/ScoreModel.dart';
 import 'package:teamtrack/models/StatConfig.dart';
-import 'package:teamtrack/functions/Extensions.dart';
 
 class TeamRow extends StatelessWidget {
   const TeamRow({

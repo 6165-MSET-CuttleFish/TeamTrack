@@ -48,7 +48,7 @@ class _TeamList extends State<TeamList> {
               child: PlatformProgressIndicator(),
             );
           }
-          var max = widget.event.teams.maxMeanScore(
+          var max = widget.event.teams.maxMedianScore(
             Dice.none,
             widget.statConfig.removeOutliers,
             widget.sortMode,
@@ -164,12 +164,13 @@ class _TeamList extends State<TeamList> {
 }
 
 class TeamSearch extends SearchDelegate<String?> {
-  TeamSearch(
-      {required this.teams,
-      required this.event,
-      this.sortMode,
-      required this.statConfig,
-      required this.elementSort,}) {
+  TeamSearch({
+    required this.teams,
+    required this.event,
+    this.sortMode,
+    required this.statConfig,
+    required this.elementSort,
+  }) {
     max = event.teams.maxMeanScore(
         Dice.none, statConfig.removeOutliers, sortMode, elementSort);
     final teams = event.teams.values;

@@ -44,7 +44,9 @@ class _CardView extends State<CardView> {
                       SliverAppBar(
                         expandedHeight: 200,
                         stretch: true,
+                        pinned: true,
                         flexibleSpace: FlexibleSpaceBar(
+                          expandedTitleScale: 1.0,
                           background: Hero(
                             tag: widget.tag,
                             child: widget.hero,
@@ -95,7 +97,7 @@ class _CardView extends State<CardView> {
           decoration: BoxDecoration(
             color: Theme.of(context).canvasColor,
             borderRadius: BorderRadius.all(
-              Radius.circular(10),
+              Radius.circular(20),
             ),
             boxShadow: [
               BoxShadow(

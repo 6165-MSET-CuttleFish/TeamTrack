@@ -4,9 +4,15 @@ import 'package:teamtrack/components/PFP.dart';
 import 'package:teamtrack/models/AppModel.dart';
 
 class UsersRow extends StatefulWidget {
-  const UsersRow({Key? key, required this.users, this.showRole = false}) : super(key: key);
+  const UsersRow({
+    Key? key,
+    required this.users,
+    this.showRole = false,
+    this.size = 28,
+  }) : super(key: key);
   final List<TeamTrackUser> users;
   final bool showRole;
+  final double size;
   @override
   _UsersRowState createState() => _UsersRowState();
 }
@@ -20,6 +26,7 @@ class _UsersRowState extends State<UsersRow> {
               (user) => PFP(
                 user: user,
                 showRole: widget.showRole,
+                size: widget.size,
               ),
             )
             .toList(),

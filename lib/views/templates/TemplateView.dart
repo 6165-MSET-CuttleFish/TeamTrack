@@ -1,22 +1,9 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:teamtrack/models/GameModel.dart';
-import 'package:teamtrack/models/ScoreModel.dart';
-import 'package:teamtrack/views/LandingPage.dart' as LandingPage;
-import 'package:teamtrack/views/home/match/MatchConfig.dart';
-import 'package:teamtrack/views/home/match/MatchList.dart';
-import 'package:teamtrack/components/CheckList.dart';
-import 'package:teamtrack/views/home/team/TeamList.dart';
-import 'package:teamtrack/functions/Extensions.dart';
 import 'package:teamtrack/models/AppModel.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
-import 'package:teamtrack/functions/Statistics.dart';
 
 import '../../api/APIKEYS.dart';
 

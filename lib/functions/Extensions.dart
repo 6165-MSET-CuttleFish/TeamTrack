@@ -135,6 +135,20 @@ extension colorExt on OpModeType? {
         return Color.fromRGBO(230, 30, 213, 1);
     }
   }
+  String getName() {
+    switch (this) {
+      case OpModeType.auto:
+        return 'Autonomous';
+      case OpModeType.tele:
+        return 'Tele-Op';
+      case OpModeType.endgame:
+        return 'Endgame';
+      case OpModeType.penalty:
+        return 'Penalty';
+      default:
+        return 'Total';
+    }
+  }
 }
 
 extension StrExt on String {

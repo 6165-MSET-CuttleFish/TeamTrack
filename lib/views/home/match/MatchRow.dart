@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:teamtrack/components/UsersRow.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/models/ScoreModel.dart';
 import 'package:teamtrack/models/StatConfig.dart';
@@ -70,7 +71,21 @@ class MatchRow extends StatelessWidget {
                   teamSummary(context),
                 ],
               )
-            : matchSummary(context),
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  matchSummary(context),
+                  Hero(
+                    tag: match.id,
+                    child: UsersRow(
+                      users: match.activeUsers ?? [],
+                      showRole: false,
+                      size: 20,
+                    ),
+                  )
+                ],
+              ),
         trailing: team != null
             ? Icon(Icons.navigate_next)
             : Row(
@@ -94,6 +109,7 @@ class MatchRow extends StatelessWidget {
           (((opponentScore - allianceScore) / opponentScore) * 0.7)
               .clamp(0.2, 0.7));
     }
+    return null;
   }
 
   ScoreSummary teamSummary(BuildContext context) {
@@ -173,23 +189,17 @@ class MatchRow extends StatelessWidget {
             ),
           ],
         ),
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              match.getRedAPI() != -1
-                  ? match.getRedAPI().toString() +
-                      ' - ' +
-                      match.getBlueAPI().toString()
-                  : 'Not on API',
-              style: GoogleFonts.gugi(
-                fontWeight: redIsGreater ? FontWeight.bold : null,
-                fontSize: match.getRedAPI() == -1 ? 10.5 : 12,
-                color: match.getRedAPI() == -1 ? Colors.amber : Colors.green,
-              ),
-            ),
-          ],
-        )
+        Text(
+          match.getRedAPI() != -1
+              ? match.getRedAPI().toString() +
+                  ' - ' +
+                  match.getBlueAPI().toString()
+              : 'Not on API',
+          style: GoogleFonts.gugi(
+            fontSize: match.getRedAPI() == -1 ? 10.5 : 12,
+            color: match.getRedAPI() == -1 ? Colors.amber : Colors.green,
+          ),
+        ),
       ],
     );
   }

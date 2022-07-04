@@ -86,6 +86,20 @@ class _TeamViewState extends State<TeamView> {
     super.initState();
   }
 
+  bool getSelection(OpModeType? opModeType) {
+    if (opModeType == null) {
+      return _selections[0];
+    } else if (opModeType == OpModeType.auto) {
+      return _selections[1];
+    } else if (opModeType == OpModeType.tele) {
+      return _selections[2];
+    } else if (opModeType == OpModeType.endgame) {
+      return _selections[3];
+    } else {
+      return false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
         bottomNavigationBar: NewPlatform.isIOS
@@ -289,72 +303,43 @@ class _TeamViewState extends State<TeamView> {
                               crossAxisAlignment: WrapCrossAlignment.center,
                               spacing: 0,
                               children: [
-                                FlatButton(
-                                  color: _selections[0] ? generalColor : null,
-                                  splashColor: generalColor,
-                                  onPressed: () {
-                                    setState(
-                                      () {
-                                        _selections[0] = !_selections[0];
-                                      },
-                                    );
-                                  },
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(18.0),
-                                    side: BorderSide(
-                                      color: generalColor,
+                                for (final opModeType in [
+                                  null,
+                                  OpModeType.auto,
+                                  OpModeType.tele,
+                                  OpModeType.endgame
+                                ])
+                                  FlatButton(
+                                    color: getSelection(opModeType)
+                                        ? opModeType.getColor()
+                                        : null,
+                                    splashColor: opModeType.getColor(),
+                                    onPressed: () {
+                                      setState(
+                                        () {
+                                          if (opModeType == null) {
+                                            _selections[0] = !_selections[0];
+                                          } else if (opModeType ==
+                                              OpModeType.auto) {
+                                            _selections[1] = !_selections[1];
+                                          } else if (opModeType ==
+                                              OpModeType.tele) {
+                                            _selections[2] = !_selections[2];
+                                          } else if (opModeType ==
+                                              OpModeType.endgame) {
+                                            _selections[3] = !_selections[3];
+                                          }
+                                        },
+                                      );
+                                    },
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(18.0),
+                                      side: BorderSide(
+                                        color: opModeType.getColor(),
+                                      ),
                                     ),
+                                    child: Text(opModeType.getName()),
                                   ),
-                                  child: Text('Total'),
-                                ),
-                                FlatButton(
-                                  color: _selections[1] ? autoColor : null,
-                                  splashColor: autoColor,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(18.0),
-                                    side: BorderSide(color: autoColor),
-                                  ),
-                                  child: Text('Autonomous'),
-                                  onPressed: () {
-                                    setState(
-                                      () {
-                                        _selections[1] = !_selections[1];
-                                      },
-                                    );
-                                  },
-                                ),
-                                FlatButton(
-                                  color: _selections[2] ? teleColor : null,
-                                  splashColor: teleColor,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(18.0),
-                                    side: BorderSide(color: teleColor),
-                                  ),
-                                  child: Text('Tele-Op'),
-                                  onPressed: () {
-                                    setState(
-                                      () {
-                                        _selections[2] = !_selections[2];
-                                      },
-                                    );
-                                  },
-                                ),
-                                FlatButton(
-                                  color: _selections[3] ? endgameColor : null,
-                                  splashColor: endgameColor,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(18.0),
-                                    side: BorderSide(color: endgameColor),
-                                  ),
-                                  child: Text('Endgame'),
-                                  onPressed: () {
-                                    setState(
-                                      () {
-                                        _selections[3] = !_selections[3];
-                                      },
-                                    );
-                                  },
-                                ),
                               ],
                             ),
                             _lineChart(),
@@ -424,143 +409,58 @@ class _TeamViewState extends State<TeamView> {
                             child: Text('Target'),
                           ),
                         ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 20, bottom: 10),
-                        child: Text(
-                          'Total',
-                          style: Theme.of(context).textTheme.bodyText1,
-                        ),
-                      ),
-                      ScoreCard(
-                        allianceTotal: widget.event.statConfig.allianceTotal,
-                        team: _team,
-                        event: widget.event,
-                        scoreDivisions: _team.scores.values.toList(),
-                        dice: _dice,
-                        removeOutliers: widget.event.statConfig.removeOutliers,
-                        matches: widget.event.getSortedMatches(true),
-                        title: 'Total',
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 20, bottom: 10),
-                        child: Text(
-                          'Autonomous',
-                          style: Theme.of(context).textTheme.bodyText1,
-                        ),
-                      ),
-                      ScoreCard(
-                        title: 'Autonomous',
-                        allianceTotal: widget.event.statConfig.allianceTotal,
-                        team: _team,
-                        event: widget.event,
-                        type: OpModeType.auto,
-                        scoreDivisions: _team.scores.values
-                            .map((e) => e.autoScore)
-                            .toList(),
-                        dice: _dice,
-                        removeOutliers: widget.event.statConfig.removeOutliers,
-                        matches: widget.event.getSortedMatches(true),
-                        elements: Column(
-                          children: teamMaxScore?.autoScore
-                                  .getElements()
-                                  .parse(putNone: false)
-                                  .map(
-                                    (element) => ScoringElementStats(
-                                      element: element,
-                                      maxElement: maxScore?.autoScore
-                                              .getElements()
-                                              .parse(putNone: false)
-                                              .firstWhere(
-                                                (e) => e.key == element.key,
-                                                orElse: () => ScoringElement(),
-                                              ) ??
-                                          element,
-                                    ),
+                      for (final opModeType in [
+                        null,
+                        OpModeType.auto,
+                        OpModeType.tele,
+                        OpModeType.endgame
+                      ])
+                        Padding(
+                          padding: const EdgeInsets.only(top: 20, bottom: 10),
+                          child: ScoreCard(
+                            allianceTotal:
+                                widget.event.statConfig.allianceTotal,
+                            team: _team,
+                            event: widget.event,
+                            scoreDivisions: _team.scores.values
+                                .map((e) => e.getScoreDivision(opModeType))
+                                .toList(),
+                            dice: _dice,
+                            removeOutliers:
+                                widget.event.statConfig.removeOutliers,
+                            matches: widget.event.getSortedMatches(true),
+                            title: opModeType.getName(),
+                            type: opModeType,
+                            elements: opModeType != null
+                                ? Column(
+                                    children: teamMaxScore
+                                            ?.getScoreDivision(opModeType)
+                                            .getElements()
+                                            .parse(putNone: false)
+                                            .map(
+                                              (element) => ScoringElementStats(
+                                                element: element,
+                                                maxElement: maxScore
+                                                        ?.getScoreDivision(
+                                                            opModeType)
+                                                        .getElements()
+                                                        .parse(putNone: false)
+                                                        .firstWhere(
+                                                          (e) =>
+                                                              e.key ==
+                                                              element.key,
+                                                          orElse: () =>
+                                                              ScoringElement(),
+                                                        ) ??
+                                                    element,
+                                              ),
+                                            )
+                                            .toList() ??
+                                        [],
                                   )
-                                  .toList() ??
-                              [],
+                                : null,
+                          ),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 20, bottom: 10),
-                        child: Text(
-                          'Tele-Op',
-                          style: Theme.of(context).textTheme.bodyText1,
-                        ),
-                      ),
-                      ScoreCard(
-                        title: 'Tele-Op',
-                        allianceTotal: widget.event.statConfig.allianceTotal,
-                        team: _team,
-                        event: widget.event,
-                        type: OpModeType.tele,
-                        scoreDivisions: _team.scores.values
-                            .map((e) => e.teleScore)
-                            .toList(),
-                        dice: _dice,
-                        removeOutliers: widget.event.statConfig.removeOutliers,
-                        matches: widget.event.getSortedMatches(true),
-                        elements: Column(
-                          children: teamMaxScore?.teleScore
-                                  .getElements()
-                                  .parse()
-                                  .map(
-                                    (element) => ScoringElementStats(
-                                      element: element,
-                                      maxElement: maxScore?.teleScore
-                                              .getElements()
-                                              .parse()
-                                              .firstWhere(
-                                                (e) => e.key == element.key,
-                                                orElse: () => ScoringElement(),
-                                              ) ??
-                                          element,
-                                    ),
-                                  )
-                                  .toList() ??
-                              [],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 20, bottom: 10),
-                        child: Text(
-                          'Endgame',
-                          style: Theme.of(context).textTheme.bodyText1,
-                        ),
-                      ),
-                      ScoreCard(
-                        title: 'Endgame',
-                        allianceTotal: widget.event.statConfig.allianceTotal,
-                        team: _team,
-                        event: widget.event,
-                        type: OpModeType.endgame,
-                        scoreDivisions: _team.scores.values
-                            .map((e) => e.endgameScore)
-                            .toList(),
-                        dice: _dice,
-                        removeOutliers: widget.event.statConfig.removeOutliers,
-                        matches: widget.event.getSortedMatches(true),
-                        elements: Column(
-                          children: teamMaxScore?.endgameScore
-                                  .getElements()
-                                  .parse()
-                                  .map(
-                                    (element) => ScoringElementStats(
-                                      element: element,
-                                      maxElement: maxScore?.endgameScore
-                                              .getElements()
-                                              .parse()
-                                              .firstWhere(
-                                                (e) => e.key == element.key,
-                                                orElse: () => ScoringElement(),
-                                              ) ??
-                                          element,
-                                    ),
-                                  )
-                                  .toList() ??
-                              [],
-                        ),
-                      ),
                       Padding(
                         padding: EdgeInsets.all(130),
                       ),

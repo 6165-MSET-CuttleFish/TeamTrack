@@ -2,10 +2,8 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/models/ScoreModel.dart';
-import 'package:teamtrack/views/LandingPage.dart' as LandingPage;
 import 'package:teamtrack/views/home/match/MatchConfig.dart';
 import 'package:teamtrack/views/home/match/MatchList.dart';
 import 'package:teamtrack/components/CheckList.dart';
@@ -17,28 +15,16 @@ import 'package:flutter/material.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:teamtrack/functions/Statistics.dart';
-import 'dart:convert';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/views/home/events/EventShare.dart';
-import 'package:teamtrack/models/AppModel.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:teamtrack/components/PlatformGraphics.dart';
-import 'package:teamtrack/views/home/events/EventView.dart';
 import 'package:provider/provider.dart';
-import 'package:teamtrack/functions/Extensions.dart';
 import '../../../api/APIKEYS.dart';
 
 class EventView extends StatefulWidget {
   EventView({
     Key? key,
     required this.event,
-    this.isPreview = false,
   }) : super(key: key);
   final Event event;
-  final bool isPreview;
 
   @override
   _EventView createState() => _EventView();
@@ -75,9 +61,7 @@ class _EventView extends State<EventView> {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: widget.isPreview
-              ? Text(widget.event.name)
-              : (_tab == 0 ? Text('Teams') : Text('Matches')),
+          title: (_tab == 0 ? Text('') : Text('Matches')),
           backgroundColor: Theme.of(context).colorScheme.primary,
           actions: [
             if (_tab == 0)
@@ -93,12 +77,11 @@ class _EventView extends State<EventView> {
                   ),
                 ),
               ),
-            if (_tab == 0)
-              IconButton(
-                icon: Icon(widget.event.shared ? Icons.share : Icons.upload),
-                tooltip: 'Share',
-                onPressed: () => _onShare(widget.event),
-              ),
+            IconButton(
+              icon: Icon(widget.event.shared ? Icons.share : Icons.upload),
+              tooltip: 'Share',
+              onPressed: () => _onShare(widget.event),
+            ),
             if (_tab != 0 && widget.event.hasKey())
               IconButton(
                   icon: Icon(Icons.refresh),
@@ -109,9 +92,7 @@ class _EventView extends State<EventView> {
                     int p = 1;
                     print(bod.toString());
                     List<Match> bruh = widget.event.getSortedMatches(ascending);
-
                     for (var x in bod) {
-
                       if (widget.event.matches.length < p) {
                         setState(() {
                           widget.event.addMatch(
@@ -157,14 +138,13 @@ class _EventView extends State<EventView> {
                           );
                         });
                         setState(() {});
-
                       }
-                      if(widget.event.matches.length>p-1) {
-                        bruh[widget.event.matches.length - p].setAPIScore(x['red_score'], x['blue_score']);
+                      if (widget.event.matches.length > p - 1) {
+                        bruh[widget.event.matches.length - p]
+                            .setAPIScore(x['red_score'], x['blue_score']);
                       }
                       p++;
                     }
-
                     dataModel.saveEvents();
                   }),
             _tab != 0
@@ -332,51 +312,19 @@ class _EventView extends State<EventView> {
             : null,
         body: materialTabs()[_tab],
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: widget.isPreview
+        floatingActionButton: widget.event.role != Role.viewer
             ? FloatingActionButton(
                 backgroundColor: Theme.of(context).colorScheme.primary,
-                tooltip: 'Import Event',
-                child: Icon(Icons.import_export),
+                tooltip: _tab == 0 ? 'Add Team' : 'Add Match',
+                child: Icon(Icons.add),
                 onPressed: () {
-                  showPlatformDialog(
-                    context: context,
-                    builder: (_) => PlatformAlert(
-                      title: Text('Import Event'),
-                      content: Text(
-                        'Are you sure?',
-                      ),
-                      actions: [
-                        PlatformDialogAction(
-                          child: Text('Cancel'),
-                          onPressed: () => Navigator.pop(context),
-                        ),
-                        PlatformDialogAction(
-                          child: Text('Import'),
-                          onPressed: () {
-                            dataModel.events.add(widget.event);
-                            LandingPage.tab = LandingPage.Tab.events;
-                            Navigator.of(context).pop();
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                      ],
-                    ),
-                  );
+                  if (_tab == 0)
+                    _teamConfig();
+                  else
+                    _matchConfig();
                 },
               )
-            : widget.event.role != Role.viewer
-                ? FloatingActionButton(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    tooltip: _tab == 0 ? 'Add Team' : 'Add Match',
-                    child: Icon(Icons.add),
-                    onPressed: () {
-                      if (_tab == 0)
-                        _teamConfig();
-                      else
-                        _matchConfig();
-                    },
-                  )
-                : null,
+            : null,
       );
 
   void _matchConfig() async {

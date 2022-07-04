@@ -166,9 +166,19 @@ class ScoreCard extends StatelessWidget {
           1,
       child: Padding(
         padding: EdgeInsets.only(left: 5, right: 5),
-        child: Hero(
-          tag: title,
-          child: stats,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Hero(
+              tag: title,
+              child: stats,
+            ),
+            Divider(),
+            Text(
+              title,
+              style: Theme.of(context).textTheme.bodyText1,
+            )
+          ],
         ),
       ),
       collapsed: scoreDivisions
@@ -179,7 +189,6 @@ class ScoreCard extends StatelessWidget {
               1
           ? Column(
               children: [
-                elements ?? Container(),
                 AspectRatio(
                   aspectRatio: 2,
                   child: Container(
@@ -329,6 +338,7 @@ class ScoreCard extends StatelessWidget {
                     ),
                   ),
                 ),
+                elements ?? Container(),
               ],
             )
           : Text(''),

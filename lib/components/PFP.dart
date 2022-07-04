@@ -4,14 +4,19 @@ import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/functions/Extensions.dart';
 
 class PFP extends StatelessWidget {
-  const PFP({Key? key, required this.user, this.showRole = true})
-      : super(key: key);
+  const PFP({
+    Key? key,
+    required this.user,
+    this.showRole = true,
+    this.size = 28,
+  }) : super(key: key);
   final TeamTrackUser user;
   final bool showRole;
+  final double size;
 
   @override
   Widget build(BuildContext context) => Container(
-        height: 28,
+        height: size,
         child: Stack(
           alignment: Alignment.bottomRight,
           children: [
@@ -20,13 +25,13 @@ class PFP extends StatelessWidget {
                     borderRadius: BorderRadius.circular(300),
                     child: Image.network(
                       user.photoURL!,
-                      height: 28,
+                      height: size,
                     ),
                   )
                 : Icon(
                     Icons.person,
                   ),
-            if (showRole) user.role.getIcon(),
+            if (showRole) user.role.getIcon(size: (size / 28) * 14),
           ],
         ),
       );
