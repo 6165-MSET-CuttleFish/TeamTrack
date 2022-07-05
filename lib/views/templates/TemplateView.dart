@@ -47,8 +47,8 @@ class _TemplateView extends State<TemplateView> {
   }
 
   initState() {
-     _getTeams();
-     _getInfo();
+    _getTeams();
+    _getInfo();
     super.initState();
   }
 
@@ -58,55 +58,66 @@ class _TemplateView extends State<TemplateView> {
           titleTextStyle: TextStyle(fontSize: 20),
           backgroundColor: Theme.of(context).colorScheme.primary,
         ),
-        body: data.isEmpty ? Center(child: PlatformProgressIndicator()) :Container(
-          child: Column(children:[
-            Text('Dates: ' +
-                data[0]['start_date'].substring(0, 10) +
-                ' - ' +
-                data[0]['end_date'].substring(0, 10)),
-            Text('Location: ' + data[0]['city']),
-            Text('Type: ' + data[0]['event_type_key']),
-            data[0]['division_name']?.let((that) => Text('Division: ' +that.toString())),
-            Expanded(
-              child: bod.isEmpty ? Center(child:Text('No Teams Loaded Yet')) :ListView.builder(
-                  itemCount: bod.length,
-                  itemBuilder: (context, index) {
-                    return Card(
-                      child: ListTile(
-                        title: Text(
-                            bod[index]['team']['team_name_short'].toString()),
-                        subtitle: Text(bod[index]['team_number'].toString()),
-                      ),
-                    );
-                  }),
-            ),
-            OutlinedButton(onPressed: () {
-              _newType = EventType.local;
-              _newName = widget.event_name;
-              dataModel.events.add(Event(
-
-                name: _newName ?? Statics.gameName,
-                type: _newType ?? EventType.remote,
-                gameName: Statics.gameName,
-                event_key: widget.event_key,
-              ));
-              for(var x in bod){
-                String _newName = x['team']['team_name_short'].toString();
-                String _newNumber = x['team_number'].toString();
-                dataModel.events[dataModel.events.length-1].addTeam(Team(_newNumber, _newName),);
-              }
-              dataModel.saveEvents();
-              ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    behavior: SnackBarBehavior.floating,
-                    duration: const Duration(milliseconds: 1000),
-                    content: Text('Event Created'),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                  ));
-            }, child: Text('Create Event')),
-          ].whereType<Widget>().toList()),
-        ),
+        body: data.isEmpty
+            ? Center(child: PlatformProgressIndicator())
+            : Container(
+                child: Column(
+                    children: [
+                  Text('Dates: ' +
+                      data[0]['start_date'].substring(0, 10) +
+                      ' - ' +
+                      data[0]['end_date'].substring(0, 10)),
+                  Text('Location: ' + data[0]['city']),
+                  Text('Type: ' + data[0]['event_type_key']),
+                  data[0]['division_name']
+                      ?.let((that) => Text('Division: ' + that.toString())),
+                  Expanded(
+                    child: bod.isEmpty
+                        ? Center(child: Text('No Teams Loaded Yet'))
+                        : ListView.builder(
+                            itemCount: bod.length,
+                            itemBuilder: (context, index) {
+                              return Card(
+                                child: ListTile(
+                                  title: Text(bod[index]['team']
+                                          ['team_name_short']
+                                      .toString()),
+                                  subtitle: Text(
+                                      bod[index]['team_number'].toString()),
+                                ),
+                              );
+                            }),
+                  ),
+                  OutlinedButton(
+                      onPressed: () {
+                        _newType = EventType.local;
+                        _newName = widget.event_name;
+                        dataModel.events.add(Event(
+                          name: _newName ?? Statics.gameName,
+                          type: _newType ?? EventType.remote,
+                          gameName: Statics.gameName,
+                          eventKey: widget.event_key,
+                        ));
+                        for (var x in bod) {
+                          String _newName =
+                              x['team']['team_name_short'].toString();
+                          String _newNumber = x['team_number'].toString();
+                          dataModel.events[dataModel.events.length - 1].addTeam(
+                            Team(_newNumber, _newName),
+                          );
+                        }
+                        dataModel.saveEvents();
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          behavior: SnackBarBehavior.floating,
+                          duration: const Duration(milliseconds: 1000),
+                          content: Text('Event Created'),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                        ));
+                      },
+                      child: Text('Create Event')),
+                ].whereType<Widget>().toList()),
+              ),
       );
 }

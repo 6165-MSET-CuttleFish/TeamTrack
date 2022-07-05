@@ -156,6 +156,7 @@ class ScoreCard extends StatelessWidget {
       ],
     );
     return CardView(
+      type: type,
       hero: stats,
       tag: title,
       isActive: scoreDivisions

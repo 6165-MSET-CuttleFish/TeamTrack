@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:teamtrack/components/PFP.dart';
 import 'package:teamtrack/models/AppModel.dart';
 
-class UsersRow extends StatefulWidget {
+class UsersRow extends StatelessWidget {
   const UsersRow({
     Key? key,
     required this.users,
@@ -14,19 +14,14 @@ class UsersRow extends StatefulWidget {
   final bool showRole;
   final double size;
   @override
-  _UsersRowState createState() => _UsersRowState();
-}
-
-class _UsersRowState extends State<UsersRow> {
-  @override
   Widget build(BuildContext context) => RowSuper(
         invert: true,
-        children: widget.users
+        children: users
             .map(
               (user) => PFP(
                 user: user,
-                showRole: widget.showRole,
-                size: widget.size,
+                showRole: showRole,
+                size: size,
               ),
             )
             .toList(),

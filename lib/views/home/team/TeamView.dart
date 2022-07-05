@@ -461,9 +461,6 @@ class _TeamViewState extends State<TeamView> {
                                 : null,
                           ),
                         ),
-                      Padding(
-                        padding: EdgeInsets.all(130),
-                      ),
                     ],
                   ),
                 )

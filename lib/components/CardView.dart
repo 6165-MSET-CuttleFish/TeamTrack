@@ -1,9 +1,9 @@
 // Expanding widget that contains a card.
-import 'package:teamtrack/components/Collapsible.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:teamtrack/models/GameModel.dart';
+import 'package:teamtrack/functions/Extensions.dart';
 
 class CardView extends StatefulWidget {
   CardView({
@@ -13,12 +13,14 @@ class CardView extends StatefulWidget {
     this.isActive = true,
     required this.hero,
     required this.tag,
+    this.type,
   }) : super(key: key);
   final Widget child;
   final Widget hero;
   final Widget collapsed;
   final bool isActive;
   final String tag;
+  final OpModeType? type;
   @override
   State<StatefulWidget> createState() => _CardView();
 }
@@ -96,6 +98,9 @@ class _CardView extends State<CardView> {
         child: Container(
           decoration: BoxDecoration(
             color: Theme.of(context).canvasColor,
+            border: Border.all(
+              color: widget.type.getColor(),
+            ),
             borderRadius: BorderRadius.all(
               Radius.circular(20),
             ),

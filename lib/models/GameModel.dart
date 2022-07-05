@@ -43,11 +43,11 @@ class Event {
     required this.name,
     required this.type,
     required this.gameName,
-    this.event_key='none',
+    this.eventKey,
     this.role = Role.editor,
   });
 
-  String event_key='none';
+  String? eventKey;
   String id = Uuid().v4();
   StatConfig statConfig = StatConfig();
 
@@ -85,17 +85,15 @@ class Event {
       },
     );
   }
-String getKey(){
-    return event_key;
-}
-bool hasKey(){
-    if(event_key!='none'&&event_key!=''){
-      return true;
-    }
-    else{
-      return false;
-    }
-}
+
+  String? getKey() {
+    return eventKey;
+  }
+
+  bool hasKey() {
+    return eventKey != null && !(eventKey?.isEmpty ?? true);
+  }
+
   void addTeam(Team newTeam) async {
     await getRef()
         ?.child('teams/${newTeam.number}')
@@ -112,11 +110,12 @@ bool hasKey(){
       arr.sort((a, b) => b.timeStamp.compareTo(a.timeStamp));
     return arr;
   }
+
   List<Match> getAllMatches(T) {
     var arr = <Match>[];
     final matches = getSortedMatches(true);
     for (var match in matches) {
-        arr.add(match);
+      arr.add(match);
     }
     return arr;
   }
@@ -336,7 +335,7 @@ bool hasKey(){
       gameName = map['gameName'] ?? Statics.gameName;
       type = getTypeFromString(map['type']);
       name = map['name'];
-      event_key = map['event_key']??"none";
+      eventKey = map['event_key'];
       try {
         teams = (map['teams'] as Map)
             .map((key, value) => MapEntry(key, Team.fromJson(value, gameName)));
@@ -421,7 +420,7 @@ bool hasKey(){
     type = getTypeFromString(json?['type']);
     statConfig.allianceTotal = type == EventType.remote;
     name = json?['name'] ?? "";
-    event_key = json?['event_key']??"none";
+    eventKey = json?['event_key'];
     try {
       teams = (json?['teams'] as Map)
           .map((key, value) => MapEntry(key, Team.fromJson(value, gameName)));
@@ -480,7 +479,7 @@ bool hasKey(){
         'seconds': createdAt.seconds,
         'nanoSeconds': createdAt.nanoseconds,
         'createdAt': cloudFirestore ? createdAt : createdAt.toJson(),
-         'event_key': event_key,
+        'event_key': eventKey,
       };
   Map<String, dynamic> toSimpleJson() => {
         'gameName': gameName,
@@ -626,16 +625,20 @@ class Match {
         " - " +
         blueScore(showPenalties: showPenalties).toString();
   }
-  void setAPIScore(int red, int blue){
+
+  void setAPIScore(int red, int blue) {
     apiRed = red;
     apiBlue = blue;
   }
-  int getRedAPI(){
+
+  int getRedAPI() {
     return apiRed;
   }
-  int getBlueAPI(){
+
+  int getBlueAPI() {
     return apiBlue;
   }
+
   int getMaxScoreVal({required bool? showPenalties}) {
     return [
       redScore(showPenalties: showPenalties),

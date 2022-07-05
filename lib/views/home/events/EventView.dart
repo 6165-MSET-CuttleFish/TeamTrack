@@ -51,11 +51,13 @@ class _EventView extends State<EventView> {
   List bod = [];
 
   _getMatches() async {
-    final response = await APIKEYS.getMatches(widget.event.getKey());
-    setState(() {
-      bod = (json.decode(response.body).toList());
-      //print(bod);
-    });
+    if (widget.event.hasKey()) {
+      final response = await APIKEYS.getMatches(widget.event.getKey() ?? '');
+      setState(() {
+        bod = (json.decode(response.body).toList());
+        //print(bod);
+      });
+    }
   }
 
   @override

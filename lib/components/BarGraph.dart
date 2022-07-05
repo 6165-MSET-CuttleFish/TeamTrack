@@ -13,6 +13,7 @@ class BarGraph extends StatelessWidget {
     this.height = 120,
     this.width = 30,
     this.title = 'Default',
+    this.fontSize = 12,
     this.units = '', // units of measurement
     this.percentage = 0,
     this.vertical = true, // vertical or horizontal bar
@@ -32,6 +33,7 @@ class BarGraph extends StatelessWidget {
   final bool compressed;
   final bool showPercentage;
   final String title;
+  final double fontSize;
   double max;
   double width;
   double val;
@@ -112,8 +114,10 @@ class BarGraph extends StatelessWidget {
               padding: EdgeInsets.all(2),
             ),
           if (!compressed)
-            Text(val.toInt().toString() + units,
-                style: Theme.of(context).textTheme.caption),
+            Text(
+              val.toInt().toString() + units,
+              style: Theme.of(context).textTheme.caption,
+            ),
         ],
       );
 

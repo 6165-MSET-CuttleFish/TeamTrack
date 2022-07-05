@@ -62,12 +62,22 @@ class MatchRow extends StatelessWidget {
                         children: [
                           Container(
                             child: matchSummary(context),
-                            width: 200,
+                            width: 150,
                           ),
                           scoreDisplay(),
+                          Spacer(),
+                          Icon(Icons.navigate_next)
                         ],
                       ),
                     ),
+                  Hero(
+                    tag: match.id,
+                    child: UsersRow(
+                      users: match.activeUsers ?? [],
+                      showRole: false,
+                      size: 20,
+                    ),
+                  ),
                   teamSummary(context),
                 ],
               )
@@ -83,11 +93,11 @@ class MatchRow extends StatelessWidget {
                       showRole: false,
                       size: 20,
                     ),
-                  )
+                  ),
                 ],
               ),
         trailing: team != null
-            ? Icon(Icons.navigate_next)
+            ? null
             : Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [scoreDisplay(), Icon(Icons.navigate_next)]),
@@ -189,6 +199,7 @@ class MatchRow extends StatelessWidget {
             ),
           ],
         ),
+        if (event.eventKey  != null)
         Text(
           match.getRedAPI() != -1
               ? match.getRedAPI().toString() +
