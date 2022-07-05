@@ -168,7 +168,7 @@ class _Incrementor extends State<Incrementor> {
                               .runTransaction(
                             (mutableData) {
                               if (widget.mutableDecrement != null) {
-                                 widget.mutableDecrement!(mutableData);
+                                widget.mutableDecrement!(mutableData);
                               }
                               var ref =
                                   (mutableData as Map?)?[widget.element.key];
