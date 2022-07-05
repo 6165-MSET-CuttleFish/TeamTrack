@@ -34,6 +34,9 @@ class TeamView extends StatefulWidget {
 }
 
 class _TeamViewState extends State<TeamView> {
+  final Color barBackgroundColor = const Color(0xff72d8bf);
+
+  int touchedIndex = -1;
   _TeamViewState(this._team);
   Dice _dice = Dice.none;
   final _selections = [true, false, false, false];
@@ -295,8 +298,8 @@ class _TeamViewState extends State<TeamView> {
                           children: [
                             Padding(
                               padding: widget.event.type != EventType.remote
-                                  ? EdgeInsets.all(40)
-                                  : EdgeInsets.all(20),
+                                  ? EdgeInsets.all(5)
+                                  : EdgeInsets.all(5),
                             ),
                             Wrap(
                               alignment: WrapAlignment.center,
@@ -349,7 +352,7 @@ class _TeamViewState extends State<TeamView> {
                       if (widget.isSoleWindow)
                         Container(
                           width: MediaQuery.of(context).size.width,
-                          child: PlatformButton(
+                          child: CupertinoButton(
                             onPressed: () async {
                               await Navigator.push(
                                 context,
@@ -373,7 +376,7 @@ class _TeamViewState extends State<TeamView> {
                       if (widget.isSoleWindow)
                         Container(
                           width: MediaQuery.of(context).size.width / 2,
-                          child: PlatformButton(
+                          child: CupertinoButton(
                             onPressed: () async {
                               if (_team.targetScore == null) {
                                 _team.targetScore = Score(
@@ -489,12 +492,13 @@ class _TeamViewState extends State<TeamView> {
                       ? LineChart(
                           LineChartData(
                             gridData: FlGridData(
-                              horizontalInterval: 1.0,
+                              horizontalInterval: 50.0,
                               show: true,
                               drawVerticalLine: true,
                               getDrawingHorizontalLine: (value) {
                                 return FlLine(
-                                  color: Colors.transparent,
+                                  strokeWidth: 1.2,
+                                  color: Colors.white,
                                 );
                               },
                               getDrawingVerticalLine: (value) {
@@ -548,7 +552,7 @@ class _TeamViewState extends State<TeamView> {
                             borderData: FlBorderData(
                               show: true,
                               border: Border.all(
-                                  color: const Color(0xff37434d), width: 1),
+                                  color: const Color(0xff37434d), width: 0),
                             ),
                             minX: 0,
                             minY: 0,
@@ -618,10 +622,10 @@ class _TeamViewState extends State<TeamView> {
                                               .event.statConfig.removeOutliers,
                                         ),
                                 color: generalColor,
-                                isCurved: true,
+                                isCurved: false,
                                 isStrokeCapRound: true,
                                 preventCurveOverShooting: true,
-                                barWidth: 5,
+                                barWidth: 2,
                               ),
                               LineChartBarData(
                                 show: _selections[1],
@@ -646,10 +650,10 @@ class _TeamViewState extends State<TeamView> {
                                               .event.statConfig.removeOutliers,
                                         ),
                                 color: autoColor,
-                                isCurved: true,
+                                isCurved: false,
                                 isStrokeCapRound: true,
                                 preventCurveOverShooting: true,
-                                barWidth: 5,
+                                barWidth: 2,
                               ),
                               LineChartBarData(
                                 show: _selections[2],
@@ -676,10 +680,10 @@ class _TeamViewState extends State<TeamView> {
                                               .event.statConfig.removeOutliers,
                                         ),
                                 color: teleColor,
-                                isCurved: true,
+                                isCurved: false,
                                 isStrokeCapRound: true,
                                 preventCurveOverShooting: true,
-                                barWidth: 5,
+                                barWidth: 2,
                               ),
                               LineChartBarData(
                                 show: _selections[3],
@@ -704,10 +708,10 @@ class _TeamViewState extends State<TeamView> {
                                               .event.statConfig.removeOutliers,
                                         ),
                                 color: endgameColor,
-                                isCurved: true,
+                                isCurved: false,
                                 isStrokeCapRound: true,
                                 preventCurveOverShooting: true,
-                                barWidth: 5,
+                                barWidth: 2,
                               ),
                             ],
                           ),
