@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:teamtrack/models/GameModel.dart';
@@ -44,12 +45,12 @@ class _TemplatesList extends State<TemplatesList> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.grey.shade900,
+     //   backgroundColor: Colors.grey.shade900,
         title: Container(
-          height: 38,
-          child: TextField(
+          height: 37,
+          child: CupertinoSearchTextField(
             onChanged: (value) => onSearch(value),
-            decoration: InputDecoration(
+           /* decoration: InputDecoration(
                 filled: true,
                 fillColor: Colors.grey[850],
                 contentPadding: EdgeInsets.all(0),
@@ -63,7 +64,7 @@ class _TemplatesList extends State<TemplatesList> {
                     color: Colors.grey.shade500
                 ),
                 hintText: "Search events"
-            ),
+            ),*/
           ),
         ),
       ), body: Container(

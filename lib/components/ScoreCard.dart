@@ -156,6 +156,7 @@ class ScoreCard extends StatelessWidget {
       ],
     );
     return CardView(
+
       type: type,
       hero: stats,
       tag: title,
@@ -168,17 +169,32 @@ class ScoreCard extends StatelessWidget {
       child: Padding(
         padding: EdgeInsets.only(left: 5, right: 5),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
+
+        Padding(
+        padding: const EdgeInsets.only(left:15, top:15  ),
+        child: Align(
+          alignment: Alignment.topLeft,
+          child:
+            Text(
+              title,
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontFamily: "Roboto",
+                  fontWeight: FontWeight.bold),
+            ),
+        ),),
+
+
+            Divider(
+              color:Colors.transparent,
+            ),
             Hero(
               tag: title,
               child: stats,
             ),
-            Divider(),
-            Text(
-              title,
-              style: Theme.of(context).textTheme.bodyText1,
-            )
           ],
         ),
       ),
@@ -190,6 +206,7 @@ class ScoreCard extends StatelessWidget {
               1
           ? Column(
               children: [
+
                 AspectRatio(
                   aspectRatio: 2,
                   child: Container(

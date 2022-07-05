@@ -1,10 +1,11 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
-
+import 'package:intl/intl.dart';
 import '../../api/APIKEYS.dart';
 
 class TemplateView extends StatefulWidget {
@@ -62,13 +63,68 @@ class _TemplateView extends State<TemplateView> {
             ? Center(child: PlatformProgressIndicator())
             : Container(
                 child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                  Text('Dates: ' +
-                      data[0]['start_date'].substring(0, 10) +
-                      ' - ' +
-                      data[0]['end_date'].substring(0, 10)),
-                  Text('Location: ' + data[0]['city']),
-                  Text('Type: ' + data[0]['event_type_key']),
+                      Padding(
+                        padding: EdgeInsets.only(top:20,left:10),
+                child:
+                      Text.rich(
+                        TextSpan(
+                          children: [
+                            WidgetSpan(child: Icon(Icons.calendar_today_rounded
+                            ,
+                            size:15,)),
+                            TextSpan(text: ' '+ DateFormat.yMMMMd('en_US').format(DateTime.parse(data[0]['start_date'].substring(0, 10))) +
+                            ' - ' +
+                                DateFormat.yMMMMd('en_US').format(DateTime.parse(data[0]['end_date'].substring(0, 10)))+'\n',
+                            style:TextStyle(
+                              fontSize: 15,
+                                fontFamily: 'Roboto',
+
+                            )
+
+                            ),
+                            WidgetSpan(
+                              child: Divider(
+                                color:Colors.transparent,
+                                height: 10,
+                              )
+                            ),
+                            WidgetSpan(child: Icon(Icons.location_on
+                              ,
+                              size:15,)),
+                            TextSpan(text: ' '+data[0]['venue']+'\n',
+                                style:TextStyle(
+                                  overflow: TextOverflow.ellipsis,
+                                  fontSize: 15,
+                                  fontFamily: 'Roboto',
+
+                                )
+
+                            ),
+                            WidgetSpan(
+                                child: Divider(
+                                  color:Colors.transparent,
+                                  height: 10,
+                                )
+                            ),
+                            WidgetSpan(child: Icon(Icons.tour_rounded
+                              ,
+                              size:15,)),
+                            TextSpan(text: ' '+data[0]['event_type_key']+'\n',
+                                style:TextStyle(
+                                  overflow: TextOverflow.ellipsis,
+                                  fontSize: 15,
+                                  fontFamily: 'Roboto',
+
+                                )
+
+                            ),
+                          ],
+
+                        ),
+                      ),
+                      ),
                   data[0]['division_name']
                       ?.let((that) => Text('Division: ' + that.toString())),
                   Expanded(
@@ -88,7 +144,12 @@ class _TemplateView extends State<TemplateView> {
                               );
                             }),
                   ),
-                  OutlinedButton(
+      Container(
+          width: MediaQuery.of(context).size.width,
+          child: Padding(
+            padding: EdgeInsets.only(left:5,right:5,top:5,bottom:5),
+            child:
+                  CupertinoButton(
                       onPressed: () {
                         _newType = EventType.local;
                         _newName = widget.event_name;
@@ -116,7 +177,15 @@ class _TemplateView extends State<TemplateView> {
                           ),
                         ));
                       },
-                      child: Text('Create Event')),
+                      color: Colors.green,
+                      child: Text('Create Event',
+                      style: TextStyle(
+                    //    color: Colors.black,
+                        fontFamily: 'Roboto',
+                      ),),
+                  ),
+                  ),
+      ),
                 ].whereType<Widget>().toList()),
               ),
       );

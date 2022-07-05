@@ -302,6 +302,9 @@ class _TeamViewState extends State<TeamView> {
                                   ? EdgeInsets.all(5)
                                   : EdgeInsets.all(5),
                             ),
+                            Padding(
+            padding:EdgeInsets.only(left:18,right:18),
+            child:
                             Wrap(
                               alignment: WrapAlignment.center,
                               crossAxisAlignment: WrapCrossAlignment.center,
@@ -318,6 +321,8 @@ class _TeamViewState extends State<TeamView> {
                                         ? opModeType.getColor()
                                         : null,
                                     splashColor: opModeType.getColor(),
+                                    padding: EdgeInsets.only(left:10,right:10),
+                                    minWidth: 0,
                                     onPressed: () {
                                       setState(
                                         () {
@@ -337,14 +342,18 @@ class _TeamViewState extends State<TeamView> {
                                       );
                                     },
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(18.0),
+                                      borderRadius: BorderRadius.circular(3.0),
                                       side: BorderSide(
+                                        width:2,
                                         color: opModeType.getColor(),
                                       ),
                                     ),
-                                    child: Text(opModeType.getName()),
+                                    child: Text(
+                                      opModeType.getName(),
+                                    ),
                                   ),
                               ],
+                            ),
                             ),
                             _lineChart(),
                           ],
@@ -353,7 +362,10 @@ class _TeamViewState extends State<TeamView> {
                       if (widget.isSoleWindow)
                         Container(
                           width: MediaQuery.of(context).size.width,
-                          child: CupertinoButton(
+                          child: Padding(
+                            padding: EdgeInsets.only(left:18,right:18),
+                            child:
+                            CupertinoButton(
                             onPressed: () async {
                               await Navigator.push(
                                 context,
@@ -371,12 +383,13 @@ class _TeamViewState extends State<TeamView> {
                             child: Text('Matches'),
                           ),
                         ),
+                        ),
                       Padding(
-                        padding: EdgeInsets.all(5),
+                        padding: EdgeInsets.only(top:20),
                       ),
                       if (widget.isSoleWindow)
                         Container(
-                          width: MediaQuery.of(context).size.width / 2,
+                          width: (MediaQuery.of(context).size.width-46),
                           child: CupertinoButton(
                             onPressed: () async {
                               if (_team.targetScore == null) {

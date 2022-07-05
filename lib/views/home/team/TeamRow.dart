@@ -54,10 +54,14 @@ class TeamRow extends StatelessWidget {
             style: Theme.of(context).textTheme.bodyText1,
           ),
         ),
-        leading: Text(
+        leading: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [Text(
           team.number,
-          style: Theme.of(context).textTheme.caption,
+          style: Theme.of(context).textTheme.bodyText1,
         ),
+        ]
+          ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [

@@ -97,16 +97,16 @@ class _CardView extends State<CardView> {
         ),
         child: Container(
           decoration: BoxDecoration(
-            color: Theme.of(context).canvasColor,
+            color: darken(widget.type.getColor(),.15),
             border: Border.all(
-              color: widget.type.getColor(),
+              color: Colors.transparent,
             ),
             borderRadius: BorderRadius.all(
-              Radius.circular(20),
+              Radius.circular(15),
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withOpacity(0.8),
+                color: Colors.black,
                 spreadRadius: 2,
                 blurRadius: 2, // changes position of shadow
               ),
@@ -118,7 +118,7 @@ class _CardView extends State<CardView> {
                 curve: Curves.fastLinearToSlowEaseIn,
                 duration: Duration(milliseconds: 800),
                 width: getWidth(),
-                height: getHeight(),
+                height: getWidth(),
                 child: widget.child,
               ),
               // Collapsible(
@@ -138,7 +138,14 @@ class _CardView extends State<CardView> {
       ),
     );
   }
+  Color darken(Color color, [double amount = .1]) {
+    assert(amount >= 0 && amount <= 1);
 
+    final hsl = HSLColor.fromColor(color);
+    final hslDark = hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0));
+
+    return hslDark.toColor();
+  }
   double getWidth() {
     double val = !_genBool
         ? MediaQuery.of(context).size.width
