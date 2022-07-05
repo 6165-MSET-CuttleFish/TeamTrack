@@ -120,46 +120,46 @@ class _MatchView extends State<MatchView> {
               : e.scores.maxScore(Dice.none, false, OpModeType.endgame, null),
         )
         .maxValue();
-    cyclesMaxTotal = event.matches.values
-        .map((element) => [element.red, element.blue])
-        .reduce((value, element) => value + element)
-        .map((e) => e?.total().teleScore.totalCycles())
-        .maxValue();
-    cyclesMaxInd = event.teams.values
-        .map(
-          (e) => _match == null
-              ? e.targetScore?.teleScore.totalCycles()
-              : e.scores.values
-                  .map((e) => e.teleScore.totalCycles())
-                  .maxValue(),
-        )
-        .maxValue();
-    teleCyclesMaxTotal = event.matches.values
-        .map((element) => [element.red, element.blue])
-        .reduce((value, element) => value + element)
-        .map((e) => e?.total().teleScore.teleCycles())
-        .maxValue();
-    teleCyclesMaxInd = event.teams.values
-        .map(
-          (e) => _match == null
-              ? e.targetScore?.teleScore.teleCycles()
-              : e.scores.values.map((e) => e.teleScore.teleCycles()).maxValue(),
-        )
-        .maxValue();
-    endgameCyclesMaxTotal = event.matches.values
-        .map((element) => [element.red, element.blue])
-        .reduce((value, element) => value + element)
-        .map((e) => e?.total().teleScore.endgameCycles())
-        .maxValue();
-    endgameCyclesMaxInd = event.teams.values
-        .map(
-          (e) => _match == null
-              ? e.targetScore?.teleScore.endgameCycles()
-              : e.scores.values
-                  .map((e) => e.teleScore.endgameCycles())
-                  .maxValue(),
-        )
-        .maxValue();
+    // cyclesMaxTotal = event.matches.values
+    //     .map((element) => [element.red, element.blue])
+    //     .reduce((value, element) => value + element)
+    //     .map((e) => e?.total().teleScore.totalCycles())
+    //     .maxValue();
+    // cyclesMaxInd = event.teams.values
+    //     .map(
+    //       (e) => _match == null
+    //           ? e.targetScore?.teleScore.totalCycles()
+    //           : e.scores.values
+    //               .map((e) => e.teleScore.totalCycles())
+    //               .maxValue(),
+    //     )
+    //     .maxValue();
+    // teleCyclesMaxTotal = event.matches.values
+    //     .map((element) => [element.red, element.blue])
+    //     .reduce((value, element) => value + element)
+    //     .map((e) => e?.total().teleScore.teleCycles())
+    //     .maxValue();
+    // teleCyclesMaxInd = event.teams.values
+    //     .map(
+    //       (e) => _match == null
+    //           ? e.targetScore?.teleScore.teleCycles()
+    //           : e.scores.values.map((e) => e.teleScore.teleCycles()).maxValue(),
+    //     )
+    //     .maxValue();
+    // endgameCyclesMaxTotal = event.matches.values
+    //     .map((element) => [element.red, element.blue])
+    //     .reduce((value, element) => value + element)
+    //     .map((e) => e?.total().teleScore.endgameCycles())
+    //     .maxValue();
+    // endgameCyclesMaxInd = event.teams.values
+    //     .map(
+    //       (e) => _match == null
+    //           ? e.targetScore?.teleScore.endgameCycles()
+    //           : e.scores.values
+    //               .map((e) => e.teleScore.endgameCycles())
+    //               .maxValue(),
+    //     )
+    //     .maxValue();
     Score('', Dice.none, event.gameName)
         .autoScore
         .getElements()
@@ -701,7 +701,7 @@ class _MatchView extends State<MatchView> {
                                 width: MediaQuery.of(context).size.width,
                                 child: CupertinoSlidingSegmentedControl(
                                   groupValue: _view,
-                                  children: <int, Widget>{
+                                  children: {
                                     0: Text('Autonomous'),
                                     1: Text('Tele-Op'),
                                     2: Text('Endgame')
@@ -779,7 +779,7 @@ class _MatchView extends State<MatchView> {
   void stateSetter([String? key]) {
     HapticFeedback.mediumImpact();
     dataModel.saveEvents();
-    if (key != null) previouslyCycledElement = key;
+    if (key != null && !widget.event.shared) previouslyCycledElement = key;
   }
 
   Color getAllianceColor() {
@@ -1015,17 +1015,19 @@ class _MatchView extends State<MatchView> {
                           if (widget.match == null) return;
                           var ref = (mutableData as Map?)?[e.key];
                           if (ref is Map) {
-                            if (ref[e.key] < e.max!()) {
-                              mutableData?[e.key] =
-                                  (ref[e.key] ?? 0) + e.incrementValue;
+                            if (ref['count'] < e.max!()) {
                               lapses.add(
                                 (_time - sum).toPrecision(3),
                               );
                               sum = _time;
                               if (!_paused &&
                                   previouslyCycledElement == e.key) {
-                                mutableData?[e.key]?['cycleTimes'] = lapses;
+                                mutableData?[e.key]?['cycleTimes'] = [
+                                  ...(ref['cycleTimes'] ?? []),
+                                  lapses.last
+                                ];
                               }
+                              previouslyCycledElement = e.key;
                             }
                           }
                         },
@@ -1127,6 +1129,26 @@ class _MatchView extends State<MatchView> {
                         element: e,
                         onPressed: () => stateSetter(e.key),
                         event: widget.event,
+                        mutableIncrement: (mutableData) {
+                          if (widget.match == null) return;
+                          var ref = (mutableData as Map?)?[e.key];
+                          if (ref is Map) {
+                            if (ref['count'] < e.max!()) {
+                              lapses.add(
+                                (_time - sum).toPrecision(3),
+                              );
+                              sum = _time;
+                              if (!_paused &&
+                                  previouslyCycledElement == e.key) {
+                                mutableData?[e.key]?['cycleTimes'] = [
+                                  ...(ref['cycleTimes'] ?? []),
+                                  lapses.last
+                                ];
+                              }
+                              previouslyCycledElement = e.key;
+                            }
+                          }
+                        },
                         path: teamPath(OpModeType.endgame),
                         score: _score,
                         max: widget.match != null
@@ -1182,7 +1204,6 @@ class _MatchView extends State<MatchView> {
       (_time - sum).toPrecision(3),
     );
     sum = _time;
-    _score?.teleScore.cycleTimes = lapses;
   }
 
   String allianceColor() {

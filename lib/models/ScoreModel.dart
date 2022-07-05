@@ -368,7 +368,7 @@ class AutoScore extends ScoreDivision {
           name: ref[e]['name'] ?? e,
           count: map[e] is Map ? map[e]['count'] : map[e],
           misses: map[e] is Map ? map[e]['misses'] : 0,
-          cycleTimes: map[e] is Map ? map[e]['cycleTimes'] ?? [] : [],
+          cycleTimes: map[e] is Map ? decodeArray(map[e]?['cycleTimes']) : [],
           min: () => ref[e]['min'] ?? 0,
           value: ref[e]['value'] ?? 1,
           isBool: ref[e]['isBool'] ?? false,
@@ -390,42 +390,12 @@ class TeleScore extends ScoreDivision {
     for (final element in this.getElements()) {
       element.count = 0;
     }
-    cycleTimes = [];
     misses.count = 0;
   }
 
   late Dice dice;
   Map<String, ScoringElement> elements = Map();
   List<ScoringElement> getElements() => elements.values.toList();
-  List<double> cycleTimes = [];
-
-  int teleCycles([double engameThreshold = 90]) {
-    double cycleSum = 0;
-    int cycles = 0;
-    for (final cycleTime in cycleTimes) {
-      cycleSum += cycleTime;
-      if (cycleSum < engameThreshold) {
-        cycles++;
-      } else {
-        break;
-      }
-    }
-    return cycles;
-  }
-
-  int totalCycles() => cycleTimes.length;
-
-  int endgameCycles([double engameThreshold = 90]) {
-    double cycleSum = 0;
-    int cycles = 0;
-    for (final cycleTime in cycleTimes) {
-      cycleSum += cycleTime;
-      if (cycleSum > 90) {
-        cycles++;
-      }
-    }
-    return cycles;
-  }
 
   ScoringElement misses =
       ScoringElement(name: "Misses", value: 1, key: 'Misses');
@@ -476,7 +446,6 @@ class TeleScore extends ScoreDivision {
         teleScore.elements[key] = other.elements[key] ?? ScoringElement();
       }
     });
-    teleScore.cycleTimes = cycleTimes + other.cycleTimes;
     teleScore.misses = misses + other.misses;
     return teleScore;
   }
@@ -488,7 +457,7 @@ class TeleScore extends ScoreDivision {
           name: ref[e]['name'] ?? e,
           count: map[e] is Map ? map[e]['count'] : map[e],
           misses: map[e] is Map ? map[e]['misses'] : 0,
-          cycleTimes: map[e] is Map ? map[e]['cycleTimes'] ?? [] : [],
+          cycleTimes: map[e] is Map ? decodeArray(map[e]?['cycleTimes']) : [],
           min: () => ref[e]['min'] ?? 0,
           value: ref[e]['value'] ?? 1,
           isBool: ref[e]['isBool'] ?? false,
@@ -501,6 +470,14 @@ class TeleScore extends ScoreDivision {
   }
   Map<String, dynamic> toJson() =>
       elements.map((key, value) => MapEntry(key, value.toJson()));
+}
+
+List<double> decodeArray(List<dynamic>? map) {
+  if (map == null) return [];
+  final x = List<num>.from(json.decode(map.toString()))
+      .map((e) => e.toDouble())
+      .toList();
+  return x;
 }
 
 /// This class is used to represent the endgame score structure of traditional and remote FTC events.
@@ -572,7 +549,7 @@ class EndgameScore extends ScoreDivision {
           name: ref[e]['name'] ?? e,
           count: json[e] is Map ? json[e]['count'] : json[e],
           misses: json[e] is Map ? json[e]['misses'] : 0,
-          cycleTimes: json[e] is Map ? json[e]['cycleTimes'] ?? [] : [],
+          cycleTimes: json[e] is Map ? decodeArray(json[e]?['cycleTimes']) : [],
           min: () => ref[e]['min'] ?? 0,
           value: ref[e]['value'] ?? 1,
           isBool: ref[e]['isBool'] ?? false,
