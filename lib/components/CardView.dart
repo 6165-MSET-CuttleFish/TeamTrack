@@ -102,13 +102,13 @@ class _CardView extends State<CardView> {
               color: Colors.transparent,
             ),
             borderRadius: BorderRadius.all(
-              Radius.circular(15),
+              Radius.circular(10),
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black,
+                color: Colors.transparent,
                 spreadRadius: 2,
-                blurRadius: 2, // changes position of shadow
+                blurRadius: 0, // changes position of shadow
               ),
             ],
           ),

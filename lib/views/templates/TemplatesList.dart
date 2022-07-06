@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
+import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import '../../api/APIKEYS.dart';
 import 'TemplateView.dart';
@@ -44,12 +45,15 @@ class _TemplatesList extends State<TemplatesList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: themeChangeProvider.darkTheme ? Colors.black:Colors.white,
         elevation: 0,
      //   backgroundColor: Colors.grey.shade900,
         title: Container(
           height: 37,
+          color: themeChangeProvider.darkTheme ? Colors.black:Colors.white,
           child: CupertinoSearchTextField(
             onChanged: (value) => onSearch(value),
+           backgroundColor: themeChangeProvider.darkTheme ? Color.fromARGB(255, 50, 50, 50):Color.fromARGB(255, 220, 220, 220),
            /* decoration: InputDecoration(
                 filled: true,
                 fillColor: Colors.grey[850],
