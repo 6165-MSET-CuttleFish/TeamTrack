@@ -5,6 +5,34 @@ import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/models/ScoreModel.dart';
 import 'package:teamtrack/models/StatConfig.dart';
 
+enum Statistics { MEAN, MEDIAN, BEST, DEVIATION }
+
+extension StatisticsExtension on Statistics {
+  String get name {
+    switch (this) {
+      case Statistics.MEAN:
+        return 'Mean';
+      case Statistics.MEDIAN:
+        return 'Median';
+      case Statistics.BEST:
+        return 'Best';
+      case Statistics.DEVIATION:
+        return 'Deviation';
+    }
+  }
+
+  double Function(List<num>) getFunction() {
+    switch (this) {
+      case Statistics.MEAN:
+        return mean;
+      case Statistics.MEDIAN:
+        return median;
+      default:
+        return standardDeviation;
+    }
+  }
+}
+
 extension Ex on double {
   double toPrecision(int n) => double.parse(toStringAsFixed(n));
 }

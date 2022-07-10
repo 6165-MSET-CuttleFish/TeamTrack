@@ -1011,26 +1011,8 @@ class _MatchView extends State<MatchView> {
                         event: widget.event,
                         path: teamPath(OpModeType.tele),
                         score: _score,
-                        mutableIncrement: (mutableData) {
-                          if (widget.match == null) return;
-                          var ref = (mutableData as Map?)?[e.key];
-                          if (ref is Map) {
-                            if (ref['count'] < e.max!()) {
-                              lapses.add(
-                                (_time - sum).toPrecision(3),
-                              );
-                              sum = _time;
-                              if (!_paused &&
-                                  previouslyCycledElement == e.key) {
-                                mutableData?[e.key]?['cycleTimes'] = [
-                                  ...(ref['cycleTimes'] ?? []),
-                                  lapses.last
-                                ];
-                              }
-                              previouslyCycledElement = e.key;
-                            }
-                          }
-                        },
+                        mutableIncrement: (mutableData) =>
+                            mutableIncrement(mutableData, e),
                         max: widget.match != null
                             ? maxTeleScores[e.key] ?? 0
                             : maxTeleTargets[e.key] ?? 0,
@@ -1075,6 +1057,24 @@ class _MatchView extends State<MatchView> {
             ),
           ),
         ];
+
+  void mutableIncrement(Object? mutableData, ScoringElement element) {
+    if (widget.match == null) return;
+    var ref = (mutableData as Map?)?[element.key];
+    if (ref is Map) {
+      if (ref['count'] < element.max!()) {
+        lapses.add(
+          (_time - sum).toPrecision(3),
+        );
+        sum = _time;
+        if (!_paused && previouslyCycledElement == element.key) {
+          mutableData?[element.key]
+              ?['cycleTimes'] = [...(ref['cycleTimes'] ?? []), lapses.last];
+        }
+        previouslyCycledElement = element.key;
+      }
+    }
+  }
 
   List<Widget> endView() => !_paused || _allowView
       ? [
@@ -1128,27 +1128,10 @@ class _MatchView extends State<MatchView> {
                       (e) => Incrementor(
                         element: e,
                         onPressed: () => stateSetter(e.key),
+                        onIncrement: _paused ? null : onIncrement,
                         event: widget.event,
-                        mutableIncrement: (mutableData) {
-                          if (widget.match == null) return;
-                          var ref = (mutableData as Map?)?[e.key];
-                          if (ref is Map) {
-                            if (ref['count'] < e.max!()) {
-                              lapses.add(
-                                (_time - sum).toPrecision(3),
-                              );
-                              sum = _time;
-                              if (!_paused &&
-                                  previouslyCycledElement == e.key) {
-                                mutableData?[e.key]?['cycleTimes'] = [
-                                  ...(ref['cycleTimes'] ?? []),
-                                  lapses.last
-                                ];
-                              }
-                              previouslyCycledElement = e.key;
-                            }
-                          }
-                        },
+                        mutableIncrement: (mutableData) =>
+                            mutableIncrement(mutableData, e),
                         path: teamPath(OpModeType.endgame),
                         score: _score,
                         max: widget.match != null

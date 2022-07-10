@@ -517,7 +517,7 @@ class _TeamViewState extends State<TeamView> {
                                             : "",
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold,
-                                            fontSize: 10));
+                                            fontSize: 10,),);
                                   },
                                 ),
                               ),
