@@ -72,7 +72,7 @@ class _TemplatesList extends State<TemplatesList> {
           ),
         ),
       ), body: Container(
-      child:bod.isEmpty ? Center(child: PlatformProgressIndicator()):bodvis.isEmpty ? Center(child: Text('No Results Found')):ListView.builder(
+      child:bod.isEmpty ? Center(child: CircularProgressIndicator.adaptive()):bodvis.isEmpty ? Center(child: Text('No Results Found')):ListView.builder(
         itemCount: bodvis.length,
         itemBuilder: (context, index) {
           return Card(
