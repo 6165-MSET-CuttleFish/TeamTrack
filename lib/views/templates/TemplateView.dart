@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:skeletons/skeletons.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
@@ -60,7 +61,112 @@ class _TemplateView extends State<TemplateView> {
           backgroundColor: Theme.of(context).colorScheme.primary,
         ),
         body: data.isEmpty
-            ? Center(child: PlatformProgressIndicator())
+            ? SkeletonItem(
+            child: Column(
+              children: [
+                SizedBox(height: 20),
+                SkeletonLine(
+                  style: SkeletonLineStyle(
+                    height:15,
+                    width: themeChangeProvider.darkTheme? MediaQuery.of(context).size.width:MediaQuery.of(context).size.width-10,
+                  ),
+                ),
+                SizedBox(height: 10),
+                SkeletonLine(
+                  style: SkeletonLineStyle(
+                    height:15,
+                    width: themeChangeProvider.darkTheme? MediaQuery.of(context).size.width:MediaQuery.of(context).size.width-10,
+                  ),
+                ),
+                SizedBox(height: 10),
+                SkeletonLine(
+                  style: SkeletonLineStyle(
+                    height:15,
+                    width: themeChangeProvider.darkTheme? MediaQuery.of(context).size.width:MediaQuery.of(context).size.width-10,
+                  ),
+                ),
+                SizedBox(height: 20),
+
+                SkeletonAvatar(
+                  style: SkeletonAvatarStyle(
+                      width: themeChangeProvider.darkTheme? MediaQuery.of(context).size.width:MediaQuery.of(context).size.width-10,
+                      height:55
+                  ),
+
+                ),
+                SizedBox(height: 8),
+                SkeletonAvatar(
+                  style: SkeletonAvatarStyle(
+                      width: themeChangeProvider.darkTheme? MediaQuery.of(context).size.width:MediaQuery.of(context).size.width-10,
+                      height:55
+                  ),
+
+                ),
+                SizedBox(height: 8),
+                SkeletonAvatar(
+                  style: SkeletonAvatarStyle(
+                      width: themeChangeProvider.darkTheme? MediaQuery.of(context).size.width:MediaQuery.of(context).size.width-10,
+                      height:55
+                  ),
+
+                ),
+                SizedBox(height: 8),
+                SkeletonAvatar(
+                  style: SkeletonAvatarStyle(
+                      width: themeChangeProvider.darkTheme? MediaQuery.of(context).size.width:MediaQuery.of(context).size.width-10,
+                      height:55
+                  ),
+
+                ),
+                SizedBox(height: 8),
+                SkeletonAvatar(
+                  style: SkeletonAvatarStyle(
+                      width: themeChangeProvider.darkTheme? MediaQuery.of(context).size.width:MediaQuery.of(context).size.width-10,
+                      height:55
+                  ),
+
+                ),
+                SizedBox(height: 8),
+                SkeletonAvatar(
+                  style: SkeletonAvatarStyle(
+                      width: themeChangeProvider.darkTheme? MediaQuery.of(context).size.width:MediaQuery.of(context).size.width-10,
+                      height:55
+                  ),
+
+                ),
+                SizedBox(height: 8),
+                SkeletonAvatar(
+                  style: SkeletonAvatarStyle(
+                      width: themeChangeProvider.darkTheme? MediaQuery.of(context).size.width:MediaQuery.of(context).size.width-10,
+                      height:55
+                  ),
+
+                ),
+                SizedBox(height: 8),
+                SkeletonAvatar(
+                  style: SkeletonAvatarStyle(
+                      width: themeChangeProvider.darkTheme? MediaQuery.of(context).size.width:MediaQuery.of(context).size.width-10,
+                      height:55
+                  ),
+
+                ),
+                SizedBox(height: 8),
+                SkeletonAvatar(
+                  style: SkeletonAvatarStyle(
+                      width: themeChangeProvider.darkTheme? MediaQuery.of(context).size.width:MediaQuery.of(context).size.width-10,
+                      height:20
+                  ),
+
+                ),
+            SizedBox(height: 8),
+            SkeletonAvatar(
+              style: SkeletonAvatarStyle(
+                  width: themeChangeProvider.darkTheme? MediaQuery.of(context).size.width:MediaQuery.of(context).size.width-10,
+                  height:40
+              ),
+              )
+              ],
+            ))
             : Container(
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -149,7 +255,7 @@ class _TemplateView extends State<TemplateView> {
           child: Padding(
             padding: EdgeInsets.only(left:5,right:5,top:5,bottom:5),
             child:
-                  CupertinoButton(
+                  MaterialButton(
                       onPressed: () {
                         _newType = EventType.local;
                         _newName = widget.event_name;
@@ -178,10 +284,13 @@ class _TemplateView extends State<TemplateView> {
                         ));
                       },
                       color: Colors.green,
+                    padding: EdgeInsets.all(0),
+                    height: 50,
                       child: Text('Create Event',
                       style: TextStyle(
                     //    color: Colors.black,
                         fontFamily: 'Roboto',
+                        fontSize: 15,
                       ),),
                   ),
                   ),
