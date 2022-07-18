@@ -510,13 +510,18 @@ extension ScoresExtension on Map<String, Score> {
   }
 
   double? percentIncrease() {
-    final sorted = this.values.toList();
-    sorted.sort((a, b) => a.timeStamp.toDate().compareTo(b.timeStamp.toDate()));
+    final sorted = sortedScores();
     if (sorted.length < 2 || sorted[this.values.length - 2].total() == 0)
       return null;
     return sorted.last
         .total()
         ?.percentIncrease(sorted[this.values.length - 2].total() ?? 0);
+  }
+
+  List<Score> sortedScores() {
+    final sorted = this.values.toList();
+    sorted.sort((a, b) => a.timeStamp.toDate().compareTo(b.timeStamp.toDate()));
+    return sorted;
   }
 }
 

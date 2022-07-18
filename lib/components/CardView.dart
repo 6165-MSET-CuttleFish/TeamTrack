@@ -16,7 +16,7 @@ class CardView extends StatefulWidget {
   }) : super(key: key);
   final Widget child;
   final String title;
-  final Widget collapsed;
+  final List<Widget> collapsed;
   final bool isActive;
   final OpModeType? type;
   @override
@@ -39,7 +39,7 @@ class _CardView extends State<CardView> {
                   body: CustomScrollView(
                     slivers: [
                       SliverAppBar(
-                        expandedHeight: 200,
+                        expandedHeight: 280,
                         stretch: true,
                         pinned: true,
                         flexibleSpace: FlexibleSpaceBar(
@@ -57,9 +57,8 @@ class _CardView extends State<CardView> {
                           ),
                         ),
                       ),
-                      SliverFillRemaining(
-                        child: widget.collapsed,
-                      ),
+                      SliverList(
+                          delegate: SliverChildListDelegate(widget.collapsed)),
                     ],
                   ),
                 ),
@@ -98,7 +97,9 @@ class _CardView extends State<CardView> {
         ),
         child: AnimatedContainer(
           decoration: BoxDecoration(
-            color: Theme.of(context).canvasColor,
+            color: _isPressed
+                ? widget.type.getColor()
+                : Theme.of(context).canvasColor,
             border: Border.all(
               color: widget.type.getColor(),
             ),
@@ -108,8 +109,8 @@ class _CardView extends State<CardView> {
             boxShadow: [
               BoxShadow(
                 color: Colors.grey.withOpacity(0.8),
-                spreadRadius: _isPressed ? 0 : 4,
-                blurRadius: _isPressed ? 0 : 4, // changes position of shadow
+                spreadRadius: _isPressed ? 0 : 2,
+                blurRadius: _isPressed ? 0 : 2, // changes position of shadow
               ),
             ],
           ),
@@ -126,7 +127,7 @@ class _CardView extends State<CardView> {
                 child: widget.child,
               ),
               Divider(
-                thickness: 2,
+                thickness: 3,
               ),
               Hero(
                 tag: widget.type ?? Null,

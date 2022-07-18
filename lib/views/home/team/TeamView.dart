@@ -423,8 +423,10 @@ class _TeamViewState extends State<TeamView> {
                                 widget.event.statConfig.allianceTotal,
                             team: _team,
                             event: widget.event,
-                            targetScore: _team.targetScore?.getScoreDivision(opModeType),
-                            scoreDivisions: _team.scores.values
+                            targetScore:
+                                _team.targetScore?.getScoreDivision(opModeType),
+                            scoreDivisions: _team.scores
+                                .sortedScores()
                                 .map((e) => e.getScoreDivision(opModeType))
                                 .toList(),
                             dice: _dice,
@@ -689,77 +691,6 @@ class _TeamViewState extends State<TeamView> {
                           ),
                         )
                       : EmptyList(),
-                  // : SfCartesianChart(
-                  //     tooltipBehavior: TooltipBehavior(enable: true),
-                  //     title: ChartTitle(
-                  //       text: 'Cycle Times and Misses',
-                  //       borderWidth: 2,
-                  //       // Aligns the chart title to left
-                  //       alignment: ChartAlignment.near,
-                  //       textStyle: TextStyle(
-                  //         color: Colors.white,
-                  //         fontSize: 14,
-                  //       ),
-                  //     ),
-                  //     series: <ChartSeries>[
-                  //       BoxAndWhiskerSeries<List<double>, int>(
-                  //         xAxisName: "Match",
-                  //         yAxisName: "Cycle Times (seconds)",
-                  //         gradient: LinearGradient(
-                  //           begin: Alignment.topCenter,
-                  //           end: Alignment.bottomCenter,
-                  //           colors: [Colors.deepPurple, Colors.green],
-                  //         ),
-                  //         dataSource: _team.scores
-                  //             .diceScores(_dice)
-                  //             .map((e) => [0.0])
-                  //             .toList(),
-                  //         boxPlotMode: BoxPlotMode.exclusive,
-                  //         xValueMapper: (List<double> cycles, _) => _ + 1,
-                  //         yValueMapper: (List<double> cycles, _) =>
-                  //             cycles.length != 0 ? cycles : [0, 0, 0, 0],
-                  //       ),
-                  //       LineSeries<int, int>(
-                  //         xAxisName: "Match",
-                  //         yAxisName: "Total Misses",
-                  //         dashArray: [10],
-                  //         width: 2,
-                  //         color: Colors.red,
-                  //         dataSource: _team.scores
-                  //             .diceScores(_dice)
-                  //             .map((e) => e.teleScore.misses.count)
-                  //             .toList(),
-                  //         xValueMapper: (int misses, _) => _ + 1,
-                  //         yValueMapper: (int misses, _) => misses,
-                  //       ),
-                  //       if (_selections[2])
-                  //         LineSeries<int, int>(
-                  //           xAxisName: "Match",
-                  //           yAxisName: "Total Tele-Op Cycles",
-                  //           width: 2,
-                  //           color: teleColor,
-                  //           dataSource: _team.scores
-                  //               .diceScores(_dice)
-                  //               .map((e) => 0)
-                  //               .toList(),
-                  //           xValueMapper: (int misses, _) => _ + 1,
-                  //           yValueMapper: (int misses, _) => misses,
-                  //         ),
-                  //       if (_selections[3])
-                  //         LineSeries<int, int>(
-                  //           xAxisName: "Match",
-                  //           yAxisName: "Total Endgame Cycles",
-                  //           width: 2,
-                  //           color: endgameColor,
-                  //           dataSource: _team.scores
-                  //               .diceScores(_dice)
-                  //               .map((e) => [1])
-                  //               .toList(),
-                  //           xValueMapper: (int misses, _) => _ + 1,
-                  //           yValueMapper: (int misses, _) => misses,
-                  //         ),
-                  //     ],
-                  //   ),
                 ),
               ),
             ),

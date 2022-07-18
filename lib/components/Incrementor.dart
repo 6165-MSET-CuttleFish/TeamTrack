@@ -86,7 +86,7 @@ class _Incrementor extends State<Incrementor> {
               if (widget.element.count != 0) {
                 var ref = (mutableData as Map?)?[
                     widget.element.nestedElements?[widget.element.count].key];
-                if (ref is Map && val == 0) {
+                if (ref is Map) {
                   mutableData?[widget.element
                       .nestedElements?[widget.element.count].key]['misses'] = 1;
                 }
