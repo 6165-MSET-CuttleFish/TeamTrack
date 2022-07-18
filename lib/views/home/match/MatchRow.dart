@@ -48,7 +48,6 @@ class MatchRow extends StatelessWidget {
         ),
       ),
       child: ListTile(
-        leading: Text(index.toString()),
         title: team != null
             ? Column(
                 mainAxisSize: MainAxisSize.min,
@@ -60,12 +59,12 @@ class MatchRow extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+                          Text(index.toString()),
                           Container(
                             child: matchSummary(context),
                             width: 150,
                           ),
                           scoreDisplay(),
-                          Spacer(),
                           Icon(Icons.navigate_next)
                         ],
                       ),
@@ -199,18 +198,18 @@ class MatchRow extends StatelessWidget {
             ),
           ],
         ),
-        if (event.eventKey  != null)
-        Text(
-          match.getRedAPI() != -1
-              ? match.getRedAPI().toString() +
-                  ' - ' +
-                  match.getBlueAPI().toString()
-              : 'Not on API',
-          style: GoogleFonts.gugi(
-            fontSize: match.getRedAPI() == -1 ? 10.5 : 12,
-            color: match.getRedAPI() == -1 ? Colors.amber : Colors.green,
+        if (event.eventKey != null)
+          Text(
+            match.getRedAPI() != -1
+                ? match.getRedAPI().toString() +
+                    ' - ' +
+                    match.getBlueAPI().toString()
+                : 'Not on API',
+            style: GoogleFonts.gugi(
+              fontSize: match.getRedAPI() == -1 ? 10.5 : 12,
+              color: match.getRedAPI() == -1 ? Colors.amber : Colors.green,
+            ),
           ),
-        ),
       ],
     );
   }

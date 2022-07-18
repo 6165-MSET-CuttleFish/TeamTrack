@@ -1,3 +1,4 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:teamtrack/components/ScoringElementStats.dart';
 import 'package:teamtrack/models/GameModel.dart';
@@ -6,142 +7,191 @@ import 'package:teamtrack/functions/Statistics.dart';
 import 'package:teamtrack/functions/Extensions.dart';
 import 'package:teamtrack/models/StatConfig.dart';
 
-class DivisionBreakdown extends StatefulWidget {
-  DivisionBreakdown({
+class DivisionBreakdown extends StatelessWidget {
+  const DivisionBreakdown({
     Key? key,
-    required this.hero,
-    required this.dice,
-    required this.tag,
-    this.opModeType,
-    required this.event,
-    this.teamMaxScore,
+    required this.targetScore,
+    required this.minY,
+    required this.maxY,
     required this.team,
-    this.maxScore,
+    this.matches,
+    required this.scoreDivisions,
     required this.statConfig,
-    required this.matches,
+    required this.dice,
+    this.opModeType,
+    this.teamMaxScore,
+    this.maxScore,
   }) : super(key: key);
-  final Widget hero;
-  final Event event;
+  final ScoreDivision? targetScore;
+  final double minY;
+  final double maxY;
   final Team team;
-  final String tag;
-  final Score? teamMaxScore;
-  final Score? maxScore;
-  final OpModeType? opModeType;
-  final List<Match> matches;
+  final List<Match>? matches;
+  final List<ScoreDivision> scoreDivisions;
   final StatConfig statConfig;
   final Dice dice;
+  final OpModeType? opModeType;
+  final Score? teamMaxScore;
+  final Score? maxScore;
   @override
-  State<StatefulWidget> createState() => _DivisionBreakdown();
-}
-
-class _DivisionBreakdown extends State<DivisionBreakdown> {
-  @override
-  Widget build(BuildContext context) {
-    final allianceTotals = widget.matches
-        .where(
-          (match) => match.dice == widget.dice || widget.dice == Dice.none,
-        )
-        .toList()
-        .spots(widget.team, widget.dice, false, type: widget.opModeType)
-        .removeOutliers(widget.statConfig.removeOutliers)
-        .map((spot) => spot.y);
-    final maxAllianceDeviation = widget.event.teams.values
-        .map(
-          (e) => widget.event.matches.values
-              .toList()
-              .spots(e, Dice.none, false, type: widget.opModeType)
-              .removeOutliers(widget.statConfig.removeOutliers)
-              .map((spot) => spot.y)
-              .standardDeviation(),
-        )
-        .minValue();
-    final maxAllianceMean = widget.event.teams.values
-        .map(
-          (e) => widget.event.matches.values
-              .toList()
-              .spots(e, Dice.none, false, type: widget.opModeType)
-              .removeOutliers(widget.statConfig.removeOutliers)
-              .map((spot) => spot.y)
-              .mean(),
-        )
-        .maxValue();
-    final maxAllianceMedian = widget.event.teams.values
-        .map(
-          (e) => widget.event.matches.values
-              .toList()
-              .spots(e, Dice.none, false, type: widget.opModeType)
-              .removeOutliers(widget.statConfig.removeOutliers)
-              .map((spot) => spot.y)
-              .median(),
-        )
-        .maxValue();
-    final maxAllianceBest = widget.event.teams.values
-        .map(
-          (e) => widget.event.matches.values
-              .toList()
-              .spots(e, Dice.none, false, type: widget.opModeType)
-              .removeOutliers(widget.statConfig.removeOutliers)
-              .map((spot) => spot.y)
-              .maxValue(),
-        )
-        .maxValue();
-    final maxY = [
-      widget.event.matches.values
-          .toList()
-          .maxAllianceScore(type: widget.opModeType, dice: widget.dice)
-          .toDouble(),
-      widget.team.targetScore?.getScoreDivision(widget.opModeType).total() ?? 0
-    ].maxValue();
-    final minY = [
-      widget.event.teams.minScore(
-        widget.dice,
-        widget.event.statConfig.removeOutliers,
-        widget.opModeType,
-      ),
-      widget.team.targetScore?.getScoreDivision(widget.opModeType).total() ?? 0,
-    ].minValue();
-    return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            expandedHeight: 200,
-            stretch: true,
-            pinned: true,
-            flexibleSpace: FlexibleSpaceBar(
-              expandedTitleScale: 1.0,
-              background: Hero(
-                tag: widget.tag,
-                child: widget.hero,
+  Widget build(BuildContext context) => Column(
+        children: [
+          AspectRatio(
+            aspectRatio: 2,
+            child: Container(
+              decoration: const BoxDecoration(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(18),
+                ),
+                // color: Color(0xff232d37),
               ),
-              title: Text(widget.tag),
-            ),
-          ),
-          SliverFillRemaining(
-            child: Column(
-              children: widget.teamMaxScore
-                      ?.getScoreDivision(widget.opModeType)
-                      .getElements()
-                      .parse(putNone: false)
-                      .map(
-                        (element) => ScoringElementStats(
-                          element: element,
-                          maxElement: widget.maxScore
-                                  ?.getScoreDivision(widget.opModeType)
-                                  .getElements()
-                                  .parse(putNone: false)
-                                  .firstWhere(
-                                    (e) => e.key == element.key,
-                                    orElse: () => ScoringElement(),
-                                  ) ??
-                              element,
+              child: Padding(
+                padding: const EdgeInsets.only(
+                    right: 50.0, left: 12.0, top: 24, bottom: 12),
+                child: LineChart(
+                  LineChartData(
+                    gridData: FlGridData(
+                      show: true,
+                      drawVerticalLine: true,
+                      getDrawingHorizontalLine: (value) => FlLine(
+                        color: Colors.transparent,
+                        strokeWidth: value % 10 == 0 ? 1 : 0,
+                      ),
+                      getDrawingVerticalLine: (value) => FlLine(
+                        color: Colors.transparent,
+                        strokeWidth: 1,
+                      ),
+                    ),
+                    titlesData: FlTitlesData(
+                      show: true,
+                      bottomTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          //reservedSize: 22,
+                          getTitlesWidget: (value, titleMeta) => Text(
+                            (value == value.toInt() ? (value + 1).toInt() : "")
+                                .toString(),
+                            style: TextStyle(fontSize: 10),
+                          ),
+                          //interval: 8,
+                          showTitles: true,
                         ),
-                      )
-                      .toList() ??
-                  [],
+                      ),
+                      topTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: false,
+                        ),
+                      ),
+                      rightTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: false,
+                        ),
+                      ),
+                      leftTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          getTitlesWidget: (value, titleMeta) => Text(
+                            value.toInt().toString(),
+                            style: TextStyle(
+                              fontSize: 15,
+                            ),
+                          ),
+                          reservedSize: 35,
+                          //interval: 12,
+                          showTitles: true,
+                        ),
+                      ),
+                    ),
+                    borderData: FlBorderData(
+                      show: true,
+                      border:
+                          Border.all(color: const Color(0xff37434d), width: 1),
+                    ),
+                    minY: minY == maxY ? null : minY,
+                    maxY: minY == maxY ? minY + 20 : maxY,
+                    lineBarsData: [
+                      if (matches != null)
+                        LineChartBarData(
+                          belowBarData: team.targetScore != null
+                              ? BarAreaData(
+                                  show: true,
+                                  color:
+                                      Colors.lightGreenAccent.withOpacity(0.5),
+                                  cutOffY: targetScore?.total()?.toDouble(),
+                                  applyCutOffY: true,
+                                )
+                              : null,
+                          aboveBarData: team.targetScore != null
+                              ? BarAreaData(
+                                  show: true,
+                                  color: Colors.redAccent.withOpacity(0.5),
+                                  cutOffY: targetScore?.total()?.toDouble(),
+                                  applyCutOffY: true,
+                                )
+                              : null,
+                          spots: matches
+                              ?.where(
+                                (e) => e.dice == dice || dice == Dice.none,
+                              )
+                              .toList()
+                              .spots(team, dice, false, type: opModeType)
+                              .removeOutliers(statConfig.removeOutliers),
+                          color: Color.fromRGBO(255, 166, 0, 1),
+                          isCurved: true,
+                          preventCurveOverShooting: true,
+                          barWidth: 5,
+                        ),
+                      LineChartBarData(
+                        belowBarData: team.targetScore != null
+                            ? BarAreaData(
+                                show: true,
+                                color: Colors.lightGreenAccent.withOpacity(0.5),
+                                cutOffY: targetScore?.total()?.toDouble(),
+                                applyCutOffY: true,
+                              )
+                            : null,
+                        aboveBarData: team.targetScore != null
+                            ? BarAreaData(
+                                show: true,
+                                color: Colors.redAccent.withOpacity(0.5),
+                                cutOffY: targetScore?.total()?.toDouble(),
+                                applyCutOffY: true,
+                              )
+                            : null,
+                        spots: scoreDivisions
+                            .diceScores(dice)
+                            .spots()
+                            .removeOutliers(statConfig.removeOutliers),
+                        color: opModeType.getColor(),
+                        isCurved: true,
+                        preventCurveOverShooting: true,
+                        barWidth: 5,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ),
+          if (opModeType != null)
+            ...teamMaxScore
+                    ?.getScoreDivision(opModeType)
+                    .getElements()
+                    .parse(putNone: false)
+                    .map(
+                      (element) => ScoringElementStats(
+                        elementList: scoreDivisions,
+                        element: element,
+                        maxElement: maxScore
+                                ?.getScoreDivision(opModeType)
+                                .getElements()
+                                .parse(putNone: false)
+                                .firstWhere(
+                                  (e) => e.key == element.key,
+                                  orElse: () => ScoringElement(),
+                                ) ??
+                            element,
+                      ),
+                    ) ??
+                []
         ],
-      ),
-    );
-  }
+      );
 }

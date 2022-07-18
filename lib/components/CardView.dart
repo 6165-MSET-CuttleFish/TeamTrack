@@ -11,15 +11,13 @@ class CardView extends StatefulWidget {
     required this.child,
     required this.collapsed,
     this.isActive = true,
-    required this.hero,
-    required this.tag,
+    required this.title,
     this.type,
   }) : super(key: key);
   final Widget child;
-  final Widget hero;
+  final String title;
   final Widget collapsed;
   final bool isActive;
-  final String tag;
   final OpModeType? type;
   @override
   State<StatefulWidget> createState() => _CardView();
@@ -35,9 +33,6 @@ class _CardView extends State<CardView> {
         onTap: () {
           HapticFeedback.mediumImpact();
           if (widget.isActive) {
-            // setState(
-            //   () => _genBool = !_genBool,
-            // );
             Navigator.of(context).push(
               platformPageRoute(
                 builder: (context) => Scaffold(
@@ -50,10 +45,16 @@ class _CardView extends State<CardView> {
                         flexibleSpace: FlexibleSpaceBar(
                           expandedTitleScale: 1.0,
                           background: Hero(
-                            tag: widget.tag,
-                            child: widget.hero,
+                            tag: widget.title,
+                            child: widget.child,
                           ),
-                          title: Text(widget.tag),
+                          title: Hero(
+                            tag: widget.type ?? Null,
+                            child: Text(
+                              widget.title,
+                              style: Theme.of(context).textTheme.caption,
+                            ),
+                          ),
                         ),
                       ),
                       SliverFillRemaining(
@@ -95,7 +96,7 @@ class _CardView extends State<CardView> {
         onTapCancel: () => setState(
           () => _isPressed = false,
         ),
-        child: Container(
+        child: AnimatedContainer(
           decoration: BoxDecoration(
             color: Theme.of(context).canvasColor,
             border: Border.all(
@@ -107,31 +108,33 @@ class _CardView extends State<CardView> {
             boxShadow: [
               BoxShadow(
                 color: Colors.grey.withOpacity(0.8),
-                spreadRadius: 2,
-                blurRadius: 2, // changes position of shadow
+                spreadRadius: _isPressed ? 0 : 4,
+                blurRadius: _isPressed ? 0 : 4, // changes position of shadow
               ),
             ],
           ),
+          curve: Curves.fastLinearToSlowEaseIn,
+          duration: Duration(milliseconds: 800),
+          width: getWidth(),
+          height: getHeight(),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              AnimatedContainer(
-                curve: Curves.fastLinearToSlowEaseIn,
-                duration: Duration(milliseconds: 800),
-                width: getWidth(),
-                height: getHeight(),
+              Hero(
+                tag: widget.title,
                 child: widget.child,
               ),
-              // Collapsible(
-              //   isCollapsed: _genBool,
-              //   child: Column(
-              //     children: [
-              //       Padding(
-              //         padding: EdgeInsets.only(bottom: 50),
-              //       ),
-              //       widget.collapsed
-              //     ],
-              //   ),
-              // )
+              Divider(
+                thickness: 2,
+              ),
+              Hero(
+                tag: widget.type ?? Null,
+                child: Text(
+                  widget.title,
+                  style: Theme.of(context).textTheme.caption,
+                ),
+              )
             ],
           ),
         ),

@@ -2,7 +2,6 @@ import 'package:teamtrack/components/Collapsible.dart';
 import 'package:teamtrack/components/EmptyList.dart';
 import 'package:teamtrack/components/PlatformGraphics.dart';
 import 'package:teamtrack/components/ScoreCard.dart';
-import 'package:teamtrack/components/ScoringElementStats.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/views/home/change/ChangeList.dart';
 import 'package:teamtrack/views/home/match/MatchList.dart';
@@ -17,7 +16,6 @@ import 'package:uuid/uuid.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'dart:convert';
 import 'package:teamtrack/functions/Statistics.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:teamtrack/functions/Extensions.dart';
 
 class TeamView extends StatefulWidget {
@@ -294,11 +292,11 @@ class _TeamViewState extends State<TeamView> {
                         isCollapsed: _team.scores.diceScores(_dice).length <= 1,
                         child: Column(
                           children: [
-                            Padding(
-                              padding: widget.event.type != EventType.remote
-                                  ? EdgeInsets.all(40)
-                                  : EdgeInsets.all(20),
-                            ),
+                            // Padding(
+                            //   padding: widget.event.type != EventType.remote
+                            //       ? EdgeInsets.all(40)
+                            //       : EdgeInsets.all(20),
+                            // ),
                             Wrap(
                               alignment: WrapAlignment.center,
                               crossAxisAlignment: WrapCrossAlignment.center,
@@ -419,10 +417,13 @@ class _TeamViewState extends State<TeamView> {
                         Padding(
                           padding: const EdgeInsets.only(top: 20, bottom: 10),
                           child: ScoreCard(
+                            teamMaxScore: teamMaxScore,
+                            maxScore: maxScore,
                             allianceTotal:
                                 widget.event.statConfig.allianceTotal,
                             team: _team,
                             event: widget.event,
+                            targetScore: _team.targetScore?.getScoreDivision(opModeType),
                             scoreDivisions: _team.scores.values
                                 .map((e) => e.getScoreDivision(opModeType))
                                 .toList(),
@@ -432,34 +433,6 @@ class _TeamViewState extends State<TeamView> {
                             matches: widget.event.getSortedMatches(true),
                             title: opModeType.getName(),
                             type: opModeType,
-                            elements: opModeType != null
-                                ? Column(
-                                    children: teamMaxScore
-                                            ?.getScoreDivision(opModeType)
-                                            .getElements()
-                                            .parse(putNone: false)
-                                            .map(
-                                              (element) => ScoringElementStats(
-                                                element: element,
-                                                maxElement: maxScore
-                                                        ?.getScoreDivision(
-                                                            opModeType)
-                                                        .getElements()
-                                                        .parse(putNone: false)
-                                                        .firstWhere(
-                                                          (e) =>
-                                                              e.key ==
-                                                              element.key,
-                                                          orElse: () =>
-                                                              ScoringElement(),
-                                                        ) ??
-                                                    element,
-                                              ),
-                                            )
-                                            .toList() ??
-                                        [],
-                                  )
-                                : null,
                           ),
                         ),
                     ],
@@ -512,12 +485,14 @@ class _TeamViewState extends State<TeamView> {
                                   showTitles: true,
                                   getTitlesWidget: (value, titleMeta) {
                                     return Text(
-                                        value == value.toInt()
-                                            ? (value + 1).toInt().toString()
-                                            : "",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 10,),);
+                                      value == value.toInt()
+                                          ? (value + 1).toInt().toString()
+                                          : "",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 10,
+                                      ),
+                                    );
                                   },
                                 ),
                               ),

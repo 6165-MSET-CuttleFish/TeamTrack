@@ -16,12 +16,12 @@ import 'package:teamtrack/functions/Extensions.dart';
 import 'package:teamtrack/functions/Statistics.dart';
 
 class Statics {
-  static String gameName = "FreightFrenzy";
+  static String gameName = 'FreightFrenzy'; // default gameName (can be changed remotely)
 }
 
 enum EventType {
   local,
-  remote,
+  remote, // TODO: Doesn't really make sense to scout remote events so maybe convert this into a specific 'driver-practice' mode
 }
 
 enum Dice {
@@ -38,6 +38,7 @@ enum OpModeType {
   penalty,
 }
 
+/// Composed of a map of [matches] and [teams] as well as a specified event [type]
 class Event {
   Event({
     required this.name,
@@ -490,6 +491,7 @@ class Event {
       };
 }
 
+/// Composed of 2 teams [team1] and [team2]
 class Alliance {
   Team? team1;
   Team? team2;
@@ -555,6 +557,8 @@ class Alliance {
       };
 }
 
+/// Composed of 2 nullable alliances [red] and [blue].
+/// null alliance indicates no alliance in play for that side (usually a remote event)
 class Match {
   EventType type = EventType.local;
   Dice dice = Dice.one;
@@ -717,6 +721,7 @@ class Match {
   }
 }
 
+/// Teams are represented by their unique [number] and any [name]
 class Team {
   String name = '';
   String number = '';
