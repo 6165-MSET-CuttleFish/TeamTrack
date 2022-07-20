@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:teamtrack/components/PlatformGraphics.dart';
+import 'package:teamtrack/components/misc/PlatformGraphics.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import '../../api/APIKEYS.dart';
 import 'TemplateView.dart';

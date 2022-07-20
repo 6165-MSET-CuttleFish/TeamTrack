@@ -2,9 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:teamtrack/api/APIKEYS.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:teamtrack/components/BarGraph.dart';
-import 'package:teamtrack/components/Incrementor.dart';
-import 'package:teamtrack/components/PlatformGraphics.dart';
+import 'package:teamtrack/components/statistics/BarGraph.dart';
+import 'package:teamtrack/components/scores/Incrementor.dart';
+import 'package:teamtrack/components/misc/PlatformGraphics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:teamtrack/models/AppModel.dart';
@@ -14,8 +14,8 @@ import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'package:teamtrack/functions/Statistics.dart';
 import 'package:teamtrack/providers/Auth.dart';
-import 'package:teamtrack/components/ScoreSummary.dart';
-import 'package:teamtrack/components/UsersRow.dart';
+import 'package:teamtrack/components/scores/ScoreSummary.dart';
+import 'package:teamtrack/components/users/UsersRow.dart';
 import 'package:uuid/uuid.dart';
 import 'package:teamtrack/functions/Extensions.dart';
 import 'package:provider/provider.dart';
@@ -274,7 +274,7 @@ class _MatchView extends State<MatchView> {
   void initState() {
     super.initState();
     if (widget.match != null) {
-      final user = AuthenticationService(firebaseAuth).getUser();
+      final user = firebaseAuth.currentUser;
       final ttuser = widget.event.getTTUserFromUser(user);
       final ref = widget.event
           .getRef()
@@ -609,7 +609,9 @@ class _MatchView extends State<MatchView> {
                                   ),
                                 Padding(
                                   padding: const EdgeInsets.only(
-                                      top: 5.0, bottom: 5.0),
+                                    top: 5.0,
+                                    bottom: 5.0,
+                                  ),
                                   child: RawMaterialButton(
                                     fillColor: _allianceTotal &&
                                             widget.event.type !=
@@ -1011,8 +1013,7 @@ class _MatchView extends State<MatchView> {
                         event: widget.event,
                         path: teamPath(OpModeType.tele),
                         score: _score,
-                        mutableIncrement: (mutableData) =>
-                            mutableIncrement(mutableData, e),
+                        mutableIncrement: mutableIncrement,
                         max: widget.match != null
                             ? maxTeleScores[e.key] ?? 0
                             : maxTeleTargets[e.key] ?? 0,
@@ -1057,24 +1058,6 @@ class _MatchView extends State<MatchView> {
             ),
           ),
         ];
-
-  void mutableIncrement(Object? mutableData, ScoringElement element) {
-    if (widget.match == null) return;
-    var ref = (mutableData as Map?)?[element.key];
-    if (ref is Map) {
-      if (ref['count'] < element.max!()) {
-        lapses.add(
-          (_time - sum).toPrecision(3),
-        );
-        sum = _time;
-        if (!_paused && previouslyCycledElement == element.key) {
-          mutableData?[element.key]
-              ?['cycleTimes'] = [...(ref['cycleTimes'] ?? []), lapses.last];
-        }
-        previouslyCycledElement = element.key;
-      }
-    }
-  }
 
   List<Widget> endView() => !_paused || _allowView
       ? [
@@ -1130,8 +1113,7 @@ class _MatchView extends State<MatchView> {
                         onPressed: () => stateSetter(e.key),
                         onIncrement: _paused ? null : onIncrement,
                         event: widget.event,
-                        mutableIncrement: (mutableData) =>
-                            mutableIncrement(mutableData, e),
+                        mutableIncrement: mutableIncrement,
                         path: teamPath(OpModeType.endgame),
                         score: _score,
                         max: widget.match != null
@@ -1179,14 +1161,37 @@ class _MatchView extends State<MatchView> {
             ),
           ),
         ];
+
+  void mutableIncrement(Object? mutableData, ScoringElement element) {
+    if (widget.match == null) return;
+    var ref = (mutableData as Map?)?[element.key];
+    if (ref is Map) {
+      if (ref['count'] < element.max!()) {
+        lapses.add(
+          (_time - sum).toPrecision(3),
+        );
+        sum = _time;
+        if (!_paused && previouslyCycledElement == element.key) {
+          mutableData?[element.key]
+              ?['cycleTimes'] = [...(ref['cycleTimes'] ?? []), lapses.last];
+        }
+        previouslyCycledElement = element.key;
+      }
+    }
+  }
+
   ScoringElement incrementValue = ScoringElement(
       name: 'Increment Value', min: () => 1, count: 1, key: null);
 
-  void onIncrement() {
+  void onIncrement(ScoringElement element) {
     lapses.add(
       (_time - sum).toPrecision(3),
     );
     sum = _time;
+    if (!_paused && previouslyCycledElement == element.key) {
+      element.cycleTimes.add(lapses.last);
+    }
+    previouslyCycledElement = element.key;
   }
 
   String allianceColor() {

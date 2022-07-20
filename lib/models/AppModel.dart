@@ -90,7 +90,7 @@ class TeamTrackUser {
       };
 }
 
-DataModel dataModel = DataModel();
+final dataModel = DataModel();
 final DarkThemeProvider themeChangeProvider = new DarkThemeProvider();
 final Database.FirebaseDatabase firebaseDatabase =
     Database.FirebaseDatabase.instance;

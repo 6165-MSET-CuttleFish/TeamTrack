@@ -1,6 +1,6 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/rendering.dart';
-import 'package:teamtrack/components/EmptyList.dart';
+import 'package:teamtrack/components/misc/EmptyList.dart';
 import 'package:teamtrack/functions/Functions.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/models/StatConfig.dart';
@@ -9,11 +9,11 @@ import 'package:teamtrack/views/home/match/MatchRow.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:teamtrack/components/PlatformGraphics.dart';
+import 'package:teamtrack/components/misc/PlatformGraphics.dart';
 import 'package:teamtrack/functions/Statistics.dart';
 import 'dart:convert';
 
-import 'package:teamtrack/components/CheckList.dart';
+import 'package:teamtrack/components/statistics/CheckList.dart';
 
 class MatchList extends StatefulWidget {
   MatchList({

@@ -1,4 +1,4 @@
-import 'package:teamtrack/components/EmptyList.dart';
+import 'package:teamtrack/components/misc/EmptyList.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/models/ScoreModel.dart';
 import 'package:teamtrack/models/StatConfig.dart';
@@ -7,7 +7,7 @@ import 'package:teamtrack/views/home/team/TeamView.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:teamtrack/components/PlatformGraphics.dart';
+import 'package:teamtrack/components/misc/PlatformGraphics.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:teamtrack/functions/Statistics.dart';
 import 'dart:convert';

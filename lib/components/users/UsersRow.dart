@@ -1,6 +1,6 @@
 import 'package:assorted_layout_widgets/assorted_layout_widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:teamtrack/components/PFP.dart';
+import 'package:teamtrack/components/users/PFP.dart';
 import 'package:teamtrack/models/AppModel.dart';
 
 class UsersRow extends StatelessWidget {

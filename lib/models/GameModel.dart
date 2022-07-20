@@ -16,7 +16,8 @@ import 'package:teamtrack/functions/Extensions.dart';
 import 'package:teamtrack/functions/Statistics.dart';
 
 class Statics {
-  static String gameName = 'FreightFrenzy'; // default gameName (can be changed remotely)
+  static String gameName =
+      'FreightFrenzy'; // default gameName (can be changed remotely)
 }
 
 enum EventType {
@@ -534,7 +535,7 @@ class Alliance {
                           ?.getScoreDivision(type)
                           .getScoringElementCount(element?.key) ??
                       0) +
-                  ((showPenalties ?? false) ? getPenalty() : 0)) +
+                  ((showPenalties ?? false) ? -getPenalty() : 0)) +
               (sharedScore
                       .getScoreDivision(type)
                       .getScoringElementCount(element?.key) ??
@@ -660,6 +661,16 @@ class Match {
   int blueScore({required bool? showPenalties}) =>
       blue?.allianceTotal(showPenalties) ?? 0;
 
+  Alliance? getWinner() {
+    if (redScore(showPenalties: true) > blueScore(showPenalties: true)) {
+      return red;
+    } else if (redScore(showPenalties: true) < blueScore(showPenalties: true)) {
+      return blue;
+    } else {
+      return null;
+    }
+  }
+
   Match.fromJson(Map<String, dynamic> json, Map<String, Team> teamList,
       this.type, String gameName) {
     try {
@@ -746,6 +757,23 @@ class Team {
   void addChange(Change change) {
     changes.add(change);
     changes.sort((a, b) => a.startDate.compareTo(b.startDate));
+  }
+
+  String? getWLT(Event event) {
+    if (event.type == EventType.remote) return null;
+    int wins = 0;
+    int losses = 0;
+    int ties = 0;
+    for (final match in event.matches.values) {
+      if (match.getWinner() == match.alliance(this)) {
+        wins++;
+      } else if (match.getWinner() == null) {
+        ties++;
+      } else {
+        losses++;
+      }
+    }
+    return '$wins-$losses-$ties';
   }
 
   Team.fromJson(Map<String, dynamic> json, String gameName) {

@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/models/AppModel.dart';
-import 'package:teamtrack/components/PlatformGraphics.dart';
+import 'package:teamtrack/components/misc/PlatformGraphics.dart';
 
 import '../../api/APIKEYS.dart';
 

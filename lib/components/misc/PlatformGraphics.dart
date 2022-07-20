@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:io' show Platform;
 
+/// Error-free platform accessor
 class NewPlatform {
   static bool get isIOS => kIsWeb ? false : Platform.isIOS;
 
@@ -11,6 +12,7 @@ class NewPlatform {
   static bool get isWeb => kIsWeb;
 }
 
+/// Platform-specific alert dialogs
 Future<void> showPlatformDialog({
   required BuildContext context,
   required Widget Function(BuildContext) builder,

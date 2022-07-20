@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:teamtrack/components/UsersRow.dart';
+import 'package:teamtrack/components/users/UsersRow.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/models/ScoreModel.dart';
 import 'package:teamtrack/models/StatConfig.dart';
-import 'package:teamtrack/components/ScoreSummary.dart';
+import 'package:teamtrack/components/scores/ScoreSummary.dart';
 
 class MatchRow extends StatelessWidget {
   const MatchRow({

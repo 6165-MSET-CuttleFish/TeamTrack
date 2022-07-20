@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:teamtrack/components/PercentChange.dart';
+import 'package:teamtrack/components/statistics/PercentChange.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/models/ScoreModel.dart';
 

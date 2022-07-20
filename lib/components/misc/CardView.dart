@@ -1,5 +1,5 @@
 // Expanding widget that contains a card.
-import 'package:teamtrack/components/PlatformGraphics.dart';
+import 'package:teamtrack/components/misc/PlatformGraphics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:teamtrack/models/GameModel.dart';

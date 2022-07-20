@@ -1,11 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:teamtrack/components/PFP.dart';
-import 'package:teamtrack/components/PlatformGraphics.dart';
+import 'package:teamtrack/components/users/PFP.dart';
+import 'package:teamtrack/components/misc/PlatformGraphics.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:teamtrack/components/EmptyList.dart';
+import 'package:teamtrack/components/misc/EmptyList.dart';
 
 class BlockList extends StatefulWidget {
   const BlockList({Key? key}) : super(key: key);

@@ -1,8 +1,8 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:teamtrack/components/BarGraph.dart';
-import 'package:teamtrack/components/PlatformGraphics.dart';
+import 'package:teamtrack/components/statistics/BarGraph.dart';
+import 'package:teamtrack/components/misc/PlatformGraphics.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/models/ScoreModel.dart';
@@ -24,8 +24,8 @@ class Incrementor extends StatefulWidget {
   }) : super(key: key);
   final ScoringElement element;
   final void Function() onPressed;
-  final void Function()? onIncrement, onDecrement;
-  final void Function(Object?)? mutableIncrement, mutableDecrement;
+  final void Function(ScoringElement)? onIncrement, onDecrement;
+  final void Function(Object?, ScoringElement)? mutableIncrement, mutableDecrement;
   final Color? backgroundColor;
   final Event? event;
   final Score? score;
@@ -158,7 +158,7 @@ class _Incrementor extends State<Incrementor> {
                         if (!(widget.event?.shared ?? false)) {
                           widget.element.misses--;
                           setState(widget.element.decrement);
-                          if (widget.onDecrement != null) widget.onDecrement!();
+                          if (widget.onDecrement != null) widget.onDecrement!(widget.element);
                         }
                         widget.onPressed();
                         if (widget.path != null)
@@ -168,7 +168,7 @@ class _Incrementor extends State<Incrementor> {
                               .runTransaction(
                             (mutableData) {
                               if (widget.mutableDecrement != null) {
-                                widget.mutableDecrement!(mutableData);
+                                widget.mutableDecrement!(mutableData, widget.element);
                               }
                               var ref =
                                   (mutableData as Map?)?[widget.element.key];
@@ -193,7 +193,7 @@ class _Incrementor extends State<Incrementor> {
                     ? () async {
                         if (!(widget.event?.shared ?? false)) {
                           setState(widget.element.decrement);
-                          if (widget.onDecrement != null) widget.onDecrement!();
+                          if (widget.onDecrement != null) widget.onDecrement!(widget.element);
                         }
                         widget.onPressed();
                         if (widget.path != null)
@@ -203,7 +203,7 @@ class _Incrementor extends State<Incrementor> {
                               .runTransaction(
                             (mutableData) {
                               if (widget.mutableDecrement != null) {
-                                widget.mutableDecrement!(mutableData);
+                                widget.mutableDecrement!(mutableData, widget.element);
                               }
                               var ref =
                                   (mutableData as Map?)?[widget.element.key];
@@ -246,7 +246,7 @@ class _Incrementor extends State<Incrementor> {
                     ? () async {
                         if (!(widget.event?.shared ?? false)) {
                           widget.element.increment();
-                          if (widget.onIncrement != null) widget.onIncrement!();
+                          if (widget.onIncrement != null) widget.onIncrement!(widget.element);
                         }
                         widget.onPressed();
                         if (widget.path != null)
@@ -256,7 +256,7 @@ class _Incrementor extends State<Incrementor> {
                               .runTransaction(
                             (mutableData) {
                               if (widget.mutableIncrement != null) {
-                                widget.mutableIncrement!(mutableData);
+                                widget.mutableIncrement!(mutableData, widget.element);
                               }
                               var ref =
                                   (mutableData as Map?)?[widget.element.key];
@@ -311,7 +311,7 @@ class _Incrementor extends State<Incrementor> {
                                 widget.element.misses = 0;
                               });
                               if (widget.onDecrement != null)
-                                widget.onDecrement!();
+                                widget.onDecrement!(widget.element);
                             }
                             widget.onPressed();
                             if (widget.path != null)

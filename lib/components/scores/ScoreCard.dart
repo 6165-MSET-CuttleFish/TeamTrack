@@ -1,11 +1,11 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:teamtrack/components/ScoringElementStats.dart';
+import 'package:teamtrack/components/scores/ScoringElementStats.dart';
 import 'package:teamtrack/functions/Extensions.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/models/ScoreModel.dart';
-import 'package:teamtrack/components/BarGraph.dart';
-import 'package:teamtrack/components/CardView.dart';
+import 'package:teamtrack/components/statistics/BarGraph.dart';
+import 'package:teamtrack/components/misc/CardView.dart';
 import 'package:teamtrack/functions/Statistics.dart';
 
 class ScoreCard extends StatelessWidget {
