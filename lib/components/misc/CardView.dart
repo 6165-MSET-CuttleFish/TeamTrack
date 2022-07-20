@@ -34,7 +34,7 @@ class _CardView extends State<CardView> {
           HapticFeedback.mediumImpact();
           if (widget.isActive) {
             Navigator.of(context).push(
-              platformPageRoute(
+              expandPageRoute(
                 builder: (context) => Scaffold(
                   body: CustomScrollView(
                     slivers: [

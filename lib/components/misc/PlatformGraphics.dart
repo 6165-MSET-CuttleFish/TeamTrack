@@ -35,6 +35,26 @@ PageRoute platformPageRoute({required Widget Function(BuildContext) builder}) =>
         ? CupertinoPageRoute(builder: builder)
         : MaterialPageRoute(builder: builder);
 
+PageRoute expandPageRoute({required Widget Function(BuildContext) builder}) {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => builder(context),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      const begin = 0.0;
+      const end = 1.0;
+      const curve = Curves.easeOut;
+      final tween =
+          Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      final offsetAnimation = animation.drive(tween);
+
+      return ScaleTransition(
+        alignment: Alignment.center,
+        scale: offsetAnimation,
+        child: child,
+      );
+    },
+  );
+}
+
 abstract class PlatformWidget<C extends Widget, M extends Widget,
     W extends Widget?> extends StatelessWidget {
   PlatformWidget({Key? key}) : super(key: key);
