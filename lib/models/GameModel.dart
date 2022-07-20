@@ -504,7 +504,11 @@ class Alliance {
     sharedScore =
         Score(Uuid().v4(), Dice.none, gameName, isAllianceScore: true);
   }
-  int getPenalty() => penaltyTotal();
+  int getPenalty() {
+    if (eventType == EventType.remote)
+      return team1?.scores[id]?.penalties.total() ?? 0;
+    return opposingAlliance?.penaltyTotal() ?? 0;
+  }
 
   bool hasTeam(Team team) =>
       (team1 != null && team1!.equals(team)) ||
