@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -508,7 +510,13 @@ class Alliance {
   int getPenalty() {
     if (eventType == EventType.remote)
       return team1?.scores[id]?.penalties.total() ?? 0;
-    return opposingAlliance?.penaltyTotal() ?? 0;
+    final penaltiesAddToOpposingAlliance = json.decode(remoteConfig
+            .getString(gameName))['PenaltiesAddToOpposingAlliance'] ??
+        false;
+    if (penaltiesAddToOpposingAlliance)
+      return -(opposingAlliance?.penaltyTotal() ?? 0);
+    else
+      return penaltyTotal();
   }
 
   bool hasTeam(Team team) =>
@@ -535,12 +543,14 @@ class Alliance {
                           ?.getScoreDivision(type)
                           .getScoringElementCount(element?.key) ??
                       0) +
-                  ((showPenalties ?? false) ? -getPenalty() : 0)) +
+                  ((showPenalties ?? false) && type == null
+                      ? getPenalty()
+                      : 0)) +
               (sharedScore
                       .getScoreDivision(type)
                       .getScoringElementCount(element?.key) ??
                   0))
-          .clamp(0, 999);
+          .clamp(type == null ? 0 : -999, 999);
   Alliance.fromJson(
     Map<String, dynamic> json,
     Map<String, Team> teamList,
@@ -592,6 +602,7 @@ class Match {
     );
   }
 
+  /// Returns the alliance that [team] is on
   Alliance? alliance(Team? team) {
     if ((red?.team1?.equals(team) ?? false) ||
         (red?.team2?.equals(team) ?? false)) {
@@ -603,6 +614,7 @@ class Match {
     return null;
   }
 
+  /// Returns the opposing alliance of the alliance that [team] is on
   Alliance? opposingAlliance(Team? team) {
     if ((red?.team1?.equals(team) ?? false) ||
         (red?.team2?.equals(team) ?? false)) {
@@ -765,12 +777,14 @@ class Team {
     int losses = 0;
     int ties = 0;
     for (final match in event.matches.values) {
-      if (match.getWinner() == match.alliance(this)) {
-        wins++;
-      } else if (match.getWinner() == null) {
-        ties++;
-      } else {
-        losses++;
+      if (match.alliance(this) != null) {
+        if (match.getWinner() == match.alliance(this)) {
+          wins++;
+        } else if (match.getWinner() == null) {
+          ties++;
+        } else {
+          losses++;
+        }
       }
     }
     return '$wins-$losses-$ties';

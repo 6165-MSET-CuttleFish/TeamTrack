@@ -19,6 +19,7 @@ class MatchRow extends StatelessWidget {
     this.teleMax = 0,
     this.endMax = 0,
     this.totalMax = 0,
+    this.penaltyMax = 0,
     required this.statConfig,
   }) : super(key: key);
   final Event event;
@@ -29,6 +30,7 @@ class MatchRow extends StatelessWidget {
   final double teleMax;
   final double endMax;
   final double totalMax;
+  final double penaltyMax;
   final StatConfig statConfig;
   final void Function()? onTap;
   final double width = 30;
@@ -132,7 +134,9 @@ class MatchRow extends StatelessWidget {
       teleMax: teleMax,
       endMax: endMax,
       totalMax: totalMax,
+      penaltyMax: penaltyMax,
       showPenalties: event.statConfig.showPenalties,
+      shortenedNames: true,
     );
   }
 

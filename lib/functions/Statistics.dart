@@ -64,12 +64,15 @@ double standardDeviation(List<num> arr) {
 }
 
 extension Arithmetic on Iterable<num?> {
+  double getStatistic(double Function(Iterable<num?>) statistic) =>
+      statistic(this);
   double mean() {
     try {
       if (length == 0) return 0.0;
       if (length == 1) return this.first?.toDouble() ?? 0.0;
       return ((reduce((value, element) =>
-                      (value?.toDouble() ?? 0) + (element?.toDouble() ?? 0)) ??
+                      (value?.toDouble().abs() ?? 0) +
+                      (element?.toDouble().abs() ?? 0)) ??
                   0.0) /
               length)
           .toDouble();
@@ -82,7 +85,7 @@ extension Arithmetic on Iterable<num?> {
   List<FlSpot> spots() {
     List<FlSpot> val = [];
     for (int i = 0; i < this.length; i++)
-      val.add(FlSpot(i.toDouble(), (this.toList()[i]?.toDouble() ?? 0)));
+      val.add(FlSpot(i.toDouble(), (this.toList()[i]?.toDouble() ?? 0).abs()));
     return val;
   }
 
@@ -100,7 +103,7 @@ extension Arithmetic on Iterable<num?> {
     final arr = this.sorted();
     int index = this.length ~/ 2;
     if (this.length % 2 == 0) return [arr[index - 1], arr[index]].mean();
-    return arr[index];
+    return arr[index].abs();
   }
 
   double accuracy() {
@@ -132,14 +135,21 @@ extension Arithmetic on Iterable<num?> {
     return arr.sublist(this.length ~/ 2 + 1).median();
   }
 
-  double maxValue() =>
-      this.length != 0 ? this.map((e) => e?.toDouble() ?? 0).reduce(max) : 0;
-  double minValue() =>
-      this.length != 0 ? this.map((e) => e?.toDouble() ?? 0).reduce(min) : 0;
+  double maxValue() => this.isNotEmpty
+      ? this.map((e) => e?.toDouble().abs() ?? 0).reduce(max)
+      : 0;
+  double minValue() => this.isNotEmpty
+      ? this.map((e) => e?.toDouble().abs() ?? 0).reduce(min)
+      : 0;
+  double sum() => this.isNotEmpty
+      ? this
+          .map((e) => e?.toDouble() ?? 0)
+          .reduce((value, element) => value + element)
+      : 0;
 
   List<double> sorted() {
     List<double> val = [];
-    for (num? i in this) val.add(i?.toDouble() ?? 0);
+    for (num? i in this) val.add(i?.toDouble().abs() ?? 0);
     val.sort((a, b) => a.compareTo(b));
     return val;
   }
@@ -173,7 +183,7 @@ extension MatchExtensions on List<Match> {
       if (alliance != null) {
         final allianceTotal =
             alliance.allianceTotal(showPenalties, type: type, element: element);
-        val.add(FlSpot(i.toDouble(), allianceTotal.toDouble()));
+        val.add(FlSpot(i.toDouble(), allianceTotal.toDouble().abs()));
         i++;
       }
     }
@@ -187,10 +197,11 @@ extension MatchExtensions on List<Match> {
         : this.where((element) => element.dice == dice);
     for (Match match in matches) {
       for (Alliance? alliance in match.getAlliances()) {
-        if ((alliance?.allianceTotal(true, type: type) ?? 0) > max)
-          max = alliance?.allianceTotal(true, type: type) ?? 0;
-        if ((alliance?.allianceTotal(false, type: type) ?? 0) > max)
-          max = alliance?.allianceTotal(false, type: type) ?? 0;
+        final withPens = (alliance?.allianceTotal(true, type: type) ?? 0).abs();
+        if (withPens > max) max = withPens;
+        final withoutPens =
+            (alliance?.allianceTotal(false, type: type) ?? 0).abs();
+        if (withoutPens > max) max = withoutPens;
       }
     }
     return max;
@@ -224,7 +235,7 @@ extension ListScore on List<Score> {
         .toList();
     List<FlSpot> val = [];
     for (int i = 0; i < list.length; i++) {
-      val.add(FlSpot(i.toDouble(), list[i].toDouble()));
+      val.add(FlSpot(i.toDouble(), list[i].toDouble().abs()));
     }
     return val;
   }
@@ -240,8 +251,9 @@ extension TeamsExtension on Map<String, Team> {
       return team;
     } else {
       var newTeam = Team(
-          number.replaceAll(new RegExp(r' -,[^\w\s]+'), '').replaceAll(' ', ''),
-          name);
+        number.replaceAll(new RegExp(r' -,[^\w\s]+'), '').replaceAll(' ', ''),
+        name,
+      );
       event.teams[newTeam.number] = newTeam;
       return newTeam;
     }
@@ -266,14 +278,14 @@ extension TeamsExtension on Map<String, Team> {
             .spots(b, Dice.none, statConfig.showPenalties,
                 type: type, element: element)
             .removeOutliers(statConfig.removeOutliers)
-            .map((spot) => spot.y)
+            .map((spot) => spot.y.abs())
             .median();
         final allianceTotalsA = matches
             .toList()
             .spots(a, Dice.none, statConfig.showPenalties,
                 type: type, element: element)
             .removeOutliers(statConfig.removeOutliers)
-            .map((spot) => spot.y)
+            .map((spot) => spot.y.abs())
             .median();
         return allianceTotalsB.compareTo(allianceTotalsA);
       });

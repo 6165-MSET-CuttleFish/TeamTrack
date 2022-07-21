@@ -5,6 +5,7 @@ import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/functions/Statistics.dart';
 import 'package:teamtrack/models/ScoreModel.dart';
 import 'package:teamtrack/models/StatConfig.dart';
+import 'package:teamtrack/functions/Extensions.dart';
 
 class TeamRow extends StatelessWidget {
   const TeamRow({
@@ -24,6 +25,15 @@ class TeamRow extends StatelessWidget {
   final ScoringElement? elementSort;
   final void Function()? onTap;
   final StatConfig statConfig;
+  Color wltColor(int i) {
+    if (i == 0) {
+      return Colors.green;
+    } else if (i == 1) {
+      return Colors.red;
+    } else {
+      return Colors.grey;
+    }
+  }
 
   @override
   Widget build(context) {
@@ -39,6 +49,7 @@ class TeamRow extends StatelessWidget {
             .values
             .percentIncrease(elementSort);
     final elementName = elementSort?.name ?? "";
+    final wlt = (team.getWLT(event) ?? '').split('-');
     return Container(
       decoration: BoxDecoration(
         border: Border.all(
@@ -49,9 +60,28 @@ class TeamRow extends StatelessWidget {
       child: ListTile(
         title: SizedBox(
           width: 200,
-          child: Text(
-            team.name,
-            style: Theme.of(context).textTheme.bodyText1,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                team.name,
+                style: Theme.of(context).textTheme.bodyText1,
+              ),
+              Row(
+                children: [
+                  for (int i = 0; i < wlt.length; i++)
+                    Row(
+                      children: [
+                        Text(
+                          wlt[i],
+                          style: TextStyle(color: wltColor(i)),
+                        ),
+                        if (i < wlt.length - 1) Text('-')
+                      ],
+                    ),
+                ],
+              )
+            ],
           ),
         ),
         leading: Text(
@@ -70,7 +100,10 @@ class TeamRow extends StatelessWidget {
                 ),
               ),
             if (percentIncrease != null && elementName.isEmpty)
-              PercentChange(percentIncrease),
+              PercentChange(
+                percentIncrease,
+                lessIsBetter: sortMode.getLessIsBetter(),
+              ),
             Padding(
               padding: EdgeInsets.all(
                 10,

@@ -112,6 +112,7 @@ class ScoreCard extends StatelessWidget {
               ? event.teams.maxMeanScore(dice, removeOutliers, type, null)
               : maxAllianceMean,
           title: 'Mean',
+          lessIsBetter: type.getLessIsBetter(),
         ),
         BarGraph(
           val: !allianceTotal
@@ -121,6 +122,7 @@ class ScoreCard extends StatelessWidget {
               ? event.teams.maxMedianScore(dice, removeOutliers, type, null)
               : maxAllianceMedian,
           title: 'Median',
+          lessIsBetter: type.getLessIsBetter(),
         ),
         BarGraph(
           val: !allianceTotal
@@ -130,6 +132,7 @@ class ScoreCard extends StatelessWidget {
               ? event.teams.maxScore(dice, removeOutliers, type)
               : maxAllianceBest,
           title: 'Best',
+          lessIsBetter: type.getLessIsBetter(),
         ),
         BarGraph(
           val: !allianceTotal
@@ -141,6 +144,7 @@ class ScoreCard extends StatelessWidget {
               : maxAllianceDeviation,
           inverted: true,
           title: 'Deviation',
+          lessIsBetter: type.getLessIsBetter(),
         ),
       ],
     );
@@ -261,7 +265,7 @@ class ScoreCard extends StatelessWidget {
                                   .toList()
                                   .spots(team, dice, false, type: type)
                                   .removeOutliers(removeOutliers),
-                              color: Color.fromRGBO(255, 166, 0, 1),
+                              color: Colors.yellow,
                               isCurved: true,
                               preventCurveOverShooting: true,
                               barWidth: 5,

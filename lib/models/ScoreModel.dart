@@ -3,8 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/functions/Extensions.dart';
+import 'package:teamtrack/functions/Statistics.dart';
 
-/// This class is used to represent the scoring structure of traditional and remote FTC events.
 Map<String, dynamic> absRef = {
   "AutoScore": {
     "DuckDelivered": {
@@ -157,16 +157,17 @@ Map<String, dynamic> absRef = {
   }
 };
 
+/// This class is used to represent the scoring structure of traditional and remote FTC events via [teleScore], [autoScore], [endgameScore], and [penalties]
 class Score extends ScoreDivision implements Comparable<Score> {
   late TeleScore teleScore;
   late AutoScore autoScore;
   late EndgameScore endgameScore;
-  Penalty penalties = Penalty();
+  late Penalty penalties;
   Map<String, bool> defendedTeamNumbers = {};
   List<Team> defendedTeams(Event event) => defendedTeamNumbers.keys
       .map((number) => event.teams[number])
       .whereType<Team>()
-      .toList();
+      .toList(); // for future Defensive Power Rating stuff
   String id = '';
   String gameName;
   late Dice dice;
@@ -178,7 +179,7 @@ class Score extends ScoreDivision implements Comparable<Score> {
     teleScore = TeleScore(ref['TeleScore']);
     autoScore = AutoScore(ref['AutoScore']);
     endgameScore = EndgameScore(ref['EndgameScore']);
-    penalties = Penalty();
+    penalties = Penalty(ref['Penalty']);
     setDice(dice, Timestamp.now());
   }
   List<ScoringElement> getElements({bool? showPenalties}) => [
@@ -197,7 +198,7 @@ class Score extends ScoreDivision implements Comparable<Score> {
         .map((e) => e.scoreValue())
         .toList();
     if (list.length == 0) return 0;
-    return list.reduce((value, element) => value + element).clamp(0, 999);
+    return list.sum().toInt().clamp(0, 999);
   }
 
   ScoreDivision getScoreDivision(OpModeType? type) {
@@ -264,7 +265,9 @@ class Score extends ScoreDivision implements Comparable<Score> {
         map['EndgameScore'] != null && (map['EndgameScore'] as Map).isNotEmpty
             ? EndgameScore.fromJson(map['EndgameScore'], ref['EndgameScore'])
             : EndgameScore(ref['EndgameScore']);
-    penalties = Penalty.fromJson(map['Penalty']);
+    penalties = map['Penalty'] != null && (map['Penalty'] as Map).isNotEmpty
+        ? Penalty.fromJson(map['Penalty'], ref['Penalty'])
+        : Penalty(ref['Penalty']);
     id = map['id'];
     autoScore.robotDisconnected = map['autoDc'] ?? false;
     teleScore.robotDisconnected = map['teleDc'] ?? false;
@@ -308,14 +311,11 @@ class AutoScore extends ScoreDivision {
   }
 
   late Dice dice;
-  Set keys = {};
-  Map<String, ScoringElement> elements = Map();
   void setCount(String key, int n) {
     elements[key]?.count = n;
   }
 
   dynamic ref;
-  List<ScoringElement> getElements() => elements.values.toList();
   Dice getDice() => dice;
   AutoScore(this.ref) {
     ref.keys.forEach(
@@ -394,8 +394,6 @@ class TeleScore extends ScoreDivision {
   }
 
   late Dice dice;
-  Map<String, ScoringElement> elements = Map();
-  List<ScoringElement> getElements() => elements.values.toList();
 
   ScoringElement misses =
       ScoringElement(name: "Misses", value: 1, key: 'Misses');
@@ -490,8 +488,6 @@ class EndgameScore extends ScoreDivision {
   }
 
   late Dice dice;
-  Map<String, ScoringElement> elements = Map();
-  List<ScoringElement> getElements() => elements.values.toList();
   dynamic ref;
   Dice getDice() => dice;
   EndgameScore(this.ref) {
@@ -575,45 +571,118 @@ class Penalty extends ScoreDivision {
   late ScoringElement majorPenalty;
   late ScoringElement minorPenalty;
   late Dice dice;
-  Penalty() {
-    majorPenalty =
-        ScoringElement(name: 'Major Penalty', value: -30, key: 'major');
-    minorPenalty =
-        ScoringElement(name: 'Minor Penalty', value: -10, key: 'minor');
+  dynamic ref;
+  Penalty(this.ref) {
+    if (ref == null) {
+      majorPenalty =
+          ScoringElement(name: 'Major Penalty', value: -30, key: 'major');
+      minorPenalty =
+          ScoringElement(name: 'Minor Penalty', value: -10, key: 'minor');
+      elements = {
+        'major': majorPenalty,
+        'minor': minorPenalty,
+      };
+    } else {
+      ref.keys.forEach(
+        (e) {
+          elements[e] = ScoringElement(
+            name: ref[e]['name'] ?? e,
+            value: ref[e]['value'] ?? 1,
+            isBool: ref[e]['isBool'] ?? false,
+            key: e,
+            id: ref[e]['id'],
+          );
+        },
+      );
+      maxSet();
+    }
+  }
+
+  void maxSet() {
+    ref.keys.forEach(
+      (e) {
+        if (ref[e]['maxIsReference'] ?? false) {
+          int ceil = ref[e]['max']['total'];
+          elements[e]?.max = () =>
+              (ceil - (elements[ref[e]['max']['reference']]?.count ?? 0))
+                  .toInt();
+        } else {
+          elements[e]?.max = () => ref[e]['max'];
+        }
+      },
+    );
   }
 
   @override
   Dice getDice() => dice;
 
   @override
-  List<ScoringElement> getElements() => [majorPenalty, minorPenalty];
-
-  @override
-  int total({bool? showPenalties, bool markDisconnect = false}) => getElements()
-      .map((e) => e.scoreValue())
-      .reduce((value, element) => value + element);
+  int total({bool? showPenalties, bool markDisconnect = false}) =>
+      elements.values.map((e) => e.scoreValue()).sum().toInt();
 
   Penalty operator +(Penalty other) {
-    var penalty = Penalty();
-    penalty.dice = dice;
-    penalty.majorPenalty = other.majorPenalty + majorPenalty;
-    penalty.minorPenalty = other.minorPenalty + minorPenalty;
-    return penalty;
+    if (ref == null) {
+      final penalty = Penalty(ref);
+      penalty.dice = dice;
+      penalty.majorPenalty = other.majorPenalty + majorPenalty;
+      penalty.minorPenalty = other.minorPenalty + minorPenalty;
+      return penalty;
+    } else {
+      final penalty = Penalty(ref);
+      penalty.dice = dice;
+      penalty.elements.keys.forEach(
+        (key) {
+          penalty.elements[key] = (elements[key] ?? ScoringElement()) +
+              (other.elements[key] ?? ScoringElement());
+        },
+      );
+      other.elements.keys.forEach((key) {
+        if (penalty.elements[key] == null) {
+          penalty.elements[key] = other.elements[key] ?? ScoringElement();
+        }
+      });
+      return penalty;
+    }
   }
 
-  Penalty.fromJson(Map<String, dynamic> json)
-      : majorPenalty = ScoringElement(
-          name: 'Major Penalty',
-          value: -30,
-          count: json['major'] is Map ? json['major']['count'] : json['major'],
-          key: 'major',
-        ),
-        minorPenalty = ScoringElement(
-          name: 'Minor Penalty',
-          value: -10,
-          count: json['minor'] is Map ? json['minor']['count'] : json['minor'],
-          key: 'minor',
-        );
+  Penalty.fromJson(Map<String, dynamic> json, this.ref) {
+    if (ref == null) {
+      majorPenalty = ScoringElement(
+        name: 'Major Penalty',
+        value: -30,
+        count: json['major'] is Map ? json['major']['count'] : json['major'],
+        key: 'major',
+      );
+      minorPenalty = ScoringElement(
+        name: 'Minor Penalty',
+        value: -10,
+        count: json['minor'] is Map ? json['minor']['count'] : json['minor'],
+        key: 'minor',
+      );
+      elements = {
+        'major': majorPenalty,
+        'minor': minorPenalty,
+      };
+    } else {
+      ref.keys.forEach(
+        (e) {
+          elements[e] = ScoringElement(
+            name: ref[e]['name'] ?? e,
+            count: json[e] is Map ? json[e]['count'] : json[e],
+            misses: json[e] is Map ? json[e]['misses'] : 0,
+            cycleTimes:
+                json[e] is Map ? decodeArray(json[e]?['cycleTimes']) : [],
+            min: () => ref[e]['min'] ?? 0,
+            value: ref[e]['value'] ?? 1,
+            isBool: ref[e]['isBool'] ?? false,
+            key: e,
+            id: ref[e]['id'],
+          );
+        },
+      );
+      maxSet();
+    }
+  }
   Map<String, dynamic> toJson() => {
         'major': majorPenalty.toJson(),
         'minor': minorPenalty.toJson(),
@@ -728,16 +797,22 @@ abstract class ScoreDivision {
               : getElements()
                   .map((e) => e
                       .scoreValue()) // map scoring elements to an array of their score values
-                  .reduce((value, element) => value + element) // sum the array
-                  .clamp(
-                      0, 999); // clamp the sum to a min of 0 and a max of 999
+                  .sum()
+                  .toInt(); // sum the array
+
   Dice getDice(); // get the dice object
-  List<ScoringElement> getElements(); // get the scoring elements
+  List<ScoringElement> getElements() =>
+      elements.values.toList(); // get the scoring elements
+  dynamic ref; // get the reference object
+  Map<String, ScoringElement> elements = {};
   late Timestamp timeStamp; // the time stamp of the Score object
   void reset(); // reset the scoring elements
   bool robotDisconnected = false; // whether the robot disconnected
   int? getScoringElementCount(String? key) {
-    if (key == null && !robotDisconnected) return total();
+    if (key == null && !robotDisconnected) {
+      final x = total();
+      return x;
+    }
     final scoringElement = this.getElements().parse().firstWhere(
           (e) => e.key == key,
           orElse: () => ScoringElement(),
@@ -747,3 +822,116 @@ abstract class ScoreDivision {
     return null;
   }
 }
+
+// example skeleton for the firabase remote config game skeleton (current example is not optimal and there are probably areas in the config where you can reduce redundancies)
+const exampleSkeleton = {
+  "AutoScore": {
+    "ExampleScoringElement1": {
+      "name": "Duck Delivered", // name shown in the app
+      "min":
+          0, // minimum score for this element (probably redundant for when isBool is true)
+      "max":
+          1, // maximum score for this element (probably redundant for when isBool is false)
+      "value": 10, // scoring value of the element
+      "isBool": true // represented by a toggle switch on the UI
+    },
+    "ExampleScoringElement2": {
+      "id":
+          "Storage Park", // the group this element belongs to (UI shows this in either a cupertino segmented bar or a expandable list tile)
+      "isBool":
+          true, // represented by a cupertino segmented bar on the UI in this case. if this is false then the UI shows this element in an expandable list tile
+      "name": "Partial", // name shown in the app
+      "min": 0,
+      "maxIsReference":
+          true, // set to true if the maximum references a different element (does not have to be in the same group)
+      "max": {
+        "total":
+            1, // the max value for the sum of both the current element and the referenced element
+        "reference":
+            "FullParkStorage" // the key of the element that is referenced (not the id)
+      },
+      "value": 3,
+    },
+  },
+  "TeleScore": {
+    "sharedFreight": {
+      "name": "Freight in Shared Hub",
+      "min": 0,
+      "max": 999,
+      "value": 4
+    },
+    "lvl3": {"name": "Level 3", "min": 0, "max": 999, "value": 6},
+    "lvl2": {"name": "Level 2", "min": 0, "max": 999, "value": 4},
+    "lvl1": {"name": "Level 1", "min": 0, "max": 999, "value": 2},
+    "storageFreight": {
+      "name": "Freight in Storage Unit",
+      "min": 0,
+      "max": 999,
+      "value": 1
+    }
+  },
+  "EndgameScore": {
+    "DucksDelivered": {
+      "name": "Ducks Delivered",
+      "min": 0,
+      "max": 10,
+      "value": 6
+    },
+    "PartialWarehouseParked": {
+      "name": "Partial",
+      "id": "Warehouse Park",
+      "min": 0,
+      "maxIsReference": true,
+      "max": {"total": 1, "reference": "FullWarehouseParked"},
+      "value": 3,
+      "isBool": true
+    },
+    "FullWarehouseParked": {
+      "name": "Full",
+      "id": "Warehouse Park",
+      "min": 0,
+      "maxIsReference": true,
+      "max": {"total": 1, "reference": "PartialWarehouseParked"},
+      "value": 6,
+      "isBool": true
+    },
+    "Element": {
+      "name": "Team Element Capped",
+      "min": 0,
+      "max": 1,
+      "value": 15,
+      "isBool": true
+    }
+  },
+  "Dice": {
+    // initial dice roll for the autonomous period
+    "1": "Left", // the first die roll
+    "2": "Middle", // the second die roll
+    "3": "Right", // the third die roll
+    "name":
+        "Barcode", // the name of the thing being randomized ; will show as 'Barcode: Left' etc.
+  },
+  "Alliance": {
+    // general alliance scoring elements not attributed to any team in particular but to the alliance as a whole
+    "AutoScore": {},
+    "TeleScore": {},
+    "EndgameScore": {
+      "AllianceHubBalanced": {
+        "name": "Alliance Hub Balanced",
+        "min": 0,
+        "max": 1,
+        "value": 10,
+        "isBool": true
+      },
+      "SharedHubTipped": {
+        "name": "Shared Hub Tipped",
+        "min": 0,
+        "max": 1,
+        "value": 20,
+        "isBool": true
+      }
+    }
+  },
+  "PenaltiesAddToOpposingAlliance":
+      false // if true then penalties are added to the opposing alliance's score
+};

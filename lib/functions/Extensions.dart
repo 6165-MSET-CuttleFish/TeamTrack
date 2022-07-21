@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/models/ScoreModel.dart';
+
 extension ObjectExt<T> on T {
   R let<R>(R Function(T that) op) => op(this);
 }
+
 extension RoleExtension on Role {
   // getter for showing to the user
   String name() {
@@ -128,14 +130,29 @@ extension colorExt on OpModeType? {
       case OpModeType.tele:
         return Colors.blue;
       case OpModeType.endgame:
-        return Colors.deepOrange;
+        return Colors.orange;
       case OpModeType.penalty:
         return Colors.red;
       default:
         return Color.fromRGBO(230, 30, 213, 1);
     }
   }
-  String getName() {
+
+  String getName({bool shortened = false}) {
+    if (shortened) {
+      switch (this) {
+        case OpModeType.auto:
+          return 'Auto';
+        case OpModeType.tele:
+          return 'Tele';
+        case OpModeType.endgame:
+          return 'End';
+        case OpModeType.penalty:
+          return 'Pen';
+        default:
+          return 'Total';
+      }
+    }
     switch (this) {
       case OpModeType.auto:
         return 'Autonomous';
@@ -149,6 +166,8 @@ extension colorExt on OpModeType? {
         return 'Total';
     }
   }
+
+  bool getLessIsBetter() => this == OpModeType.penalty ? true : false;
 }
 
 extension StrExt on String {

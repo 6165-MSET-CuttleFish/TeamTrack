@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// This widget is used to animate the header above [SearchWidget] so that it
+/// This widget is used to animate the [child] so that it
 /// smoothly collapses and expands when a change in the state is detected.
 class Collapsible extends StatefulWidget {
   final Widget? child;

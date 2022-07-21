@@ -41,14 +41,13 @@ PageRoute expandPageRoute({required Widget Function(BuildContext) builder}) {
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       const begin = 0.0;
       const end = 1.0;
-      const curve = Curves.easeOut;
+      const curve = Curves.linear;
       final tween =
           Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
       final offsetAnimation = animation.drive(tween);
 
-      return ScaleTransition(
-        alignment: Alignment.center,
-        scale: offsetAnimation,
+      return FadeTransition(
+        opacity: offsetAnimation,
         child: child,
       );
     },

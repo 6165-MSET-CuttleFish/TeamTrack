@@ -207,6 +207,7 @@ class _MatchList extends State<MatchList> {
     double teleMax = 0;
     double endMax = 0;
     double totalMax = 0;
+    double penaltyMax = 0;
     if (widget.team != null) {
       autoMax = widget.event.statConfig.allianceTotal
           ? widget.event.matches.values
@@ -246,6 +247,16 @@ class _MatchList extends State<MatchList> {
               .map((spot) => spot.y)
               .maxValue()
           : widget.team?.scores.maxScore(Dice.none, false, null, null) ?? 0;
+          penaltyMax = widget.event.statConfig.allianceTotal
+          ? widget.event.matches.values
+              .toList()
+              .spots(widget.team!, Dice.none, false, type: OpModeType.penalty)
+              .removeOutliers(widget.event.statConfig.removeOutliers)
+              .map((spot) => spot.y)
+              .maxValue()
+          : widget.team?.scores
+                  .maxScore(Dice.none, false, OpModeType.penalty, null) ??
+              0;
     }
     return ListView.builder(
       controller: NewPlatform.isIOS ? null : scrollController,
@@ -299,6 +310,7 @@ class _MatchList extends State<MatchList> {
           teleMax: teleMax,
           endMax: endMax,
           totalMax: totalMax,
+          penaltyMax: penaltyMax,
           statConfig: widget.event.statConfig,
           onTap: () => navigateToMatch(
             context,

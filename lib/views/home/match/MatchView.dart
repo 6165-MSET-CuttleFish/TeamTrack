@@ -120,6 +120,18 @@ class _MatchView extends State<MatchView> {
               : e.scores.maxScore(Dice.none, false, OpModeType.endgame, null),
         )
         .maxValue();
+    penaltyMaxTotal = event.matches.values
+        .map((element) => [element.red, element.blue])
+        .reduce((value, element) => value + element)
+        .map((e) => e?.total().penalties.total().abs())
+        .maxValue();
+    penaltyMaxInd = event.teams.values
+        .map(
+          (e) => _match == null
+              ? e.targetScore?.penalties.total().abs()
+              : e.scores.maxScore(Dice.none, false, OpModeType.penalty, null),
+        )
+        .maxValue();
     // cyclesMaxTotal = event.matches.values
     //     .map((element) => [element.red, element.blue])
     //     .reduce((value, element) => value + element)
@@ -253,7 +265,9 @@ class _MatchView extends State<MatchView> {
       teleMaxInd = 0,
       teleMaxTotal = 0,
       endgameMaxInd = 0,
-      endgameMaxTotal = 0;
+      endgameMaxTotal = 0,
+      penaltyMaxInd = 0,
+      penaltyMaxTotal = 0;
   double cyclesMaxInd = 0,
       cyclesMaxTotal = 0,
       teleCyclesMaxInd = 0,
@@ -649,6 +663,12 @@ class _MatchView extends State<MatchView> {
                                               _allianceTotal
                                           ? endgameMaxTotal
                                           : endgameMaxInd,
+                                      penaltyMax: (widget.event.type ==
+                                                      EventType.remote &&
+                                                  widget.match != null) ||
+                                              _allianceTotal
+                                          ? penaltyMaxTotal
+                                          : penaltyMaxInd,
                                       totalMax: (widget.event.type ==
                                                       EventType.remote &&
                                                   widget.match != null) ||

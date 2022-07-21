@@ -171,7 +171,7 @@ class TeamSearch extends SearchDelegate<String?> {
     required this.statConfig,
     required this.elementSort,
   }) {
-    max = event.teams.maxMeanScore(
+    max = event.teams.maxMedianScore(
         Dice.none, statConfig.removeOutliers, sortMode, elementSort);
     final teams = event.teams.values;
     if (statConfig.allianceTotal) {
@@ -182,7 +182,7 @@ class TeamSearch extends SearchDelegate<String?> {
                 .spots(e, Dice.none, statConfig.showPenalties, type: sortMode)
                 .removeOutliers(statConfig.removeOutliers)
                 .map((spot) => spot.y)
-                .mean(),
+                .median(),
           )
           .maxValue();
     }

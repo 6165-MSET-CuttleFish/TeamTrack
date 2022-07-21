@@ -184,6 +184,7 @@ class _EventView extends State<EventView> {
                             });
                             if (sortingModifier != null)
                               showModalBottomSheet(
+                                isScrollControlled: true,
                                 context: context,
                                 builder: (_) => Column(
                                   mainAxisSize: MainAxisSize.min,
@@ -210,12 +211,8 @@ class _EventView extends State<EventView> {
                                 ),
                               );
                           },
-                          items: [
-                            null,
-                            OpModeType.auto,
-                            OpModeType.tele,
-                            OpModeType.endgame,
-                          ].map<DropdownMenuItem<OpModeType?>>(
+                          items: [null, ...OpModeType.values]
+                              .map<DropdownMenuItem<OpModeType?>>(
                             (value) {
                               return DropdownMenuItem<OpModeType?>(
                                 value: value,

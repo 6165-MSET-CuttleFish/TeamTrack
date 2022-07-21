@@ -19,6 +19,8 @@ class BarGraph extends StatelessWidget {
     this.vertical = true, // vertical or horizontal bar
     this.compressed = false,
     this.showPercentage = true,
+    this.lessIsBetter = false, // if true, lower numbers are better
+    this.titleWidthConstraint,
   }) : super(key: key) {
     percentage = (inverted
             ? (val != 0 ? (max / val).clamp(0, 1) : 1) * 100.0
@@ -32,6 +34,8 @@ class BarGraph extends StatelessWidget {
   }
   final bool compressed;
   final bool showPercentage;
+  final bool lessIsBetter;
+  final double? titleWidthConstraint;
   final String title;
   final double fontSize;
   double max;
@@ -48,8 +52,8 @@ class BarGraph extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (!compressed)
-            Container(
-              width: 74,
+            SizedBox(
+              width: titleWidthConstraint,
               child: Center(
                 child: Text(
                   title,
@@ -96,7 +100,7 @@ class BarGraph extends StatelessWidget {
                 child: showPercentage
                     ? Center(
                         child: Text(
-                          percentage != 0 ? percentage.toString() + '%' : '',
+                          percentage != 0 ? '$percentage%' : '',
                           style: GoogleFonts.gugi(
                             textStyle: TextStyle(
                               fontSize: 10,
@@ -122,23 +126,33 @@ class BarGraph extends StatelessWidget {
       );
 
   Color _colorSelect(double val, double max) {
+    Color color;
     if (!inverted) {
       if (val / max < 0.5) {
-        return CupertinoColors.systemRed;
+        color = lessIsBetter
+            ? CupertinoColors.systemGreen
+            : CupertinoColors.systemRed;
       } else if (val / max < 0.7) {
-        return CupertinoColors.systemYellow;
+        color = CupertinoColors.systemYellow;
       } else {
-        return CupertinoColors.systemGreen;
+        color = lessIsBetter
+            ? CupertinoColors.systemRed
+            : CupertinoColors.systemGreen;
       }
     } else {
       if (max / val < 0.5) {
-        return CupertinoColors.systemRed;
+        color = lessIsBetter
+            ? CupertinoColors.systemGreen
+            : CupertinoColors.systemRed;
       } else if (max / val < 0.7) {
-        return CupertinoColors.systemYellow;
+        color = CupertinoColors.systemYellow;
       } else {
-        return CupertinoColors.systemGreen;
+        color = lessIsBetter
+            ? CupertinoColors.systemRed
+            : CupertinoColors.systemGreen;
       }
     }
+    return color;
   }
 }
 

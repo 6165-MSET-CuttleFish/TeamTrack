@@ -18,8 +18,8 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await remoteConfig.fetchAndActivate();
-  Statics.gameName = remoteConfig.getString("gameName");
-  dataModel.restoreEvents();
+  Statics.gameName = remoteConfig.getString("gameName"); // season's game name (to be changed in remote config every season)
+  dataModel.restoreEvents(); // restore on-device events from shared preferences
   if (!NewPlatform.isWeb) {
     final settings = await messaging.requestPermission(
       alert: true,
@@ -29,13 +29,13 @@ Future<void> main() async {
       criticalAlert: false,
       provisional: false,
       sound: true,
-    );
+    ); // ask for permission to receive push notifications
     if (settings.authorizationStatus == AuthorizationStatus.authorized ||
         settings.authorizationStatus == AuthorizationStatus.provisional) {
       await PushNotifications.initialize();
       String? token = await PushNotifications.getToken();
       if (token != "") {
-        dataModel.token = token;
+        dataModel.token = token; // save token to later be pushed to firestore
       }
     } else {
       print('User declined or has not accepted permission');

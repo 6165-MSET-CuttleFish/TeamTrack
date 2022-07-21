@@ -35,14 +35,15 @@ class TeamView extends StatefulWidget {
 class _TeamViewState extends State<TeamView> {
   _TeamViewState(this._team);
   Dice _dice = Dice.none;
-  final _selections = [true, false, false, false];
+  final _selections = {
+    null: true,
+    OpModeType.auto: false,
+    OpModeType.tele: false,
+    OpModeType.endgame: false,
+    OpModeType.penalty: false,
+  };
   Team _team;
   bool _showCycles = false;
-  final endgameColor = Colors.deepOrange;
-  final penaltyColor = Colors.red;
-  final teleColor = Colors.blue;
-  final autoColor = Colors.green;
-  final generalColor = Color.fromRGBO(230, 30, 213, 1);
 
   Score? maxScore;
   Score? teamMaxScore;
@@ -85,19 +86,7 @@ class _TeamViewState extends State<TeamView> {
     super.initState();
   }
 
-  bool getSelection(OpModeType? opModeType) {
-    if (opModeType == null) {
-      return _selections[0];
-    } else if (opModeType == OpModeType.auto) {
-      return _selections[1];
-    } else if (opModeType == OpModeType.tele) {
-      return _selections[2];
-    } else if (opModeType == OpModeType.endgame) {
-      return _selections[3];
-    } else {
-      return false;
-    }
-  }
+  bool getSelection(OpModeType? opModeType) => _selections[opModeType] ?? false;
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -292,22 +281,12 @@ class _TeamViewState extends State<TeamView> {
                         isCollapsed: _team.scores.diceScores(_dice).length <= 1,
                         child: Column(
                           children: [
-                            // Padding(
-                            //   padding: widget.event.type != EventType.remote
-                            //       ? EdgeInsets.all(40)
-                            //       : EdgeInsets.all(20),
-                            // ),
                             Wrap(
                               alignment: WrapAlignment.center,
                               crossAxisAlignment: WrapCrossAlignment.center,
                               spacing: 0,
                               children: [
-                                for (final opModeType in [
-                                  null,
-                                  OpModeType.auto,
-                                  OpModeType.tele,
-                                  OpModeType.endgame
-                                ])
+                                for (final opModeType in [null, ...OpModeType.values])
                                   FlatButton(
                                     color: getSelection(opModeType)
                                         ? opModeType.getColor()
@@ -315,20 +294,8 @@ class _TeamViewState extends State<TeamView> {
                                     splashColor: opModeType.getColor(),
                                     onPressed: () {
                                       setState(
-                                        () {
-                                          if (opModeType == null) {
-                                            _selections[0] = !_selections[0];
-                                          } else if (opModeType ==
-                                              OpModeType.auto) {
-                                            _selections[1] = !_selections[1];
-                                          } else if (opModeType ==
-                                              OpModeType.tele) {
-                                            _selections[2] = !_selections[2];
-                                          } else if (opModeType ==
-                                              OpModeType.endgame) {
-                                            _selections[3] = !_selections[3];
-                                          }
-                                        },
+                                        () => _selections[opModeType] =
+                                            !(_selections[opModeType] ?? true),
                                       );
                                     },
                                     shape: RoundedRectangleBorder(
@@ -408,12 +375,7 @@ class _TeamViewState extends State<TeamView> {
                             child: Text('Target'),
                           ),
                         ),
-                      for (final opModeType in [
-                        null,
-                        OpModeType.auto,
-                        OpModeType.tele,
-                        OpModeType.endgame
-                      ])
+                      for (final opModeType in [null, ...OpModeType.values])
                         Padding(
                           padding: const EdgeInsets.only(top: 20, bottom: 10),
                           child: ScoreCard(
@@ -501,15 +463,7 @@ class _TeamViewState extends State<TeamView> {
                               leftTitles: AxisTitles(
                                 sideTitles: SideTitles(
                                   showTitles: true,
-                                  // getTitlesWidget: (value, titleMeta) {
-                                  //   return Text(value.toInt().toString(),
-                                  //       style: TextStyle(
-                                  //         fontWeight: FontWeight.bold,
-                                  //         fontSize: 15,
-                                  //       ));
-                                  // },
                                   reservedSize: 35,
-                                  //interval: 15,
                                 ),
                               ),
                               topTitles: AxisTitles(
@@ -544,149 +498,35 @@ class _TeamViewState extends State<TeamView> {
                               _team.targetScore?.total()?.toDouble() ?? 0.0
                             ].maxValue(),
                             lineBarsData: [
-                              LineChartBarData(
-                                belowBarData: _team.targetScore != null
-                                    ? BarAreaData(
-                                        show: true,
-                                        color: Colors.lightGreenAccent
-                                            .withOpacity(0.5),
-                                        cutOffY: _team.targetScore
-                                            ?.total()
-                                            ?.toDouble(),
-                                        applyCutOffY: true,
-                                      )
-                                    : null,
-                                aboveBarData: _team.targetScore != null
-                                    ? BarAreaData(
-                                        show: true,
-                                        color:
-                                            Colors.redAccent.withOpacity(0.5),
-                                        cutOffY: _team.targetScore
-                                            ?.total()
-                                            ?.toDouble(),
-                                        applyCutOffY: true,
-                                      )
-                                    : null,
-                                show: _selections[0],
-                                spots: widget.event.statConfig.allianceTotal
-                                    ? widget.event
-                                        .getSortedMatches(true)
-                                        .where((e) =>
-                                            e.dice == _dice ||
-                                            _dice == Dice.none)
-                                        .toList()
-                                        .spots(
-                                          _team,
-                                          _dice,
-                                          widget.event.statConfig.showPenalties,
-                                        )
-                                        .removeOutliers(
-                                          widget
-                                              .event.statConfig.removeOutliers,
-                                        )
-                                    : _team.scores
-                                        .diceScores(_dice)
-                                        .spots(
-                                          null,
-                                          showPenalties: widget
-                                              .event.statConfig.showPenalties,
-                                        )
-                                        .removeOutliers(
-                                          widget
-                                              .event.statConfig.removeOutliers,
-                                        ),
-                                color: generalColor,
-                                isCurved: true,
-                                isStrokeCapRound: true,
-                                preventCurveOverShooting: true,
-                                barWidth: 5,
-                              ),
-                              LineChartBarData(
-                                show: _selections[1],
-                                spots: widget.event.statConfig.allianceTotal
-                                    ? widget.event
-                                        .getSortedMatches(true)
-                                        .where(
-                                          (e) =>
-                                              e.dice == _dice ||
-                                              _dice == Dice.none,
-                                        )
-                                        .toList()
-                                        .spots(_team, _dice, false,
-                                            type: OpModeType.auto)
-                                        .removeOutliers(widget
-                                            .event.statConfig.removeOutliers)
-                                    : _team.scores
-                                        .diceScores(_dice)
-                                        .spots(OpModeType.auto)
-                                        .removeOutliers(
-                                          widget
-                                              .event.statConfig.removeOutliers,
-                                        ),
-                                color: autoColor,
-                                isCurved: true,
-                                isStrokeCapRound: true,
-                                preventCurveOverShooting: true,
-                                barWidth: 5,
-                              ),
-                              LineChartBarData(
-                                show: _selections[2],
-                                spots: widget.event.statConfig.allianceTotal
-                                    ? widget.event
-                                        .getSortedMatches(true)
-                                        .where(
-                                          (e) =>
-                                              e.dice == _dice ||
-                                              _dice == Dice.none,
-                                        )
-                                        .toList()
-                                        .spots(_team, _dice, false,
-                                            type: OpModeType.tele)
-                                        .removeOutliers(
-                                          widget
-                                              .event.statConfig.removeOutliers,
-                                        )
-                                    : _team.scores
-                                        .diceScores(_dice)
-                                        .spots(OpModeType.tele)
-                                        .removeOutliers(
-                                          widget
-                                              .event.statConfig.removeOutliers,
-                                        ),
-                                color: teleColor,
-                                isCurved: true,
-                                isStrokeCapRound: true,
-                                preventCurveOverShooting: true,
-                                barWidth: 5,
-                              ),
-                              LineChartBarData(
-                                show: _selections[3],
-                                spots: widget.event.statConfig.allianceTotal
-                                    ? widget.event
-                                        .getSortedMatches(true)
-                                        .where(
-                                          (e) =>
-                                              e.dice == _dice ||
-                                              _dice == Dice.none,
-                                        )
-                                        .toList()
-                                        .spots(_team, _dice, false,
-                                            type: OpModeType.endgame)
-                                        .removeOutliers(widget
-                                            .event.statConfig.removeOutliers)
-                                    : _team.scores
-                                        .diceScores(_dice)
-                                        .spots(OpModeType.endgame)
-                                        .removeOutliers(
-                                          widget
-                                              .event.statConfig.removeOutliers,
-                                        ),
-                                color: endgameColor,
-                                isCurved: true,
-                                isStrokeCapRound: true,
-                                preventCurveOverShooting: true,
-                                barWidth: 5,
-                              ),
+                              for (final opModeType in [null, ...OpModeType.values])
+                                LineChartBarData(
+                                  show: _selections[opModeType],
+                                  spots: widget.event.statConfig.allianceTotal
+                                      ? widget.event
+                                          .getSortedMatches(true)
+                                          .where(
+                                            (e) =>
+                                                e.dice == _dice ||
+                                                _dice == Dice.none,
+                                          )
+                                          .toList()
+                                          .spots(_team, _dice, false,
+                                              type: opModeType)
+                                          .removeOutliers(widget
+                                              .event.statConfig.removeOutliers)
+                                      : _team.scores
+                                          .diceScores(_dice)
+                                          .spots(opModeType)
+                                          .removeOutliers(
+                                            widget.event.statConfig
+                                                .removeOutliers,
+                                          ),
+                                  color: opModeType.getColor(),
+                                  isCurved: true,
+                                  isStrokeCapRound: true,
+                                  preventCurveOverShooting: true,
+                                  barWidth: 5,
+                                ),
                             ],
                           ),
                         )
@@ -694,38 +534,6 @@ class _TeamViewState extends State<TeamView> {
                 ),
               ),
             ),
-            // SizedBox(
-            //   width: 45,
-            //   height: 90,
-            //   child: OutlinedButton(
-            //     onPressed: () => setState(
-            //       () => _showCycles = !_showCycles,
-            //     ),
-            //     child: Text(
-            //       'Show Cycle Times',
-            //       style: Theme.of(context).textTheme.button,
-            //       textAlign: TextAlign.center,
-            //     ),
-            //     style: ButtonStyle(
-            //       backgroundColor: MaterialStateProperty.all(
-            //         _showCycles
-            //             ? Colors.grey.withOpacity(0.3)
-            //             : Colors.cyan.withOpacity(0.3),
-            //       ),
-            //       shape: MaterialStateProperty.all(
-            //         RoundedRectangleBorder(
-            //           borderRadius: BorderRadius.all(
-            //             Radius.circular(20),
-            //           ),
-            //         ),
-            //       ),
-            //       alignment: Alignment.center,
-            //       padding: MaterialStateProperty.all(
-            //         EdgeInsets.all(0),
-            //       ),
-            //     ),
-            //   ),
-            // ),
           ],
         )
       : Text('');
