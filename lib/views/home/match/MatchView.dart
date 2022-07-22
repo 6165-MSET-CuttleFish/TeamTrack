@@ -67,221 +67,56 @@ class _MatchView extends State<MatchView> {
       }
       _score = _selectedTeam?.scores[_match?.id];
     }
-    totalMaxTotal = event.matches.values
-        .map((element) => [element.red, element.blue])
-        .reduce((value, element) => value + element)
-        .map((e) => e?.total().total())
-        .maxValue();
-    totalMaxInd = event.teams.values
-        .map(
-          (e) => _match == null
-              ? e.targetScore?.total()
-              : e.scores.maxScore(
-                  Dice.none,
-                  false,
-                  null,
-                  null,
-                ),
-        )
-        .maxValue();
-    autoMaxTotal = event.matches.values
-        .map((element) => [element.red, element.blue])
-        .reduce((value, element) => value + element)
-        .map((e) => e?.total().autoScore.total())
-        .maxValue();
-    autoMaxInd = event.teams.values
-        .map(
-          (e) => _match == null
-              ? e.targetScore?.autoScore.total()
-              : e.scores.maxScore(Dice.none, false, OpModeType.auto, null),
-        )
-        .maxValue();
-    teleMaxTotal = event.matches.values
-        .map((element) => [element.red, element.blue])
-        .reduce((value, element) => value + element)
-        .map((e) => e?.total().teleScore.total())
-        .maxValue();
-    teleMaxInd = event.teams.values
-        .map(
-          (e) => _match == null
-              ? e.targetScore?.teleScore.total()
-              : e.scores.maxScore(Dice.none, false, OpModeType.tele, null),
-        )
-        .maxValue();
-    endgameMaxTotal = event.matches.values
-        .map((element) => [element.red, element.blue])
-        .reduce((value, element) => value + element)
-        .map((e) => e?.total().endgameScore.total())
-        .maxValue();
-    endgameMaxInd = event.teams.values
-        .map(
-          (e) => _match == null
-              ? e.targetScore?.endgameScore.total()
-              : e.scores.maxScore(Dice.none, false, OpModeType.endgame, null),
-        )
-        .maxValue();
-    penaltyMaxTotal = event.matches.values
-        .map((element) => [element.red, element.blue])
-        .reduce((value, element) => value + element)
-        .map((e) => e?.total().penalties.total().abs())
-        .maxValue();
-    penaltyMaxInd = event.teams.values
-        .map(
-          (e) => _match == null
-              ? e.targetScore?.penalties.total().abs()
-              : e.scores.maxScore(Dice.none, false, OpModeType.penalty, null),
-        )
-        .maxValue();
-    // cyclesMaxTotal = event.matches.values
-    //     .map((element) => [element.red, element.blue])
-    //     .reduce((value, element) => value + element)
-    //     .map((e) => e?.total().teleScore.totalCycles())
-    //     .maxValue();
-    // cyclesMaxInd = event.teams.values
-    //     .map(
-    //       (e) => _match == null
-    //           ? e.targetScore?.teleScore.totalCycles()
-    //           : e.scores.values
-    //               .map((e) => e.teleScore.totalCycles())
-    //               .maxValue(),
-    //     )
-    //     .maxValue();
-    // teleCyclesMaxTotal = event.matches.values
-    //     .map((element) => [element.red, element.blue])
-    //     .reduce((value, element) => value + element)
-    //     .map((e) => e?.total().teleScore.teleCycles())
-    //     .maxValue();
-    // teleCyclesMaxInd = event.teams.values
-    //     .map(
-    //       (e) => _match == null
-    //           ? e.targetScore?.teleScore.teleCycles()
-    //           : e.scores.values.map((e) => e.teleScore.teleCycles()).maxValue(),
-    //     )
-    //     .maxValue();
-    // endgameCyclesMaxTotal = event.matches.values
-    //     .map((element) => [element.red, element.blue])
-    //     .reduce((value, element) => value + element)
-    //     .map((e) => e?.total().teleScore.endgameCycles())
-    //     .maxValue();
-    // endgameCyclesMaxInd = event.teams.values
-    //     .map(
-    //       (e) => _match == null
-    //           ? e.targetScore?.teleScore.endgameCycles()
-    //           : e.scores.values
-    //               .map((e) => e.teleScore.endgameCycles())
-    //               .maxValue(),
-    //     )
-    //     .maxValue();
-    Score('', Dice.none, event.gameName)
-        .autoScore
-        .getElements()
-        .parse(putNone: false)
-        .forEach(
-      (e) {
-        maxAutoScores[e.key ?? ''] = event.teams.values
-            .map(
-              (team) => team.scores.values
-                  .map((score) => score.autoScore
-                      .getElements()
-                      .parse()
-                      .firstWhere((element) => element.key == e.key,
-                          orElse: () => ScoringElement())
-                      .scoreValue())
-                  .maxValue(),
-            )
-            .maxValue();
-        maxAutoTargets[e.key ?? ''] = event.teams.values
-            .map((team) => team.targetScore?.autoScore
-                .getElements()
-                .parse()
-                .firstWhere((element) => element.key == e.key,
-                    orElse: () => ScoringElement())
-                .scoreValue())
-            .maxValue();
+    [null, ...OpModeType.values].forEach(
+      (type) {
+        maxScoresInd[type] = {};
+        maxScoresTarget[type] = {};
+        maxScoresTotal[type] = {};
       },
     );
-    Score('', Dice.none, event.gameName)
-        .teleScore
-        .getElements()
-        .parse(putNone: false)
-        .forEach(
-      (e) {
-        maxTeleScores[e.key ?? ''] = event.teams.values
-            .map(
-              (team) => team.scores.values
-                  .map((score) => score.teleScore
-                      .getElements()
-                      .parse()
-                      .firstWhere((element) => element.key == e.key,
-                          orElse: () => ScoringElement())
-                      .scoreValue())
-                  .maxValue(),
-            )
-            .maxValue();
-        maxTeleTargets[e.key ?? ''] = event.teams.values
-            .map((team) => team.targetScore?.teleScore
-                .getElements()
-                .parse()
-                .firstWhere((element) => element.key == e.key,
-                    orElse: () => ScoringElement())
-                .scoreValue())
-            .maxValue();
-      },
-    );
-    Score('', Dice.none, event.gameName)
-        .endgameScore
-        .getElements()
-        .parse(putNone: false)
-        .forEach(
-      (e) {
-        maxEndgameScores[e.key ?? ''] = event.teams.values
-            .map(
-              (team) => team.scores.values
-                  .map((score) => score.endgameScore
-                      .getElements()
-                      .parse()
-                      .firstWhere((element) => element.key == e.key,
-                          orElse: () => ScoringElement())
-                      .scoreValue())
-                  .maxValue(),
-            )
-            .maxValue();
-        maxEndgameTargets[e.key ?? ''] = event.teams.values
-            .map((team) => team.targetScore?.endgameScore
-                .getElements()
-                .parse()
-                .firstWhere((element) => element.key == e.key,
-                    orElse: () => ScoringElement())
-                .scoreValue())
-            .maxValue();
-      },
-    );
+    [null, ...OpModeType.values].forEach((type) => [
+          null,
+          ...Score('', Dice.none, event.gameName)
+              .getScoreDivision(type)
+              .getElements()
+              .parse(putNone: false)
+        ].forEach(
+          (element) {
+            maxScoresInd[type]?[element?.key] = event.teams.values
+                .map(
+                  (team) => team.scores.maxScore(
+                    Dice.none,
+                    false,
+                    type,
+                    element?.key,
+                  ),
+                )
+                .maxValue();
+            maxScoresTotal[type]?[element?.key] = event.matches.values
+                .map((element) => [element.red, element.blue])
+                .reduce((value, element) => value + element)
+                .map((alliance) => alliance
+                    ?.combinedScore()
+                    .getScoreDivision(type)
+                    .getScoringElementCount(element?.key)
+                    ?.abs())
+                .maxValue();
+            maxScoresTarget[type]?[element?.key] = event.teams.values
+                .map((team) => team.targetScore
+                    ?.getScoreDivision(type)
+                    .getElements()
+                    .parse()
+                    .firstWhere((element) => element.key == element.key,
+                        orElse: () => ScoringElement())
+                    .scoreValue())
+                .maxValue();
+          },
+        ));
   }
 
-  double totalMaxTotal = 0,
-      totalMaxInd = 0,
-      autoMaxInd = 0,
-      autoMaxTotal = 0,
-      teleMaxInd = 0,
-      teleMaxTotal = 0,
-      endgameMaxInd = 0,
-      endgameMaxTotal = 0,
-      penaltyMaxInd = 0,
-      penaltyMaxTotal = 0;
-  double cyclesMaxInd = 0,
-      cyclesMaxTotal = 0,
-      teleCyclesMaxInd = 0,
-      teleCyclesMaxTotal = 0,
-      endgameCyclesMaxInd = 0,
-      endgameCyclesMaxTotal = 0,
-      missesInd = 0,
-      missesTotal = 0;
-  Map<String, double> maxTeleScores = {};
-  Map<String, double> maxEndgameScores = {};
-  Map<String, double> maxAutoScores = {};
-  Map<String, double> maxAutoTargets = {};
-  Map<String, double> maxTeleTargets = {};
-  Map<String, double> maxEndgameTargets = {};
+  Map<OpModeType?, Map<String?, double>> maxScoresInd = {};
+  Map<OpModeType?, Map<String?, double>> maxScoresTarget = {};
+  Map<OpModeType?, Map<String?, double>> maxScoresTotal = {};
   String? previouslyCycledElement;
 
   @override
@@ -643,38 +478,54 @@ class _MatchView extends State<MatchView> {
                                                       EventType.remote &&
                                                   widget.match != null) ||
                                               _allianceTotal
-                                          ? _selectedAlliance?.total()
+                                          ? _selectedAlliance?.combinedScore()
                                           : _score,
                                       autoMax: (widget.event.type ==
                                                       EventType.remote &&
                                                   widget.match != null) ||
                                               _allianceTotal
-                                          ? autoMaxTotal
-                                          : autoMaxInd,
+                                          ? (maxScoresTotal[OpModeType.auto]
+                                                  ?[null] ??
+                                              0)
+                                          : maxScoresInd[OpModeType.auto]
+                                                  ?[null] ??
+                                              0,
                                       teleMax: (widget.event.type ==
                                                       EventType.remote &&
                                                   widget.match != null) ||
                                               _allianceTotal
-                                          ? teleMaxTotal
-                                          : teleMaxInd,
+                                          ? (maxScoresTotal[OpModeType.tele]
+                                                  ?[null] ??
+                                              0)
+                                          : maxScoresInd[OpModeType.tele]
+                                                  ?[null] ??
+                                              0,
                                       endMax: (widget.event.type ==
                                                       EventType.remote &&
                                                   widget.match != null) ||
                                               _allianceTotal
-                                          ? endgameMaxTotal
-                                          : endgameMaxInd,
+                                          ? (maxScoresTotal[OpModeType.endgame]
+                                                  ?[null] ??
+                                              0)
+                                          : maxScoresInd[OpModeType.endgame]
+                                                  ?[null] ??
+                                              0,
                                       penaltyMax: (widget.event.type ==
                                                       EventType.remote &&
                                                   widget.match != null) ||
                                               _allianceTotal
-                                          ? penaltyMaxTotal
-                                          : penaltyMaxInd,
+                                          ? (maxScoresTotal[OpModeType.penalty]
+                                                  ?[null] ??
+                                              0)
+                                          : maxScoresInd[OpModeType.penalty]
+                                                  ?[null] ??
+                                              0,
                                       totalMax: (widget.event.type ==
                                                       EventType.remote &&
                                                   widget.match != null) ||
                                               _allianceTotal
-                                          ? totalMaxTotal
-                                          : totalMaxInd,
+                                          ? (maxScoresTotal[null]?[null] ?? 0)
+                                          : maxScoresInd[null]?[null] ?? 0,
                                       showPenalties: _showPenalties,
                                       height: 40,
                                     ),
@@ -917,7 +768,7 @@ class _MatchView extends State<MatchView> {
               val: _score?.autoScore.total(markDisconnect: false)?.toDouble() ??
                   0.0,
               max: _selectedAlliance
-                      ?.total()
+                      ?.combinedScore()
                       .autoScore
                       .total(markDisconnect: false)
                       ?.toDouble() ??
@@ -943,8 +794,8 @@ class _MatchView extends State<MatchView> {
                       path: teamPath(OpModeType.auto),
                       score: _score,
                       max: widget.match != null
-                          ? maxAutoScores[e.key] ?? 0
-                          : maxAutoTargets[e.key] ?? 0,
+                          ? (maxScoresInd[OpModeType.auto]?[e.key] ?? 0)
+                          : maxScoresTarget[OpModeType.auto]?[e.key] ?? 0,
                     ),
                   )
                   .toList() ??
@@ -993,7 +844,7 @@ class _MatchView extends State<MatchView> {
                         ?.toDouble() ??
                     0.0,
                 max: _selectedAlliance
-                        ?.total()
+                        ?.combinedScore()
                         .teleScore
                         .total(markDisconnect: false)
                         ?.toDouble() ??
@@ -1035,8 +886,8 @@ class _MatchView extends State<MatchView> {
                         score: _score,
                         mutableIncrement: mutableIncrement,
                         max: widget.match != null
-                            ? maxTeleScores[e.key] ?? 0
-                            : maxTeleTargets[e.key] ?? 0,
+                            ? (maxScoresInd[OpModeType.tele]?[e.key] ?? 0)
+                            : maxScoresTarget[OpModeType.tele]?[e.key] ?? 0,
                       ),
                     )
                     .toList() ??
@@ -1109,7 +960,7 @@ class _MatchView extends State<MatchView> {
                         ?.toDouble() ??
                     0.0,
                 max: _selectedAlliance
-                        ?.total()
+                        ?.combinedScore()
                         .endgameScore
                         .total(markDisconnect: false)
                         ?.toDouble() ??
@@ -1137,8 +988,8 @@ class _MatchView extends State<MatchView> {
                         path: teamPath(OpModeType.endgame),
                         score: _score,
                         max: widget.match != null
-                            ? maxEndgameScores[e.key] ?? 0
-                            : maxEndgameTargets[e.key] ?? 0,
+                            ? (maxScoresInd[OpModeType.endgame]?[e.key] ?? 0)
+                            : maxScoresTarget[OpModeType.endgame]?[e.key] ?? 0,
                       ),
                     )
                     .toList() ??

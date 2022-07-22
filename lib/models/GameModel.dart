@@ -522,19 +522,23 @@ class Alliance {
   bool hasTeam(Team team) =>
       (team1 != null && team1!.equals(team)) ||
       (team2 != null && team2!.equals(team));
+
   int penaltyTotal() =>
       (team1?.scores[id]?.penalties.total() ?? 0) +
       (team2?.scores[id]?.penalties.total() ?? 0);
 
-  Score total() {
+  Score combinedScore() {
     Score returnVal = (team1?.scores[id] ?? Score('', Dice.none, gameName)) +
         (team2?.scores[id] ?? Score('', Dice.none, gameName)) +
         (sharedScore);
     return returnVal;
   }
 
-  int allianceTotal(bool? showPenalties,
-          {OpModeType? type, ScoringElement? element}) =>
+  int allianceTotal(
+    bool? showPenalties, {
+    OpModeType? type,
+    ScoringElement? element,
+  }) =>
       (((team1?.scores[id]
                           ?.getScoreDivision(type)
                           .getScoringElementCount(element?.key) ??
@@ -741,9 +745,9 @@ class Match {
 
   Score? getAllianceScore(String? number) {
     if (number == red?.team1?.number || number == red?.team2?.number)
-      return red?.total();
+      return red?.combinedScore();
     else if (number == blue?.team1?.number || number == blue?.team2?.number)
-      return blue?.total();
+      return blue?.combinedScore();
     return null;
   }
 }

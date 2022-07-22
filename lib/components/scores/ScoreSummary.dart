@@ -57,12 +57,14 @@ class ScoreSummary extends StatelessWidget {
             val: score
                     ?.getScoreDivision(opModeType)
                     .total(showPenalties: showPenalties)
-                    ?.toDouble() ??
+                    ?.toDouble()
+                    .abs() ??
                 0,
-            max: getMax(opModeType),
+            max: getMax(opModeType).abs(),
             title: opModeType.getName(shortened: shortenedNames),
             units: units,
             titleWidthConstraint: titleWidthConstraint,
+            lessIsBetter: opModeType.getLessIsBetter(),
           ),
       ],
     );

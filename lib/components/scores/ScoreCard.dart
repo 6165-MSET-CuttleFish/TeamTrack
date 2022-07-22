@@ -139,12 +139,11 @@ class ScoreCard extends StatelessWidget {
               ? scoreDivisions.standardDeviationScore(dice, removeOutliers)
               : allianceTotals?.standardDeviation() ?? 0,
           max: !allianceTotal
-              ? event.teams.lowestStandardDeviationScore(
-                  dice, removeOutliers, type, null)
+              ? event.teams
+                  .maxStandardDeviationScore(dice, removeOutliers, type, null)
               : maxAllianceDeviation,
-          inverted: true,
           title: 'Deviation',
-          lessIsBetter: type.getLessIsBetter(),
+          lessIsBetter: !type.getLessIsBetter(),
         ),
       ],
     );

@@ -50,6 +50,7 @@ class MatchRow extends StatelessWidget {
         ),
       ),
       child: ListTile(
+        leading: team == null ? Text(index.toString()) : null,
         title: team != null
             ? Column(
                 mainAxisSize: MainAxisSize.min,
@@ -125,7 +126,7 @@ class MatchRow extends StatelessWidget {
 
   ScoreSummary teamSummary(BuildContext context) {
     Score? score = statConfig.allianceTotal
-        ? match.alliance(team)?.total()
+        ? match.alliance(team)?.combinedScore()
         : team?.scores[match.id];
     return ScoreSummary(
       event: event,

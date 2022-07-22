@@ -617,8 +617,11 @@ class Penalty extends ScoreDivision {
   Dice getDice() => dice;
 
   @override
-  int total({bool? showPenalties, bool markDisconnect = false}) =>
-      elements.values.map((e) => e.scoreValue()).sum().toInt();
+  int total({bool? showPenalties, bool markDisconnect = false}) {
+    final list = elements.values.map((e) => e.scoreValue());
+    final sum = list.sum().toInt();
+    return sum;
+  }
 
   Penalty operator +(Penalty other) {
     if (ref == null) {
@@ -626,6 +629,10 @@ class Penalty extends ScoreDivision {
       penalty.dice = dice;
       penalty.majorPenalty = other.majorPenalty + majorPenalty;
       penalty.minorPenalty = other.minorPenalty + minorPenalty;
+      penalty.elements = {
+        'major': penalty.majorPenalty,
+        'minor': penalty.minorPenalty,
+      };
       return penalty;
     } else {
       final penalty = Penalty(ref);

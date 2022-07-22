@@ -17,12 +17,14 @@ class TeamRow extends StatelessWidget {
     this.onTap,
     required this.statConfig,
     required this.elementSort,
+    required this.statistics,
   }) : super(key: key);
   final Team team;
   final Event event;
   final double max;
   final OpModeType? sortMode;
   final ScoringElement? elementSort;
+  final Statistics statistics;
   final void Function()? onTap;
   final StatConfig statConfig;
   Color wltColor(int i) {
@@ -40,13 +42,11 @@ class TeamRow extends StatelessWidget {
     final percentIncrease = statConfig.allianceTotal
         ? event
             .getMatches(team)
-            .map((e) => e.alliance(team)?.total())
+            .map((e) => e.alliance(team)?.combinedScore())
             .whereType<Score>()
             .percentIncrease(elementSort)
-        : team.scores
-            .map(
-                (key, value) => MapEntry(key, value.getScoreDivision(sortMode)))
-            .values
+        : team.scores.values
+            .map((e) => e.getScoreDivision(sortMode))
             .percentIncrease(elementSort);
     final elementName = elementSort?.name ?? "";
     final wlt = (team.getWLT(event) ?? '').split('-');
@@ -91,15 +91,7 @@ class TeamRow extends StatelessWidget {
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (elementName.isNotEmpty)
-              SizedBox(
-                width: 50,
-                child: Text(
-                  elementName,
-                  style: Theme.of(context).textTheme.caption,
-                ),
-              ),
-            if (percentIncrease != null && elementName.isEmpty)
+            if (percentIncrease != null && percentIncrease.isFinite)
               PercentChange(
                 percentIncrease,
                 lessIsBetter: sortMode.getLessIsBetter(),
@@ -109,33 +101,35 @@ class TeamRow extends StatelessWidget {
                 10,
               ),
             ),
-            RotatedBox(
-              quarterTurns: 1,
-              child: BarGraph(
-                height: 70,
-                width: 30,
-                val: statConfig.allianceTotal
-                    ? event.matches.values
-                        .toList()
-                        .spots(
-                          team,
-                          Dice.none,
-                          statConfig.showPenalties,
-                          type: sortMode,
-                          element: elementSort,
-                        )
-                        .removeOutliers(statConfig.removeOutliers)
-                        .map((spot) => spot.y)
-                        .median()
-                    : team.scores.medianScore(
+            BarGraph(
+              height: 70,
+              width: 20,
+              vertical: false,
+              val: statConfig.allianceTotal
+                  ? event.matches.values
+                      .toList()
+                      .spots(
+                        team,
                         Dice.none,
-                        statConfig.removeOutliers,
-                        sortMode,
-                        elementSort,
-                      ),
-                max: max,
-                title: 'Median',
-              ),
+                        statConfig.showPenalties,
+                        type: sortMode,
+                        element: elementSort,
+                      )
+                      .removeOutliers(statConfig.removeOutliers)
+                      .map((spot) => spot.y)
+                      .getStatistic(statistics.getFunction())
+                  : team.scores.customStatisticScore(
+                      Dice.none,
+                      statConfig.removeOutliers,
+                      statistics,
+                      sortMode,
+                      elementSort,
+                    ),
+              max: max,
+              title: '',
+              lessIsBetter: (statistics.getLessIsBetter() ||
+                      sortMode.getLessIsBetter()) &&
+                  !(statistics.getLessIsBetter() && sortMode.getLessIsBetter()),
             ),
             Icon(Icons.navigate_next)
           ],

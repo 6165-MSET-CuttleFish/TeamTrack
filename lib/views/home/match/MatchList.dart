@@ -4,6 +4,7 @@ import 'package:teamtrack/components/misc/EmptyList.dart';
 import 'package:teamtrack/functions/Functions.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/models/StatConfig.dart';
+import 'package:teamtrack/views/home/match/ExampleMatchRow.dart';
 import 'package:teamtrack/views/home/match/MatchConfig.dart';
 import 'package:teamtrack/views/home/match/MatchRow.dart';
 import 'package:teamtrack/models/AppModel.dart';
@@ -76,7 +77,6 @@ class _MatchList extends State<MatchList> {
               title: Text('Matches'),
               backgroundColor: Theme.of(context).colorScheme.primary,
               actions: [
-
                 IconButton(
                   icon: Icon(Icons.settings),
                   tooltip: 'Configure',
@@ -191,137 +191,108 @@ class _MatchList extends State<MatchList> {
       );
 
   Widget _matches([ScrollController? scrollController]) {
+    final allMatches = widget.event.getSortedMatches(widget.ascending);
     final matches =
         (widget.event.type == EventType.remote || widget.team != null)
-            ? widget.event
-                .getSortedMatches(widget.ascending)
+            ? allMatches
                 .where((e) =>
                     e.alliance(
                       widget.event.teams[widget.team?.number],
                     ) !=
                     null)
                 .toList()
-            : widget.event.getSortedMatches(widget.ascending);
+            : allMatches;
     if (matches.length == 0) return EmptyList();
-    double autoMax = 0;
-    double teleMax = 0;
-    double endMax = 0;
-    double totalMax = 0;
-    double penaltyMax = 0;
+    Map<OpModeType?, double> maxScores = {};
     if (widget.team != null) {
-      autoMax = widget.event.statConfig.allianceTotal
-          ? widget.event.matches.values
-              .toList()
-              .spots(widget.team!, Dice.none, false, type: OpModeType.auto)
-              .removeOutliers(widget.event.statConfig.removeOutliers)
-              .map((spot) => spot.y)
-              .maxValue()
-          : widget.team?.scores
-                  .maxScore(Dice.none, false, OpModeType.auto, null) ??
-              0;
-      teleMax = widget.event.statConfig.allianceTotal
-          ? widget.event.matches.values
-              .toList()
-              .spots(widget.team!, Dice.none, false, type: OpModeType.tele)
-              .removeOutliers(widget.event.statConfig.removeOutliers)
-              .map((spot) => spot.y)
-              .maxValue()
-          : widget.team?.scores
-                  .maxScore(Dice.none, false, OpModeType.tele, null) ??
-              0;
-      endMax = widget.event.statConfig.allianceTotal
-          ? widget.event.matches.values
-              .toList()
-              .spots(widget.team!, Dice.none, false, type: OpModeType.endgame)
-              .removeOutliers(widget.event.statConfig.removeOutliers)
-              .map((spot) => spot.y)
-              .maxValue()
-          : widget.team?.scores
-                  .maxScore(Dice.none, false, OpModeType.endgame, null) ??
-              0;
-      totalMax = widget.event.statConfig.allianceTotal
-          ? widget.event.matches.values
-              .toList()
-              .spots(widget.team!, Dice.none, false)
-              .removeOutliers(widget.event.statConfig.removeOutliers)
-              .map((spot) => spot.y)
-              .maxValue()
-          : widget.team?.scores.maxScore(Dice.none, false, null, null) ?? 0;
-          penaltyMax = widget.event.statConfig.allianceTotal
-          ? widget.event.matches.values
-              .toList()
-              .spots(widget.team!, Dice.none, false, type: OpModeType.penalty)
-              .removeOutliers(widget.event.statConfig.removeOutliers)
-              .map((spot) => spot.y)
-              .maxValue()
-          : widget.team?.scores
-                  .maxScore(Dice.none, false, OpModeType.penalty, null) ??
-              0;
+      [null, ...OpModeType.values].forEach((type) {
+        maxScores[type] = widget.event.statConfig.allianceTotal
+            ? widget.event.matches.values
+                .toList()
+                .spots(widget.team!, Dice.none, false, type: type)
+                .removeOutliers(widget.event.statConfig.removeOutliers)
+                .map((spot) => spot.y)
+                .maxValue()
+            : widget.team?.scores.maxScore(Dice.none, false, type, null) ?? 0;
+      });
     }
     return ListView.builder(
-      controller: NewPlatform.isIOS ? null : scrollController,
-      itemCount: matches.length,
-      itemBuilder: (context, index) => Slidable(
-        endActionPane: ActionPane(
-          // A motion is a widget used to control how the pane animates.
-          motion: const StretchMotion(),
-          children: [
-            SlidableAction(
-              icon: Icons.delete,
-              backgroundColor: Colors.red,
-              onPressed: (_) {
-                showPlatformDialog(
-                  context: context,
-                  builder: (BuildContext context) => PlatformAlert(
-                    title: Text('Delete Match'),
-                    content: Text('Are you sure?'),
-                    actions: [
-                      PlatformDialogAction(
-                        isDefaultAction: true,
-                        child: Text('Cancel'),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
+        controller: NewPlatform.isIOS ? null : scrollController,
+        itemCount: matches.length + 1,
+        itemBuilder: (context, index) {
+          if (index == 0)
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: ExampleMatchRow(
+                event: widget.event,
+                team: widget.team,
+              ),
+            );
+          final match = matches[index - 1];
+          final qualNumber = allMatches.indexOf(match);
+          return Slidable(
+            endActionPane: ActionPane(
+              // A motion is a widget used to control how the pane animates.
+              motion: const StretchMotion(),
+              children: [
+                SlidableAction(
+                  icon: Icons.delete,
+                  backgroundColor: Colors.red,
+                  onPressed: (_) {
+                    showPlatformDialog(
+                      context: context,
+                      builder: (BuildContext context) => PlatformAlert(
+                        title: Text('Delete Match'),
+                        content: Text('Are you sure?'),
+                        actions: [
+                          PlatformDialogAction(
+                            isDefaultAction: true,
+                            child: Text('Cancel'),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          PlatformDialogAction(
+                            isDefaultAction: false,
+                            isDestructive: true,
+                            child: Text('Confirm'),
+                            onPressed: () {
+                              setState(
+                                () => widget.event.deleteMatch(match),
+                              );
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
                       ),
-                      PlatformDialogAction(
-                        isDefaultAction: false,
-                        isDestructive: true,
-                        child: Text('Confirm'),
-                        onPressed: () {
-                          setState(
-                            () => widget.event.deleteMatch(matches[index]),
-                          );
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                    ],
-                  ),
-                );
-              },
+                    );
+                  },
+                ),
+              ],
             ),
-          ],
-        ),
-        child: MatchRow(
-          match: matches[index],
-          team: widget.event.teams[widget.team?.number],
-          event: widget.event,
-          index: widget.ascending ? index + 1 : matches.length - index,
-          autoMax: autoMax,
-          teleMax: teleMax,
-          endMax: endMax,
-          totalMax: totalMax,
-          penaltyMax: penaltyMax,
-          statConfig: widget.event.statConfig,
-          onTap: () => navigateToMatch(
-            context,
-            match: matches[index],
-            event: widget.event,
-            team: widget.team,
-            state: this,
-          ),
-        ),
-      ),
-    );
+            child: MatchRow(
+              match: match,
+              team: widget.event.teams[widget.team?.number],
+              event: widget.event,
+              index: widget.ascending
+                  ? qualNumber + 1
+                  : allMatches.length - qualNumber,
+              autoMax: maxScores[OpModeType.auto] ?? 0,
+              teleMax: maxScores[OpModeType.tele] ?? 0,
+              endMax: maxScores[OpModeType.endgame] ?? 0,
+              totalMax: maxScores[null] ?? 0,
+              penaltyMax: maxScores[OpModeType.penalty] ?? 0,
+              statConfig: widget.event.statConfig,
+              onTap: () => navigateToMatch(
+                context,
+                match: match,
+                event: widget.event,
+                team: widget.team,
+                state: this,
+              ),
+            ),
+          );
+        });
   }
 }
 

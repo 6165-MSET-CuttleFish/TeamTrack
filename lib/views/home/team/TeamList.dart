@@ -2,6 +2,7 @@ import 'package:teamtrack/components/misc/EmptyList.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/models/ScoreModel.dart';
 import 'package:teamtrack/models/StatConfig.dart';
+import 'package:teamtrack/views/home/team/ExampleTeamRow.dart';
 import 'package:teamtrack/views/home/team/TeamRow.dart';
 import 'package:teamtrack/views/home/team/TeamView.dart';
 import 'package:teamtrack/models/AppModel.dart';
@@ -19,11 +20,13 @@ class TeamList extends StatefulWidget {
     required this.sortMode,
     required this.statConfig,
     required this.elementSort,
+    required this.statistic,
   }) : super(key: key);
   final Event event;
   final OpModeType? sortMode;
   final ScoringElement? elementSort;
   final StatConfig statConfig;
+  final Statistics statistic;
   @override
   State<StatefulWidget> createState() => _TeamList();
 }
@@ -48,9 +51,10 @@ class _TeamList extends State<TeamList> {
               child: PlatformProgressIndicator(),
             );
           }
-          var max = widget.event.teams.maxMedianScore(
+          var max = widget.event.teams.maxCustomStatisticScore(
             Dice.none,
             widget.statConfig.removeOutliers,
+            widget.statistic,
             widget.sortMode,
             widget.elementSort,
           );
@@ -60,6 +64,7 @@ class _TeamList extends State<TeamList> {
                   widget.elementSort,
                   widget.statConfig,
                   widget.event.matches.values.toList(),
+                  widget.statistic,
                 )
               : widget.event.teams.orderedTeams();
           if (widget.statConfig.allianceTotal) {
@@ -71,93 +76,106 @@ class _TeamList extends State<TeamList> {
                           type: widget.sortMode)
                       .removeOutliers(widget.statConfig.removeOutliers)
                       .map((spot) => spot.y)
-                      .median(),
+                      .getStatistic(widget.statistic.getFunction()),
                 )
                 .maxValue();
           }
           if (teams.length == 0) return EmptyList();
           return ListView.builder(
-            itemCount: teams.length,
-            itemBuilder: (context, index) => Slidable(
-              child: TeamRow(
-                team: teams[index],
-                event: widget.event,
-                sortMode: widget.sortMode,
-                statConfig: widget.statConfig,
-                elementSort: widget.elementSort,
-                max: max,
-                onTap: () async {
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => TeamView(
-                        team: teams[index],
-                        event: widget.event,
-                      ),
-                    ),
-                  );
-                  setState(() {});
-                },
-              ),
-              endActionPane: ActionPane(
-                // A motion is a widget used to control how the pane animates.
-                motion: const StretchMotion(),
-                children: [
-                  SlidableAction(
-                    icon: Icons.delete,
-                    backgroundColor: Colors.red,
-                    onPressed: (_) {
-                      showPlatformDialog(
-                        context: context,
-                        builder: (BuildContext context) => PlatformAlert(
-                          title: Text('Delete Team'),
-                          content: Text('Are you sure?'),
-                          actions: [
-                            PlatformDialogAction(
-                              isDefaultAction: true,
-                              child: Text('Cancel'),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                            PlatformDialogAction(
-                              isDefaultAction: false,
-                              isDestructive: true,
-                              child: Text('Confirm'),
-                              onPressed: () {
-                                String? s;
-                                setState(() {
-                                  s = widget.event.deleteTeam(teams[index]);
-                                });
-                                dataModel.saveEvents();
-                                Navigator.of(context).pop();
-                                if (s != null)
-                                  showPlatformDialog(
-                                    context: context,
-                                    builder: (context) => PlatformAlert(
-                                      title: Text('Error'),
-                                      content:
-                                          Text('Team is present in matches'),
-                                      actions: [
-                                        PlatformDialogAction(
-                                          child: Text('Okay'),
-                                          isDefaultAction: true,
-                                          onPressed: () =>
-                                              Navigator.of(context).pop(),
-                                        )
-                                      ],
-                                    ),
-                                  );
-                              },
-                            ),
-                          ],
+            itemCount: teams.length + 1,
+            itemBuilder: (context, index) {
+              if (index == 0)
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: ExampleTeamRow(
+                    sortMode: widget.sortMode,
+                    elementSort: widget.elementSort,
+                    statistics: widget.statistic,
+                  ),
+                );
+              final team = teams[index - 1];
+              return Slidable(
+                child: TeamRow(
+                  team: team,
+                  event: widget.event,
+                  sortMode: widget.sortMode,
+                  statConfig: widget.statConfig,
+                  elementSort: widget.elementSort,
+                  max: max,
+                  statistics: widget.statistic,
+                  onTap: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => TeamView(
+                          team: team,
+                          event: widget.event,
                         ),
-                      );
-                    },
-                  )
-                ],
-              ),
-            ),
+                      ),
+                    );
+                    setState(() {});
+                  },
+                ),
+                endActionPane: ActionPane(
+                  // A motion is a widget used to control how the pane animates.
+                  motion: const StretchMotion(),
+                  children: [
+                    SlidableAction(
+                      icon: Icons.delete,
+                      backgroundColor: Colors.red,
+                      onPressed: (_) {
+                        showPlatformDialog(
+                          context: context,
+                          builder: (BuildContext context) => PlatformAlert(
+                            title: Text('Delete Team'),
+                            content: Text('Are you sure?'),
+                            actions: [
+                              PlatformDialogAction(
+                                isDefaultAction: true,
+                                child: Text('Cancel'),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                              PlatformDialogAction(
+                                isDefaultAction: false,
+                                isDestructive: true,
+                                child: Text('Confirm'),
+                                onPressed: () {
+                                  String? s;
+                                  setState(() {
+                                    s = widget.event.deleteTeam(team);
+                                  });
+                                  dataModel.saveEvents();
+                                  Navigator.of(context).pop();
+                                  if (s != null)
+                                    showPlatformDialog(
+                                      context: context,
+                                      builder: (context) => PlatformAlert(
+                                        title: Text('Error'),
+                                        content:
+                                            Text('Team is present in matches'),
+                                        actions: [
+                                          PlatformDialogAction(
+                                            child: Text('Okay'),
+                                            isDefaultAction: true,
+                                            onPressed: () =>
+                                                Navigator.of(context).pop(),
+                                          )
+                                        ],
+                                      ),
+                                    );
+                                },
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    )
+                  ],
+                ),
+              );
+            },
           );
         },
       );
@@ -170,9 +188,10 @@ class TeamSearch extends SearchDelegate<String?> {
     this.sortMode,
     required this.statConfig,
     required this.elementSort,
+    required this.statistics,
   }) {
-    max = event.teams.maxMedianScore(
-        Dice.none, statConfig.removeOutliers, sortMode, elementSort);
+    max = event.teams.maxCustomStatisticScore(Dice.none,
+        statConfig.removeOutliers, statistics, sortMode, elementSort);
     final teams = event.teams.values;
     if (statConfig.allianceTotal) {
       max = teams
@@ -182,7 +201,7 @@ class TeamSearch extends SearchDelegate<String?> {
                 .spots(e, Dice.none, statConfig.showPenalties, type: sortMode)
                 .removeOutliers(statConfig.removeOutliers)
                 .map((spot) => spot.y)
-                .median(),
+                .getStatistic(statistics.getFunction()),
           )
           .maxValue();
     }
@@ -193,6 +212,7 @@ class TeamSearch extends SearchDelegate<String?> {
   List<Team> teams;
   Event event;
   StatConfig statConfig;
+  Statistics statistics;
 
   @override
   List<Widget> buildActions(BuildContext context) => [
@@ -231,6 +251,7 @@ class TeamSearch extends SearchDelegate<String?> {
     return ListView.builder(
       itemCount: suggestionList.length,
       itemBuilder: (context, index) => TeamRow(
+        statistics: statistics,
         statConfig: statConfig,
         team: suggestionList[index],
         event: event,

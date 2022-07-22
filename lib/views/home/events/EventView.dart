@@ -33,6 +33,7 @@ class EventView extends StatefulWidget {
 class _EventView extends State<EventView> {
   OpModeType? sortingModifier;
   ScoringElement? elementSort;
+  Statistics statistics = Statistics.MEDIAN;
   bool ascending = false;
 
   List<Widget> materialTabs() => [
@@ -41,6 +42,7 @@ class _EventView extends State<EventView> {
           sortMode: sortingModifier,
           statConfig: widget.event.statConfig,
           elementSort: elementSort,
+          statistic: statistics,
         ),
         MatchList(
           event: widget.event,
@@ -149,6 +151,38 @@ class _EventView extends State<EventView> {
                     }
                     dataModel.saveEvents();
                   }),
+            if (_tab == 0)
+              Center(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    DropdownButton<Statistics>(
+                      value: statistics,
+                      icon: Icon(Icons.functions),
+                      iconSize: 24,
+                      elevation: 16,
+                      underline: Container(
+                        height: 0.5,
+                        color: Colors.deepPurple,
+                      ),
+                      onChanged: (newValue) {
+                        HapticFeedback.lightImpact();
+                        setState(() {
+                          statistics = newValue ?? Statistics.MEDIAN;
+                        });
+                      },
+                      items: Statistics.values
+                          .map(
+                            (value) => DropdownMenuItem<Statistics>(
+                              value: value,
+                              child: Text(value.name),
+                            ),
+                          )
+                          .toList(),
+                    ),
+                  ],
+                ),
+              ),
             _tab != 0
                 ? IconButton(
                     tooltip: "Sort",
@@ -212,14 +246,13 @@ class _EventView extends State<EventView> {
                               );
                           },
                           items: [null, ...OpModeType.values]
-                              .map<DropdownMenuItem<OpModeType?>>(
-                            (value) {
-                              return DropdownMenuItem<OpModeType?>(
-                                value: value,
-                                child: Text(value?.toVal() ?? "Total"),
-                              );
-                            },
-                          ).toList(),
+                              .map(
+                                (value) => DropdownMenuItem<OpModeType?>(
+                                  value: value,
+                                  child: Text(value?.toVal() ?? "Total"),
+                                ),
+                              )
+                              .toList(),
                         ),
                       ],
                     ),
@@ -241,10 +274,12 @@ class _EventView extends State<EventView> {
                                   elementSort,
                                   widget.event.statConfig,
                                   widget.event.matches.values.toList(),
+                                  statistics,
                                 )
                               : widget.event.teams.orderedTeams(),
                           sortMode: sortingModifier,
                           event: widget.event,
+                          statistics: statistics,
                         )
                       : MatchSearch(
                           statConfig: widget.event.statConfig,
