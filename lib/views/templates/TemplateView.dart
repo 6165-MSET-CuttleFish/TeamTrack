@@ -10,12 +10,12 @@ import '../../api/APIKEYS.dart';
 class TemplateView extends StatefulWidget {
   TemplateView({
     Key? key,
-    required this.event_key,
-    required this.event_name,
+    required this.eventKey,
+    required this.eventName,
     this.isPreview = false,
   }) : super(key: key);
-  final String event_key;
-  final String event_name;
+  final String eventKey;
+  final String eventName;
   final bool isPreview;
 
   @override
@@ -29,7 +29,7 @@ class _TemplateView extends State<TemplateView> {
   EventType? _newType;
   String? _newName;
   _getTeams() {
-    APIKEYS.getTeams(widget.event_key).then((response) {
+    APIKEYS.getTeams(widget.eventKey).then((response) {
       setState(() {
         bod = (json.decode(response.body).toList());
         //print(bod);
@@ -38,7 +38,7 @@ class _TemplateView extends State<TemplateView> {
   }
 
   _getInfo() {
-    APIKEYS.getInfo(widget.event_key).then((response) {
+    APIKEYS.getInfo(widget.eventKey).then((response) {
       setState(() {
         data = (json.decode(response.body).toList());
         print(data);
@@ -54,7 +54,7 @@ class _TemplateView extends State<TemplateView> {
 
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: Text(widget.event_name),
+          title: Text(widget.eventName),
           titleTextStyle: TextStyle(fontSize: 20),
           backgroundColor: Theme.of(context).colorScheme.primary,
         ),
@@ -91,12 +91,12 @@ class _TemplateView extends State<TemplateView> {
                   OutlinedButton(
                       onPressed: () {
                         _newType = EventType.local;
-                        _newName = widget.event_name;
+                        _newName = widget.eventName;
                         dataModel.events.add(Event(
                           name: _newName ?? Statics.gameName,
                           type: _newType ?? EventType.remote,
                           gameName: Statics.gameName,
-                          eventKey: widget.event_key,
+                          eventKey: widget.eventKey,
                         ));
                         for (var x in bod) {
                           String _newName =

@@ -50,7 +50,7 @@ class ScoreSummary extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       mainAxisSize: MainAxisSize.max,
       children: [
-        for (final opModeType in [null, ...OpModeType.values])
+        for (final opModeType in opModeExt.getAll())
           BarGraph(
             height: height,
             width: width,

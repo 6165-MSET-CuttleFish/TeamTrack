@@ -286,7 +286,7 @@ class _TeamViewState extends State<TeamView> {
                               crossAxisAlignment: WrapCrossAlignment.center,
                               spacing: 0,
                               children: [
-                                for (final opModeType in [null, ...OpModeType.values])
+                                for (final opModeType in opModeExt.getAll())
                                   FlatButton(
                                     color: getSelection(opModeType)
                                         ? opModeType.getColor()
@@ -375,7 +375,7 @@ class _TeamViewState extends State<TeamView> {
                             child: Text('Target'),
                           ),
                         ),
-                      for (final opModeType in [null, ...OpModeType.values])
+                      for (final opModeType in opModeExt.getAll())
                         Padding(
                           padding: const EdgeInsets.only(top: 20, bottom: 10),
                           child: ScoreCard(
@@ -498,7 +498,7 @@ class _TeamViewState extends State<TeamView> {
                               _team.targetScore?.total()?.toDouble() ?? 0.0
                             ].maxValue(),
                             lineBarsData: [
-                              for (final opModeType in [null, ...OpModeType.values])
+                              for (final opModeType in opModeExt.getAll())
                                 LineChartBarData(
                                   show: _selections[opModeType],
                                   spots: widget.event.statConfig.allianceTotal

@@ -205,14 +205,14 @@ class MatchRow extends StatelessWidget {
         ),
         if (event.eventKey != null)
           Text(
-            match.getRedAPI() != -1
+            match.getRedAPI() != null
                 ? match.getRedAPI().toString() +
                     ' - ' +
                     match.getBlueAPI().toString()
                 : 'Not on API',
             style: GoogleFonts.gugi(
-              fontSize: match.getRedAPI() == -1 ? 10.5 : 12,
-              color: match.getRedAPI() == -1 ? Colors.amber : Colors.green,
+              fontSize: match.getRedAPI() == null ? 10.5 : 12,
+              color: match.getRedAPI() == null ? Colors.amber : Colors.green,
             ),
           ),
       ],

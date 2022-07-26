@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/models/GameModel.dart';
@@ -122,7 +123,7 @@ extension TimestampExt on Timestamp {
   }
 }
 
-extension colorExt on OpModeType? {
+extension opModeExt on OpModeType? {
   Color getColor() {
     switch (this) {
       case OpModeType.auto:
@@ -167,7 +168,23 @@ extension colorExt on OpModeType? {
     }
   }
 
+  static List<OpModeType?> getAll() => [null, ...OpModeType.values];
+
+  static List<OpModeType> getMain() =>
+      [OpModeType.auto, OpModeType.tele, OpModeType.endgame];
+
   bool getLessIsBetter() => this == OpModeType.penalty ? true : false;
+}
+
+extension eventTypeExt on EventType {
+  Icon getIcon({bool filled = true}) => this == EventType.local
+      ? Icon(filled ? CupertinoIcons.person_3_fill : CupertinoIcons.person_3)
+      : Icon(filled
+          ? CupertinoIcons.rectangle_stack_person_crop_fill
+          : CupertinoIcons.rectangle_stack_person_crop);
+
+  String getName({bool filled = true}) =>
+      this == EventType.local ? 'In-Person Event' : 'Driver Practice';
 }
 
 extension StrExt on String {

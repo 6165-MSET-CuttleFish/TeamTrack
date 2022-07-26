@@ -81,101 +81,108 @@ class _TeamList extends State<TeamList> {
                 .maxValue();
           }
           if (teams.length == 0) return EmptyList();
-          return ListView.builder(
-            itemCount: teams.length + 1,
-            itemBuilder: (context, index) {
-              if (index == 0)
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: ExampleTeamRow(
-                    sortMode: widget.sortMode,
-                    elementSort: widget.elementSort,
-                    statistics: widget.statistic,
-                  ),
-                );
-              final team = teams[index - 1];
-              return Slidable(
-                child: TeamRow(
-                  team: team,
-                  event: widget.event,
+          return Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: ExampleTeamRow(
                   sortMode: widget.sortMode,
-                  statConfig: widget.statConfig,
                   elementSort: widget.elementSort,
-                  max: max,
                   statistics: widget.statistic,
-                  onTap: () async {
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => TeamView(
-                          team: team,
-                          event: widget.event,
-                        ),
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: teams.length,
+                  itemBuilder: (context, index) {
+                    final team = teams[index];
+                    return Slidable(
+                      child: TeamRow(
+                        team: team,
+                        event: widget.event,
+                        sortMode: widget.sortMode,
+                        statConfig: widget.statConfig,
+                        elementSort: widget.elementSort,
+                        max: max,
+                        statistics: widget.statistic,
+                        onTap: () async {
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TeamView(
+                                team: team,
+                                event: widget.event,
+                              ),
+                            ),
+                          );
+                          setState(() {});
+                        },
+                      ),
+                      endActionPane: ActionPane(
+                        // A motion is a widget used to control how the pane animates.
+                        motion: const StretchMotion(),
+                        children: [
+                          SlidableAction(
+                            icon: Icons.delete,
+                            backgroundColor: Colors.red,
+                            onPressed: (_) {
+                              showPlatformDialog(
+                                context: context,
+                                builder: (BuildContext context) =>
+                                    PlatformAlert(
+                                  title: Text('Delete Team'),
+                                  content: Text('Are you sure?'),
+                                  actions: [
+                                    PlatformDialogAction(
+                                      isDefaultAction: true,
+                                      child: Text('Cancel'),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                    PlatformDialogAction(
+                                      isDefaultAction: false,
+                                      isDestructive: true,
+                                      child: Text('Confirm'),
+                                      onPressed: () {
+                                        String? s;
+                                        setState(() {
+                                          s = widget.event.deleteTeam(team);
+                                        });
+                                        dataModel.saveEvents();
+                                        Navigator.of(context).pop();
+                                        if (s != null)
+                                          showPlatformDialog(
+                                            context: context,
+                                            builder: (context) => PlatformAlert(
+                                              title: Text('Error'),
+                                              content: Text(
+                                                  'Team is present in matches'),
+                                              actions: [
+                                                PlatformDialogAction(
+                                                  child: Text('Okay'),
+                                                  isDefaultAction: true,
+                                                  onPressed: () =>
+                                                      Navigator.of(context)
+                                                          .pop(),
+                                                )
+                                              ],
+                                            ),
+                                          );
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          )
+                        ],
                       ),
                     );
-                    setState(() {});
                   },
                 ),
-                endActionPane: ActionPane(
-                  // A motion is a widget used to control how the pane animates.
-                  motion: const StretchMotion(),
-                  children: [
-                    SlidableAction(
-                      icon: Icons.delete,
-                      backgroundColor: Colors.red,
-                      onPressed: (_) {
-                        showPlatformDialog(
-                          context: context,
-                          builder: (BuildContext context) => PlatformAlert(
-                            title: Text('Delete Team'),
-                            content: Text('Are you sure?'),
-                            actions: [
-                              PlatformDialogAction(
-                                isDefaultAction: true,
-                                child: Text('Cancel'),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                              PlatformDialogAction(
-                                isDefaultAction: false,
-                                isDestructive: true,
-                                child: Text('Confirm'),
-                                onPressed: () {
-                                  String? s;
-                                  setState(() {
-                                    s = widget.event.deleteTeam(team);
-                                  });
-                                  dataModel.saveEvents();
-                                  Navigator.of(context).pop();
-                                  if (s != null)
-                                    showPlatformDialog(
-                                      context: context,
-                                      builder: (context) => PlatformAlert(
-                                        title: Text('Error'),
-                                        content:
-                                            Text('Team is present in matches'),
-                                        actions: [
-                                          PlatformDialogAction(
-                                            child: Text('Okay'),
-                                            isDefaultAction: true,
-                                            onPressed: () =>
-                                                Navigator.of(context).pop(),
-                                          )
-                                        ],
-                                      ),
-                                    );
-                                },
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    )
-                  ],
-                ),
-              );
-            },
+              ),
+            ],
           );
         },
       );

@@ -25,7 +25,8 @@ class Incrementor extends StatefulWidget {
   final ScoringElement element;
   final void Function() onPressed;
   final void Function(ScoringElement)? onIncrement, onDecrement;
-  final void Function(Object?, ScoringElement)? mutableIncrement, mutableDecrement;
+  final void Function(Object?, ScoringElement)? mutableIncrement,
+      mutableDecrement;
   final Color? backgroundColor;
   final Event? event;
   final Score? score;
@@ -158,7 +159,8 @@ class _Incrementor extends State<Incrementor> {
                         if (!(widget.event?.shared ?? false)) {
                           widget.element.misses--;
                           setState(widget.element.decrement);
-                          if (widget.onDecrement != null) widget.onDecrement!(widget.element);
+                          if (widget.onDecrement != null)
+                            widget.onDecrement!(widget.element);
                         }
                         widget.onPressed();
                         if (widget.path != null)
@@ -168,7 +170,8 @@ class _Incrementor extends State<Incrementor> {
                               .runTransaction(
                             (mutableData) {
                               if (widget.mutableDecrement != null) {
-                                widget.mutableDecrement!(mutableData, widget.element);
+                                widget.mutableDecrement!(
+                                    mutableData, widget.element);
                               }
                               var ref =
                                   (mutableData as Map?)?[widget.element.key];
@@ -193,7 +196,8 @@ class _Incrementor extends State<Incrementor> {
                     ? () async {
                         if (!(widget.event?.shared ?? false)) {
                           setState(widget.element.decrement);
-                          if (widget.onDecrement != null) widget.onDecrement!(widget.element);
+                          if (widget.onDecrement != null)
+                            widget.onDecrement!(widget.element);
                         }
                         widget.onPressed();
                         if (widget.path != null)
@@ -203,7 +207,8 @@ class _Incrementor extends State<Incrementor> {
                               .runTransaction(
                             (mutableData) {
                               if (widget.mutableDecrement != null) {
-                                widget.mutableDecrement!(mutableData, widget.element);
+                                widget.mutableDecrement!(
+                                    mutableData, widget.element);
                               }
                               var ref =
                                   (mutableData as Map?)?[widget.element.key];
@@ -246,7 +251,8 @@ class _Incrementor extends State<Incrementor> {
                     ? () async {
                         if (!(widget.event?.shared ?? false)) {
                           widget.element.increment();
-                          if (widget.onIncrement != null) widget.onIncrement!(widget.element);
+                          if (widget.onIncrement != null)
+                            widget.onIncrement!(widget.element);
                         }
                         widget.onPressed();
                         if (widget.path != null)
@@ -256,7 +262,8 @@ class _Incrementor extends State<Incrementor> {
                               .runTransaction(
                             (mutableData) {
                               if (widget.mutableIncrement != null) {
-                                widget.mutableIncrement!(mutableData, widget.element);
+                                widget.mutableIncrement!(
+                                    mutableData, widget.element);
                               }
                               var ref =
                                   (mutableData as Map?)?[widget.element.key];
@@ -287,80 +294,79 @@ class _Incrementor extends State<Incrementor> {
   @override
   Widget build(BuildContext context) {
     return RawMaterialButton(
-      onLongPress: widget.event?.role != Role.viewer
-          ? (widget.element.count > widget.element.min!() ||
-                  widget.element.misses > 0
-              ? () {
-                  showPlatformDialog(
-                    context: context,
-                    builder: (context) => PlatformAlert(
-                      title: Text("Reset Field"),
-                      content: Text("Are you sure?"),
-                      actions: [
-                        PlatformDialogAction(
-                          child: Text("Cancel"),
-                          onPressed: () => Navigator.pop(context),
-                        ),
-                        PlatformDialogAction(
-                          child: Text("Confirm"),
-                          isDestructive: true,
-                          onPressed: () async {
-                            if (!(widget.event?.shared ?? false)) {
-                              setState(() {
-                                widget.element.count = widget.element.min!();
-                                widget.element.misses = 0;
-                              });
-                              if (widget.onDecrement != null)
-                                widget.onDecrement!(widget.element);
-                            }
-                            widget.onPressed();
-                            if (widget.path != null)
-                              await widget.event
-                                  ?.getRef()
-                                  ?.child(widget.path!)
-                                  .runTransaction(
-                                (mutableData) {
-                                  if (widget.element.isBool &&
-                                      widget.element.nestedElements != null) {
-                                    for (final nestedElement
-                                        in widget.element.nestedElements!) {
-                                      if (nestedElement.key != null) {
-                                        final ref = (mutableData
-                                            as Map?)?[nestedElement.key];
-                                        if (ref is Map) {
-                                          mutableData?[nestedElement.key]
-                                              ['misses'] = 0;
-                                          mutableData?[nestedElement.key]
-                                              ['count'] = 0;
-                                        } else {
-                                          mutableData?[nestedElement.key] = 0;
-                                        }
-                                      }
-                                    }
-                                    return Transaction.success(mutableData);
-                                  }
-                                  final ref = (mutableData
-                                      as Map?)?[widget.element.key];
-                                  if (ref is Map) {
-                                    mutableData?[widget.element.key] = {
-                                      'count': widget.element.min!(),
-                                      'misses': 0,
-                                    };
-                                  } else {
-                                    mutableData?[widget.element.key] =
-                                        widget.element.min!();
-                                  }
-                                  return Transaction.success(mutableData);
-                                },
-                              );
-                            Navigator.pop(context);
-                          },
-                        )
-                      ],
+      onLongPress: widget.event?.role != Role.viewer &&
+              (widget.element.count > widget.element.min!() ||
+                  widget.element.misses > 0)
+          ? () {
+              showPlatformDialog(
+                context: context,
+                builder: (context) => PlatformAlert(
+                  title: Text("Reset Field"),
+                  content: Text("Are you sure?"),
+                  actions: [
+                    PlatformDialogAction(
+                      child: Text("Cancel"),
+                      onPressed: () => Navigator.pop(context),
                     ),
-                  );
-                }
-              : null)
+                    PlatformDialogAction(
+                      child: Text("Confirm"),
+                      isDestructive: true,
+                      onPressed: () async {
+                        if (!(widget.event?.shared ?? false)) {
+                          setState(() {
+                            widget.element.count = widget.element.min!();
+                            widget.element.misses = 0;
+                          });
+                          if (widget.onDecrement != null)
+                            widget.onDecrement!(widget.element);
+                        }
+                        widget.onPressed();
+                        if (widget.path != null)
+                          await widget.event
+                              ?.getRef()
+                              ?.child(widget.path!)
+                              .runTransaction(
+                            (mutableData) {
+                              if (widget.element.isBool &&
+                                  widget.element.nestedElements != null) {
+                                for (final nestedElement
+                                    in widget.element.nestedElements!) {
+                                  if (nestedElement.key != null) {
+                                    final ref = (mutableData
+                                        as Map?)?[nestedElement.key];
+                                    if (ref is Map) {
+                                      mutableData?[nestedElement.key]
+                                          ['misses'] = 0;
+                                      mutableData?[nestedElement.key]['count'] =
+                                          0;
+                                    } else {
+                                      mutableData?[nestedElement.key] = 0;
+                                    }
+                                  }
+                                }
+                                return Transaction.success(mutableData);
+                              }
+                              final ref =
+                                  (mutableData as Map?)?[widget.element.key];
+                              if (ref is Map) {
+                                mutableData?[widget.element.key] = {
+                                  'count': widget.element.min!(),
+                                  'misses': 0,
+                                };
+                              } else {
+                                mutableData?[widget.element.key] =
+                                    widget.element.min!();
+                              }
+                              return Transaction.success(mutableData);
+                            },
+                          );
+                        Navigator.pop(context);
+                      },
+                    )
+                  ],
+                ),
+              );
+            }
           : null,
       onPressed: widget.event?.role != Role.viewer
           ? (widget.element.misses > 0

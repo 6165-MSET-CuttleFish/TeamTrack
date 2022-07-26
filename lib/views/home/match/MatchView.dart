@@ -35,7 +35,7 @@ class _MatchView extends State<MatchView> {
   Team? _selectedTeam;
   Alliance? _selectedAlliance;
   Score? _score;
-  int _view = 0;
+  OpModeType _view = OpModeType.auto;
   Match? _match;
   final blue = Colors.blue;
   final red = CupertinoColors.systemRed;
@@ -67,14 +67,14 @@ class _MatchView extends State<MatchView> {
       }
       _score = _selectedTeam?.scores[_match?.id];
     }
-    [null, ...OpModeType.values].forEach(
+    opModeExt.getAll().forEach(
       (type) {
         maxScoresInd[type] = {};
         maxScoresTarget[type] = {};
         maxScoresTotal[type] = {};
       },
     );
-    [null, ...OpModeType.values].forEach((type) => [
+    opModeExt.getAll().forEach((type) => [
           null,
           ...Score('', Dice.none, event.gameName)
               .getScoreDivision(type)
@@ -128,7 +128,7 @@ class _MatchView extends State<MatchView> {
       final ref = widget.event
           .getRef()
           ?.child('matches/${widget.match?.id}/activeUsers/${user?.uid}');
-      ref?.set(ttuser.toJson(widget.match?.red?.team1?.number));
+      ref?.set(ttuser.toJson(_selectedTeam?.number));
       ref?.onDisconnect().remove();
     } else {
       _allianceTotal = false;
@@ -337,7 +337,8 @@ class _MatchView extends State<MatchView> {
                                     child: Text(
                                       _match
                                               ?.redScore(
-                                                  showPenalties: _showPenalties)
+                                                showPenalties: true,
+                                              )
                                               .toString() ??
                                           '0',
                                       style:
@@ -572,18 +573,19 @@ class _MatchView extends State<MatchView> {
                             if (NewPlatform.isIOS)
                               SizedBox(
                                 width: MediaQuery.of(context).size.width,
-                                child: CupertinoSlidingSegmentedControl(
+                                child: CupertinoSlidingSegmentedControl<
+                                    OpModeType>(
                                   groupValue: _view,
                                   children: {
-                                    0: Text('Autonomous'),
-                                    1: Text('Tele-Op'),
-                                    2: Text('Endgame')
+                                    OpModeType.auto: Text('Autonomous'),
+                                    OpModeType.tele: Text('Tele-Op'),
+                                    OpModeType.endgame: Text('Endgame')
                                   },
-                                  onValueChanged: (int? x) {
+                                  onValueChanged: (OpModeType? type) {
                                     setState(
                                       () {
                                         HapticFeedback.mediumImpact();
-                                        _view = x ?? 0;
+                                        _view = type ?? OpModeType.auto;
                                       },
                                     );
                                   },
@@ -599,17 +601,14 @@ class _MatchView extends State<MatchView> {
                                     unselectedLabelColor: Colors.grey,
                                     labelStyle:
                                         TextStyle(fontFamily: '.SF UI Display'),
-                                    tabs: [
-                                      Tab(
-                                        text: 'Autonomous',
-                                      ),
-                                      Tab(
-                                        text: 'Tele-Op',
-                                      ),
-                                      Tab(
-                                        text: 'Endgame',
-                                      )
-                                    ],
+                                    tabs: opModeExt
+                                        .getMain()
+                                        .map(
+                                          (type) => Tab(
+                                            text: type.getName(),
+                                          ),
+                                        )
+                                        .toList(),
                                   ),
                                 ),
                               ),
@@ -620,22 +619,15 @@ class _MatchView extends State<MatchView> {
                             if (NewPlatform.isAndroid || NewPlatform.isWeb)
                               Expanded(
                                 child: TabBarView(
-                                  children: [
-                                    ListView(
-                                      children: autoView(),
-                                    ),
-                                    ListView(
-                                      children: teleView(),
-                                    ),
-                                    ListView(
-                                      children: endView(),
-                                    )
-                                  ],
+                                  children: opModeExt
+                                      .getMain()
+                                      .map((type) => viewSelect(type))
+                                      .toList(),
                                 ),
                               ),
                             if (NewPlatform.isIOS)
                               Expanded(
-                                child: viewSelect(),
+                                child: viewSelect(_view),
                               )
                           ],
                         ),
@@ -715,21 +707,143 @@ class _MatchView extends State<MatchView> {
     return null;
   }
 
-  ListView viewSelect() {
-    switch (_view) {
-      case 0:
-        return ListView(
-          children: autoView(),
-        );
-      case 1:
-        return ListView(
-          children: teleView(),
-        );
+  String getDcName(OpModeType type) {
+    switch (type) {
+      case OpModeType.auto:
+        return 'autoDc';
+      case OpModeType.tele:
+        return 'teleDc';
       default:
-        return ListView(
-          children: endView(),
-        );
+        return 'endDc';
     }
+  }
+
+  ListView viewSelect(OpModeType type) {
+    return ListView(
+      children: !_paused || _allowView || type == OpModeType.auto
+          ? [
+              if (widget.event.type != EventType.remote && _match != null)
+                RawMaterialButton(
+                  onPressed: () {
+                    setState(() {
+                      _score?.getScoreDivision(type).robotDisconnected =
+                          !(_score?.autoScore.robotDisconnected ?? false);
+                    });
+                    widget.event
+                        .getRef()
+                        ?.child(teamPath(OpModeType.auto))
+                        .parent
+                        ?.update(
+                      {
+                        getDcName(type):
+                            _score?.getScoreDivision(type).robotDisconnected ??
+                                false
+                      },
+                    );
+                  },
+                  fillColor:
+                      (_score?.getScoreDivision(type).robotDisconnected ??
+                              false)
+                          ? Colors.yellow.withOpacity(0.3)
+                          : null,
+                  child: BarGraph(
+                    title: "Contribution",
+                    vertical: false,
+                    height: MediaQuery.of(context).size.width,
+                    width: 15,
+                    val: _score
+                            ?.getScoreDivision(type)
+                            .total(markDisconnect: false)
+                            ?.toDouble() ??
+                        0.0,
+                    max: _selectedAlliance
+                            ?.combinedScore()
+                            .getScoreDivision(type)
+                            .total(markDisconnect: false)
+                            ?.toDouble() ??
+                        0.0,
+                  ),
+                ),
+              Incrementor(
+                backgroundColor: Colors.grey.withOpacity(0.3),
+                element: incrementValue,
+                onPressed: () => setState(
+                  () {
+                    _score?.teleScore.getElements().forEach((element) {
+                      if (!element.isBool) {
+                        element.incrementValue = incrementValue.count;
+                      }
+                      stateSetter();
+                    });
+                  },
+                ),
+              ),
+              if (_score?.getScoreDivision(type).robotDisconnected ?? false)
+                Column(
+                  children: [
+                    Icon(Icons.warning),
+                    Center(child: Text("Robot Disconnected")),
+                  ],
+                ),
+              if (!(_score?.getScoreDivision(type).robotDisconnected ?? false))
+                ..._score
+                        ?.getScoreDivision(type)
+                        .getElements()
+                        .parse()
+                        .map(
+                          (e) => Incrementor(
+                            element: e,
+                            onPressed: () => stateSetter(e.key),
+                            event: widget.event,
+                            path: teamPath(type),
+                            score: _score,
+                            max: widget.match != null
+                                ? (maxScoresInd[type]?[e.key] ?? 0)
+                                : maxScoresTarget[type]?[e.key] ?? 0,
+                          ),
+                        )
+                        .toList() ??
+                    [],
+              if (widget.match != null)
+                ..._selectedAlliance?.sharedScore
+                        .getScoreDivision(type)
+                        .getElements()
+                        .parse()
+                        .map(
+                          (e) => Incrementor(
+                            element: e,
+                            onPressed: () => stateSetter(e.key),
+                            event: widget.event,
+                            path: matchPath(type),
+                            score: _score,
+                            backgroundColor:
+                                getAllianceColor().withOpacity(0.3),
+                          ),
+                        ) ??
+                    [],
+            ]
+          : [
+              Material(
+                child: IconButton(
+                  icon: Icon(Icons.play_arrow),
+                  tooltip: 'Driver Control Play',
+                  onPressed: () {
+                    _paused = false;
+                    _allowView = true;
+                  },
+                ),
+              ),
+              Material(
+                child: IconButton(
+                  icon: Icon(Icons.visibility),
+                  tooltip: 'View',
+                  onPressed: () {
+                    _allowView = true;
+                  },
+                ),
+              ),
+            ],
+    );
   }
 
   String teamPath(OpModeType opModeType) {
@@ -741,297 +855,6 @@ class _MatchView extends State<MatchView> {
 
   String matchPath(OpModeType opModeType) =>
       'matches/${widget.match?.id}/${allianceColor()}/sharedScore/${OpModeType.endgame.toRep()}';
-  List<Widget> autoView() => [
-        if (widget.event.type != EventType.remote && _match != null)
-          RawMaterialButton(
-            onPressed: () {
-              setState(() {
-                _score?.autoScore.robotDisconnected =
-                    !(_score?.autoScore.robotDisconnected ?? false);
-              });
-              widget.event
-                  .getRef()
-                  ?.child(teamPath(OpModeType.auto))
-                  .parent
-                  ?.update(
-                {'autoDc': _score?.autoScore.robotDisconnected ?? false},
-              );
-            },
-            fillColor: (_score?.autoScore.robotDisconnected ?? false)
-                ? Colors.yellow.withOpacity(0.3)
-                : null,
-            child: BarGraph(
-              title: "Contribution",
-              vertical: false,
-              height: MediaQuery.of(context).size.width,
-              width: 15,
-              val: _score?.autoScore.total(markDisconnect: false)?.toDouble() ??
-                  0.0,
-              max: _selectedAlliance
-                      ?.combinedScore()
-                      .autoScore
-                      .total(markDisconnect: false)
-                      ?.toDouble() ??
-                  0.0,
-            ),
-          ),
-        if (_score?.autoScore.robotDisconnected ?? false)
-          Column(
-            children: [
-              Icon(Icons.warning),
-              Center(child: Text("Robot Disconnected")),
-            ],
-          ),
-        if (!(_score?.autoScore.robotDisconnected ?? false))
-          ..._score?.autoScore
-                  .getElements()
-                  .parse()
-                  .map(
-                    (e) => Incrementor(
-                      element: e,
-                      onPressed: () => stateSetter(e.key),
-                      event: widget.event,
-                      path: teamPath(OpModeType.auto),
-                      score: _score,
-                      max: widget.match != null
-                          ? (maxScoresInd[OpModeType.auto]?[e.key] ?? 0)
-                          : maxScoresTarget[OpModeType.auto]?[e.key] ?? 0,
-                    ),
-                  )
-                  .toList() ??
-              [],
-        if (widget.match != null)
-          ..._selectedAlliance?.sharedScore.autoScore.getElements().parse().map(
-                    (e) => Incrementor(
-                      element: e,
-                      onPressed: () => stateSetter(e.key),
-                      event: widget.event,
-                      path: matchPath(OpModeType.auto),
-                      score: _score,
-                      backgroundColor: getAllianceColor().withOpacity(0.3),
-                    ),
-                  ) ??
-              [],
-      ];
-
-  List<Widget> teleView() => !_paused || _allowView
-      ? [
-          if (widget.event.type != EventType.remote && _match != null)
-            RawMaterialButton(
-              onPressed: () {
-                setState(() {
-                  _score?.teleScore.robotDisconnected =
-                      !(_score?.teleScore.robotDisconnected ?? false);
-                });
-                widget.event
-                    .getRef()
-                    ?.child(teamPath(OpModeType.tele))
-                    .parent
-                    ?.update(
-                  {'teleDc': _score?.teleScore.robotDisconnected ?? false},
-                );
-              },
-              fillColor: (_score?.autoScore.robotDisconnected ?? false)
-                  ? Colors.yellow.withOpacity(0.3)
-                  : null,
-              child: BarGraph(
-                title: "Contribution",
-                vertical: false,
-                height: MediaQuery.of(context).size.width,
-                width: 15,
-                val: _score?.teleScore
-                        .total(markDisconnect: false)
-                        ?.toDouble() ??
-                    0.0,
-                max: _selectedAlliance
-                        ?.combinedScore()
-                        .teleScore
-                        .total(markDisconnect: false)
-                        ?.toDouble() ??
-                    0.0,
-              ),
-            ),
-          Incrementor(
-            backgroundColor: Colors.grey.withOpacity(0.3),
-            element: incrementValue,
-            onPressed: () => setState(
-              () {
-                _score?.teleScore.getElements().forEach((element) {
-                  if (!element.isBool) {
-                    element.incrementValue = incrementValue.count;
-                  }
-                  stateSetter();
-                });
-              },
-            ),
-          ),
-          if (_score?.teleScore.robotDisconnected ?? false)
-            Column(
-              children: [
-                Icon(Icons.warning),
-                Center(child: Text("Robot Disconnected")),
-              ],
-            ),
-          if (!(_score?.teleScore.robotDisconnected ?? false))
-            ..._score?.teleScore
-                    .getElements()
-                    .parse()
-                    .map(
-                      (e) => Incrementor(
-                        element: e,
-                        onPressed: () => stateSetter(e.key),
-                        onIncrement: _paused ? null : onIncrement,
-                        event: widget.event,
-                        path: teamPath(OpModeType.tele),
-                        score: _score,
-                        mutableIncrement: mutableIncrement,
-                        max: widget.match != null
-                            ? (maxScoresInd[OpModeType.tele]?[e.key] ?? 0)
-                            : maxScoresTarget[OpModeType.tele]?[e.key] ?? 0,
-                      ),
-                    )
-                    .toList() ??
-                [],
-          if (widget.match != null)
-            ..._selectedAlliance?.sharedScore.teleScore
-                    .getElements()
-                    .parse()
-                    .map(
-                      (e) => Incrementor(
-                        element: e,
-                        onPressed: () => stateSetter(e.key),
-                        event: widget.event,
-                        path: matchPath(OpModeType.tele),
-                        score: _score,
-                        backgroundColor: getAllianceColor().withOpacity(0.3),
-                      ),
-                    ) ??
-                [],
-        ]
-      : [
-          Material(
-            child: IconButton(
-              icon: Icon(Icons.play_arrow),
-              tooltip: 'Driver Control Play',
-              onPressed: () {
-                _paused = false;
-                _allowView = true;
-              },
-            ),
-          ),
-          Material(
-            child: IconButton(
-              icon: Icon(Icons.visibility),
-              tooltip: 'View',
-              onPressed: () {
-                _allowView = true;
-              },
-            ),
-          ),
-        ];
-
-  List<Widget> endView() => !_paused || _allowView
-      ? [
-          if (widget.event.type != EventType.remote && _match != null)
-            RawMaterialButton(
-              onPressed: () {
-                setState(() {
-                  _score?.endgameScore.robotDisconnected =
-                      !(_score?.endgameScore.robotDisconnected ?? false);
-                });
-                widget.event
-                    .getRef()
-                    ?.child(teamPath(OpModeType.endgame))
-                    .parent
-                    ?.update(
-                  {'endDc': _score?.endgameScore.robotDisconnected ?? false},
-                );
-              },
-              fillColor: (_score?.autoScore.robotDisconnected ?? false)
-                  ? Colors.yellow.withOpacity(0.3)
-                  : null,
-              child: BarGraph(
-                title: "Contribution",
-                vertical: false,
-                height: MediaQuery.of(context).size.width,
-                width: 15,
-                val: _score?.endgameScore
-                        .total(markDisconnect: false)
-                        ?.toDouble() ??
-                    0.0,
-                max: _selectedAlliance
-                        ?.combinedScore()
-                        .endgameScore
-                        .total(markDisconnect: false)
-                        ?.toDouble() ??
-                    0.0,
-              ),
-            ),
-          if (_score?.endgameScore.robotDisconnected ?? false)
-            Column(
-              children: [
-                Icon(Icons.warning),
-                Center(child: Text("Robot Disconnected")),
-              ],
-            ),
-          if (!(_score?.endgameScore.robotDisconnected ?? false))
-            ..._score?.endgameScore
-                    .getElements()
-                    .parse()
-                    .map(
-                      (e) => Incrementor(
-                        element: e,
-                        onPressed: () => stateSetter(e.key),
-                        onIncrement: _paused ? null : onIncrement,
-                        event: widget.event,
-                        mutableIncrement: mutableIncrement,
-                        path: teamPath(OpModeType.endgame),
-                        score: _score,
-                        max: widget.match != null
-                            ? (maxScoresInd[OpModeType.endgame]?[e.key] ?? 0)
-                            : maxScoresTarget[OpModeType.endgame]?[e.key] ?? 0,
-                      ),
-                    )
-                    .toList() ??
-                [],
-          Padding(padding: EdgeInsets.all(5)),
-          if (widget.match != null)
-            ..._selectedAlliance?.sharedScore.endgameScore
-                    .getElements()
-                    .parse()
-                    .map(
-                      (e) => Incrementor(
-                        element: e,
-                        onPressed: () => stateSetter(e.key),
-                        event: widget.event,
-                        path: matchPath(OpModeType.endgame),
-                        score: _score,
-                        backgroundColor: getAllianceColor().withOpacity(0.3),
-                      ),
-                    ) ??
-                [],
-        ]
-      : [
-          Material(
-            child: IconButton(
-              tooltip: 'Driver Control Play',
-              icon: Icon(Icons.play_arrow),
-              onPressed: () {
-                _paused = false;
-                _allowView = true;
-              },
-            ),
-          ),
-          Material(
-            child: IconButton(
-              icon: Icon(Icons.visibility),
-              tooltip: 'View',
-              onPressed: () {
-                _allowView = true;
-              },
-            ),
-          ),
-        ];
 
   void mutableIncrement(Object? mutableData, ScoringElement element) {
     if (widget.match == null) return;

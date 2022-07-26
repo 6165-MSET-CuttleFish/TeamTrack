@@ -36,6 +36,7 @@ class ScoreCard extends StatelessWidget {
   final List<Match>? matches;
   final Score? teamMaxScore;
   final Score? maxScore;
+
   @override
   Widget build(BuildContext context) {
     final allianceTotals = matches
@@ -46,46 +47,6 @@ class ScoreCard extends StatelessWidget {
         .spots(team, dice, false, type: type)
         .removeOutliers(removeOutliers)
         .map((spot) => spot.y);
-    final maxAllianceDeviation = event.teams.values
-        .map(
-          (e) => event.matches.values
-              .toList()
-              .spots(e, Dice.none, false, type: type)
-              .removeOutliers(removeOutliers)
-              .map((spot) => spot.y)
-              .standardDeviation(),
-        )
-        .minValue();
-    final maxAllianceMean = event.teams.values
-        .map(
-          (e) => event.matches.values
-              .toList()
-              .spots(e, Dice.none, false, type: type)
-              .removeOutliers(removeOutliers)
-              .map((spot) => spot.y)
-              .mean(),
-        )
-        .maxValue();
-    final maxAllianceMedian = event.teams.values
-        .map(
-          (e) => event.matches.values
-              .toList()
-              .spots(e, Dice.none, false, type: type)
-              .removeOutliers(removeOutliers)
-              .map((spot) => spot.y)
-              .median(),
-        )
-        .maxValue();
-    final maxAllianceBest = event.teams.values
-        .map(
-          (e) => event.matches.values
-              .toList()
-              .spots(e, Dice.none, false, type: type)
-              .removeOutliers(removeOutliers)
-              .map((spot) => spot.y)
-              .maxValue(),
-        )
-        .maxValue();
     final maxY = [
       event.matches.values
           .toList()
@@ -101,52 +62,6 @@ class ScoreCard extends StatelessWidget {
       ),
       team.targetScore?.getScoreDivision(type).total() ?? 0,
     ].minValue();
-    final stats = Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        BarGraph(
-          val: !allianceTotal
-              ? scoreDivisions.meanScore(dice, removeOutliers)
-              : allianceTotals?.mean() ?? 0,
-          max: !allianceTotal
-              ? event.teams.maxMeanScore(dice, removeOutliers, type, null)
-              : maxAllianceMean,
-          title: 'Mean',
-          lessIsBetter: type.getLessIsBetter(),
-        ),
-        BarGraph(
-          val: !allianceTotal
-              ? scoreDivisions.medianScore(dice, removeOutliers)
-              : allianceTotals?.median() ?? 0,
-          max: !allianceTotal
-              ? event.teams.maxMedianScore(dice, removeOutliers, type, null)
-              : maxAllianceMedian,
-          title: 'Median',
-          lessIsBetter: type.getLessIsBetter(),
-        ),
-        BarGraph(
-          val: !allianceTotal
-              ? scoreDivisions.maxScore(dice, removeOutliers)
-              : allianceTotals?.maxValue() ?? 0,
-          max: !allianceTotal
-              ? event.teams.maxScore(dice, removeOutliers, type)
-              : maxAllianceBest,
-          title: 'Best',
-          lessIsBetter: type.getLessIsBetter(),
-        ),
-        BarGraph(
-          val: !allianceTotal
-              ? scoreDivisions.standardDeviationScore(dice, removeOutliers)
-              : allianceTotals?.standardDeviation() ?? 0,
-          max: !allianceTotal
-              ? event.teams
-                  .maxStandardDeviationScore(dice, removeOutliers, type, null)
-              : maxAllianceDeviation,
-          title: 'Deviation',
-          lessIsBetter: !type.getLessIsBetter(),
-        ),
-      ],
-    );
     return CardView(
       type: type,
       title: title,
@@ -156,13 +71,46 @@ class ScoreCard extends StatelessWidget {
               .removeOutliers(removeOutliers)
               .length >
           1,
-      child: Padding(padding: EdgeInsets.only(left: 5, right: 5), child: stats),
+      child: Padding(
+        padding: EdgeInsets.only(left: 5, right: 5),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: Statistics.values
+              .map(
+                (statistic) => BarGraph(
+                  val: !allianceTotal
+                      ? scoreDivisions.customStatisticScore(
+                          dice, removeOutliers, statistic)
+                      : allianceTotals?.getStatistic(statistic.getFunction()) ??
+                          0,
+                  max: !allianceTotal
+                      ? event.teams.maxCustomStatisticScore(
+                          dice, removeOutliers, statistic, type, null)
+                      : event.teams.values
+                          .map(
+                            (e) => event.matches.values
+                                .toList()
+                                .spots(e, Dice.none, false, type: type)
+                                .removeOutliers(removeOutliers)
+                                .map((spot) => spot.y)
+                                .getStatistic(statistic.getFunction()),
+                          )
+                          .maxValue(),
+                  title: statistic.name,
+                  lessIsBetter: (statistic.getLessIsBetter() ||
+                          type.getLessIsBetter()) &&
+                      !(statistic.getLessIsBetter() && type.getLessIsBetter()),
+                ),
+              )
+              .toList(),
+        ),
+      ),
       collapsed: scoreDivisions
                   .diceScores(dice)
                   .map((score) => score.total())
                   .removeOutliers(removeOutliers)
                   .length >
-              1
+              1 // only allow card expand if the amount of scores is greater than 1
           ? [
               AspectRatio(
                 aspectRatio: 2,

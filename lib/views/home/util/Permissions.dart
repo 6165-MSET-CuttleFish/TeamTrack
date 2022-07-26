@@ -1,4 +1,4 @@
-import 'package:firebase_database/firebase_database.dart' as Database;
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -18,7 +18,7 @@ class Permissions extends StatefulWidget {
       : super(key: key);
   final List<TeamTrackUser> users;
   final TeamTrackUser? currentUser;
-  final Database.DatabaseReference? ref;
+  final DatabaseReference? ref;
   final Event event;
   @override
   _PermissionsState createState() => _PermissionsState();

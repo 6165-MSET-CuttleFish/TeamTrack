@@ -88,8 +88,8 @@ class ScoringElementStats extends StatelessWidget {
                                 .misses,
                           )
                           .toList(),
-                      xValueMapper: (int misses, _) => _ + 1,
-                      yValueMapper: (int misses, _) => misses,
+                      xValueMapper: (misses, _) => _ + 1,
+                      yValueMapper: (misses, _) => misses,
                     ),
                     LineSeries<int, int>(
                       xAxisName: "Match",
@@ -104,9 +104,10 @@ class ScoringElementStats extends StatelessWidget {
                                 .firstWhere((f) => f.key == element.key)
                                 .totalAttempted(),
                           )
+                          .whereType<int>()
                           .toList(),
-                      xValueMapper: (int misses, _) => _ + 1,
-                      yValueMapper: (int misses, _) => misses,
+                      xValueMapper: (misses, _) => _ + 1,
+                      yValueMapper: (misses, _) => misses,
                     ),
                     LineSeries<int, int>(
                       xAxisName: "Match",
@@ -121,6 +122,7 @@ class ScoringElementStats extends StatelessWidget {
                                 .firstWhere((f) => f.key == element.key)
                                 .totalAttempted(), // TODO: add tele/end cycles
                           )
+                          .whereType<int>()
                           .toList(),
                       xValueMapper: (int misses, _) => _ + 1,
                       yValueMapper: (int misses, _) => misses,
@@ -144,14 +146,7 @@ class ScoringElementStats extends StatelessWidget {
         units: ' pts',
         vertical: false,
       );
-  // BarGraph buildNestedGraph(BuildContext context) => BarGraph(
-  //       val: element.scoreValue().toDouble(),
-  //       max: maxElement.scoreValue().toDouble(),
-  //       width: 20,
-  //       height: 60,
-  //       title: "Median",
-  //       vertical: false,
-  //     );
+
   BarGraph buildAccuracyGraph(BuildContext context) => BarGraph(
         val: element.count.toDouble(),
         max: maxElement.count.toDouble(),

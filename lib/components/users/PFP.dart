@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/functions/Extensions.dart';
 
+/// Display's a [user]'s profile picture
 class PFP extends StatelessWidget {
   const PFP({
     Key? key,
@@ -28,9 +29,7 @@ class PFP extends StatelessWidget {
                       height: size,
                     ),
                   )
-                : Icon(
-                    Icons.person,
-                  ),
+                : Icon(Icons.person),
             if (showRole) user.role.getIcon(size: (size / 28) * 14),
           ],
         ),

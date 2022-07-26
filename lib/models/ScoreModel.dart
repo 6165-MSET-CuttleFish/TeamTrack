@@ -216,14 +216,8 @@ class Score extends ScoreDivision implements Comparable<Score> {
     }
   }
 
-  void reset() => [
-        teleScore,
-        autoScore,
-        endgameScore,
-        penalties,
-      ].forEach(
-        (e) => e.reset(),
-      );
+  void reset() =>
+      OpModeType.values.forEach((type) => getScoreDivision(type).reset());
 
   Score operator +(Score other) {
     Score result = Score(id, dice, gameName, isAllianceScore: isAllianceScore);
@@ -470,13 +464,11 @@ class TeleScore extends ScoreDivision {
       elements.map((key, value) => MapEntry(key, value.toJson()));
 }
 
-List<double> decodeArray(List<dynamic>? map) {
-  if (map == null) return [];
-  final x = List<num>.from(json.decode(map.toString()))
-      .map((e) => e.toDouble())
-      .toList();
-  return x;
-}
+List<double> decodeArray(List<dynamic>? map) => map == null
+    ? []
+    : List<num>.from(json.decode(map.toString()))
+        .map((e) => e.toDouble())
+        .toList();
 
 /// This class is used to represent the endgame score structure of traditional and remote FTC events.
 /// Remote config capable, so to change the structure of endgame, do so in the Firebase Remote Config console
@@ -697,7 +689,7 @@ class Penalty extends ScoreDivision {
 }
 
 /// This class is used to represent a Scoring Element of FTC events.
-class ScoringElement {
+class ScoringElement implements Scorable {
   ScoringElement({
     this.name = '',
     this.count = 0,
@@ -716,12 +708,14 @@ class ScoringElement {
   }
   String name;
   String? key;
-  int count;
-  int misses;
+  int count = 0;
+  int misses = 0;
+  int normalCycles = 0;
+  int endgameCycles = 0;
   int value;
   int? totalValue;
   String? id;
-  List<double> cycleTimes;
+  List<double> cycleTimes = [];
   List<ScoringElement>? nestedElements;
   bool isBool;
   late int Function()? min = () => 0;
@@ -748,15 +742,19 @@ class ScoringElement {
   bool didAttempt() =>
       misses > 0 ||
       count > 0 ||
-      (nestedElements?.reduce((value, element) {
-            if (element.didAttempt()) value.count = 1;
-            return value;
-          }).didAttempt() ??
+      (nestedElements?.reduce(
+            (value, element) {
+              if (element.didAttempt()) value.count = 1;
+              return value;
+            },
+          ).didAttempt() ??
           false);
 
-  int totalAttempted() => count + misses;
+  int? totalAttempted() => didAttempt() ? count + misses : null;
 
   int? countFactoringAttempted() => didAttempt() ? count : null;
+
+  int? total() => didAttempt() ? scoreValue() : null;
 
   int? scoreValueFactoringAttempted() => didAttempt() ? scoreValue() : null;
 
@@ -779,7 +777,26 @@ class ScoringElement {
         'count': count,
         'misses': misses,
         'cycleTimes': cycleTimes,
+        'normalCycles': normalCycles,
+        'endgameCycles': endgameCycles,
       };
+
+  ScoringElement.fromJson(
+    Map<String, dynamic> map, {
+    required this.name,
+    required this.value,
+    required this.key,
+    this.isBool = false,
+    this.max,
+    this.min,
+  }) {
+    count = map['count'];
+    misses = map['misses'];
+    cycleTimes = decodeArray(map['cycleTimes']);
+    normalCycles = map['normalCycles'];
+    endgameCycles = map['endgameCycles'];
+    setStuff();
+  }
 
   ScoringElement operator +(ScoringElement other) {
     return ScoringElement(
@@ -795,7 +812,7 @@ class ScoringElement {
   }
 }
 
-abstract class ScoreDivision {
+abstract class ScoreDivision implements Scorable {
   int? total({bool? showPenalties, bool markDisconnect = true}) =>
       (markDisconnect && robotDisconnected)
           ? null
@@ -828,6 +845,10 @@ abstract class ScoreDivision {
       return scoringElement.scoreValue();
     return null;
   }
+}
+
+abstract class Scorable {
+  int? total();
 }
 
 // example skeleton for the firabase remote config game skeleton (current example is not optimal and there are probably areas in the config where you can reduce redundancies)
