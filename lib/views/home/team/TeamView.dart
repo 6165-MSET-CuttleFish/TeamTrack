@@ -1,3 +1,4 @@
+import 'package:teamtrack/components/AutonDrawingTool.dart';
 import 'package:teamtrack/components/misc/Collapsible.dart';
 import 'package:teamtrack/components/misc/EmptyList.dart';
 import 'package:teamtrack/components/misc/PlatformGraphics.dart';
@@ -47,6 +48,7 @@ class _TeamViewState extends State<TeamView> {
 
   Score? maxScore;
   Score? teamMaxScore;
+  AutonPainter painter=AutonPainter();
 
   @override
   void initState() {
@@ -401,6 +403,10 @@ class _TeamViewState extends State<TeamView> {
                         ),
                     ],
                   ),
+                ),
+                Container(
+                  height: 300,
+                  child: painter,
                 )
               ],
             );
