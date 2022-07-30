@@ -13,6 +13,7 @@ import 'package:teamtrack/views/auth/Login.dart';
 import 'package:teamtrack/views/home/events/EventsList.dart';
 import 'package:teamtrack/views/inbox/BlockList.dart';
 import 'package:teamtrack/views/inbox/Inbox.dart';
+import 'package:teamtrack/views/teams/TeamLanding.dart';
 import 'package:teamtrack/views/templates/TemplatesList.dart';
 
 class LandingPage extends StatefulWidget {
@@ -27,6 +28,7 @@ enum Tab {
   inbox,
   blocked_users,
   templates,
+  teams,
 }
 
 var tab = Tab.events;
@@ -54,6 +56,8 @@ class _LandingPageState extends State<LandingPage> {
         return Text("Templates");
       case Tab.events:
         return Text("Events");
+      case Tab.teams:
+        return Text("Teams");
     }
   }
 
@@ -67,6 +71,8 @@ class _LandingPageState extends State<LandingPage> {
         return TemplatesList();
       case Tab.events:
         return EventsList();
+      case Tab.teams:
+        return TeamLanding();
     }
   }
 
@@ -344,6 +350,15 @@ class _LandingPageState extends State<LandingPage> {
                               builder: (context) => LoginView(returnBack: true),
                             ),
                           ),
+                        ),
+                      if (!(context.read<User?>()?.isAnonymous ?? true))
+                        ListTile(
+                          leading: Icon(Icons.six_ft_apart),
+                          title: Text("Teams"),
+                          onTap: () {
+                            setState(() => tab = Tab.teams);
+                            Navigator.of(context).pop();
+                          },
                         ),
                       ListTile(
                         leading: Icon(Icons.logout),

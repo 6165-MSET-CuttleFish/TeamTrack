@@ -34,29 +34,15 @@ class _CardView extends State<CardView> {
           HapticFeedback.mediumImpact();
           if (widget.isActive) {
             Navigator.of(context).push(
-              expandPageRoute(
+              platformPageRoute(
                 builder: (context) => Scaffold(
                   body: CustomScrollView(
                     slivers: [
                       SliverAppBar(
                         title: Text(widget.title),
-                        expandedHeight: 280,
+                        expandedHeight: 0,
                         stretch: true,
                         pinned: true,
-                        flexibleSpace: FlexibleSpaceBar(
-                          expandedTitleScale: 1.0,
-                          background: Hero(
-                            tag: widget.title,
-                            child: widget.child,
-                          ),
-                          title: Hero(
-                            tag: widget.type ?? Null,
-                            child: Text(
-                              widget.title,
-                              style: Theme.of(context).textTheme.caption,
-                            ),
-                          ),
-                        ),
                       ),
                       SliverList(
                           delegate: SliverChildListDelegate(widget.collapsed)),

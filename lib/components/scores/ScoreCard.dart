@@ -156,7 +156,7 @@ class ScoreCard extends StatelessWidget {
               .removeOutliers(removeOutliers)
               .length >
           1,
-      child: Padding(padding: EdgeInsets.only(left: 5, right: 5), child: stats),
+      child: Padding(padding: EdgeInsets.only(left: 25, right: 15), child: stats),
       collapsed: scoreDivisions
                   .diceScores(dice)
                   .map((score) => score.total())
@@ -164,6 +164,7 @@ class ScoreCard extends StatelessWidget {
                   .length >
               1
           ? [
+        Padding(padding: EdgeInsets.only(left: 25, right: 15), child: stats),
               AspectRatio(
                 aspectRatio: 2,
                 child: Container(
@@ -175,7 +176,7 @@ class ScoreCard extends StatelessWidget {
                   ),
                   child: Padding(
                     padding: const EdgeInsets.only(
-                        right: 50.0, left: 12.0, top: 24, bottom: 12),
+                        right: 25.0, left: 12.0, top: 24, bottom: 12),
                     child: LineChart(
                       LineChartData(
                         gridData: FlGridData(
