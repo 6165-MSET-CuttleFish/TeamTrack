@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:teamtrack/components/users/PFP.dart';
 import 'package:teamtrack/models/AppModel.dart';
 
+/// Displays [users] profile pictures in a row
 class UsersRow extends StatelessWidget {
   const UsersRow({
     Key? key,

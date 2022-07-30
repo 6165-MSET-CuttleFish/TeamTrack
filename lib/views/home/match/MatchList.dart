@@ -280,11 +280,7 @@ class _MatchList extends State<MatchList> {
                     index: widget.ascending
                         ? qualNumber + 1
                         : allMatches.length - qualNumber,
-                    autoMax: maxScores[OpModeType.auto] ?? 0,
-                    teleMax: maxScores[OpModeType.tele] ?? 0,
-                    endMax: maxScores[OpModeType.endgame] ?? 0,
-                    totalMax: maxScores[null] ?? 0,
-                    penaltyMax: maxScores[OpModeType.penalty] ?? 0,
+                    maxes: maxScores,
                     statConfig: widget.event.statConfig,
                     onTap: () => navigateToMatch(
                       context,

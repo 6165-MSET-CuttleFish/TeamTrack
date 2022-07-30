@@ -15,22 +15,14 @@ class MatchRow extends StatelessWidget {
     required this.index,
     this.onTap,
     this.team,
-    this.autoMax = 0,
-    this.teleMax = 0,
-    this.endMax = 0,
-    this.totalMax = 0,
-    this.penaltyMax = 0,
+    this.maxes = const {},
     required this.statConfig,
   }) : super(key: key);
   final Event event;
   final Match match;
   final int index;
   final Team? team;
-  final double autoMax;
-  final double teleMax;
-  final double endMax;
-  final double totalMax;
-  final double penaltyMax;
+  final Map<OpModeType?, double> maxes;
   final StatConfig statConfig;
   final void Function()? onTap;
   final double width = 30;
@@ -131,11 +123,7 @@ class MatchRow extends StatelessWidget {
     return ScoreSummary(
       event: event,
       score: score,
-      autoMax: autoMax,
-      teleMax: teleMax,
-      endMax: endMax,
-      totalMax: totalMax,
-      penaltyMax: penaltyMax,
+      maxes: maxes,
       showPenalties: event.statConfig.showPenalties,
       shortenedNames: true,
     );

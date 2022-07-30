@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+/// Displays the [percentIncrease] with a widget
 class PercentChange extends StatelessWidget {
   const PercentChange(
     this.percentIncrease, {

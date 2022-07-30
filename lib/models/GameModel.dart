@@ -57,7 +57,8 @@ class Event {
 
   TeamTrackUser? author;
   String gameName = Statics.gameName;
-  Role role = Role.editor;
+  Role role =
+      Role.editor; // the permissions enabled for the current user in this event
   bool shared = false;
   EventType type = EventType.remote;
   Map<String, Team> teams = {};

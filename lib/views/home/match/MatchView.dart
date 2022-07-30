@@ -107,7 +107,7 @@ class _MatchView extends State<MatchView> {
                     .getElements()
                     .parse()
                     .firstWhere((element) => element.key == element.key,
-                        orElse: () => ScoringElement())
+                        orElse: () => ScoringElement.nullScore())
                     .scoreValue())
                 .maxValue();
           },
@@ -159,6 +159,30 @@ class _MatchView extends State<MatchView> {
     super.dispose();
   }
 
+  Map<OpModeType?, double> getMaxScoreInd() {
+    Map<OpModeType?, double> maxScore = {};
+    for (final type in opModeExt.getAll()) {
+      maxScore[type] = maxScoresInd[type]?[null] ?? 0;
+    }
+    return maxScore;
+  }
+
+  Map<OpModeType?, double> getMaxScoreTotal() {
+    Map<OpModeType?, double> maxScore = {};
+    for (final type in opModeExt.getAll()) {
+      maxScore[type] = maxScoresTotal[type]?[null] ?? 0;
+    }
+    return maxScore;
+  }
+
+  Map<OpModeType?, double> getMaxScoreTarget() {
+    Map<OpModeType?, double> maxScore = {};
+    for (final type in opModeExt.getAll()) {
+      maxScore[type] = maxScoresTarget[type]?[null] ?? 0;
+    }
+    return maxScore;
+  }
+
   @override
   Widget build(BuildContext context) => StreamBuilder<DatabaseEvent>(
         stream: widget.event.getRef()?.onValue,
@@ -181,7 +205,7 @@ class _MatchView extends State<MatchView> {
             } else {
               _score = _selectedTeam?.scores[_match?.id];
               _score?.teleScore.getElements().forEach((element) {
-                element.incrementValue = incrementValue.count;
+                element.incrementValue = incrementValue.normalCount;
               });
             }
           }
@@ -201,8 +225,8 @@ class _MatchView extends State<MatchView> {
                 }
               }
               final secondsLeft = 120 - _time;
-              final minutes = secondsLeft >= 0 ? secondsLeft ~/ 60 : 0;
-              final seconds = secondsLeft >= 0 ? secondsLeft % 60 : 0;
+              final minutes = secondsLeft >= 0 ? secondsLeft ~/ 60 : 0.0;
+              final seconds = secondsLeft >= 0 ? secondsLeft % 60 : 0.0;
               String timerText =
                   '$minutes:${seconds.toInt().toString().padLeft(2, '0')}';
               return Container(
@@ -481,52 +505,12 @@ class _MatchView extends State<MatchView> {
                                               _allianceTotal
                                           ? _selectedAlliance?.combinedScore()
                                           : _score,
-                                      autoMax: (widget.event.type ==
+                                      maxes: (widget.event.type ==
                                                       EventType.remote &&
                                                   widget.match != null) ||
                                               _allianceTotal
-                                          ? (maxScoresTotal[OpModeType.auto]
-                                                  ?[null] ??
-                                              0)
-                                          : maxScoresInd[OpModeType.auto]
-                                                  ?[null] ??
-                                              0,
-                                      teleMax: (widget.event.type ==
-                                                      EventType.remote &&
-                                                  widget.match != null) ||
-                                              _allianceTotal
-                                          ? (maxScoresTotal[OpModeType.tele]
-                                                  ?[null] ??
-                                              0)
-                                          : maxScoresInd[OpModeType.tele]
-                                                  ?[null] ??
-                                              0,
-                                      endMax: (widget.event.type ==
-                                                      EventType.remote &&
-                                                  widget.match != null) ||
-                                              _allianceTotal
-                                          ? (maxScoresTotal[OpModeType.endgame]
-                                                  ?[null] ??
-                                              0)
-                                          : maxScoresInd[OpModeType.endgame]
-                                                  ?[null] ??
-                                              0,
-                                      penaltyMax: (widget.event.type ==
-                                                      EventType.remote &&
-                                                  widget.match != null) ||
-                                              _allianceTotal
-                                          ? (maxScoresTotal[OpModeType.penalty]
-                                                  ?[null] ??
-                                              0)
-                                          : maxScoresInd[OpModeType.penalty]
-                                                  ?[null] ??
-                                              0,
-                                      totalMax: (widget.event.type ==
-                                                      EventType.remote &&
-                                                  widget.match != null) ||
-                                              _allianceTotal
-                                          ? (maxScoresTotal[null]?[null] ?? 0)
-                                          : maxScoresInd[null]?[null] ?? 0,
+                                          ? getMaxScoreTotal()
+                                          : getMaxScoreInd(),
                                       showPenalties: _showPenalties,
                                       height: 40,
                                     ),
@@ -555,6 +539,7 @@ class _MatchView extends State<MatchView> {
                                           .getElements()
                                           .map(
                                             (e) => Incrementor(
+                                              getTime: () => _time,
                                               element: e,
                                               backgroundColor:
                                                   Colors.transparent,
@@ -682,7 +667,7 @@ class _MatchView extends State<MatchView> {
                           _selectedTeam = team;
                           _selectedAlliance = _match?.alliance(team);
                           _score = _selectedTeam?.scores[_match?.id];
-                          incrementValue.count = _score?.teleScore
+                          incrementValue.normalCount = _score?.teleScore
                                   .getElements()[0]
                                   .incrementValue ??
                               1;
@@ -727,7 +712,8 @@ class _MatchView extends State<MatchView> {
                   onPressed: () {
                     setState(() {
                       _score?.getScoreDivision(type).robotDisconnected =
-                          !(_score?.autoScore.robotDisconnected ?? false);
+                          !(_score?.getScoreDivision(type).robotDisconnected ??
+                              false);
                     });
                     widget.event
                         .getRef()
@@ -766,12 +752,13 @@ class _MatchView extends State<MatchView> {
                 ),
               Incrementor(
                 backgroundColor: Colors.grey.withOpacity(0.3),
+                getTime: () => _time,
                 element: incrementValue,
                 onPressed: () => setState(
                   () {
                     _score?.teleScore.getElements().forEach((element) {
                       if (!element.isBool) {
-                        element.incrementValue = incrementValue.count;
+                        element.incrementValue = incrementValue.normalCount;
                       }
                       stateSetter();
                     });
@@ -792,6 +779,7 @@ class _MatchView extends State<MatchView> {
                         .parse()
                         .map(
                           (e) => Incrementor(
+                            getTime: () => _time,
                             element: e,
                             onPressed: () => stateSetter(e.key),
                             event: widget.event,
@@ -811,6 +799,7 @@ class _MatchView extends State<MatchView> {
                         .parse()
                         .map(
                           (e) => Incrementor(
+                            getTime: () => _time,
                             element: e,
                             onPressed: () => stateSetter(e.key),
                             event: widget.event,
@@ -875,7 +864,12 @@ class _MatchView extends State<MatchView> {
   }
 
   ScoringElement incrementValue = ScoringElement(
-      name: 'Increment Value', min: () => 1, count: 1, key: null);
+    name: 'Increment Value',
+    min: () => 1,
+    normalCount: 1,
+    key: null,
+    value: 1,
+  );
 
   void onIncrement(ScoringElement element) {
     lapses.add(

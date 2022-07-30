@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/functions/Extensions.dart';
 
-/// Display's a [user]'s profile picture
+/// Displays a [user]'s profile picture
 class PFP extends StatelessWidget {
   const PFP({
     Key? key,

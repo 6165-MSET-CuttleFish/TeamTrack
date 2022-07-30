@@ -8,6 +8,7 @@ import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/functions/Extensions.dart';
 import 'package:teamtrack/models/GameModel.dart';
 
+/// UI to check and change the role of users in an event
 class Permissions extends StatefulWidget {
   const Permissions(
       {Key? key,
@@ -28,84 +29,86 @@ class _PermissionsState extends State<Permissions> {
   @override
   Widget build(BuildContext context) => ListView(
         children: widget.users
-            .map((user) => Slidable(
-                  endActionPane: ActionPane(
-                    // A motion is a widget used to control how the pane animates.
-                    motion: const StretchMotion(),
-                    children: [
-                      SlidableAction(
-                        onPressed: widget.event.role == Role.admin
-                            ? (_) {
-                                showPlatformDialog(
-                                  context: context,
-                                  builder: (BuildContext context) =>
-                                      PlatformAlert(
-                                    title: Text('Remove User'),
-                                    content: Text('Are you sure?'),
-                                    actions: [
-                                      PlatformDialogAction(
-                                        isDefaultAction: true,
-                                        child: Text('Cancel'),
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                      ),
-                                      PlatformDialogAction(
-                                        isDefaultAction: false,
-                                        isDestructive: true,
-                                        child: Text('Confirm'),
-                                        onPressed: () {
-                                          widget.ref
-                                              ?.child('${user.uid}')
-                                              .remove();
-                                          setState(() => {});
-                                          Navigator.of(context).pop();
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }
-                            : null,
-                        icon: Icons.delete,
-                        backgroundColor: Colors.red,
-                      )
-                    ],
-                  ),
-                  child: ListTile(
-                    leading: PFP(user: user),
-                    title: Text(
-                      user.displayName ?? "Unknown",
-                    ),
-                    subtitle: Text(
-                      user.email ?? "Unknown",
-                      style: Theme.of(context).textTheme.caption,
-                    ),
-                    trailing: DropdownButton<Role>(
-                      value: user.role,
-                      items: Role.values
-                          .map(
-                            (e) => DropdownMenuItem<Role>(
-                              child: Text(
-                                e.name(),
-                              ),
-                              value: e,
-                            ),
-                          )
-                          .toList(),
-                      onChanged: (widget.event.role == Role.admin &&
-                              widget.currentUser?.uid != user.uid)
-                          ? (newValue) {
-                              HapticFeedback.lightImpact();
-                              widget.ref
-                                  ?.child('${user.uid}/role')
-                                  .set(newValue?.toRep());
-                              setState(() {});
+            .map(
+              (user) => Slidable(
+                endActionPane: ActionPane(
+                  // A motion is a widget used to control how the pane animates.
+                  motion: const StretchMotion(),
+                  children: [
+                    SlidableAction(
+                      onPressed: widget.event.role == Role.admin
+                          ? (_) {
+                              showPlatformDialog(
+                                context: context,
+                                builder: (BuildContext context) =>
+                                    PlatformAlert(
+                                  title: Text('Remove User'),
+                                  content: Text('Are you sure?'),
+                                  actions: [
+                                    PlatformDialogAction(
+                                      isDefaultAction: true,
+                                      child: Text('Cancel'),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                    PlatformDialogAction(
+                                      isDefaultAction: false,
+                                      isDestructive: true,
+                                      child: Text('Confirm'),
+                                      onPressed: () {
+                                        widget.ref
+                                            ?.child('${user.uid}')
+                                            .remove();
+                                        setState(() => {});
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              );
                             }
                           : null,
-                    ),
+                      icon: Icons.delete,
+                      backgroundColor: Colors.red,
+                    )
+                  ],
+                ),
+                child: ListTile(
+                  leading: PFP(user: user),
+                  title: Text(
+                    user.displayName ?? "Unknown",
                   ),
-                ))
+                  subtitle: Text(
+                    user.email ?? "Unknown",
+                    style: Theme.of(context).textTheme.caption,
+                  ),
+                  trailing: DropdownButton<Role>(
+                    value: user.role,
+                    items: Role.values
+                        .map(
+                          (e) => DropdownMenuItem<Role>(
+                            child: Text(
+                              e.name(),
+                            ),
+                            value: e,
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (widget.event.role == Role.admin &&
+                            widget.currentUser?.uid != user.uid)
+                        ? (newValue) {
+                            HapticFeedback.lightImpact();
+                            widget.ref
+                                ?.child('${user.uid}/role')
+                                .set(newValue?.toRep());
+                            setState(() {});
+                          }
+                        : null,
+                  ),
+                ),
+              ),
+            )
             .toList(),
       );
 }

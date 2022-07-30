@@ -52,6 +52,7 @@ double maxValue(Iterable<num?> arr) => arr.maxValue();
 extension Arithmetic on Iterable<num?> {
   double getStatistic(double Function(Iterable<num?>) statistic) =>
       statistic(this);
+
   double mean() {
     final arr = this.whereType<num>();
     if (arr.isEmpty) return 0.0;

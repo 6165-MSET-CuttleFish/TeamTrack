@@ -53,7 +53,7 @@ class _TeamViewState extends State<TeamView> {
     maxScore = Score('', Dice.none, widget.event.gameName);
     maxScore?.getElements().forEach(
       (element) {
-        element.count = widget.event.teams.values
+        element.normalCount = widget.event.teams.values
             .map(
               (team) => !element.isBool
                   ? team.scores.values
@@ -61,7 +61,7 @@ class _TeamViewState extends State<TeamView> {
                         (score) => score
                             .getElements()
                             .firstWhere((e) => e.key == element.key,
-                                orElse: () => ScoringElement())
+                                orElse: () => ScoringElement.nullScore())
                             .countFactoringAttempted(),
                       )
                       .whereType<int>()
@@ -72,7 +72,7 @@ class _TeamViewState extends State<TeamView> {
                         (score) => score
                             .getElements()
                             .firstWhere((e) => e.key == element.key,
-                                orElse: () => ScoringElement())
+                                orElse: () => ScoringElement.nullScore())
                             .countFactoringAttempted(),
                       )
                       .whereType<int>()
@@ -242,13 +242,13 @@ class _TeamViewState extends State<TeamView> {
               teamMaxScore = Score('', Dice.none, widget.event.gameName);
               teamMaxScore?.getElements().forEach(
                 (element) {
-                  element.count = !element.isBool
+                  element.normalCount = !element.isBool
                       ? _team.scores.values
                           .map(
                             (score) => score
                                 .getElements()
                                 .firstWhere((e) => e.key == element.key,
-                                    orElse: () => ScoringElement())
+                                    orElse: () => ScoringElement.nullScore())
                                 .countFactoringAttempted(),
                           )
                           .whereType<int>()
@@ -260,7 +260,7 @@ class _TeamViewState extends State<TeamView> {
                             (score) => score
                                 .getElements()
                                 .firstWhere((e) => e.key == element.key,
-                                    orElse: () => ScoringElement())
+                                    orElse: () => ScoringElement.nullScore())
                                 .countFactoringAttempted(),
                           )
                           .whereType<int>()

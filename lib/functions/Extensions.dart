@@ -76,20 +76,22 @@ extension MergeExt on List<ScoringElement> {
           element.id!,
           () => ScoringElement(
             id: element.id,
+            value: 0,
             key: element.id,
             name: element.id ?? "",
             nestedElements: [
               if (putNone)
                 ScoringElement(
                   name: "None",
+                  value: 0,
                 ),
             ],
           ),
         );
         final bigElement = conglomerates[element.id!];
         bigElement?.nestedElements?.add(element);
-        bigElement?.count += element.count;
-        bigElement?.misses += element.misses;
+        bigElement?.normalCount += element.normalCount;
+        bigElement?.normalMisses += element.normalMisses;
         bigElement?.isBool = element.isBool;
         bigElement?.totalValue =
             (bigElement.totalValue ?? 0) + element.scoreValue();
@@ -97,11 +99,11 @@ extension MergeExt on List<ScoringElement> {
     }
     for (ScoringElement element in conglomerates.values) {
       for (int i = 0; i < (element.nestedElements?.length ?? 0); i++) {
-        if (element.nestedElements?[i].misses == 1 && element.isBool) {
-          element.misses = 1;
+        if (element.nestedElements?[i].normalMisses == 1 && element.isBool) {
+          element.normalMisses = 1;
         }
-        if (element.nestedElements?[i].count == 1 && element.isBool) {
-          element.count = i;
+        if (element.nestedElements?[i].normalCount == 1 && element.isBool) {
+          element.normalCount = i;
         } else if (!(conglomerates[element.id!]?.isBool ?? true)) {
           conglomerates[element.id!]
               ?.nestedElements
@@ -184,7 +186,7 @@ extension eventTypeExt on EventType {
           : CupertinoIcons.rectangle_stack_person_crop);
 
   String getName({bool filled = true}) =>
-      this == EventType.local ? 'In-Person Event' : 'Driver Practice';
+      this == EventType.local ? 'In-Person Event' : 'Remote Event';
 }
 
 extension StrExt on String {
