@@ -39,6 +39,7 @@ class _CardView extends State<CardView> {
                   body: CustomScrollView(
                     slivers: [
                       SliverAppBar(
+                        title: Text(widget.title),
                         expandedHeight: 280,
                         stretch: true,
                         pinned: true,

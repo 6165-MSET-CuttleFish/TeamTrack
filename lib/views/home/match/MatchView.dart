@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
-import 'package:teamtrack/api/APIKEYS.dart';
+import 'package:teamtrack/functions/APIMethods.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:teamtrack/components/statistics/BarGraph.dart';
 import 'package:teamtrack/components/scores/Incrementor.dart';
@@ -12,6 +12,7 @@ import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/models/ScoreModel.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
+import 'package:teamtrack/api/APIKEYS.dart';
 import 'package:teamtrack/functions/Statistics.dart';
 import 'package:teamtrack/providers/Auth.dart';
 import 'package:teamtrack/components/scores/ScoreSummary.dart';

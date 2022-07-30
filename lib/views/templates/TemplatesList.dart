@@ -1,10 +1,13 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:teamtrack/components/misc/PlatformGraphics.dart';
+import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/models/GameModel.dart';
-import '../../api/APIKEYS.dart';
+import 'package:teamtrack/functions/APIMethods.dart';
 import 'TemplateView.dart';
+import 'package:skeletons/skeletons.dart';
 class TemplatesList extends StatefulWidget {
   TemplatesList({Key? key, this.onTap}) : super(key: key);
   final void Function(Event)? onTap;
@@ -19,7 +22,7 @@ class _TemplatesList extends State<TemplatesList> {
   List bod = [];
   List bodvis = [];
   _getEvents() {
-    APIKEYS.getEvents().then((response) {
+    APIMethods.getEvents().then((response) {
       setState(() {
         bod = (json.decode(response.body)
             .toList());
@@ -43,13 +46,16 @@ class _TemplatesList extends State<TemplatesList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: themeChangeProvider.darkTheme ? Colors.black:Colors.white,
         elevation: 0,
-        backgroundColor: Colors.grey.shade900,
+        //   backgroundColor: Colors.grey.shade900,
         title: Container(
-          height: 38,
-          child: TextField(
+          height: 37,
+          color: themeChangeProvider.darkTheme ? Colors.black:Colors.white,
+          child: CupertinoSearchTextField(
             onChanged: (value) => onSearch(value),
-            decoration: InputDecoration(
+            backgroundColor: themeChangeProvider.darkTheme ? Color.fromARGB(255, 50, 50, 50):Color.fromARGB(255, 220, 220, 220),
+            /* decoration: InputDecoration(
                 filled: true,
                 fillColor: Colors.grey[850],
                 contentPadding: EdgeInsets.all(0),
@@ -63,11 +69,134 @@ class _TemplatesList extends State<TemplatesList> {
                     color: Colors.grey.shade500
                 ),
                 hintText: "Search events"
-            ),
+            ),*/
           ),
         ),
       ), body: Container(
-      child:bod.isEmpty ? Center(child: PlatformProgressIndicator()):bodvis.isEmpty ? Center(child: Text('No Results Found')):ListView.builder(
+      child:bod.isEmpty ? Center(child: SkeletonItem(
+          child: Column(
+            children: [
+              SizedBox(height: 5),
+              SkeletonAvatar(
+                style: SkeletonAvatarStyle(
+                  width: themeChangeProvider.darkTheme? MediaQuery.of(context).size.width:MediaQuery.of(context).size.width-10,
+                  height:55
+                ),
+              ),
+              SizedBox(height: 8),
+              SkeletonAvatar(
+                style: SkeletonAvatarStyle(
+                    width: themeChangeProvider.darkTheme? MediaQuery.of(context).size.width:MediaQuery.of(context).size.width-10,
+                    height:55
+                ),
+
+              ),
+              SizedBox(height: 8),
+              SkeletonAvatar(
+                style: SkeletonAvatarStyle(
+                    width: themeChangeProvider.darkTheme? MediaQuery.of(context).size.width:MediaQuery.of(context).size.width-10,
+                    height:55
+                ),
+
+              ),
+              SizedBox(height: 8),
+              SkeletonAvatar(
+                style: SkeletonAvatarStyle(
+                    width: themeChangeProvider.darkTheme? MediaQuery.of(context).size.width:MediaQuery.of(context).size.width-10,
+                    height:55
+                ),
+
+              ),
+              SizedBox(height: 8),
+              SkeletonAvatar(
+                style: SkeletonAvatarStyle(
+                    width: themeChangeProvider.darkTheme? MediaQuery.of(context).size.width:MediaQuery.of(context).size.width-10,
+                    height:55
+                ),
+
+              ),
+              SizedBox(height: 8),
+              SkeletonAvatar(
+                style: SkeletonAvatarStyle(
+                    width: themeChangeProvider.darkTheme? MediaQuery.of(context).size.width:MediaQuery.of(context).size.width-10,
+                    height:55
+                ),
+
+              ),
+              SizedBox(height: 8),
+              SkeletonAvatar(
+                style: SkeletonAvatarStyle(
+                    width: themeChangeProvider.darkTheme? MediaQuery.of(context).size.width:MediaQuery.of(context).size.width-10,
+                    height:55
+                ),
+
+              ),
+              SizedBox(height: 8),
+              SkeletonAvatar(
+                style: SkeletonAvatarStyle(
+                    width: themeChangeProvider.darkTheme? MediaQuery.of(context).size.width:MediaQuery.of(context).size.width-10,
+                    height:55
+                ),
+
+              ),
+              SizedBox(height: 8),
+              SkeletonAvatar(
+                style: SkeletonAvatarStyle(
+                    width: themeChangeProvider.darkTheme? MediaQuery.of(context).size.width:MediaQuery.of(context).size.width-10,
+                    height:55
+                ),
+
+              ),
+              SizedBox(height: 8),
+              SkeletonAvatar(
+                style: SkeletonAvatarStyle(
+                    width: themeChangeProvider.darkTheme? MediaQuery.of(context).size.width:MediaQuery.of(context).size.width-10,
+                    height:55
+                ),
+
+              ),
+              SizedBox(height: 8),
+              SkeletonAvatar(
+                style: SkeletonAvatarStyle(
+                    width: themeChangeProvider.darkTheme? MediaQuery.of(context).size.width:MediaQuery.of(context).size.width-10,
+                    height:55
+                ),
+
+              ),
+              SizedBox(height: 8),
+              SkeletonAvatar(
+                style: SkeletonAvatarStyle(
+                    width: themeChangeProvider.darkTheme? MediaQuery.of(context).size.width:MediaQuery.of(context).size.width-10,
+                    height:55
+                ),
+
+              ),
+              SizedBox(height: 8),
+              SkeletonAvatar(
+                style: SkeletonAvatarStyle(
+                    width: themeChangeProvider.darkTheme? MediaQuery.of(context).size.width:MediaQuery.of(context).size.width-10,
+                    height:55
+                ),
+
+              ),
+              SizedBox(height: 8),
+              SkeletonAvatar(
+                style: SkeletonAvatarStyle(
+                    width: themeChangeProvider.darkTheme? MediaQuery.of(context).size.width:MediaQuery.of(context).size.width-10,
+                    height:55
+                ),
+
+              ),
+              SizedBox(height: 8),
+              SkeletonAvatar(
+                style: SkeletonAvatarStyle(
+                    width: themeChangeProvider.darkTheme? MediaQuery.of(context).size.width:MediaQuery.of(context).size.width-10,
+                    height:55
+                ),                ),
+
+            ],
+          )),
+      ):bodvis.isEmpty ? Center(child: Text('No Results Found')):ListView.builder(
         itemCount: bodvis.length,
         itemBuilder: (context, index) {
           return Card(

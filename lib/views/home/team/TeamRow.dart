@@ -84,9 +84,13 @@ class TeamRow extends StatelessWidget {
             ],
           ),
         ),
-        leading: Text(
-          team.number,
-          style: Theme.of(context).textTheme.caption,
+        leading:  Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [Text(
+              team.number,
+              style: Theme.of(context).textTheme.bodyText1,
+            ),
+            ]
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
@@ -101,9 +105,12 @@ class TeamRow extends StatelessWidget {
                 10,
               ),
             ),
+      Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
             BarGraph(
               height: 70,
-              width: 20,
+              width: 15,
               vertical: false,
               val: statConfig.allianceTotal
                   ? event.matches.values
@@ -130,7 +137,7 @@ class TeamRow extends StatelessWidget {
               lessIsBetter: (statistics.getLessIsBetter() ||
                       sortMode.getLessIsBetter()) &&
                   !(statistics.getLessIsBetter() && sortMode.getLessIsBetter()),
-            ),
+            ),]),
             Icon(Icons.navigate_next)
           ],
         ),
