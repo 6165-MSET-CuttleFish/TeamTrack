@@ -1,9 +1,10 @@
 import 'package:http/http.dart' as http;
 import '../../api/APIKEYS.dart';
 class APIMethods {
+  static const TOA_URL = APIKEYS.TOA_URL;
   static Future getEvents() async {
     final respons = await http.get(
-      Uri.parse('$APIKEYS.TOA_URL/event'),
+      Uri.parse('$TOA_URL/event'),
       headers: {
         'X-TOA-Key': APIKEYS.TOA_KEY,
         'X-Application-Origin': 'TeamTrack',
@@ -14,7 +15,7 @@ class APIMethods {
   }
   static Future getTeams(String id) async {
     final respons = await http.get(
-      Uri.parse('$APIKEYS.TOA_URL/event/$id/teams'),
+      Uri.parse('$TOA_URL/event/$id/teams'),
       headers: {
         'X-TOA-Key': APIKEYS.TOA_KEY,
         'X-Application-Origin': 'TeamTrack',
@@ -26,7 +27,7 @@ class APIMethods {
   }
   static Future<dynamic> getMatches(String id) {
     return http.get(
-      Uri.parse('$APIKEYS.TOA_URL/event/$id/matches'),
+      Uri.parse('$TOA_URL/event/$id/matches'),
       headers: {
         'X-TOA-Key': APIKEYS.TOA_KEY,
         'X-Application-Origin': 'TeamTrack',
@@ -37,7 +38,7 @@ class APIMethods {
   }
   static Future getInfo(String id) async {
     final respons = await http.get(
-      Uri.parse('$APIKEYS.TOA_URL/event/$id'),
+      Uri.parse('$TOA_URL/event/$id'),
       headers: {
         'X-TOA-Key': APIKEYS.TOA_KEY,
         'X-Application-Origin': 'TeamTrack',

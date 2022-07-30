@@ -74,6 +74,7 @@ class _LandingPageState extends State<LandingPage> {
   Widget build(BuildContext context) {
     final themeChange = context.watch<DarkThemeProvider>();
     final TextEditingController controller = new TextEditingController();
+    final TextEditingController controller2 = new TextEditingController();
     for (var event in dataModel.events.where((e) => !e.shared)) {
       final user = context.read<User?>();
       event.author = TeamTrackUser.fromUser(user);
@@ -106,7 +107,7 @@ class _LandingPageState extends State<LandingPage> {
         (data?['blockedUsers'] as Map?)?.keys.forEach((key) {
           try {
             final ttuser =
-                TeamTrackUser.fromJson(data?['blockedUsers']?[key], key);
+            TeamTrackUser.fromJson(data?['blockedUsers']?[key], key);
             dataModel.blockedUsers.add(ttuser);
           } catch (e) {
             dataModel.blockedUsers.add(TeamTrackUser(
@@ -127,7 +128,7 @@ class _LandingPageState extends State<LandingPage> {
                     : Icon(CupertinoIcons.moon),
                 onPressed: () {
                   setState(() =>
-                      themeChange.darkTheme = !themeChangeProvider.darkTheme);
+                  themeChange.darkTheme = !themeChangeProvider.darkTheme);
                 },
               )
             ],
@@ -135,11 +136,11 @@ class _LandingPageState extends State<LandingPage> {
           body: body(),
           floatingActionButton: tab == Tab.events
               ? FloatingActionButton(
-                  tooltip: "Add Event",
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  child: Icon(Icons.add),
-                  onPressed: _onPressed,
-                )
+            tooltip: "Add Event",
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            child: Icon(Icons.add),
+            onPressed: _onPressed,
+          )
               : null,
           drawer: Drawer(
             elevation: 1,
@@ -160,23 +161,32 @@ class _LandingPageState extends State<LandingPage> {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
+                                MainAxisAlignment.spaceEvenly,
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   if (context.read<User?>()?.photoURL != null)
-                                    ClipRRect(
+                                    Padding(
+                                      padding: EdgeInsets.only(bottom:10)
+                                      ,child:ClipRRect(
                                       borderRadius: BorderRadius.circular(300),
                                       child: Image.network(
                                         context.read<User?>()!.photoURL!,
                                         height: 70,
                                       ),
+                                    ),
                                     )
                                   else
-                                    Icon(Icons.account_circle, size: 70),
+                                    Padding(
+                                        padding: EdgeInsets.only(bottom:10),
+                                        child:
+                                        Icon(Icons.account_circle, size: 70)
+                                    ),
                                   Text(
                                     context.read<User?>()?.displayName ??
                                         "Guest",
-                                    style: TextStyle(color: Colors.white),
+                                    style: TextStyle(color: Colors.white,
+                                        fontSize: 18
+                                    ),
                                   ),
                                   Text(
                                     context.read<User?>()?.email ?? "",
@@ -196,13 +206,23 @@ class _LandingPageState extends State<LandingPage> {
                                 showPlatformDialog(
                                   context: context,
                                   builder: (_) => PlatformAlert(
-                                    title: Text("Change Display Name"),
-                                    content: PlatformTextField(
-                                      textInputAction: TextInputAction.done,
-                                      placeholder: "Display Name",
-                                      keyboardType: TextInputType.name,
-                                      controller: controller,
-                                    ),
+                                    title: Text("Change User Details"),
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children:[
+                                        PlatformTextField(
+                                          textInputAction: TextInputAction.done,
+                                          placeholder: "Display Name",
+                                          keyboardType: TextInputType.name,
+                                          controller: controller,
+                                        ),
+                                        PlatformTextField(
+                                          textInputAction: TextInputAction.done,
+                                          placeholder: "Profile Picture URL",
+                                          keyboardType: TextInputType.url,
+                                          controller: controller2,
+                                        ),
+                                      ],),
                                     actions: [
                                       PlatformDialogAction(
                                         child: Text("Cancel"),
@@ -217,8 +237,15 @@ class _LandingPageState extends State<LandingPage> {
                                             await context
                                                 .read<User?>()
                                                 ?.updateDisplayName(
-                                                  controller.text,
-                                                );
+                                              controller.text,
+                                            );
+
+                                          if (controller2.text.isNotEmpty)
+                                            await context
+                                                .read<User?>()
+                                                ?.updatePhotoURL(
+                                              controller2.text,
+                                            );
                                           Navigator.pop(context);
                                           showPlatformDialog(
                                             context: context,
@@ -276,24 +303,24 @@ class _LandingPageState extends State<LandingPage> {
                           leading: Icon(Icons.inbox_rounded),
                           title: Text("Inbox"),
                           trailing:
-                              (data?['inbox'] as Map?)?.entries.length == 0
-                                  ? null
-                                  : Container(
-                                      decoration: ShapeDecoration(
-                                        color: Colors.red,
-                                        shape: CircleBorder(),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                          (data?['inbox'] as Map?)
-                                                  ?.entries
-                                                  .length
-                                                  .toString() ??
-                                              "0",
-                                        ),
-                                      ),
-                                    ),
+                          (data?['inbox'] as Map?)?.entries.length == 0
+                              ? null
+                              : Container(
+                            decoration: ShapeDecoration(
+                              color: Colors.red,
+                              shape: CircleBorder(),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                (data?['inbox'] as Map?)
+                                    ?.entries
+                                    .length
+                                    .toString() ??
+                                    "0",
+                              ),
+                            ),
+                          ),
                           onTap: () {
                             setState(() => tab = Tab.inbox);
                             Navigator.of(context).pop();
@@ -446,7 +473,7 @@ class _LandingPageState extends State<LandingPage> {
                     _chosen();
                   },
                   leading:
-                      Icon(CupertinoIcons.rectangle_stack_person_crop_fill),
+                  Icon(CupertinoIcons.rectangle_stack_person_crop_fill),
                   title: Text('Remote Event'),
                 ),
               ),
@@ -457,48 +484,48 @@ class _LandingPageState extends State<LandingPage> {
   }
 
   void _chosen() => showPlatformDialog(
-        context: context,
-        builder: (BuildContext context) => PlatformAlert(
-          title: Text(
-              'New ${_newType == EventType.remote ? 'Remote' : 'In-Person'} Event'),
-          content: PlatformTextField(
-            textInputAction: TextInputAction.done,
-            keyboardType: TextInputType.name,
-            textCapitalization: TextCapitalization.words,
-            onChanged: (String input) {
-              _newName = input;
-            },
-            placeholder: 'Enter name',
-          ),
-          actions: [
-            PlatformDialogAction(
-              isDefaultAction: true,
-              child: Text('Cancel'),
-              onPressed: () {
-                _newName = '';
-                Navigator.of(context).pop();
-              },
-            ),
-            PlatformDialogAction(
-              isDefaultAction: false,
-              child: Text('Add'),
-              onPressed: () {
-                setState(
-                  () {
-                    if (_newName!.isNotEmpty)
-                      dataModel.events.add(Event(
-                        name: _newName ?? Statics.gameName,
-                        type: _newType ?? EventType.remote,
-                        gameName: Statics.gameName,
-                      ));
-                    dataModel.saveEvents();
-                    _newName = '';
-                  },
-                );
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
+    context: context,
+    builder: (BuildContext context) => PlatformAlert(
+      title: Text(
+          'New ${_newType == EventType.remote ? 'Remote' : 'In-Person'} Event'),
+      content: PlatformTextField(
+        textInputAction: TextInputAction.done,
+        keyboardType: TextInputType.name,
+        textCapitalization: TextCapitalization.words,
+        onChanged: (String input) {
+          _newName = input;
+        },
+        placeholder: 'Enter name',
+      ),
+      actions: [
+        PlatformDialogAction(
+          isDefaultAction: true,
+          child: Text('Cancel'),
+          onPressed: () {
+            _newName = '';
+            Navigator.of(context).pop();
+          },
         ),
-      );
+        PlatformDialogAction(
+          isDefaultAction: false,
+          child: Text('Add'),
+          onPressed: () {
+            setState(
+                  () {
+                if (_newName!.isNotEmpty)
+                  dataModel.events.add(Event(
+                    name: _newName ?? Statics.gameName,
+                    type: _newType ?? EventType.remote,
+                    gameName: Statics.gameName,
+                  ));
+                dataModel.saveEvents();
+                _newName = '';
+              },
+            );
+            Navigator.of(context).pop();
+          },
+        ),
+      ],
+    ),
+  );
 }

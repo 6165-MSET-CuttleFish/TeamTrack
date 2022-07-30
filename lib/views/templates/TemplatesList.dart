@@ -163,36 +163,7 @@ class _TemplatesList extends State<TemplatesList> {
                 ),
 
               ),
-              SizedBox(height: 8),
-              SkeletonAvatar(
-                style: SkeletonAvatarStyle(
-                    width: themeChangeProvider.darkTheme? MediaQuery.of(context).size.width:MediaQuery.of(context).size.width-10,
-                    height:55
-                ),
 
-              ),
-              SizedBox(height: 8),
-              SkeletonAvatar(
-                style: SkeletonAvatarStyle(
-                    width: themeChangeProvider.darkTheme? MediaQuery.of(context).size.width:MediaQuery.of(context).size.width-10,
-                    height:55
-                ),
-
-              ),
-              SizedBox(height: 8),
-              SkeletonAvatar(
-                style: SkeletonAvatarStyle(
-                    width: themeChangeProvider.darkTheme? MediaQuery.of(context).size.width:MediaQuery.of(context).size.width-10,
-                    height:55
-                ),
-
-              ),
-              SizedBox(height: 8),
-              SkeletonAvatar(
-                style: SkeletonAvatarStyle(
-                    width: themeChangeProvider.darkTheme? MediaQuery.of(context).size.width:MediaQuery.of(context).size.width-10,
-                    height:55
-                ),                ),
 
             ],
           )),
