@@ -98,7 +98,7 @@ class _Incrementor extends State<Incrementor> {
               }
               if (widget.element.totalCount() != 0) {
                 var ref = (mutableData as Map?)?[widget
-                    .element.nestedElements?[widget.element.normalCount].key];
+                    .element.nestedElements?[widget.element.totalCount()].key];
                 if (ref == null) {
                   mutableData?[widget.element.key] = widget.element.toJson();
                   ref = mutableData?[widget.element.key];
@@ -106,7 +106,7 @@ class _Incrementor extends State<Incrementor> {
                 if (ref is Map) {
                   mutableData?[widget
                       .element
-                      .nestedElements?[widget.element.normalCount]
+                      .nestedElements?[widget.element.totalCount()]
                       .key][missesName] = 1;
                 }
               }
