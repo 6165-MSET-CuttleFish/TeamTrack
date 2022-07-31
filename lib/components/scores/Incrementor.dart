@@ -64,7 +64,8 @@ class _Incrementor extends State<Incrementor> {
               widget.element.nestedElements?[i].resetCount();
               widget.element.nestedElements?[i].resetMisses();
             }
-            widget.element.nestedElements?[val].setCount(widget.getTime(), 1);
+            widget.element.nestedElements?[val].setCount(
+                0, 1); // endgame cycle differentiation not worth for booleans
             if (widget.element.totalCount() != 0) {
               widget.element.nestedElements?[widget.element.totalCount()]
                   .changeMisses(widget.getTime(), 1);
@@ -107,7 +108,7 @@ class _Incrementor extends State<Incrementor> {
                   mutableData?[widget
                       .element
                       .nestedElements?[widget.element.totalCount()]
-                      .key][missesName] = 1;
+                      .key]['misses'] = 1;
                 }
               }
               if (val != 0) {
@@ -119,7 +120,7 @@ class _Incrementor extends State<Incrementor> {
                 }
                 if (ref is Map) {
                   mutableData?[widget.element.nestedElements?[val].key]
-                      [countName] = 1;
+                      ['count'] = 1;
                 } else {
                   mutableData?[widget.element.nestedElements?[val].key] = 1;
                 }
@@ -135,11 +136,11 @@ class _Incrementor extends State<Incrementor> {
                 if (!(widget.event?.shared ?? false)) {
                   if (val &&
                       widget.element.netCount() < widget.element.max!()) {
-                    widget.element.resetCount();
+                    widget.element.setCount(0, 1);
                     widget.element.resetMisses();
                   } else {
                     widget.element.resetCount();
-                    widget.element.setMisses(widget.getTime(), 1);
+                    widget.element.setMisses(0, 1);
                   }
                 }
                 widget.onPressed();
@@ -155,13 +156,13 @@ class _Incrementor extends State<Incrementor> {
                       ref = mutableData?[widget.element.key];
                     }
                     if (ref is Map) {
-                      mutableData?[widget.element.key][countName] = val
+                      mutableData?[widget.element.key]['count'] = val
                           ? (widget.element.netCount() < widget.element.max!()
                               ? 1
                               : 0)
                           : 0;
-                      mutableData?[widget.element.key][missesName] =
-                          mutableData[widget.element.key][countName] ==
+                      mutableData?[widget.element.key]['misses'] =
+                          mutableData[widget.element.key]['count'] ==
                                   widget.element.min!()
                               ? 1
                               : 0;

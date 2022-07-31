@@ -28,6 +28,10 @@ class Score extends ScoreDivision implements Comparable<Score> {
     autoScore = AutoScore(ref['AutoScore']);
     endgameScore = EndgameScore(ref['EndgameScore']);
     penalties = Penalty(ref['Penalty']);
+    for (ScoringElement element in autoScore.getElements()) {
+      element.doubleScoresElement = teleScore.elements[element.key];
+      teleScore.elements[element.key]?.initialCount = element.totalCount();
+    }
     setDice(dice, Timestamp.now());
   }
   List<ScoringElement> getElements({bool? showPenalties}) => [
