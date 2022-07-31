@@ -184,8 +184,8 @@ class _ScoringElementStatsState extends State<ScoringElementStats> {
       );
 
   BarGraph buildAccuracyGraph(BuildContext context) => BarGraph(
-        val: widget.element.normalCount.toDouble(),
-        max: widget.maxElement.normalCount.toDouble(),
+        val: widget.element.netCount().toDouble(),
+        max: widget.maxElement.netCount().toDouble(),
         width: 20,
         height: 60,
         vertical: false,

@@ -205,7 +205,7 @@ class _MatchView extends State<MatchView> {
             } else {
               _score = _selectedTeam?.scores[_match?.id];
               _score?.teleScore.getElements().forEach((element) {
-                element.incrementValue = incrementValue.normalCount;
+                element.incrementValue = incrementValue.totalCount();
               });
             }
           }

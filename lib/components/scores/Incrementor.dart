@@ -81,6 +81,10 @@ class _Incrementor extends State<Incrementor> {
                   i++) {
                 var ref = (mutableData
                     as Map?)?[widget.element.nestedElements?[i].key];
+                if (ref == null) {
+                  mutableData?[widget.element.key] = widget.element.toJson();
+                  ref = mutableData?[widget.element.key];
+                }
                 if (ref is Map) {
                   mutableData?[widget.element.nestedElements?[i].key] = {
                     'count': 0,
@@ -95,6 +99,10 @@ class _Incrementor extends State<Incrementor> {
               if (widget.element.totalCount() != 0) {
                 var ref = (mutableData as Map?)?[widget
                     .element.nestedElements?[widget.element.normalCount].key];
+                if (ref == null) {
+                  mutableData?[widget.element.key] = widget.element.toJson();
+                  ref = mutableData?[widget.element.key];
+                }
                 if (ref is Map) {
                   mutableData?[widget
                       .element
@@ -105,6 +113,10 @@ class _Incrementor extends State<Incrementor> {
               if (val != 0) {
                 var ref = (mutableData
                     as Map?)?[widget.element.nestedElements?[val].key];
+                if (ref == null) {
+                  mutableData?[widget.element.key] = widget.element.toJson();
+                  ref = mutableData?[widget.element.key];
+                }
                 if (ref is Map) {
                   mutableData?[widget.element.nestedElements?[val].key]
                       [countName] = 1;
@@ -137,6 +149,11 @@ class _Incrementor extends State<Incrementor> {
                       ?.child(widget.path!)
                       .runTransaction((mutableData) {
                     var ref = (mutableData as Map?)?[widget.element.key];
+                    if (ref == null) {
+                      mutableData?[widget.element.key] =
+                          widget.element.toJson();
+                      ref = mutableData?[widget.element.key];
+                    }
                     if (ref is Map) {
                       mutableData?[widget.element.key][countName] = val
                           ? (widget.element.netCount() < widget.element.max!()
@@ -188,10 +205,15 @@ class _Incrementor extends State<Incrementor> {
                             );
                           }
                           var ref = (mutableData as Map?)?[widget.element.key];
+                          if (ref == null) {
+                            mutableData?[widget.element.key] =
+                                widget.element.toJson();
+                            ref = mutableData?[widget.element.key];
+                          }
                           if (ref is Map) {
                             if ((ref['count'] ?? 0) +
                                     (ref['endgameCount'] ?? 0) +
-                                    (ref['initialCount'] ?? 0) >
+                                    widget.element.initialCount >
                                 widget.element.min!())
                               mutableData?[widget.element.key][countName] =
                                   ref[countName] -
@@ -229,10 +251,15 @@ class _Incrementor extends State<Incrementor> {
                                 mutableData, widget.element);
                           }
                           var ref = (mutableData as Map?)?[widget.element.key];
+                          if (ref == null) {
+                            mutableData?[widget.element.key] =
+                                widget.element.toJson();
+                            ref = mutableData?[widget.element.key];
+                          }
                           if (ref is Map) {
                             if ((ref['count'] ?? 0) +
                                     (ref['endgameCount'] ?? 0) +
-                                    (ref['initialCount'] ?? 0) >
+                                    widget.element.initialCount >
                                 widget.element.min!()) {
                               mutableData?[widget.element.key][countName] =
                                   (ref[countName] ?? 0) -
@@ -290,16 +317,21 @@ class _Incrementor extends State<Incrementor> {
                             );
                           }
                           var ref = (mutableData as Map?)?[widget.element.key];
+                          if (ref == null) {
+                            mutableData?[widget.element.key] =
+                                widget.element.toJson();
+                            ref = mutableData?[widget.element.key];
+                          }
                           if (ref is Map) {
                             if ((ref['count'] ?? 0) +
                                     (ref['endgameCount'] ?? 0) +
-                                    (ref['initialCount'] ?? 0) <
+                                    widget.element.initialCount <
                                 widget.element.max!())
                               mutableData?[widget.element.key][countName] =
                                   (ref[countName] ?? 0) +
                                       widget.element.incrementValue;
                           } else {
-                            if (ref < widget.element.max!())
+                            if ((ref ?? 0) < widget.element.max!())
                               mutableData?[widget.element.key] =
                                   ref + widget.element.incrementValue;
                           }
@@ -320,7 +352,7 @@ class _Incrementor extends State<Incrementor> {
   Widget build(BuildContext context) {
     return RawMaterialButton(
       onLongPress: widget.event?.role != Role.viewer &&
-              (widget.element.totalCount() > widget.element.min!() ||
+              (widget.element.totalCount() != widget.element.min!() ||
                   widget.element.totalMisses() > 0)
           ? () {
               showPlatformDialog(

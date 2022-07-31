@@ -5,158 +5,6 @@ import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/functions/Extensions.dart';
 import 'package:teamtrack/functions/Statistics.dart';
 
-Map<String, dynamic> absRef = {
-  "AutoScore": {
-    "DuckDelivered": {
-      "name": "Duck Delivered",
-      "min": 0,
-      "max": 1,
-      "value": 10,
-      "isBool": true
-    },
-    "PartialParkStorage": {
-      "name": "Partial",
-      "id": "Storage Park",
-      "min": 0,
-      "maxIsReference": true,
-      "max": {"total": 1, "reference": "FullParkStorage"},
-      "value": 3,
-      "isBool": true
-    },
-    "FullParkStorage": {
-      "name": "Full",
-      "id": "Storage Park",
-      "min": 0,
-      "maxIsReference": true,
-      "max": {"total": 1, "reference": "PartialParkStorage"},
-      "value": 6,
-      "isBool": true
-    },
-    "PartialParkWarehouse": {
-      "name": "Partial",
-      "id": "Warehouse Park",
-      "min": 0,
-      "maxIsReference": true,
-      "max": {"total": 1, "reference": "FullParkWarehouse"},
-      "value": 5,
-      "isBool": true
-    },
-    "FullParkWarehouse": {
-      "name": "Full",
-      "id": "Warehouse Park",
-      "min": 0,
-      "maxIsReference": true,
-      "max": {"total": 1, "reference": "PartialParkWarehouse"},
-      "value": 10,
-      "isBool": true
-    },
-    "FreightInStorage": {
-      "name": "Storage Freight",
-      "min": 0,
-      "max": 999,
-      "value": 2
-    },
-    "FreightInHub": {"name": "Hub Freight", "min": 0, "max": 999, "value": 6},
-    "DuckLevelBonus": {
-      "name": "Duck",
-      "id": "Bonus",
-      "min": 0,
-      "maxIsReference": true,
-      "max": {"total": 1, "reference": "ShippingLevelBonus"},
-      "value": 10,
-      "isBool": true
-    },
-    "ShippingLevelBonus": {
-      "name": "Team Element",
-      "id": "Bonus",
-      "min": 0,
-      "maxIsReference": true,
-      "max": {"total": 1, "reference": "DuckLevelBonus"},
-      "value": 20,
-      "isBool": true
-    }
-  },
-  "TeleScore": {
-    "sharedFreight": {"name": "Shared Hub", "min": 0, "max": 999, "value": 4},
-    "lvl3": {
-      "name": "Level 3",
-      "min": 0,
-      "max": 999,
-      "value": 6,
-      "id": "Alliance Hub"
-    },
-    "lvl2": {
-      "name": "Level 2",
-      "min": 0,
-      "max": 999,
-      "value": 4,
-      "id": "Alliance Hub"
-    },
-    "lvl1": {
-      "name": "Level 1",
-      "min": 0,
-      "max": 999,
-      "value": 2,
-      "id": "Alliance Hub"
-    },
-    "storageFreight": {"name": "Storage Unit", "min": 0, "max": 999, "value": 1}
-  },
-  "EndgameScore": {
-    "DucksDelivered": {
-      "name": "Ducks Delivered",
-      "min": 0,
-      "max": 10,
-      "value": 6
-    },
-    "PartialWarehouseParked": {
-      "name": "Partial",
-      "id": "Warehouse Park",
-      "min": 0,
-      "maxIsReference": true,
-      "max": {"total": 1, "reference": "FullWarehouseParked"},
-      "value": 3,
-      "isBool": true
-    },
-    "FullWarehouseParked": {
-      "name": "Full",
-      "id": "Warehouse Park",
-      "min": 0,
-      "maxIsReference": true,
-      "max": {"total": 1, "reference": "PartialWarehouseParked"},
-      "value": 6,
-      "isBool": true
-    },
-    "Element": {
-      "name": "Team Element Capped",
-      "min": 0,
-      "max": 1,
-      "value": 15,
-      "isBool": true
-    }
-  },
-  "Dice": {"1": "Left", "2": "Middle", "3": "Right", "name": "Barcode"},
-  "Alliance": {
-    "AutoScore": {},
-    "TeleScore": {},
-    "EndgameScore": {
-      "AllianceHubBalanced": {
-        "name": "Alliance Hub Balanced",
-        "min": 0,
-        "max": 1,
-        "value": 10,
-        "isBool": true
-      },
-      "SharedHubTipped": {
-        "name": "Shared Hub Tipped",
-        "min": 0,
-        "max": 1,
-        "value": 20,
-        "isBool": true
-      }
-    }
-  }
-};
-
 /// This class is used to represent the scoring structure of traditional and remote FTC events via [teleScore], [autoScore], [endgameScore], and [penalties]
 class Score extends ScoreDivision implements Comparable<Score> {
   late TeleScore teleScore;
@@ -271,6 +119,10 @@ class Score extends ScoreDivision implements Comparable<Score> {
     } catch (e) {
       defendedTeamNumbers = {};
     }
+    for (ScoringElement element in autoScore.getElements()) {
+      element.doubleScoresElement = teleScore.elements[element.key];
+      teleScore.elements[element.key]?.initialCount = element.totalCount();
+    }
     setDice(Dice.one, Timestamp.now());
   }
   Map<String, dynamic> toJson() => {
@@ -332,8 +184,8 @@ class AutoScore extends ScoreDivision {
       (e) {
         elements[e] = ScoringElement(
           name: ref[e]['name'] ?? e,
-          normalCount: map[e] is Map ? map[e]['count'] : map[e],
-          normalMisses: map[e] is Map ? map[e]['misses'] : 0,
+          normalCount: map[e] is Map ? (map[e]['count'] ?? 0) : (map[e] ?? 0),
+          normalMisses: map[e] is Map ? (map[e]['misses'] ?? 0) : 0,
           endgameCount: map[e] is Map ? (map[e]['endgameCount'] ?? 0) : 0,
           endgameMisses: map[e] is Map ? (map[e]['endgameMisses'] ?? 0) : 0,
           cycleTimes: map[e] is Map ? decodeArray(map[e]?['cycleTimes']) : [],
@@ -393,7 +245,7 @@ class TeleScore extends ScoreDivision {
       (e) {
         elements[e] = ScoringElement(
           name: ref[e]['name'] ?? e,
-          normalCount: map[e] is Map ? map[e]['count'] : map[e],
+          normalCount: map[e] is Map ? (map[e]['count'] ?? 0) : (map[e] ?? 0),
           normalMisses: map[e] is Map ? map[e]['misses'] : 0,
           endgameCount: map[e] is Map ? (map[e]['endgameCount'] ?? 0) : 0,
           endgameMisses: map[e] is Map ? (map[e]['endgameMisses'] ?? 0) : 0,
@@ -454,16 +306,16 @@ class EndgameScore extends ScoreDivision {
     return endgameScore;
   }
 
-  EndgameScore.fromJson(Map<String, dynamic> json, this.ref) {
+  EndgameScore.fromJson(Map<String, dynamic> map, this.ref) {
     ref.keys.forEach(
       (e) {
         elements[e] = ScoringElement(
           name: ref[e]['name'] ?? e,
-          normalCount: json[e] is Map ? json[e]['count'] : json[e],
-          normalMisses: json[e] is Map ? json[e]['misses'] : 0,
-          endgameCount: json[e] is Map ? (json[e]['endgameCount'] ?? 0) : 0,
-          endgameMisses: json[e] is Map ? (json[e]['endgameMisses'] ?? 0) : 0,
-          cycleTimes: json[e] is Map ? decodeArray(json[e]?['cycleTimes']) : [],
+          normalCount: map[e] is Map ? (map[e]['count'] ?? 0) : (map[e] ?? 0),
+          normalMisses: map[e] is Map ? map[e]['misses'] : 0,
+          endgameCount: map[e] is Map ? (map[e]['endgameCount'] ?? 0) : 0,
+          endgameMisses: map[e] is Map ? (map[e]['endgameMisses'] ?? 0) : 0,
+          cycleTimes: map[e] is Map ? decodeArray(map[e]?['cycleTimes']) : [],
           min: () => ref[e]['min'] ?? 0,
           value: ref[e]['value'] ?? 1,
           isBool: ref[e]['isBool'] ?? false,
@@ -548,20 +400,18 @@ class Penalty extends ScoreDivision {
     }
   }
 
-  Penalty.fromJson(Map<String, dynamic> json, this.ref) {
+  Penalty.fromJson(Map<String, dynamic> map, this.ref) {
     if (ref == null) {
       majorPenalty = ScoringElement(
         name: 'Major Penalty',
         value: -30,
-        normalCount:
-            json['major'] is Map ? json['major']['count'] : json['major'],
+        normalCount: map['major'] is Map ? map['major']['count'] : map['major'],
         key: 'major',
       );
       minorPenalty = ScoringElement(
         name: 'Minor Penalty',
         value: -10,
-        normalCount:
-            json['minor'] is Map ? json['minor']['count'] : json['minor'],
+        normalCount: map['minor'] is Map ? map['minor']['count'] : map['minor'],
         key: 'minor',
       );
       elements = {
@@ -573,12 +423,11 @@ class Penalty extends ScoreDivision {
         (e) {
           elements[e] = ScoringElement(
             name: ref[e]['name'] ?? e,
-            normalCount: json[e] is Map ? json[e]['count'] : json[e],
-            normalMisses: json[e] is Map ? json[e]['misses'] : 0,
-            endgameCount: json[e] is Map ? (json[e]['endgameCount'] ?? 0) : 0,
-            endgameMisses: json[e] is Map ? (json[e]['endgameMisses'] ?? 0) : 0,
-            cycleTimes:
-                json[e] is Map ? decodeArray(json[e]?['cycleTimes']) : [],
+            normalCount: map[e] is Map ? (map[e]['count'] ?? 0) : (map[e] ?? 0),
+            normalMisses: map[e] is Map ? map[e]['misses'] : 0,
+            endgameCount: map[e] is Map ? (map[e]['endgameCount'] ?? 0) : 0,
+            endgameMisses: map[e] is Map ? (map[e]['endgameMisses'] ?? 0) : 0,
+            cycleTimes: map[e] is Map ? decodeArray(map[e]?['cycleTimes']) : [],
             min: () => ref[e]['min'] ?? 0,
             value: ref[e]['value'] ?? 1,
             isBool: ref[e]['isBool'] ?? false,
@@ -642,6 +491,8 @@ class ScoringElement implements Scorable {
   String? id;
   List<double> cycleTimes = [];
   List<ScoringElement>? nestedElements;
+  ScoringElement? doubleScoresElement;
+
   bool isBool;
   late int Function()? min = () => 0;
   late int Function()? max = () => 999;
@@ -697,6 +548,7 @@ class ScoringElement implements Scorable {
         max!() - endgameCount - initialCount,
       );
     }
+    doubleScoresElement?.initialCount += count;
   }
 
   void resetCount() {
@@ -778,6 +630,7 @@ class ScoringElement implements Scorable {
       normalMisses: other.normalMisses + normalMisses,
       endgameCount: other.endgameCount + endgameCount,
       endgameMisses: other.endgameMisses + endgameMisses,
+      initialCount: other.initialCount + initialCount,
       value: value,
       key: other.key,
       name: name,

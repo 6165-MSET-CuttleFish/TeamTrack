@@ -91,7 +91,9 @@ extension MergeExt on List<ScoringElement> {
         final bigElement = conglomerates[element.id!];
         bigElement?.nestedElements?.add(element);
         bigElement?.normalCount += element.normalCount;
+        bigElement?.endgameCount += element.endgameCount;
         bigElement?.normalMisses += element.normalMisses;
+        bigElement?.endgameMisses += element.endgameMisses;
         bigElement?.isBool = element.isBool;
         bigElement?.totalValue =
             (bigElement.totalValue ?? 0) + element.scoreValue();
@@ -103,7 +105,7 @@ extension MergeExt on List<ScoringElement> {
           element.normalMisses = 1;
         }
         if (element.nestedElements?[i].normalCount == 1 && element.isBool) {
-          element.normalCount = i;
+          element.normalCount = i; // TODO: Fix
         } else if (!(conglomerates[element.id!]?.isBool ?? true)) {
           conglomerates[element.id!]
               ?.nestedElements
