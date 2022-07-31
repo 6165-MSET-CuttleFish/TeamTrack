@@ -11,18 +11,20 @@ class ScoringElementStats extends StatefulWidget {
   ScoringElementStats({
     Key? key,
     required this.element,
-    required this.maxElement,
     required this.elementList,
+    required this.allElements,
     this.backgroundColor,
     required this.removeOutliers,
     this.target,
+    required this.lessIsBetter,
   }) : super(key: key);
   final ScoringElement element;
   final Color? backgroundColor;
-  final ScoringElement maxElement;
   final List<ScoringElement> elementList;
+  final List<List<ScoringElement>> allElements;
   final ScoringElement? target;
   final bool removeOutliers;
+  final lessIsBetter;
 
   @override
   State<ScoringElementStats> createState() => _ScoringElementStatsState();
@@ -123,14 +125,14 @@ class _ScoringElementStatsState extends State<ScoringElementStats> {
                         ],
                       )
                     : ScoreTimeline(
-                        minY: 0,
                         individualTotals: widget.elementList
-                            .map((e) => e.totalCount().toDouble())
+                            .map((e) => e.total()?.toDouble())
                             .removeOutliers(widget.removeOutliers)
                             .toList(),
                         lineColor:
                             Theme.of(context).canvasColor.inverseColor(1.0),
                         target: widget.target?.totalCount().toDouble(),
+                        lessIsBetter: widget.lessIsBetter,
                       ),
                 if (!widget.element.isBool)
                   SizedBox(
@@ -174,8 +176,13 @@ class _ScoringElementStatsState extends State<ScoringElementStats> {
   }
 
   BarGraph buildIntegerGraph(BuildContext context) => BarGraph(
-        val: widget.element.scoreValue().toDouble(),
-        max: widget.maxElement.scoreValue().toDouble(),
+        val: widget.elementList
+            .map((e) => e.total())
+            .removeOutliers(widget.removeOutliers)
+            .median(),
+        max: widget.allElements
+            .map((list) => list.map((e) => e.total()).median())
+            .maxValue(),
         width: 20,
         height: 60,
         title: "Median",
@@ -184,8 +191,13 @@ class _ScoringElementStatsState extends State<ScoringElementStats> {
       );
 
   BarGraph buildAccuracyGraph(BuildContext context) => BarGraph(
-        val: widget.element.netCount().toDouble(),
-        max: widget.maxElement.netCount().toDouble(),
+        val: widget.elementList
+            .map((e) => e.total())
+            .removeOutliers(widget.removeOutliers)
+            .accuracy(),
+        max: widget.allElements
+            .map((list) => list.map((e) => e.total()).accuracy())
+            .maxValue(),
         width: 20,
         height: 60,
         vertical: false,

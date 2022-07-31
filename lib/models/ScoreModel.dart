@@ -567,9 +567,7 @@ class ScoringElement implements Scorable {
 
   int scoreValue() {
     if (nestedElements != null) {
-      return nestedElements!
-          .map((e) => e.scoreValue())
-          .reduce((value, element) => value + element);
+      return nestedElements!.map((e) => e.scoreValue()).sum().toInt();
     }
     return totalValue ?? ((normalCount + endgameCount + initialCount) * value);
   }

@@ -11,9 +11,11 @@ class ScoreTimeline extends StatelessWidget {
     this.target,
     this.allianceTotals,
     required this.lineColor,
+    required this.lessIsBetter,
   }) : super(key: key);
   final double? minY;
   final double? maxY;
+  final bool lessIsBetter;
   final List<double> individualTotals;
   final List<double>? allianceTotals;
   final double? target;
@@ -88,14 +90,18 @@ class ScoreTimeline extends StatelessWidget {
                   border: Border.all(color: const Color(0xff37434d), width: 1),
                 ),
                 minY: minY == maxY ? null : minY,
-                maxY: minY == maxY ? (minY ?? 0) + 20 : maxY,
+                maxY: minY == maxY && minY != 0 && minY != null
+                    ? (minY ?? 0) + 20
+                    : maxY,
                 lineBarsData: [
                   if (allianceTotals != null)
                     LineChartBarData(
                       belowBarData: target != null
                           ? BarAreaData(
                               show: true,
-                              color: Colors.lightGreenAccent.withOpacity(0.5),
+                              color: lessIsBetter
+                                  ? Colors.redAccent.withOpacity(0.5)
+                                  : Colors.lightGreenAccent.withOpacity(0.5),
                               cutOffY: target,
                               applyCutOffY: true,
                             )
@@ -103,13 +109,14 @@ class ScoreTimeline extends StatelessWidget {
                       aboveBarData: target != null
                           ? BarAreaData(
                               show: true,
-                              color: Colors.redAccent.withOpacity(0.5),
+                              color: lessIsBetter
+                                  ? Colors.lightGreenAccent.withOpacity(0.5)
+                                  : Colors.redAccent.withOpacity(0.5),
                               cutOffY: target,
                               applyCutOffY: true,
                             )
                           : null,
-                      spots: allianceTotals
-                          ?.spots(),
+                      spots: allianceTotals?.spots(),
                       color: Colors.yellow,
                       isCurved: true,
                       preventCurveOverShooting: true,
@@ -119,7 +126,9 @@ class ScoreTimeline extends StatelessWidget {
                     belowBarData: target != null
                         ? BarAreaData(
                             show: true,
-                            color: Colors.lightGreenAccent.withOpacity(0.5),
+                            color: lessIsBetter
+                                ? Colors.redAccent.withOpacity(0.5)
+                                : Colors.lightGreenAccent.withOpacity(0.5),
                             cutOffY: target,
                             applyCutOffY: true,
                           )
@@ -127,13 +136,14 @@ class ScoreTimeline extends StatelessWidget {
                     aboveBarData: target != null
                         ? BarAreaData(
                             show: true,
-                            color: Colors.redAccent.withOpacity(0.5),
+                            color: lessIsBetter
+                                ? Colors.lightGreenAccent.withOpacity(0.5)
+                                : Colors.redAccent.withOpacity(0.5),
                             cutOffY: target,
                             applyCutOffY: true,
                           )
                         : null,
-                    spots:
-                        individualTotals.spots(),
+                    spots: individualTotals.spots(),
                     color: lineColor,
                     isCurved: true,
                     preventCurveOverShooting: true,

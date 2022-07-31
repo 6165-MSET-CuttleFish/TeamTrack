@@ -21,8 +21,6 @@ class ScoreCard extends StatelessWidget {
     required this.allianceTotal,
     required this.title,
     this.targetScore,
-    required this.teamMaxScore,
-    required this.maxScore,
   }) : super(key: key);
   final List<ScoreDivision> scoreDivisions;
   final Dice dice;
@@ -34,8 +32,6 @@ class ScoreCard extends StatelessWidget {
   final ScoreDivision? targetScore;
   final bool removeOutliers;
   final List<Match>? matches;
-  final Score? teamMaxScore;
-  final Score? maxScore;
 
   @override
   Widget build(BuildContext context) {
@@ -129,45 +125,54 @@ class ScoreCard extends StatelessWidget {
                     .map((e) => e.y)
                     .removeOutliers(removeOutliers),
                 lineColor: type.getColor(),
+                lessIsBetter: type.getLessIsBetter(),
               ),
               if (type != null)
-                ...teamMaxScore
-                        ?.getScoreDivision(type)
-                        .getElements()
-                        .parse(putNone: false)
-                        .map(
-                          (element) => ScoringElementStats(
-                            elementList: scoreDivisions
-                                .map(
-                                  (e) => e.getElements().parse().firstWhere(
-                                        (f) => f.key == element.key,
-                                        orElse: () =>
-                                            ScoringElement.nullScore(),
-                                      ),
-                                )
-                                .toList(),
-                            element: element,
-                            maxElement: maxScore
-                                    ?.getScoreDivision(type)
-                                    .getElements()
-                                    .parse(putNone: false)
-                                    .firstWhere(
-                                      (e) => e.key == element.key,
-                                      orElse: () => ScoringElement.nullScore(),
-                                    ) ??
-                                element,
-                            removeOutliers: removeOutliers,
-                            target: targetScore
-                                    ?.getElements()
-                                    .parse(putNone: false)
-                                    .firstWhere(
-                                      (e) => e.key == element.key,
-                                      orElse: () => ScoringElement.nullScore(),
-                                    ) ??
-                                element,
-                          ),
-                        ) ??
-                    []
+                ...Score('', Dice.none, event.gameName)
+                    .getScoreDivision(type)
+                    .getElements()
+                    .parse(putNone: false)
+                    .map(
+                      (element) => ScoringElementStats(
+                        lessIsBetter: type.getLessIsBetter(),
+                        elementList: scoreDivisions
+                            .map(
+                              (e) => e.getElements().parse().firstWhere(
+                                    (f) => f.key == element.key,
+                                    orElse: () => ScoringElement.nullScore(),
+                                  ),
+                            )
+                            .toList(),
+                        element:
+                            element, // TODO: Fix Median calculation for nested elements
+                        allElements: event.teams.values
+                            .map(
+                              (team) => team.scores.values
+                                  .map(
+                                    (score) => score
+                                        .getScoreDivision(type)
+                                        .getElements()
+                                        .parse()
+                                        .firstWhere(
+                                          (f) => f.key == element.key,
+                                          orElse: () =>
+                                              ScoringElement.nullScore(),
+                                        ),
+                                  )
+                                  .toList(),
+                            )
+                            .toList(),
+                        removeOutliers: removeOutliers,
+                        target: targetScore
+                                ?.getElements()
+                                .parse(putNone: false)
+                                .firstWhere(
+                                  (e) => e.key == element.key,
+                                  orElse: () => ScoringElement.nullScore(),
+                                ) ??
+                            element,
+                      ),
+                    )
             ]
           : [],
     );

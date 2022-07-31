@@ -379,8 +379,6 @@ class _TeamViewState extends State<TeamView> {
                         Padding(
                           padding: const EdgeInsets.only(top: 20, bottom: 10),
                           child: ScoreCard(
-                            teamMaxScore: teamMaxScore,
-                            maxScore: maxScore,
                             allianceTotal:
                                 widget.event.statConfig.allianceTotal,
                             team: _team,

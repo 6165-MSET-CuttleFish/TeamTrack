@@ -95,8 +95,8 @@ extension MergeExt on List<ScoringElement> {
         bigElement?.normalMisses += element.normalMisses;
         bigElement?.endgameMisses += element.endgameMisses;
         bigElement?.isBool = element.isBool;
-        bigElement?.totalValue =
-            (bigElement.totalValue ?? 0) + element.scoreValue();
+        // bigElement?.totalValue =
+        //     (bigElement.totalValue ?? 0) + element.scoreValue();
       }
     }
     for (ScoringElement element in conglomerates.values) {
@@ -105,7 +105,7 @@ extension MergeExt on List<ScoringElement> {
           element.normalMisses = 1;
         }
         if (element.nestedElements?[i].normalCount == 1 && element.isBool) {
-          element.normalCount = i; // TODO: Fix
+          element.normalCount = i;
         } else if (!(conglomerates[element.id!]?.isBool ?? true)) {
           conglomerates[element.id!]
               ?.nestedElements
