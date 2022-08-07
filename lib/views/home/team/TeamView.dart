@@ -48,7 +48,7 @@ class _TeamViewState extends State<TeamView> {
 
   Score? maxScore;
   Score? teamMaxScore;
-  AutonPainter painter=AutonPainter();
+  late AutonPainter painter;
 
   @override
   void initState() {
@@ -85,6 +85,7 @@ class _TeamViewState extends State<TeamView> {
             .toInt();
       },
     );
+    painter=new AutonPainter(team: _team,);
     super.initState();
   }
 

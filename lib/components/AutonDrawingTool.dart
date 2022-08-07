@@ -7,24 +7,38 @@ import 'package:flutter/rendering.dart';
 
 import 'dart:ui' as ui;
 
+import '../models/GameModel.dart';
+
 class AutonPainter extends StatefulWidget {
-  const AutonPainter({Key? key}) : super(key: key);
+  final Team team;
+
+  const AutonPainter({
+    Key? key,
+    required this.team,
+  }) : super(key: key);
 
   @override
-  _AutonPainterState createState() => _AutonPainterState();
+  _AutonPainterState createState() => _AutonPainterState(team);
 }
 final GlobalKey _key = GlobalKey();
 double magicOffset=0.0;
 double xLow=50.0, xHigh=290.0;
 double yLow=10.0, yHigh=250.0;
 double kCanvasSize = 800.0;
+String _teamNumber="6165";
+String scope="Carousel";
+double pointsLeft=0;
+double pointsRight=0;
 var  _offsets = <Offset>[];
 class _AutonPainterState extends State<AutonPainter> {
-  @override
+  Team team;
+  _AutonPainterState(this.team);
   void clearPath() {
     setState(() {
       _offsets.clear();
     });
+    pointsLeft=0;
+    pointsRight=0;
   }
   void savePath() {
     print("Saving...");
@@ -50,9 +64,19 @@ class _AutonPainterState extends State<AutonPainter> {
       });
     }
   }
+  void setTeam(String team){
+    _teamNumber=team;
+  }
   void uploadFile(Uint8List image) async {
     FirebaseStorage storage = FirebaseStorage.instance;
-    Reference ref = storage.ref().child('6165 -${DateTime.now()}.svg');
+    if(pointsLeft-pointsRight>(pointsRight+pointsLeft)/2+10){
+      scope="Carousel";
+    }else if(pointsLeft-pointsRight<(pointsRight+pointsLeft)/2-10){
+      scope="Cycling";
+    }else{
+      scope="Both";
+    }
+    Reference ref = storage.ref().child('${_teamNumber} - ${scope}.svg');
     UploadTask uploadTask = ref.putData(image, SettableMetadata(contentType: 'image/svg'));
     try{
       await uploadTask
@@ -65,6 +89,7 @@ class _AutonPainterState extends State<AutonPainter> {
     String url = await ref.getDownloadURL();
   }
   Widget build(BuildContext context) {
+    setTeam(team.number);
     return RepaintBoundary(
         key: _key,
         child: Scaffold(
@@ -80,6 +105,11 @@ class _AutonPainterState extends State<AutonPainter> {
                             onPanDown: (details) {
                               final localPosition = context.findRenderObject() as RenderBox;
                               final renderBox = localPosition.globalToLocal(details.globalPosition);
+                              if(renderBox.dx<((xLow+xHigh)/2)){
+                                pointsLeft++;
+                              }else{
+                                pointsRight++;
+                              }
                               if(renderBox.dx>=xLow&&renderBox.dy>=yLow&&renderBox.dx<=xHigh&&renderBox.dy<=yHigh) {
                                 setState(() {
                                   _offsets.add(renderBox);
@@ -89,6 +119,11 @@ class _AutonPainterState extends State<AutonPainter> {
                             onPanUpdate: (details) {
                               final localPosition = context.findRenderObject() as RenderBox;
                               final renderBox = localPosition.globalToLocal(details.globalPosition);
+                              if(renderBox.dx<((xLow+xHigh)/2)){
+                                pointsLeft++;
+                              }else{
+                                pointsRight++;
+                              }
                               if(renderBox.dx>=xLow&&renderBox.dy>=yLow&&renderBox.dx<=xHigh&&renderBox.dy<=yHigh) {
                                 setState(() {
                                   _offsets.add(renderBox);
