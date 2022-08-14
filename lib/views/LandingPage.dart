@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:teamtrack/functions/Extensions.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:teamtrack/components/misc/PlatformGraphics.dart';
@@ -14,6 +18,8 @@ import 'package:teamtrack/views/home/events/EventsList.dart';
 import 'package:teamtrack/views/inbox/BlockList.dart';
 import 'package:teamtrack/views/inbox/Inbox.dart';
 import 'package:teamtrack/views/templates/TemplatesList.dart';
+import 'package:collection/collection.dart';
+
 
 class LandingPage extends StatefulWidget {
   const LandingPage({Key? key}) : super(key: key);
@@ -79,7 +85,13 @@ class _LandingPageState extends State<LandingPage> {
       event.author = TeamTrackUser.fromUser(user);
       event.role = Role.admin;
     }
-    return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>?>(
+
+
+
+    return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>?>
+      (
+
+      //get data from database
       stream: firebaseFirestore
           .collection('users')
           .doc(context.read<User?>()?.uid)
@@ -106,7 +118,7 @@ class _LandingPageState extends State<LandingPage> {
         (data?['blockedUsers'] as Map?)?.keys.forEach((key) {
           try {
             final ttuser =
-                TeamTrackUser.fromJson(data?['blockedUsers']?[key], key);
+            TeamTrackUser.fromJson(data?['blockedUsers']?[key], key);
             dataModel.blockedUsers.add(ttuser);
           } catch (e) {
             dataModel.blockedUsers.add(TeamTrackUser(
@@ -115,6 +127,9 @@ class _LandingPageState extends State<LandingPage> {
                 email: data?['blockedUsers']?[key]));
           }
         });
+
+
+        //light mode/dark mode at the top
         return Scaffold(
           appBar: AppBar(
             backgroundColor: Theme.of(context).colorScheme.primary,
@@ -127,26 +142,35 @@ class _LandingPageState extends State<LandingPage> {
                     : Icon(CupertinoIcons.moon),
                 onPressed: () {
                   setState(() =>
-                      themeChange.darkTheme = !themeChangeProvider.darkTheme);
+                  themeChange.darkTheme = !themeChangeProvider.darkTheme);
                 },
               )
             ],
           ),
+
+
+          //idk
           body: body(),
           floatingActionButton: tab == Tab.events
               ? FloatingActionButton(
-                  tooltip: "Add Event",
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  child: Icon(Icons.add),
-                  onPressed: _onPressed,
-                )
+            tooltip: "Add Event",
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            child: Icon(Icons.add),
+            onPressed: _onPressed,
+          )
               : null,
+
+
+
           drawer: Drawer(
             elevation: 1,
             child: Material(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+
+
+                  //change display name
                   DrawerHeader(
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.primary,
@@ -160,7 +184,7 @@ class _LandingPageState extends State<LandingPage> {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
+                                MainAxisAlignment.spaceEvenly,
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   if (context.read<User?>()?.photoURL != null)
@@ -217,8 +241,8 @@ class _LandingPageState extends State<LandingPage> {
                                             await context
                                                 .read<User?>()
                                                 ?.updateDisplayName(
-                                                  controller.text,
-                                                );
+                                              controller.text,
+                                            );
                                           Navigator.pop(context);
                                           showPlatformDialog(
                                             context: context,
@@ -251,9 +275,16 @@ class _LandingPageState extends State<LandingPage> {
                       ],
                     ),
                   ),
+
+
+
+
                   Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+
+
+                      //Events button
                       ListTile(
                         leading: Icon(Icons.list),
                         title: Text("Events"),
@@ -262,6 +293,9 @@ class _LandingPageState extends State<LandingPage> {
                           Navigator.of(context).pop();
                         },
                       ),
+
+
+                      //Templates button
                       if (!NewPlatform.isWeb)
                         ListTile(
                           leading: Icon(CupertinoIcons.square_stack),
@@ -271,34 +305,40 @@ class _LandingPageState extends State<LandingPage> {
                             Navigator.of(context).pop();
                           },
                         ),
+
+
+                      //Inbox button
                       if (!(context.read<User?>()?.isAnonymous ?? true))
                         ListTile(
                           leading: Icon(Icons.inbox_rounded),
                           title: Text("Inbox"),
                           trailing:
-                              (data?['inbox'] as Map?)?.entries.length == 0
-                                  ? null
-                                  : Container(
-                                      decoration: ShapeDecoration(
-                                        color: Colors.red,
-                                        shape: CircleBorder(),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                          (data?['inbox'] as Map?)
-                                                  ?.entries
-                                                  .length
-                                                  .toString() ??
-                                              "0",
-                                        ),
-                                      ),
-                                    ),
+                          (data?['inbox'] as Map?)?.entries.length == 0
+                              ? null
+                              : Container(
+                            decoration: ShapeDecoration(
+                              color: Colors.red,
+                              shape: CircleBorder(),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                (data?['inbox'] as Map?)
+                                    ?.entries
+                                    .length
+                                    .toString() ??
+                                    "0",
+                              ),
+                            ),
+                          ),
                           onTap: () {
                             setState(() => tab = Tab.inbox);
                             Navigator.of(context).pop();
                           },
                         ),
+
+
+                      //If user isn't anon than list blocked users
                       if (!(context.read<User?>()?.isAnonymous ?? true))
                         ListTile(
                           leading: Icon(Icons.people_alt),
@@ -308,6 +348,9 @@ class _LandingPageState extends State<LandingPage> {
                             Navigator.of(context).pop();
                           },
                         ),
+
+
+                      //if user anon then list link acc
                       if (context.read<User?>()?.isAnonymous ?? false)
                         ListTile(
                           leading: Icon(Icons.link),
@@ -318,6 +361,9 @@ class _LandingPageState extends State<LandingPage> {
                             ),
                           ),
                         ),
+
+
+                      //Sign out button
                       ListTile(
                         leading: Icon(Icons.logout),
                         title: Text('Sign Out'),
@@ -348,8 +394,131 @@ class _LandingPageState extends State<LandingPage> {
                           );
                         },
                       ),
+
+                      //delete acc button
+                      ListTile(
+                        leading: Icon(Icons.delete_forever),
+                        title: Text('Delete Account'),
+                        onTap: () {
+                          showPlatformDialog(
+                            context: context,
+                            builder: (context) => PlatformAlert(
+                              title: Text('Are you sure?'),
+                              content: Text('This action cannot be reversed, and all data will be lost permanently.'),
+                              actions: [
+                                PlatformDialogAction(
+                                  isDefaultAction: true,
+                                  child: Text('Cancel'),
+                                  onPressed: () => Navigator.of(context).pop(),
+                                ),
+                                PlatformDialogAction(
+                                  isDestructive: true,
+                                  child: Text('Delete Account'),
+                                  onPressed: () async {
+
+                                    User? user=context.read<User?>();
+                                    final uid = user?.uid;
+                                    List<Event> localEvents=dataModel.events;
+                                    //delete local events
+                                    localEvents.forEach((ev)
+                                    {
+                                      setState(() => dataModel.events.remove(ev));
+                                    });
+
+                                    dataModel.saveEvents();
+
+                                    //deal with shared events
+                                    List<Event> sharedEvents=dataModel.sharedEvents;
+                                    sharedEvents.forEach((ev) async
+                                    {
+                                      final ref=ev.getRef()?.child("Permissions");
+                                      //temporary variables
+                                      TeamTrackUser? firstAdmin;
+                                      TeamTrackUser? firstEditor;
+                                      TeamTrackUser? firstViewer;
+                                      TeamTrackUser? targetUser;
+
+                                      setState(() => {});
+
+                                      //check is there are multiple people with access to the event
+                                      //If there are: proceed. If not, just delete the event(code at bottom)
+                                      if(ev.users.length>1)
+                                      {
+                                        setState(() => {});
+                                        //check if the user is an admin. If he isn't that means there is another admin
+                                        //so we can just delete the user permissions(skip steps)
+                                        if (ev.users.firstWhere((element) => element.uid == context.read<User?>()?.uid).
+                                        role == Role.admin)
+                                        {
+                                          //look through the list for an admin OR other potential candidates to be given admin
+
+                                          firstAdmin=ev.users.firstWhereOrNull((element) => element.uid!=uid
+                                              &&element.role==Role.admin);
+                                          firstEditor=ev.users.firstWhereOrNull((element) => element.role==Role.editor);
+                                          firstViewer=ev.users.firstWhereOrNull((element)=> element.role==Role.viewer);
+
+                                          setState(() => {});
+
+
+                                          //if there is no current other admin, then choose one of the other users to make admin
+                                          if (firstAdmin != null)
+                                            targetUser=null;
+                                          else if(firstEditor!=null)
+                                            targetUser=firstEditor;
+                                          else
+                                            targetUser=firstViewer;
+                                          setState(() => {});
+
+                                          if(targetUser!=null)
+                                          {
+                                            await
+                                            ref?.child('${targetUser?.uid}/role').set("admin");
+                                            setState(() => {});
+                                          }
+                                        }
+
+                                        setState(() => {});
+                                        await
+                                        ref?.child('$uid').remove();
+                                        setState(() => {});
+                                        //maybe set the author to another one of the admins
+                                      }
+                                      else
+                                      {
+                                        await
+                                      ev.getRef()?.remove();
+                                      setState(() => {});
+                                      }
+                                      });
+
+                                      dataModel.saveEvents();
+                                      setState(() => {});
+
+                                      user?.delete().then((yikes) async
+                                        {
+                                          await
+                                          FirebaseFirestore.instance.collection("users")
+                                              .doc(user?.uid)
+                                              .delete();
+                                        });
+
+                                      context
+                                          .read<AuthenticationService>()
+                                          .signOut();
+                                      Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+
                     ],
                   )
+
+
+
                 ],
               ),
             ),
@@ -446,7 +615,7 @@ class _LandingPageState extends State<LandingPage> {
                     _chosen();
                   },
                   leading:
-                      Icon(CupertinoIcons.rectangle_stack_person_crop_fill),
+                  Icon(CupertinoIcons.rectangle_stack_person_crop_fill),
                   title: Text('Remote Event'),
                 ),
               ),
@@ -457,48 +626,48 @@ class _LandingPageState extends State<LandingPage> {
   }
 
   void _chosen() => showPlatformDialog(
-        context: context,
-        builder: (BuildContext context) => PlatformAlert(
-          title: Text(
-              'New ${_newType == EventType.remote ? 'Remote' : 'In-Person'} Event'),
-          content: PlatformTextField(
-            textInputAction: TextInputAction.done,
-            keyboardType: TextInputType.name,
-            textCapitalization: TextCapitalization.words,
-            onChanged: (String input) {
-              _newName = input;
-            },
-            placeholder: 'Enter name',
-          ),
-          actions: [
-            PlatformDialogAction(
-              isDefaultAction: true,
-              child: Text('Cancel'),
-              onPressed: () {
-                _newName = '';
-                Navigator.of(context).pop();
-              },
-            ),
-            PlatformDialogAction(
-              isDefaultAction: false,
-              child: Text('Add'),
-              onPressed: () {
-                setState(
-                  () {
-                    if (_newName!.isNotEmpty)
-                      dataModel.events.add(Event(
-                        name: _newName ?? Statics.gameName,
-                        type: _newType ?? EventType.remote,
-                        gameName: Statics.gameName,
-                      ));
-                    dataModel.saveEvents();
-                    _newName = '';
-                  },
-                );
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
+    context: context,
+    builder: (BuildContext context) => PlatformAlert(
+      title: Text(
+          'New ${_newType == EventType.remote ? 'Remote' : 'In-Person'} Event'),
+      content: PlatformTextField(
+        textInputAction: TextInputAction.done,
+        keyboardType: TextInputType.name,
+        textCapitalization: TextCapitalization.words,
+        onChanged: (String input) {
+          _newName = input;
+        },
+        placeholder: 'Enter name',
+      ),
+      actions: [
+        PlatformDialogAction(
+          isDefaultAction: true,
+          child: Text('Cancel'),
+          onPressed: () {
+            _newName = '';
+            Navigator.of(context).pop();
+          },
         ),
-      );
+        PlatformDialogAction(
+          isDefaultAction: false,
+          child: Text('Add'),
+          onPressed: () {
+            setState(
+                  () {
+                if (_newName!.isNotEmpty)
+                  dataModel.events.add(Event(
+                    name: _newName ?? Statics.gameName,
+                    type: _newType ?? EventType.remote,
+                    gameName: Statics.gameName,
+                  ));
+                dataModel.saveEvents();
+                _newName = '';
+              },
+            );
+            Navigator.of(context).pop();
+          },
+        ),
+      ],
+    ),
+  );
 }
