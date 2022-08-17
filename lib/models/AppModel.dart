@@ -7,6 +7,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:teamtrack/functions/Functions.dart';
+import 'package:uuid/uuid.dart';
 import 'GameModel.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import '../providers/Theme.dart';
@@ -18,6 +19,8 @@ class DataModel {
   String? token;
   List<Event> inbox = [];
   List<TeamTrackUser> blockedUsers = [];
+  List<TeamTrackTeam> teams = [];
+
 
   List<Event> allEvents() => events + sharedEvents;
 
@@ -34,7 +37,9 @@ class DataModel {
     prefs.setString("Events", jsonEncode(coded));
     print(coded);
   }
-
+  List<TeamTrackTeam> get allTeams{
+    return teams;
+  }
   void restoreEvents() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -89,7 +94,18 @@ class TeamTrackUser {
         'watchingTeam': teamNumber ?? watchingTeam,
       };
 }
+class TeamTrackTeam {
+  TeamTrackTeam({
+    required this.teamName,
+    required this.teamNumber,
+  });
+String teamName;
+  String id = Uuid().v4();
+  String teamNumber;
+  List<User> users = [];
 
+
+}
 final dataModel = DataModel();
 final DarkThemeProvider themeChangeProvider = new DarkThemeProvider();
 final Database.FirebaseDatabase firebaseDatabase =

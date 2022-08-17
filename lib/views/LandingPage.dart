@@ -36,6 +36,7 @@ var tab = Tab.events;
 class _LandingPageState extends State<LandingPage> {
   EventType? _newType;
   String? _newName;
+  String ? _newNumber;
 
   @override
   void initState() {
