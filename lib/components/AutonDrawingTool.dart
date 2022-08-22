@@ -69,9 +69,9 @@ class _AutonPainterState extends State<AutonPainter> {
   }
   void uploadFile(Uint8List image) async {
     FirebaseStorage storage = FirebaseStorage.instance;
-    if(pointsLeft-pointsRight>(pointsRight+pointsLeft)/2+10){
+    if(pointsLeft-pointsRight>(pointsRight+pointsLeft)/2){
       scope="Carousel";
-    }else if(pointsLeft-pointsRight<(pointsRight+pointsLeft)/2-10){
+    }else if(pointsLeft-pointsRight<(pointsRight+pointsLeft)/2){
       scope="Cycling";
     }else{
       scope="Both";
@@ -105,9 +105,9 @@ class _AutonPainterState extends State<AutonPainter> {
                             onPanDown: (details) {
                               final localPosition = context.findRenderObject() as RenderBox;
                               final renderBox = localPosition.globalToLocal(details.globalPosition);
-                              if(renderBox.dx<((xLow+xHigh)/2)){
+                              if(renderBox.dx<((xLow+xHigh)/2-10)){
                                 pointsLeft++;
-                              }else{
+                              }else if(renderBox.dx>((xLow+xHigh)/2+10)){
                                 pointsRight++;
                               }
                               if(renderBox.dx>=xLow&&renderBox.dy>=yLow&&renderBox.dx<=xHigh&&renderBox.dy<=yHigh) {
@@ -119,9 +119,9 @@ class _AutonPainterState extends State<AutonPainter> {
                             onPanUpdate: (details) {
                               final localPosition = context.findRenderObject() as RenderBox;
                               final renderBox = localPosition.globalToLocal(details.globalPosition);
-                              if(renderBox.dx<((xLow+xHigh)/2)){
+                              if(renderBox.dx<((xLow+xHigh)/2-10)){
                                 pointsLeft++;
-                              }else{
+                              }else if(renderBox.dx>((xLow+xHigh)/2+10)){
                                 pointsRight++;
                               }
                               if(renderBox.dx>=xLow&&renderBox.dy>=yLow&&renderBox.dx<=xHigh&&renderBox.dy<=yHigh) {
