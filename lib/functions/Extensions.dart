@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/models/GameModel.dart';
@@ -75,32 +76,36 @@ extension MergeExt on List<ScoringElement> {
           element.id!,
           () => ScoringElement(
             id: element.id,
+            value: 0,
             key: element.id,
             name: element.id ?? "",
             nestedElements: [
               if (putNone)
                 ScoringElement(
                   name: "None",
+                  value: 0,
                 ),
             ],
           ),
         );
         final bigElement = conglomerates[element.id!];
         bigElement?.nestedElements?.add(element);
-        bigElement?.count += element.count;
-        bigElement?.misses += element.misses;
+        bigElement?.normalCount += element.normalCount;
+        bigElement?.endgameCount += element.endgameCount;
+        bigElement?.normalMisses += element.normalMisses;
+        bigElement?.endgameMisses += element.endgameMisses;
         bigElement?.isBool = element.isBool;
-        bigElement?.totalValue =
-            (bigElement.totalValue ?? 0) + element.scoreValue();
+        // bigElement?.totalValue =
+        //     (bigElement.totalValue ?? 0) + element.scoreValue();
       }
     }
     for (ScoringElement element in conglomerates.values) {
       for (int i = 0; i < (element.nestedElements?.length ?? 0); i++) {
-        if (element.nestedElements?[i].misses == 1 && element.isBool) {
-          element.misses = 1;
+        if (element.nestedElements?[i].normalMisses == 1 && element.isBool) {
+          element.normalMisses = 1;
         }
-        if (element.nestedElements?[i].count == 1 && element.isBool) {
-          element.count = i;
+        if (element.nestedElements?[i].normalCount == 1 && element.isBool) {
+          element.normalCount = i;
         } else if (!(conglomerates[element.id!]?.isBool ?? true)) {
           conglomerates[element.id!]
               ?.nestedElements
@@ -122,7 +127,7 @@ extension TimestampExt on Timestamp {
   }
 }
 
-extension colorExt on OpModeType? {
+extension opModeExt on OpModeType? {
   Color getColor() {
     switch (this) {
       case OpModeType.auto:
@@ -167,7 +172,23 @@ extension colorExt on OpModeType? {
     }
   }
 
+  static List<OpModeType?> getAll() => [null, ...OpModeType.values];
+
+  static List<OpModeType> getMain() =>
+      [OpModeType.auto, OpModeType.tele, OpModeType.endgame];
+
   bool getLessIsBetter() => this == OpModeType.penalty ? true : false;
+}
+
+extension eventTypeExt on EventType {
+  Icon getIcon({bool filled = true}) => this == EventType.local
+      ? Icon(filled ? CupertinoIcons.person_3_fill : CupertinoIcons.person_3)
+      : Icon(filled
+          ? CupertinoIcons.rectangle_stack_person_crop_fill
+          : CupertinoIcons.rectangle_stack_person_crop);
+
+  String getName({bool filled = true}) =>
+      this == EventType.local ? 'In-Person Event' : 'Remote Event';
 }
 
 extension StrExt on String {

@@ -245,7 +245,7 @@ class _EventView extends State<EventView> {
                                 ),
                               );
                           },
-                          items: [null, ...OpModeType.values]
+                          items: opModeExt.getAll()
                               .map(
                                 (value) => DropdownMenuItem<OpModeType?>(
                                   value: value,

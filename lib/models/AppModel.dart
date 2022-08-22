@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart' as Database;
+import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -27,7 +27,6 @@ class DataModel {
   List<Event> remoteEvents() =>
       allEvents().where((e) => e.type == EventType.remote).toList();
 
-
   Future<void> saveEvents() async {
     final coded = events.map((e) => e.toJson()).toList();
     final prefs = await SharedPreferences.getInstance();
@@ -38,8 +37,7 @@ class DataModel {
   void restoreEvents() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      var x = jsonDecode(prefs.getString("Events") ?? '') as List;
-      events = x
+      events = (jsonDecode(prefs.getString('Events') ?? '') as List)
           .map((e) => Event.fromJson(e))
           .where((element) => !element.shared)
           .toList();
@@ -92,8 +90,7 @@ class TeamTrackUser {
 
 final dataModel = DataModel();
 final DarkThemeProvider themeChangeProvider = new DarkThemeProvider();
-final Database.FirebaseDatabase firebaseDatabase =
-    Database.FirebaseDatabase.instance;
+final FirebaseDatabase firebaseDatabase = FirebaseDatabase.instance;
 final FirebaseFunctions functions = FirebaseFunctions.instance;
 final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 final FirebaseMessaging messaging = FirebaseMessaging.instance;

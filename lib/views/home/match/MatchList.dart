@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:teamtrack/components/misc/PlatformGraphics.dart';
 import 'package:teamtrack/functions/Statistics.dart';
+import 'package:teamtrack/functions/Extensions.dart';
 import 'dart:convert';
 
 import 'package:teamtrack/components/statistics/CheckList.dart';
@@ -205,7 +206,7 @@ class _MatchList extends State<MatchList> {
     if (matches.length == 0) return EmptyList();
     Map<OpModeType?, double> maxScores = {};
     if (widget.team != null) {
-      [null, ...OpModeType.values].forEach((type) {
+      opModeExt.getAll().forEach((type) {
         maxScores[type] = widget.event.statConfig.allianceTotal
             ? widget.event.matches.values
                 .toList()
@@ -216,83 +217,84 @@ class _MatchList extends State<MatchList> {
             : widget.team?.scores.maxScore(Dice.none, false, type, null) ?? 0;
       });
     }
-    return ListView.builder(
-        controller: NewPlatform.isIOS ? null : scrollController,
-        itemCount: matches.length + 1,
-        itemBuilder: (context, index) {
-          if (index == 0)
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
-              child: ExampleMatchRow(
-                event: widget.event,
-                team: widget.team,
-              ),
-            );
-          final match = matches[index - 1];
-          final qualNumber = allMatches.indexOf(match);
-          return Slidable(
-            endActionPane: ActionPane(
-              // A motion is a widget used to control how the pane animates.
-              motion: const StretchMotion(),
-              children: [
-                SlidableAction(
-                  icon: Icons.delete,
-                  backgroundColor: Colors.red,
-                  onPressed: (_) {
-                    showPlatformDialog(
-                      context: context,
-                      builder: (BuildContext context) => PlatformAlert(
-                        title: Text('Delete Match'),
-                        content: Text('Are you sure?'),
-                        actions: [
-                          PlatformDialogAction(
-                            isDefaultAction: true,
-                            child: Text('Cancel'),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                          PlatformDialogAction(
-                            isDefaultAction: false,
-                            isDestructive: true,
-                            child: Text('Confirm'),
-                            onPressed: () {
-                              setState(
-                                () => widget.event.deleteMatch(match),
-                              );
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        ],
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: ExampleMatchRow(
+            event: widget.event,
+            team: widget.team,
+          ),
+        ),
+        Expanded(
+          child: ListView.builder(
+              controller: NewPlatform.isIOS ? null : scrollController,
+              itemCount: matches.length,
+              itemBuilder: (context, index) {
+                final match = matches[index];
+                final qualNumber = allMatches.indexOf(match);
+                return Slidable(
+                  endActionPane: ActionPane(
+                    // A motion is a widget used to control how the pane animates.
+                    motion: const StretchMotion(),
+                    children: [
+                      SlidableAction(
+                        icon: Icons.delete,
+                        backgroundColor: Colors.red,
+                        onPressed: (_) {
+                          showPlatformDialog(
+                            context: context,
+                            builder: (BuildContext context) => PlatformAlert(
+                              title: Text('Delete Match'),
+                              content: Text('Are you sure?'),
+                              actions: [
+                                PlatformDialogAction(
+                                  isDefaultAction: true,
+                                  child: Text('Cancel'),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                                PlatformDialogAction(
+                                  isDefaultAction: false,
+                                  isDestructive: true,
+                                  child: Text('Confirm'),
+                                  onPressed: () {
+                                    setState(
+                                      () => widget.event.deleteMatch(match),
+                                    );
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
-              ],
-            ),
-            child: MatchRow(
-              match: match,
-              team: widget.event.teams[widget.team?.number],
-              event: widget.event,
-              index: widget.ascending
-                  ? qualNumber + 1
-                  : allMatches.length - qualNumber,
-              autoMax: maxScores[OpModeType.auto] ?? 0,
-              teleMax: maxScores[OpModeType.tele] ?? 0,
-              endMax: maxScores[OpModeType.endgame] ?? 0,
-              totalMax: maxScores[null] ?? 0,
-              penaltyMax: maxScores[OpModeType.penalty] ?? 0,
-              statConfig: widget.event.statConfig,
-              onTap: () => navigateToMatch(
-                context,
-                match: match,
-                event: widget.event,
-                team: widget.team,
-                state: this,
-              ),
-            ),
-          );
-        });
+                    ],
+                  ),
+                  child: MatchRow(
+                    match: match,
+                    team: widget.event.teams[widget.team?.number],
+                    event: widget.event,
+                    index: widget.ascending
+                        ? qualNumber + 1
+                        : allMatches.length - qualNumber,
+                    maxes: maxScores,
+                    statConfig: widget.event.statConfig,
+                    onTap: () => navigateToMatch(
+                      context,
+                      match: match,
+                      event: widget.event,
+                      team: widget.team,
+                      state: this,
+                    ),
+                  ),
+                );
+              }),
+        ),
+      ],
+    );
   }
 }
 

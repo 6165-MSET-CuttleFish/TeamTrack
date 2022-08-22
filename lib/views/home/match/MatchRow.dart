@@ -15,22 +15,14 @@ class MatchRow extends StatelessWidget {
     required this.index,
     this.onTap,
     this.team,
-    this.autoMax = 0,
-    this.teleMax = 0,
-    this.endMax = 0,
-    this.totalMax = 0,
-    this.penaltyMax = 0,
+    this.maxes = const {},
     required this.statConfig,
   }) : super(key: key);
   final Event event;
   final Match match;
   final int index;
   final Team? team;
-  final double autoMax;
-  final double teleMax;
-  final double endMax;
-  final double totalMax;
-  final double penaltyMax;
+  final Map<OpModeType?, double> maxes;
   final StatConfig statConfig;
   final void Function()? onTap;
   final double width = 30;
@@ -131,11 +123,7 @@ class MatchRow extends StatelessWidget {
     return ScoreSummary(
       event: event,
       score: score,
-      autoMax: autoMax,
-      teleMax: teleMax,
-      endMax: endMax,
-      totalMax: totalMax,
-      penaltyMax: penaltyMax,
+      maxes: maxes,
       showPenalties: event.statConfig.showPenalties,
       shortenedNames: true,
     );
@@ -205,14 +193,14 @@ class MatchRow extends StatelessWidget {
         ),
         if (event.eventKey != null)
           Text(
-            match.getRedAPI() != -1
+            match.getRedAPI() != null
                 ? match.getRedAPI().toString() +
                     ' - ' +
                     match.getBlueAPI().toString()
                 : 'Not on API',
             style: GoogleFonts.gugi(
-              fontSize: match.getRedAPI() == -1 ? 10.5 : 12,
-              color: match.getRedAPI() == -1 ? Colors.amber : Colors.green,
+              fontSize: match.getRedAPI() == null ? 10.5 : 12,
+              color: match.getRedAPI() == null ? Colors.amber : Colors.green,
             ),
           ),
       ],

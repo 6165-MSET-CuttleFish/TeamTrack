@@ -19,7 +19,8 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await remoteConfig.fetchAndActivate();
-  Statics.gameName = remoteConfig.getString("gameName"); // season's game name (to be changed in remote config every season)
+  Statics.gameName = remoteConfig.getString("gameName");
+  // season's game name (to be changed in remote config every season)
   dataModel.restoreEvents(); // restore on-device events from shared preferences
   if (!NewPlatform.isWeb) {
     final settings = await messaging.requestPermission(

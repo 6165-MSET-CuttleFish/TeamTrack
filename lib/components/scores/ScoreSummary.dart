@@ -9,11 +9,7 @@ class ScoreSummary extends StatelessWidget {
     Key? key,
     required this.event,
     required this.score,
-    this.autoMax = 0,
-    this.teleMax = 0,
-    this.endMax = 0,
-    this.totalMax = 0,
-    this.penaltyMax = 0,
+    required this.maxes,
     this.height = 60,
     this.width = 30,
     required this.showPenalties,
@@ -25,24 +21,10 @@ class ScoreSummary extends StatelessWidget {
   final Score? score;
   final bool shortenedNames;
   final double? titleWidthConstraint;
-  final double autoMax, teleMax, endMax, totalMax, penaltyMax;
+  final Map<OpModeType?, double> maxes;
   final double width, height;
   final bool showPenalties;
   final String units;
-  double getMax(OpModeType? opModeType) {
-    switch (opModeType) {
-      case OpModeType.auto:
-        return autoMax;
-      case OpModeType.tele:
-        return teleMax;
-      case OpModeType.endgame:
-        return endMax;
-      case OpModeType.penalty:
-        return penaltyMax;
-      default:
-        return totalMax;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +32,7 @@ class ScoreSummary extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       mainAxisSize: MainAxisSize.max,
       children: [
-        for (final opModeType in [null, ...OpModeType.values])
+        for (final opModeType in opModeExt.getAll())
           BarGraph(
             height: height,
             width: width,
@@ -60,7 +42,7 @@ class ScoreSummary extends StatelessWidget {
                     ?.toDouble()
                     .abs() ??
                 0,
-            max: getMax(opModeType).abs(),
+            max: maxes[opModeType]?.abs() ?? 0,
             title: opModeType.getName(shortened: shortenedNames),
             units: units,
             titleWidthConstraint: titleWidthConstraint,

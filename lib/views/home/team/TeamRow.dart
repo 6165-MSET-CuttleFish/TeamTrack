@@ -48,7 +48,6 @@ class TeamRow extends StatelessWidget {
         : team.scores.values
             .map((e) => e.getScoreDivision(sortMode))
             .percentIncrease(elementSort);
-    final elementName = elementSort?.name ?? "";
     final wlt = (team.getWLT(event) ?? '').split('-');
     return Container(
       decoration: BoxDecoration(

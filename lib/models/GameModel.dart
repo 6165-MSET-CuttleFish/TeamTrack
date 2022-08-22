@@ -24,7 +24,7 @@ class Statics {
 
 enum EventType {
   local,
-  remote, // TODO: Doesn't really make sense to scout remote events so maybe convert this into a specific 'driver-practice' mode
+  remote,
 }
 
 enum Dice {
@@ -57,10 +57,11 @@ class Event {
 
   TeamTrackUser? author;
   String gameName = Statics.gameName;
-  Role role = Role.editor;
+  Role role =
+      Role.editor; // the permissions enabled for the current user in this event
   bool shared = false;
   EventType type = EventType.remote;
-  Map<String, Team> teams = Map<String, Team>();
+  Map<String, Team> teams = {};
   Map<String, Match> matches = {};
   String name = "";
   Timestamp createdAt = Timestamp.now();
@@ -75,28 +76,22 @@ class Event {
   Future<HttpsCallableResult<dynamic>> shareEvent({
     required String email,
     required Role role,
-  }) async {
-    final callable = functions.httpsCallable('shareEvent');
-    return callable.call(
-      {
-        'email': email,
-        'name': this.name,
-        'id': this.id,
-        'author': this.author?.toJson(),
-        'type': this.type.toString(),
-        'gameName': this.gameName,
-        'role': role.toRep(),
-      },
-    );
-  }
+  }) =>
+      functions.httpsCallable('shareEvent').call(
+        {
+          'email': email,
+          'name': name,
+          'id': id,
+          'author': author?.toJson(),
+          'type': type.toString(),
+          'gameName': gameName,
+          'role': role.toRep(),
+        },
+      );
 
-  String? getKey() {
-    return eventKey;
-  }
+  String? getKey() => eventKey;
 
-  bool hasKey() {
-    return eventKey != null && !(eventKey?.isEmpty ?? true);
-  }
+  bool hasKey() => eventKey != null && !(eventKey?.isEmpty ?? true);
 
   void addTeam(Team newTeam) async {
     await getRef()
@@ -388,10 +383,12 @@ class Event {
       try {
         author = TeamTrackUser.fromJson(map['author'], null);
       } catch (e) {
+        // IMPORTANT: these try catches exist for transitionary periods of the db (making sure old users can still access their data)
         author = TeamTrackUser(
-            role: Role.editor,
-            displayName: map['authorName'],
-            email: map['authorEmail']);
+          role: Role.editor,
+          displayName: map['authorName'],
+          email: map['authorEmail'],
+        );
       }
 
       for (var match in matches.values) {
@@ -502,6 +499,7 @@ class Alliance {
   Alliance? opposingAlliance;
   late Score sharedScore;
   String? id;
+  int? totalScore;
   String gameName;
   Alliance(this.team1, this.team2, this.eventType, this.gameName) {
     sharedScore =
@@ -586,8 +584,6 @@ class Match {
   String id = '';
   List<TeamTrackUser>? activeUsers;
   Timestamp timeStamp = Timestamp.now();
-  int apiRed = -1;
-  int apiBlue = -1;
   Match(this.red, this.blue, this.type) {
     id = Uuid().v4();
     timeStamp = Timestamp.now();
@@ -651,17 +647,17 @@ class Match {
         blueScore(showPenalties: showPenalties).toString();
   }
 
-  void setAPIScore(int red, int blue) {
-    apiRed = red;
-    apiBlue = blue;
+  void setAPIScore(int redScore, int blueScore) {
+    red?.totalScore = redScore;
+    blue?.totalScore = blueScore;
   }
 
-  int getRedAPI() {
-    return apiRed;
+  int? getRedAPI() {
+    return red?.totalScore;
   }
 
-  int getBlueAPI() {
-    return apiBlue;
+  int? getBlueAPI() {
+    return blue?.totalScore;
   }
 
   int getMaxScoreVal({required bool? showPenalties}) {

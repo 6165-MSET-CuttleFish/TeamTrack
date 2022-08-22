@@ -52,6 +52,7 @@ double maxValue(Iterable<num?> arr) => arr.maxValue();
 extension Arithmetic on Iterable<num?> {
   double getStatistic(double Function(Iterable<num?>) statistic) =>
       statistic(this);
+
   double mean() {
     final arr = this.whereType<num>();
     if (arr.isEmpty) return 0.0;
@@ -198,12 +199,6 @@ extension MatchExtensions on List<Match> {
     }
     return max;
   }
-
-  double maxScore(bool showPenalties) => this
-      .toList()
-      .map((e) => e.getMaxScoreVal(showPenalties: showPenalties))
-      .maxValue()
-      .toDouble();
 }
 
 extension SpotExtensions on List<FlSpot> {
@@ -214,8 +209,11 @@ extension SpotExtensions on List<FlSpot> {
 }
 
 extension ListScore on List<Score> {
-  List<FlSpot> spots(OpModeType? type,
-      {bool? showPenalties, bool markDisconnect = false}) {
+  List<FlSpot> spots(
+    OpModeType? type, {
+    bool? showPenalties,
+    bool markDisconnect = false,
+  }) {
     final list = this
         .map(
           (e) => e.getScoreDivision(type).total(
@@ -328,148 +326,12 @@ extension TeamsExtension on Map<String, Team> {
         .minValue();
   }
 
-  double maxMeanScore(Dice? dice, bool removeOutliers, OpModeType? type,
-      ScoringElement? element) {
-    if (this.length == 0) return 1;
-    return this
-        .values
-        .map((e) => e.scores
-            .meanScore(dice ?? Dice.none, removeOutliers, type, element))
-        .maxValue();
-  }
-
-  double maxMedianScore(Dice? dice, bool removeOutliers, OpModeType? type,
-      ScoringElement? element) {
-    if (this.length == 0) return 1;
-    var x = this
-        .values
-        .map((e) => e.scores
-            .medianScore(dice ?? Dice.none, removeOutliers, type, element))
-        .toList();
-    return x.maxValue();
-  }
-
-  double lowestStandardDeviationScore(Dice? dice, bool removeOutliers,
-      OpModeType? type, ScoringElement? element) {
-    if (this.length == 0) return 1;
-    final arr = this
-        .values
-        .map((e) => e.scores
-            .standardDeviationScore(dice, removeOutliers, type, element))
-        .where((element) => element != 0);
-    return arr.length != 0 ? arr.reduce(min) : 1;
-  }
-
-  double maxStandardDeviationScore(Dice? dice, bool removeOutliers,
-      OpModeType? type, ScoringElement? element) {
-    if (this.length == 0) return 1;
-    final arr = this.values.map((e) =>
-        e.scores.standardDeviationScore(dice, removeOutliers, type, element));
-    return arr.maxValue();
-  }
-
   double maxCustomStatisticScore(Dice? dice, bool removeOutliers,
       Statistics statistic, OpModeType? type, ScoringElement? element) {
     if (this.length == 0) return 1;
     final arr = this.values.map((e) => e.scores
         .customStatisticScore(dice, removeOutliers, statistic, type, element));
     return arr.maxValue();
-  }
-}
-
-extension ScoreDivExtension on List<ScoreDivision> {
-  List<FlSpot> spots() => this.map((e) => e.total()).spots();
-
-  double maxScore(Dice dice, bool removeOutliers, {String? element}) {
-    final arr = this.diceScores(dice);
-    if (arr.length == 0) return 0;
-    return arr
-        .map((e) => e.getScoringElementCount(element)?.toDouble().abs())
-        .removeOutliers(removeOutliers)
-        .maxValue()
-        .toDouble();
-  }
-
-  double customStatisticScore(
-      Dice dice, bool removeOutliers, Statistics statistics,
-      {ScoringElement? element}) {
-    final arr = this.diceScores(dice);
-    if (arr.length == 0) return 0;
-    return arr
-        .map((e) => e.getScoringElementCount(element?.key)?.toDouble())
-        .removeOutliers(removeOutliers)
-        .getStatistic(statistics.getFunction());
-  }
-
-  double medianScore(Dice dice, bool removeOutliers,
-      {ScoringElement? element}) {
-    final arr = this.diceScores(dice);
-    if (arr.length == 0) return 0;
-    return arr
-        .map((e) => e.getScoringElementCount(element?.key)?.toDouble())
-        .removeOutliers(removeOutliers)
-        .median();
-  }
-
-  double minScore(Dice dice, bool removeOutliers, {ScoringElement? element}) {
-    final arr = this.diceScores(dice);
-    if (arr.length == 0) return 0;
-    return arr
-        .map((e) => e.getScoringElementCount(element?.key)?.toDouble())
-        .removeOutliers(removeOutliers)
-        .minValue()
-        .toDouble();
-  }
-
-  double funcScore(Dice dice, bool removeOutliers,
-      {required double Function(List<num>) func}) {
-    final arr = this.diceScores(dice);
-    if (arr.length == 0) return 0;
-    return func(
-      arr
-          .map(
-            (e) => e.total()?.toDouble(),
-          )
-          .removeOutliers(
-            removeOutliers,
-          ),
-    );
-  }
-
-  double meanScore(Dice dice, bool removeOutliers, {ScoringElement? element}) {
-    final arr = this.diceScores(dice);
-    if (arr.length == 0) return 0;
-    return arr
-        .map((e) => e.getScoringElementCount(element?.key)?.toDouble())
-        .removeOutliers(removeOutliers)
-        .mean();
-  }
-
-  double standardDeviationScore(Dice dice, bool removeOutliers) {
-    final arr = this.diceScores(dice);
-    if (arr.length == 0) return 0;
-    return arr
-        .map((e) => e.total()?.toDouble())
-        .removeOutliers(removeOutliers)
-        .standardDeviation();
-  }
-
-  double devianceScore(Dice dice, bool removeOutliers) {
-    final arr = this.diceScores(dice);
-    if (arr.length == 0) return 0;
-    return arr
-        .map((e) => e.total()?.toDouble())
-        .removeOutliers(removeOutliers)
-        .standardDeviation();
-  }
-
-  List<ScoreDivision> diceScores(Dice dice) {
-    var returnList =
-        (dice != Dice.none ? this.where((e) => e.getDice() == dice) : this)
-            .toList();
-    returnList
-        .sort((a, b) => a.timeStamp.toDate().compareTo(b.timeStamp.toDate()));
-    return returnList;
   }
 }
 
@@ -494,46 +356,6 @@ extension ScoresExtension on Map<String, Score> {
             e.getScoreDivision(type).getScoringElementCount(element)?.abs())
         .removeOutliers(removeOutliers);
     if (temp.length != 0) return temp.reduce(min).toDouble();
-    return 0;
-  }
-
-  double meanScore(Dice dice, bool removeOutliers, OpModeType? type,
-      ScoringElement? element) {
-    final arr = this.diceScores(dice);
-    if (arr.length == 0) return 0;
-    var temp = arr
-        .map((e) => e
-            .getScoreDivision(type)
-            .getScoringElementCount(element?.key)
-            ?.abs())
-        .removeOutliers(removeOutliers);
-    if (temp.length != 0) return temp.mean();
-    return 0;
-  }
-
-  double medianScore(Dice dice, bool removeOutliers, OpModeType? type,
-      ScoringElement? element) {
-    final arr = this.diceScores(dice);
-    if (arr.length == 0) return 0;
-    var temp = arr
-        .map((e) => e
-            .getScoreDivision(type)
-            .getScoringElementCount(element?.key)
-            ?.abs())
-        .removeOutliers(removeOutliers);
-    if (temp.length != 0) return temp.median();
-    return 0;
-  }
-
-  double standardDeviationScore(Dice? dice, bool removeOutliers,
-      OpModeType? type, ScoringElement? element) {
-    final arr = this.diceScores(dice);
-    if (arr.length == 0) return 0;
-    var temp = arr
-        .map((e) =>
-            e.getScoreDivision(type).getScoringElementCount(element?.key))
-        .removeOutliers(removeOutliers);
-    if (temp.length != 0) return temp.standardDeviation();
     return 0;
   }
 
@@ -578,6 +400,29 @@ extension ScoresExtension on Map<String, Score> {
 }
 
 extension more on Iterable<ScoreDivision> {
+  List<FlSpot> spots() => this.map((e) => e.total()).spots();
+
+  double customStatisticScore(
+      Dice dice, bool removeOutliers, Statistics statistics,
+      {ScoringElement? element}) {
+    final arr = this.diceScores(dice);
+    if (arr.length == 0) return 0;
+    return arr
+        .map((e) => e.getScoringElementCount(element?.key)?.toDouble())
+        .removeOutliers(removeOutliers)
+        .getStatistic(statistics.getFunction());
+  }
+
+  /// Returns the scores which had the [dice] autonomous randomization case
+  List<ScoreDivision> diceScores(Dice dice) {
+    var returnList =
+        (dice != Dice.none ? this.where((e) => e.getDice() == dice) : this)
+            .toList();
+    returnList
+        .sort((a, b) => a.timeStamp.toDate().compareTo(b.timeStamp.toDate()));
+    return returnList;
+  }
+
   double? percentIncrease(ScoringElement? element) {
     final sorted = this.toList();
     sorted.sort((a, b) => a.timeStamp.toDate().compareTo(b.timeStamp.toDate()));

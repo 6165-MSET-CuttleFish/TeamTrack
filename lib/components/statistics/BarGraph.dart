@@ -4,28 +4,25 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:teamtrack/components/misc/PlatformGraphics.dart';
 
+/// Used to show proportion of [val]/[max] in a color coded format
 class BarGraph extends StatelessWidget {
   BarGraph({
     Key? key,
     this.max = 2,
     this.val = 9,
-    this.inverted = false,
     this.height = 120,
     this.width = 30,
-    this.title = 'Default',
+    this.title = '',
     this.fontSize = 12,
-    this.units = '', // units of measurement
+    this.units = '',
     this.percentage = 0,
     this.vertical = true, // vertical or horizontal bar
-    this.compressed = false,
-    this.showPercentage = true,
+    this.compressed = false, // whether to show the text or not
+    this.showPercentage = true, // whether to show the percentage or not
     this.lessIsBetter = false, // if true, lower numbers are better
     this.titleWidthConstraint,
   }) : super(key: key) {
-    percentage = (inverted
-            ? (val != 0 ? (max / val).clamp(0, 1) : 1) * 100.0
-            : (max != 0 ? (val / max).clamp(0, 1) : 0) * 100.0)
-        .toInt();
+    percentage = ((max != 0 ? (val / max).clamp(0, 1) : 0) * 100.0).toInt();
     if (!vertical) {
       double temp = width;
       width = height;
@@ -38,12 +35,11 @@ class BarGraph extends StatelessWidget {
   final double? titleWidthConstraint;
   final String title;
   final double fontSize;
-  double max;
+  final double max;
   double width;
-  double val;
-  final bool inverted;
+  final double val;
   double height;
-  final String units;
+  final String units; // units of [val]
   final bool vertical;
   int percentage;
   @override
@@ -85,13 +81,9 @@ class BarGraph extends StatelessWidget {
                 duration: Duration(milliseconds: 600),
                 width: vertical
                     ? width
-                    : (inverted
-                        ? (val != 0 ? (max / val).clamp(0, 1) : 1) * width
-                        : (max != 0 ? (val / max).clamp(0, 1) : 0) * width),
+                    : (max != 0 ? (val / max).clamp(0, 1) : 0) * width,
                 height: vertical
-                    ? (inverted
-                        ? (val != 0 ? (max / val).clamp(0, 1) : 1) * height
-                        : (max != 0 ? (val / max).clamp(0, 1) : 0) * height)
+                    ? (max != 0 ? (val / max).clamp(0, 1) : 0) * height
                     : height,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(60),
@@ -127,30 +119,16 @@ class BarGraph extends StatelessWidget {
 
   Color _colorSelect(double val, double max) {
     Color color;
-    if (!inverted) {
-      if (val / max < 0.5) {
-        color = lessIsBetter
-            ? CupertinoColors.systemGreen
-            : CupertinoColors.systemRed;
-      } else if (val / max < 0.7) {
-        color = CupertinoColors.systemYellow;
-      } else {
-        color = lessIsBetter
-            ? CupertinoColors.systemRed
-            : CupertinoColors.systemGreen;
-      }
+    if (val / max < 0.5) {
+      color = lessIsBetter
+          ? CupertinoColors.systemGreen
+          : CupertinoColors.systemRed;
+    } else if (val / max < 0.7) {
+      color = CupertinoColors.systemYellow;
     } else {
-      if (max / val < 0.5) {
-        color = lessIsBetter
-            ? CupertinoColors.systemGreen
-            : CupertinoColors.systemRed;
-      } else if (max / val < 0.7) {
-        color = CupertinoColors.systemYellow;
-      } else {
-        color = lessIsBetter
-            ? CupertinoColors.systemRed
-            : CupertinoColors.systemGreen;
-      }
+      color = lessIsBetter
+          ? CupertinoColors.systemRed
+          : CupertinoColors.systemGreen;
     }
     return color;
   }

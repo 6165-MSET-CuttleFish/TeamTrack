@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:teamtrack/components/scores/ScoreRangeSummary.dart';
 import 'package:teamtrack/models/Change.dart';
 import 'package:teamtrack/models/GameModel.dart';
-import 'package:teamtrack/functions/Statistics.dart';
 
 class ChangeRow extends StatelessWidget {
   const ChangeRow({
@@ -19,41 +18,21 @@ class ChangeRow extends StatelessWidget {
   final Team team;
   final void Function()? onTap;
   @override
-  Widget build(BuildContext context) {
-    final scores = team.scores.values.where((score) =>
-        score.timeStamp.compareTo(change.startDate) >= 0 &&
-        score.timeStamp.compareTo(change.endDate ?? Timestamp.now()) <= 0);
-    final autoIncrease =
-        scores.map((score) => score.autoScore).totalPercentIncrease(null) ?? 0;
-    final teleIncrease =
-        scores.map((score) => score.teleScore).totalPercentIncrease(null) ?? 0;
-    final endgameIncrease =
-        scores.map((score) => score.endgameScore).totalPercentIncrease(null) ?? 0;
-    final totalIncrease = scores.totalPercentIncrease(null) ?? 0;
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: Colors.grey,
-          width: 1,
+  Widget build(BuildContext context) => Container(
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Colors.grey,
+            width: 1,
+          ),
         ),
-      ),
-      child: ListTile(
-        onTap: onTap,
-        title: Column(
-          children: [
-            Text(change.title),
-            Text(
-              '${formatDate(
-                change.startDate.toDate(),
-                [
-                  mm,
-                  '/',
-                  dd,
-                  '/',
-                  yyyy,
-                ],
-              )} - ${change.endDate != null ? formatDate(
-                  change.endDate!.toDate(),
+        child: ListTile(
+          onTap: onTap,
+          title: Column(
+            children: [
+              Text(change.title),
+              Text(
+                '${formatDate(
+                  change.startDate.toDate(),
                   [
                     mm,
                     '/',
@@ -61,20 +40,29 @@ class ChangeRow extends StatelessWidget {
                     '/',
                     yyyy,
                   ],
-                ) : "Present"}',
-              style: Theme.of(context).textTheme.caption,
-            ),
-            ScoreRangeSummary(
-              event: event,
-              showPenalties: event.statConfig.showPenalties,
-              auto: autoIncrease,
-              tele: teleIncrease,
-              end: endgameIncrease,
-              total: totalIncrease,
-            ),
-          ],
+                )} - ${change.endDate != null ? formatDate(
+                    change.endDate!.toDate(),
+                    [
+                      mm,
+                      '/',
+                      dd,
+                      '/',
+                      yyyy,
+                    ],
+                  ) : "Present"}',
+                style: Theme.of(context).textTheme.caption,
+              ),
+              ScoreRangeSummary(
+                scores: team.scores.values
+                    .where((score) =>
+                        score.timeStamp.compareTo(change.startDate) >= 0 &&
+                        score.timeStamp
+                                .compareTo(change.endDate ?? Timestamp.now()) <=
+                            0)
+                    .toList(),
+              ),
+            ],
+          ),
         ),
-      ),
-    );
-  }
+      );
 }
