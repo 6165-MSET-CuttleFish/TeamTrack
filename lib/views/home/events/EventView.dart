@@ -17,7 +17,7 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:teamtrack/functions/Statistics.dart';
 import 'package:teamtrack/views/home/events/EventShare.dart';
 import 'package:provider/provider.dart';
-import '../../../api/APIKEYS.dart';
+import 'package:teamtrack/functions/APIMethods.dart';
 
 class EventView extends StatefulWidget {
   EventView({
@@ -54,7 +54,7 @@ class _EventView extends State<EventView> {
 
   _getMatches() async {
     if (widget.event.hasKey()) {
-      final response = await APIKEYS.getMatches(widget.event.getKey() ?? '');
+      final response = await APIMethods.getMatches(widget.event.getKey() ?? '');
       setState(() {
         bod = (json.decode(response.body).toList());
         //print(bod);
