@@ -66,6 +66,7 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
     "sendTime": admin.firestore.FieldValue.serverTimestamp(),
     "type": data.type,
     "gameName": data.gameName,
+    "eventKey": data.eventKey,
   };
   const ref = admin.firestore().collection("users").doc(recipient.uid);
   let tokens:string[] = [];
@@ -127,6 +128,7 @@ export const nativizeEvent = functions.database
           "id": event.id,
           "type": event.type,
           "gameName": event.gameName,
+          "eventKey": event.eventKey,
         };
         t.update(doc.ref, {events: events});
       });
