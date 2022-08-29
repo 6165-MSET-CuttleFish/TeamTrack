@@ -416,15 +416,12 @@ class _LandingPageState extends State<LandingPage> {
                                   child: Text('Delete Account'),
                                   onPressed: () async {
 
-                                    User? user=context.read<User?>();
-                                    final uid = user?.uid;
-                                    List<Event> localEvents=dataModel.events;
-                                    //delete local events
-                                    localEvents.forEach((ev)
-                                    {
-                                      setState(() => dataModel.events.remove(ev));
-                                    });
 
+
+                                    //User? user=context.read<User?>();
+                                    final uid = FirebaseAuth.instance.currentUser?.uid;
+
+                                    setState(() => dataModel.events.clear());
                                     dataModel.saveEvents();
 
                                     //deal with shared events
@@ -437,70 +434,108 @@ class _LandingPageState extends State<LandingPage> {
                                       TeamTrackUser? firstEditor;
                                       TeamTrackUser? firstViewer;
                                       TeamTrackUser? targetUser;
+                                      setState(() => {});
 
+
+                                      //update users list from firebase
+                                      dynamic map = await ev.getRef()?.once();
+                                      ev.updateLocal(
+                                        json.decode(
+                                          json.encode(
+                                            map?.snapshot.value,
+                                          ),
+                                        ),
+                                        context,
+                                      );
+                                      setState(() => {});
+
+                                      List<TeamTrackUser> users=ev.users;
                                       setState(() => {});
 
                                       //check is there are multiple people with access to the event
                                       //If there are: proceed. If not, just delete the event(code at bottom)
-                                      if(ev.users.length>1)
+
+                                      if(users.length>1)
                                       {
                                         setState(() => {});
                                         //check if the user is an admin. If he isn't that means there is another admin
                                         //so we can just delete the user permissions(skip steps)
-                                        if (ev.users.firstWhere((element) => element.uid == context.read<User?>()?.uid).
+                                        if (users.firstWhere((element) => element.uid == context.read<User?>()?.uid).
                                         role == Role.admin)
                                         {
                                           //look through the list for an admin OR other potential candidates to be given admin
-
-                                          firstAdmin=ev.users.firstWhereOrNull((element) => element.uid!=uid
+                                          firstAdmin=users.firstWhereOrNull((element) => element.uid!=uid
                                               &&element.role==Role.admin);
-                                          firstEditor=ev.users.firstWhereOrNull((element) => element.role==Role.editor);
-                                          firstViewer=ev.users.firstWhereOrNull((element)=> element.role==Role.viewer);
-
+                                          firstEditor=users.firstWhereOrNull((element) => element.role==Role.editor);
+                                          firstViewer=users.firstWhereOrNull((element)=> element.role==Role.viewer);
                                           setState(() => {});
 
-
                                           //if there is no current other admin, then choose one of the other users to make admin
-                                          if (firstAdmin != null)
-                                            targetUser=null;
-                                          else if(firstEditor!=null)
+                                          if(firstEditor!=null)
                                             targetUser=firstEditor;
-                                          else
+                                          else if(firstViewer!=null)
                                             targetUser=firstViewer;
                                           setState(() => {});
 
-                                          if(targetUser!=null)
+
+
+
+                                          //change so check from firebase
+                                          while(firstAdmin==null&&targetUser!=null)
                                           {
+                                            debugPrint(targetUser.displayName);
                                             await
-                                            ref?.child('${targetUser?.uid}/role').set("admin");
+
+                                              ref?.child('${targetUser?.uid}/role').set("admin");
+                                              setState(() => {});
+
+
+                                            firstAdmin=ev.users.firstWhereOrNull((element) => element.uid!=uid
+                                                &&element.role==Role.admin);
                                             setState(() => {});
                                           }
                                         }
+                                        //run this in a while loop as well
+                                        setState(() => {});
+                                        /*while(ref?.child('$uid').get()!=null)
+                                        {
 
-                                        setState(() => {});
+                                        }*/
+                                       // while(ev.users.firstWhereOrNull((element) => element.uid==uid)!=null)
+                                        //{
                                         await
-                                        ref?.child('$uid').remove();
-                                        setState(() => {});
-                                        //maybe set the author to another one of the admins
+                                        ev.getRef()?.child('Permissions/$uid').remove();
+
+                                          /*await
+                                          ref?.child('$uid').remove().then((yikes) async
+                                          {
+                                            DocumentReference doc=FirebaseFirestore.instance.collection("users")
+                                                .doc('${user?.uid}/events/${ev.id}');
+                                            doc.delete();
+                                          });
+                                          setState(() => {});*/
+
+                                          setState(() => {});
+                                        //}
                                       }
                                       else
                                       {
                                         await
-                                      ev.getRef()?.remove();
-                                      setState(() => {});
+                                        ev.getRef()?.remove();
+                                        setState(() => {});
                                       }
                                       });
 
                                       dataModel.saveEvents();
                                       setState(() => {});
 
-                                      user?.delete().then((yikes) async
+                                      /*user?.delete().then((yikes) async
                                         {
                                           await
                                           FirebaseFirestore.instance.collection("users")
                                               .doc(user?.uid)
                                               .delete();
-                                        });
+                                        });*/
 
                                       context
                                           .read<AuthenticationService>()

@@ -103,6 +103,15 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
   return returnVal;
 });
 
+export const modifyUserRole = functions.https.onCall(async (data, context) =>
+{
+    return
+      await admin
+      .database.ref()
+      .child(`Events/${data.gameName}/${data.id}/Permissions/${data.uid}/role`)
+      .set(data.role);
+});
+
 // update creator's permissions and add the new event to creator's events list
 export const nativizeEvent = functions.database
     .ref("/Events/{gameName}/{event}")
