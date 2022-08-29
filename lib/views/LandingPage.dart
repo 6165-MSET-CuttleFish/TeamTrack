@@ -428,6 +428,7 @@ class _LandingPageState extends State<LandingPage> {
                                     List<Event> sharedEvents=dataModel.sharedEvents;
                                     sharedEvents.forEach((ev) async
                                     {
+                                      debugPrint('REEEEEEEEEE $uid');
                                       final ref=ev.getRef()?.child("Permissions");
                                       //temporary variables
                                       TeamTrackUser? firstAdmin;
@@ -457,6 +458,7 @@ class _LandingPageState extends State<LandingPage> {
 
                                       if(users.length>1)
                                       {
+                                        debugPrint('REEEEEEEEEE $uid');
                                         setState(() => {});
                                         //check if the user is an admin. If he isn't that means there is another admin
                                         //so we can just delete the user permissions(skip steps)
@@ -483,6 +485,7 @@ class _LandingPageState extends State<LandingPage> {
                                           //change so check from firebase
                                           while(firstAdmin==null&&targetUser!=null)
                                           {
+                                            debugPrint('REEEEEEEEEE $uid');
                                             debugPrint(targetUser.displayName);
                                             await
 
