@@ -113,11 +113,12 @@ export const modifyUserRole = functions.https.onCall(async (data, context) =>
         );
       }
 
-    //return 'Events/${data.gameName}/${data.id}/Permissions/${data.uid}';
+    //semi-security fix: user has to be admin to remove use this to remove other users. user has to be part of group to remove himself
     if(data.role==null)
     {
      return await admin.database().ref().child(`Events/${data.gameName}/${data.id}/Permissions/${data.uid}`).remove();
     }
+    //semi-security fix: user must be admin to modify perms
     else
     {
     return await admin.database().ref().child(`Events/${data.gameName}/${data.id}/Permissions/${data.uid}/role`).set(data.role);

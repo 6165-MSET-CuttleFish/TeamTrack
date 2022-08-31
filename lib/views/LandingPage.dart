@@ -418,8 +418,8 @@ class _LandingPageState extends State<LandingPage> {
 
 
 
-                                    //User? user=context.read<User?>();
-                                    final uid = FirebaseAuth.instance.currentUser?.uid;
+                                    User? user=FirebaseAuth.instance.currentUser;
+                                    final uid = user?.uid;
                                     final email=FirebaseAuth.instance.currentUser?.email;
 
                                     setState(() => dataModel.events.clear());
@@ -428,80 +428,107 @@ class _LandingPageState extends State<LandingPage> {
                                     //deal with shared events
                                     List<Event> sharedEvents=dataModel.sharedEvents;
 
-                                    for(Event ev in sharedEvents)
-                                    {
-                                      debugPrint('REEEEEEEEEE $uid');
+                                    //debugPrint('HEREEEEEEEEEEEEEEEE');
 
-                                      //temporary variables
-                                      TeamTrackUser? firstEditor;
-                                      TeamTrackUser? firstViewer;
-                                      TeamTrackUser? targetUser;
-                                      setState(() => {});
+                                    try {
+                                      for (Event ev in sharedEvents) {
+                                        //debugPrint('REEEEEEEEEE $uid');
 
-                                      //update users list from firebase
-                                      final map = await ev.getRef()?.once();
-                                      ev.updateLocal(
-                                        json.decode(
-                                          json.encode(
-                                            map?.snapshot.value,
+                                        //temporary variables
+                                        TeamTrackUser? firstEditor;
+                                        TeamTrackUser? firstViewer;
+                                        TeamTrackUser? targetUser;
+                                        setState(() => {});
+
+                                        //update users list from firebase
+                                        final map = await ev.getRef()?.once();
+                                        ev.updateLocal(
+                                          json.decode(
+                                            json.encode(
+                                              map?.snapshot.value,
+                                            ),
                                           ),
-                                        ),
-                                        context,
-                                      );
-                                      setState(() => {});
-
-                                      List<TeamTrackUser> users = ev.users;
-                                      setState(() => {});
-
-
-                                      if (users.firstWhereOrNull((element) => element.uid == uid)?.role != Role.admin
-                                          || users.firstWhereOrNull((element) => element.role==Role.admin&&element.uid!=uid)!=null)
-                                      {
-                                        await ev.modifyUser(uid:uid, role: null);
-
-                                        //setState(() => {});
-                                      }
-                                      else if(users.singleOrNull!=null)
-                                      {
-                                        await ev.getRef()?.remove();
-                                        setState(() => {});
-                                        //delete event
-                                      }
-                                      else
-                                      {
-                                        firstEditor=users.firstWhereOrNull((element) => element.role==Role.editor);
-                                        firstViewer=users.firstWhereOrNull((element) => element.role==Role.viewer);
+                                          context,
+                                        );
                                         setState(() => {});
 
-                                        if(firstEditor!=null)
-                                          targetUser=firstEditor;
-                                        else if(firstViewer!=null)
-                                          targetUser=firstViewer;
+                                        List<TeamTrackUser> users = ev.users;
                                         setState(() => {});
 
+                                        //debugPrint("THISSSSSSSSSSSSSSSSSS");
 
-                                        await ev.modifyUser(uid: targetUser?.uid, role: Role.admin);
 
-                                        //setState(() => {});
+                                        if (users
+                                            .firstWhereOrNull((
+                                            element) => element.uid == uid)
+                                            ?.role != Role.admin
+                                            || users.firstWhereOrNull((
+                                                element) =>
+                                            element.role == Role.admin &&
+                                                element.uid != uid) != null) {
+                                          await ev.modifyUser(
+                                              uid: uid, role: null);
 
-                                        await ev.modifyUser(uid: uid, role: null);
+                                          //setState(() => {});
+                                        }
+                                        else if (users.singleOrNull != null) {
+                                          await ev.getRef()?.remove();
+                                          setState(() => {});
+                                          //delete event
+                                        }
+                                        else {
+                                          firstEditor = users.firstWhereOrNull((
+                                              element) =>
+                                          element.role == Role.editor);
+                                          firstViewer = users.firstWhereOrNull((
+                                              element) =>
+                                          element.role == Role.viewer);
+                                          setState(() => {});
 
-                                        setState(() => {});
+                                          if (firstEditor != null)
+                                            targetUser = firstEditor;
+                                          else if (firstViewer != null)
+                                            targetUser = firstViewer;
+                                          setState(() => {});
+
+
+                                          await ev.modifyUser(
+                                              uid: targetUser?.uid,
+                                              role: Role.admin);
+
+                                          //setState(() => {});
+
+                                          await ev.modifyUser(
+                                              uid: uid, role: null);
+
+                                          setState(() => {});
+                                        }
                                       }
                                     }
-
+                                    catch(err)
+                                    {
+                                      debugPrint("this code was written while listening to egirl asmr");
+                                    }
                                       dataModel.saveEvents();
                                       setState(() => {});
 
-                                      /*user?.delete().then((yikes) async
+                                      try {
+                                        user?.delete().then((yikes) async
                                         {
                                           await
-                                          FirebaseFirestore.instance.collection("users")
-                                              .doc(user?.uid)
+                                          FirebaseFirestore.instance.collection(
+                                              "users")
+                                              .doc(uid)
                                               .delete();
-                                        });*/
+                                        });
+                                        setState(() => {});
+                                      }
+                                      catch(err)
+                                      {
+                                        debugPrint("lol");
+                                      }
 
-                                      context
+                                    context
                                           .read<AuthenticationService>()
                                           .signOut();
                                       Navigator.of(context).pop();
