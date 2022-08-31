@@ -6,8 +6,6 @@ import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/components/misc/PlatformGraphics.dart';
 
 import '../../api/APIKEYS.dart';
-import '../../functions/APIMethods.dart';
-
 
 class TemplateView extends StatefulWidget {
   TemplateView({
@@ -31,7 +29,7 @@ class _TemplateView extends State<TemplateView> {
   EventType? _newType;
   String? _newName;
   _getTeams() {
-    APIMethods.getTeams(widget.eventKey).then((response) {
+    APIKEYS.getTeams(widget.eventKey).then((response) {
       setState(() {
         bod = (json.decode(response.body).toList());
         //print(bod);
@@ -40,7 +38,7 @@ class _TemplateView extends State<TemplateView> {
   }
 
   _getInfo() {
-    APIMethods.getInfo(widget.eventKey).then((response) {
+    APIKEYS.getInfo(widget.eventKey).then((response) {
       setState(() {
         data = (json.decode(response.body).toList());
         print(data);

@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:teamtrack/components/misc/PlatformGraphics.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import '../../api/APIKEYS.dart';
-import '../../functions/APIMethods.dart';
-
 import 'TemplateView.dart';
 
 class TemplatesList extends StatefulWidget {
@@ -23,7 +21,7 @@ class _TemplatesList extends State<TemplatesList> {
   List bod = [];
   List bodvis = [];
   _getEvents() {
-    APIMethods.getEvents().then((response) {
+    APIKEYS.getEvents().then((response) {
       setState(() {
         bod = (json.decode(response.body).toList());
         bodvis = bod;
