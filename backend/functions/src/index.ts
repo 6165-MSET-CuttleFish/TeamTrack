@@ -103,6 +103,29 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
   return returnVal;
 });
 
+export const modifyUserRole = functions.https.onCall(async (data, context) =>
+{
+    if (!context.auth)
+    { // if not authenticated
+        throw new functions.https.HttpsError(
+            "unauthenticated",
+            "User not logged in"
+        );
+      }
+
+    //semi-security fix: user has to be admin to remove use this to remove other users. user has to be part of group to remove himself
+    if(data.role==null)
+    {
+     return await admin.database().ref().child(`Events/${data.gameName}/${data.id}/Permissions/${data.uid}`).remove();
+    }
+    //semi-security fix: user must be admin to modify perms
+    else
+    {
+    return await admin.database().ref().child(`Events/${data.gameName}/${data.id}/Permissions/${data.uid}/role`).set(data.role);
+    }
+});
+
+
 // update creator's permissions and add the new event to creator's events list
 export const nativizeEvent = functions.database
     .ref("/Events/{gameName}/{event}")
