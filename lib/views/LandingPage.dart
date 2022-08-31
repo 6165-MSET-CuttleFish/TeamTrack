@@ -416,6 +416,7 @@ class _LandingPageState extends State<LandingPage> {
                                   child: Text('Delete Account'),
                                   onPressed: () async {
 
+                                    //pull request comment
                                     //PROBLEMS TO ADDRESS:
                                     //1. Security issues caused by cloud function
                                     //2. Swapping the author(idk if this is done by default. need to test)
