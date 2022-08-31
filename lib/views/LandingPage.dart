@@ -416,7 +416,10 @@ class _LandingPageState extends State<LandingPage> {
                                   child: Text('Delete Account'),
                                   onPressed: () async {
 
-
+                                    //PROBLEMS TO ADDRESS:
+                                    //1. Security issues caused by cloud function
+                                    //2. Swapping the author(idk if this is done by default. need to test)
+                                    //3. Testing with groups of many people
 
                                     User? user=FirebaseAuth.instance.currentUser;
                                     final uid = user?.uid;
@@ -457,7 +460,7 @@ class _LandingPageState extends State<LandingPage> {
 
                                         //debugPrint("THISSSSSSSSSSSSSSSSSS");
 
-
+                                        //If user isn't admin or if there is another admin in the event, remove perms
                                         if (users
                                             .firstWhereOrNull((
                                             element) => element.uid == uid)
@@ -471,11 +474,14 @@ class _LandingPageState extends State<LandingPage> {
 
                                           //setState(() => {});
                                         }
+                                        //If there is only one person in the event(this acc) delete the event
                                         else if (users.singleOrNull != null) {
                                           await ev.getRef()?.remove();
                                           setState(() => {});
                                           //delete event
                                         }
+                                        //If neither of those apply(user is admin+there are only editors/viewers),
+                                        //passes admin on to one of them and then removes perms
                                         else {
                                           firstEditor = users.firstWhereOrNull((
                                               element) =>
@@ -512,6 +518,7 @@ class _LandingPageState extends State<LandingPage> {
                                       dataModel.saveEvents();
                                       setState(() => {});
 
+                                      //delete the user
                                       try {
                                         user?.delete().then((yikes) async
                                         {
@@ -528,6 +535,7 @@ class _LandingPageState extends State<LandingPage> {
                                         debugPrint("lol");
                                       }
 
+                                      //sign out
                                     context
                                           .read<AuthenticationService>()
                                           .signOut();
