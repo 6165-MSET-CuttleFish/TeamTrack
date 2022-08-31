@@ -105,12 +105,25 @@ export const shareEvent = functions.https.onCall(async (data, context) => {
 
 export const modifyUserRole = functions.https.onCall(async (data, context) =>
 {
-    return
-      await admin
-      .database.ref()
-      .child(`Events/${data.gameName}/${data.id}/Permissions/${data.uid}/role`)
-      .set(data.role);
+    if (!context.auth)
+    { // if not authenticated
+        throw new functions.https.HttpsError(
+            "unauthenticated",
+            "User not logged in"
+        );
+      }
+
+    //return 'Events/${data.gameName}/${data.id}/Permissions/${data.uid}';
+    if(data.role==null)
+    {
+     return await admin.database().ref().child(`Events/${data.gameName}/${data.id}/Permissions/${data.uid}`).remove();
+    }
+    else
+    {
+    return await admin.database().ref().child(`Events/${data.gameName}/${data.id}/Permissions/${data.uid}/role`).set(data.role);
+    }
 });
+
 
 // update creator's permissions and add the new event to creator's events list
 export const nativizeEvent = functions.database

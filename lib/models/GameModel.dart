@@ -89,6 +89,22 @@ class Event {
         },
       );
 
+  Future<HttpsCallableResult<dynamic>> modifyUser({
+    required String? uid,
+    required Role? role,
+  }) {
+    debugPrint('AHHHHHHHHHHHHHHHHHHHHHHHHHHHHH Events/$gameName/$id/Permissions/$uid');
+    return functions.httpsCallable('modifyUserRole').call(
+      {
+        'uid': uid,
+        'id': id,
+        'gameName': gameName,
+        'role': role?.toRep(),
+      },
+    );
+  }
+
+
   String? getKey() => eventKey;
 
   bool hasKey() => eventKey != null && !(eventKey?.isEmpty ?? true);

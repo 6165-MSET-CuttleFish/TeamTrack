@@ -420,26 +420,26 @@ class _LandingPageState extends State<LandingPage> {
 
                                     //User? user=context.read<User?>();
                                     final uid = FirebaseAuth.instance.currentUser?.uid;
+                                    final email=FirebaseAuth.instance.currentUser?.email;
 
                                     setState(() => dataModel.events.clear());
                                     dataModel.saveEvents();
 
                                     //deal with shared events
                                     List<Event> sharedEvents=dataModel.sharedEvents;
-                                    sharedEvents.forEach((ev) async
+
+                                    for(Event ev in sharedEvents)
                                     {
                                       debugPrint('REEEEEEEEEE $uid');
-                                      final ref=ev.getRef()?.child("Permissions");
+
                                       //temporary variables
-                                      TeamTrackUser? firstAdmin;
                                       TeamTrackUser? firstEditor;
                                       TeamTrackUser? firstViewer;
                                       TeamTrackUser? targetUser;
                                       setState(() => {});
 
-
                                       //update users list from firebase
-                                      dynamic map = await ev.getRef()?.once();
+                                      final map = await ev.getRef()?.once();
                                       ev.updateLocal(
                                         json.decode(
                                           json.encode(
@@ -450,84 +450,45 @@ class _LandingPageState extends State<LandingPage> {
                                       );
                                       setState(() => {});
 
-                                      List<TeamTrackUser> users=ev.users;
+                                      List<TeamTrackUser> users = ev.users;
                                       setState(() => {});
 
-                                      //check is there are multiple people with access to the event
-                                      //If there are: proceed. If not, just delete the event(code at bottom)
 
-                                      if(users.length>1)
+                                      if (users.firstWhereOrNull((element) => element.uid == uid)?.role != Role.admin
+                                          || users.firstWhereOrNull((element) => element.role==Role.admin&&element.uid!=uid)!=null)
                                       {
-                                        debugPrint('REEEEEEEEEE $uid');
+                                        await ev.modifyUser(uid:uid, role: null);
+
+                                        //setState(() => {});
+                                      }
+                                      else if(users.singleOrNull!=null)
+                                      {
+                                        await ev.getRef()?.remove();
                                         setState(() => {});
-                                        //check if the user is an admin. If he isn't that means there is another admin
-                                        //so we can just delete the user permissions(skip steps)
-                                        if (users.firstWhere((element) => element.uid == context.read<User?>()?.uid).
-                                        role == Role.admin)
-                                        {
-                                          //look through the list for an admin OR other potential candidates to be given admin
-                                          firstAdmin=users.firstWhereOrNull((element) => element.uid!=uid
-                                              &&element.role==Role.admin);
-                                          firstEditor=users.firstWhereOrNull((element) => element.role==Role.editor);
-                                          firstViewer=users.firstWhereOrNull((element)=> element.role==Role.viewer);
-                                          setState(() => {});
-
-                                          //if there is no current other admin, then choose one of the other users to make admin
-                                          if(firstEditor!=null)
-                                            targetUser=firstEditor;
-                                          else if(firstViewer!=null)
-                                            targetUser=firstViewer;
-                                          setState(() => {});
-
-
-
-
-                                          //change so check from firebase
-                                          while(firstAdmin==null&&targetUser!=null)
-                                          {
-                                            debugPrint('REEEEEEEEEE $uid');
-                                            debugPrint(targetUser.displayName);
-                                            await
-
-                                              ref?.child('${targetUser?.uid}/role').set("admin");
-                                              setState(() => {});
-
-
-                                            firstAdmin=ev.users.firstWhereOrNull((element) => element.uid!=uid
-                                                &&element.role==Role.admin);
-                                            setState(() => {});
-                                          }
-                                        }
-                                        //run this in a while loop as well
-                                        setState(() => {});
-                                        /*while(ref?.child('$uid').get()!=null)
-                                        {
-
-                                        }*/
-                                       // while(ev.users.firstWhereOrNull((element) => element.uid==uid)!=null)
-                                        //{
-                                        await
-                                        ev.getRef()?.child('Permissions/$uid').remove();
-
-                                          /*await
-                                          ref?.child('$uid').remove().then((yikes) async
-                                          {
-                                            DocumentReference doc=FirebaseFirestore.instance.collection("users")
-                                                .doc('${user?.uid}/events/${ev.id}');
-                                            doc.delete();
-                                          });
-                                          setState(() => {});*/
-
-                                          setState(() => {});
-                                        //}
+                                        //delete event
                                       }
                                       else
                                       {
-                                        await
-                                        ev.getRef()?.remove();
+                                        firstEditor=users.firstWhereOrNull((element) => element.role==Role.editor);
+                                        firstViewer=users.firstWhereOrNull((element) => element.role==Role.viewer);
+                                        setState(() => {});
+
+                                        if(firstEditor!=null)
+                                          targetUser=firstEditor;
+                                        else if(firstViewer!=null)
+                                          targetUser=firstViewer;
+                                        setState(() => {});
+
+
+                                        await ev.modifyUser(uid: targetUser?.uid, role: Role.admin);
+
+                                        //setState(() => {});
+
+                                        await ev.modifyUser(uid: uid, role: null);
+
                                         setState(() => {});
                                       }
-                                      });
+                                    }
 
                                       dataModel.saveEvents();
                                       setState(() => {});
@@ -544,7 +505,9 @@ class _LandingPageState extends State<LandingPage> {
                                           .read<AuthenticationService>()
                                           .signOut();
                                       Navigator.of(context).pop();
-                                  },
+
+
+                                    },
                                 ),
                               ],
                             ),
