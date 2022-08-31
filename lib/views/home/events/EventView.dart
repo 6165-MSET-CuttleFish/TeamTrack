@@ -17,9 +17,7 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:teamtrack/functions/Statistics.dart';
 import 'package:teamtrack/views/home/events/EventShare.dart';
 import 'package:provider/provider.dart';
-import '../../../api/APIKEYS.dart';
-import '../../../functions/APIMethods.dart';
-
+import 'package:teamtrack/functions/APIMethods.dart';
 
 class EventView extends StatefulWidget {
   EventView({

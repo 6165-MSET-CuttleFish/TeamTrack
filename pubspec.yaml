@@ -37,6 +37,7 @@ dependencies:
   flutter_slidable: ^1.2.0
   auth_buttons: ^2.0.4
   syncfusion_flutter_charts: ^20.1.58+1
+  skeletons: ^0.0.3
 
   firebase_core: ^1.12.0
   firebase_messaging: ^11.2.6

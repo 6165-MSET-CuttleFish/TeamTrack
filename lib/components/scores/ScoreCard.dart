@@ -68,7 +68,7 @@ class ScoreCard extends StatelessWidget {
               .length >
           1, // only allow card expand if the amount of scores is greater than 1
       child: Padding(
-        padding: EdgeInsets.only(left: 5, right: 5),
+        padding: EdgeInsets.only(left: 25, right:15),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: Statistics.values
@@ -108,6 +108,40 @@ class ScoreCard extends StatelessWidget {
                   .length >
               1
           ? [
+        Padding(
+          padding: EdgeInsets.only(left: 15, right: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: Statistics.values
+                .map(
+                  (statistic) => BarGraph(
+                val: !allianceTotal
+                    ? scoreDivisions.customStatisticScore(
+                    dice, removeOutliers, statistic)
+                    : allianceTotals?.getStatistic(statistic.getFunction()) ??
+                    0,
+                max: !allianceTotal
+                    ? event.teams.maxCustomStatisticScore(
+                    dice, removeOutliers, statistic, type, null)
+                    : event.teams.values
+                    .map(
+                      (e) => event.matches.values
+                      .toList()
+                      .spots(e, Dice.none, false, type: type)
+                      .removeOutliers(removeOutliers)
+                      .map((spot) => spot.y)
+                      .getStatistic(statistic.getFunction()),
+                )
+                    .maxValue(),
+                title: statistic.name,
+                lessIsBetter: (statistic.getLessIsBetter() ||
+                    type.getLessIsBetter()) &&
+                    !(statistic.getLessIsBetter() && type.getLessIsBetter()),
+              ),
+            )
+                .toList(),
+          ),
+        ),
               ScoreTimeline(
                 minY: minY == maxY ? null : minY,
                 maxY: minY == maxY ? minY + 20 : maxY,

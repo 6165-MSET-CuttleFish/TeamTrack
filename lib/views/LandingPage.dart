@@ -80,6 +80,7 @@ class _LandingPageState extends State<LandingPage> {
   Widget build(BuildContext context) {
     final themeChange = context.watch<DarkThemeProvider>();
     final TextEditingController controller = new TextEditingController();
+    final TextEditingController controller2 = new TextEditingController();
     for (var event in dataModel.events.where((e) => !e.shared)) {
       final user = context.read<User?>();
       event.author = TeamTrackUser.fromUser(user);
@@ -188,19 +189,28 @@ class _LandingPageState extends State<LandingPage> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   if (context.read<User?>()?.photoURL != null)
-                                    ClipRRect(
+                                    Padding(
+                                      padding: EdgeInsets.only(bottom:10)
+                                      ,child:ClipRRect(
                                       borderRadius: BorderRadius.circular(300),
                                       child: Image.network(
                                         context.read<User?>()!.photoURL!,
                                         height: 70,
                                       ),
+                                    ),
                                     )
                                   else
-                                    Icon(Icons.account_circle, size: 70),
+                                    Padding(
+                                        padding: EdgeInsets.only(bottom:10),
+                                        child:
+                                        Icon(Icons.account_circle, size: 70)
+                                    ),
                                   Text(
                                     context.read<User?>()?.displayName ??
                                         "Guest",
-                                    style: TextStyle(color: Colors.white),
+                                    style: TextStyle(color: Colors.white,
+                                        fontSize: 18
+                                    ),
                                   ),
                                   Text(
                                     context.read<User?>()?.email ?? "",
@@ -220,13 +230,23 @@ class _LandingPageState extends State<LandingPage> {
                                 showPlatformDialog(
                                   context: context,
                                   builder: (_) => PlatformAlert(
-                                    title: Text("Change Display Name"),
-                                    content: PlatformTextField(
-                                      textInputAction: TextInputAction.done,
-                                      placeholder: "Display Name",
-                                      keyboardType: TextInputType.name,
-                                      controller: controller,
-                                    ),
+                                    title: Text("Change User Details"),
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children:[
+                                        PlatformTextField(
+                                          textInputAction: TextInputAction.done,
+                                          placeholder: "Display Name",
+                                          keyboardType: TextInputType.name,
+                                          controller: controller,
+                                        ),
+                                        PlatformTextField(
+                                          textInputAction: TextInputAction.done,
+                                          placeholder: "Profile Picture URL",
+                                          keyboardType: TextInputType.url,
+                                          controller: controller2,
+                                        ),
+                                      ],),
                                     actions: [
                                       PlatformDialogAction(
                                         child: Text("Cancel"),
@@ -242,6 +262,13 @@ class _LandingPageState extends State<LandingPage> {
                                                 .read<User?>()
                                                 ?.updateDisplayName(
                                               controller.text,
+                                            )
+
+                                          if (controller2.text.isNotEmpty)
+                                            await context
+                                                .read<User?>()
+                                                ?.updatePhotoURL(
+                                              controller2.text,
                                             );
                                           Navigator.pop(context);
                                           showPlatformDialog(

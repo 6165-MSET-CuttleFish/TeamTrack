@@ -86,6 +86,7 @@ class Event {
           'type': type.toString(),
           'gameName': gameName,
           'role': role.toRep(),
+          'eventKey':eventKey,
         },
       );
 
