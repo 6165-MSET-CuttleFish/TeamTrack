@@ -49,6 +49,8 @@ class _TeamViewState extends State<TeamView> {
   Score? maxScore;
   Score? teamMaxScore;
   late AutonPainter painter;
+  List<String> items = ['Items', 'Item2'];
+  String? selectedItem = 'Items';
 
   @override
   void initState() {
@@ -401,6 +403,19 @@ class _TeamViewState extends State<TeamView> {
                           ),
                         ),
                     ],
+                  ),
+                ),
+                Container(
+                  width: 240,
+                  child: DropdownButtonFormField<String>(
+                    value: selectedItem,
+                    items: items
+                      .map((item)=> DropdownMenuItem<String>(
+                      value: item,
+                        child: Text(item, style: TextStyle(fontSize: 24)),
+                    ))
+                      .toList(),
+                    onChanged: (item) => setState(() => selectedItem=item),
                   ),
                 ),
                 Container(
