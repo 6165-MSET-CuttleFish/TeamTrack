@@ -49,8 +49,8 @@ class _TeamViewState extends State<TeamView> {
   Score? maxScore;
   Score? teamMaxScore;
   late AutonPainter painter;
-  List<String> items = ['Items', 'Item2'];
-  String? selectedItem = 'Items';
+  List<String> items = ['Carousel', 'Cycling'];
+  String? selectedItem = 'None';
 
   @override
   void initState() {
