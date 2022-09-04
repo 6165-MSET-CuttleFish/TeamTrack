@@ -69,15 +69,15 @@ class _AutonPainterState extends State<AutonPainter> {
   }
   void uploadFile(Uint8List image) async {
     FirebaseStorage storage = FirebaseStorage.instance;
-    if(pointsLeft-pointsRight>(pointsRight+pointsLeft)/2){
+    if(pointsRight>0&&pointsLeft>0){
+      scope="Both";
+    }else if(pointsLeft-pointsRight>(pointsRight+pointsLeft)/2){
       scope="Carousel";
     }else if(pointsLeft-pointsRight<(pointsRight+pointsLeft)/2){
       scope="Cycling";
-    }else{
-      scope="Both";
     }
-    Reference ref = storage.ref().child('${_teamNumber} - ${scope}.svg');
-    UploadTask uploadTask = ref.putData(image, SettableMetadata(contentType: 'image/svg'));
+    Reference ref = storage.ref().child('${_teamNumber} - ${scope}.png');
+    UploadTask uploadTask = ref.putData(image, SettableMetadata(contentType: 'image/png'));
     try{
       await uploadTask
           .whenComplete((){
@@ -119,9 +119,9 @@ class _AutonPainterState extends State<AutonPainter> {
                             onPanUpdate: (details) {
                               final localPosition = context.findRenderObject() as RenderBox;
                               final renderBox = localPosition.globalToLocal(details.globalPosition);
-                              if(renderBox.dx<((xLow+xHigh)/2-10)){
+                              if(renderBox.dx<((xLow+xHigh)/2-100)){
                                 pointsLeft++;
-                              }else if(renderBox.dx>((xLow+xHigh)/2+10)){
+                              }else if(renderBox.dx>((xLow+xHigh)/2+100)){
                                 pointsRight++;
                               }
                               if(renderBox.dx>=xLow&&renderBox.dy>=yLow&&renderBox.dx<=xHigh&&renderBox.dy<=yHigh) {
