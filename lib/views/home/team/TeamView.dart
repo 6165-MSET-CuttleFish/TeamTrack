@@ -1,3 +1,4 @@
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:teamtrack/components/AutonDrawingTool.dart';
 import 'package:teamtrack/components/misc/Collapsible.dart';
 import 'package:teamtrack/components/misc/EmptyList.dart';
@@ -49,6 +50,8 @@ class _TeamViewState extends State<TeamView> {
   Score? maxScore;
   Score? teamMaxScore;
   late AutonPainter painter;
+  List<String> items = ['None','Carousel', 'Cycling', 'Both'];
+  String? selectedItem = 'None';
 
   @override
   void initState() {
@@ -406,7 +409,48 @@ class _TeamViewState extends State<TeamView> {
                 Container(
                   height: 300,
                   child: painter,
-                )
+                ),
+                Container(
+                  width: 240,
+                  child: Column(
+                     children:[
+                       DropdownButtonFormField<String>(
+                         value: selectedItem,
+                         items: items
+                           .map((item)=> DropdownMenuItem<String>(
+                           value: item,
+                             child: Text(item, style: TextStyle(fontSize: 20)),
+                         ))
+                           .toList(),
+                         onChanged: (item) => setState(() => selectedItem=item),
+                       ),
+                       Container(
+                         //Put in the gallery stuff
+                         child: FutureBuilder(
+                           future: FirebaseStorage.instance.ref().child('${_team.number} - ${selectedItem}.png').getDownloadURL(),
+                           builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                             if(snapshot.connectionState == ConnectionState.done && snapshot.hasData){
+                               return Container(
+                                 height: 300,
+                                 width: 300,
+                                 child: Image.network(snapshot.data!, fit: BoxFit.cover,),
+                               );
+                             }
+                             if(snapshot.connectionState == ConnectionState.waiting || !snapshot.hasData){
+                               return Container(
+                                 height: 0,
+                               );
+                             }
+                             return Container(
+                               height: 0,
+                             );
+                           },
+
+                         ),
+                       )
+                     ]
+                  ),
+                ),
               ],
             );
           },
