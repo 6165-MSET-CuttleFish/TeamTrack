@@ -240,12 +240,12 @@ class _LandingPageState extends State<LandingPage> {
                                           keyboardType: TextInputType.name,
                                           controller: controller,
                                         ),
-                                        PlatformTextField(
+                                    /*    PlatformTextField(
                                           textInputAction: TextInputAction.done,
                                           placeholder: "Profile Picture URL",
                                           keyboardType: TextInputType.url,
                                           controller: controller2,
-                                        ),
+                                        ),*/
                                       ],),
                                     actions: [
                                       PlatformDialogAction(
@@ -262,14 +262,14 @@ class _LandingPageState extends State<LandingPage> {
                                                 .read<User?>()
                                                 ?.updateDisplayName(
                                               controller.text,
-                                            )
+                                            );
 
-                                          if (controller2.text.isNotEmpty)
+                                  /*        if (controller2.text.isNotEmpty)
                                             await context
                                                 .read<User?>()
                                                 ?.updatePhotoURL(
                                               controller2.text,
-                                            );
+                                            );*/
                                           Navigator.pop(context);
                                           showPlatformDialog(
                                             context: context,

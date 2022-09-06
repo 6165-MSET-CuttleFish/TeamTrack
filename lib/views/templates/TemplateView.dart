@@ -283,7 +283,7 @@ class _TemplateView extends State<TemplateView> {
                       ),
                     ));
                   },
-                  color: Colors.cyan,
+                  color:  Theme.of(context).colorScheme.primary,
                   padding: EdgeInsets.all(0),
                   height: 50,
                   child: Text('Create Event',
@@ -291,6 +291,7 @@ class _TemplateView extends State<TemplateView> {
                       //    color: Colors.black,
                       fontFamily: 'Roboto',
                       fontSize: 15,
+                      color:themeChangeProvider.darkTheme ? Colors.black:Colors.white,
                     ),),
                 ),
               ),
