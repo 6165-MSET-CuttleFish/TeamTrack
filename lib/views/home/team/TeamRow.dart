@@ -101,8 +101,8 @@ class TeamRow extends StatelessWidget {
               ),
             ),
             BarGraph(
-              height: 70,
-              width: 20,
+              height: 60,
+              width: 15,
               vertical: false,
               val: statConfig.allianceTotal
                   ? event.matches.values
