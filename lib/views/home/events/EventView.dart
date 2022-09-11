@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
@@ -57,7 +58,7 @@ class _EventView extends State<EventView> {
       final response = await APIMethods.getMatches(widget.event.getKey() ?? '');
       setState(() {
         bod = (json.decode(response.body).toList());
-        //print(bod);
+       // log(bod.toString());
       });
     }
   }
@@ -94,7 +95,7 @@ class _EventView extends State<EventView> {
                     //print(widget.event.getKey());
                     await _getMatches();
                     int p = 1;
-                    print(bod.toString());
+                    //print(bod.toString());
                     List<Match> bruh = widget.event.getSortedMatches(ascending);
                     for (var x in bod) {
                       if (widget.event.matches.length < p) {
@@ -103,6 +104,7 @@ class _EventView extends State<EventView> {
                             Match(
                               Alliance(
                                 widget.event.teams.findAdd(
+
                                     x['participants'][0]['team']['team_number']
                                         .toString(),
                                     x['participants'][0]['team']
