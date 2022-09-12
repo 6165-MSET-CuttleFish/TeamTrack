@@ -96,9 +96,7 @@ class _LoginView extends State<LoginView> {
                     ),
                   ),
                   Spacer(),
-                  Padding(
-                    padding:EdgeInsets.only(right:25),
-                      child:OutlinedButton(
+OutlinedButton(
                         style: ButtonStyle(
                           backgroundColor: MaterialStateProperty.all(
                             Theme.of(context).platform == TargetPlatform.iOS? Theme.of(context).colorScheme.primary?.withOpacity(1):Theme.of(context).colorScheme.primary?.withOpacity(.6),
@@ -132,7 +130,7 @@ class _LoginView extends State<LoginView> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [Icon(Icons.person), Text('Sign Up')],
                     ),
-                  )),
+                  ),
                   OutlinedButton(
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all(

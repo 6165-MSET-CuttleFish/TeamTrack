@@ -70,7 +70,10 @@ class _EventView extends State<EventView> {
           backgroundColor: Theme.of(context).colorScheme.primary,
           actions: [
             if (_tab == 0)
-              IconButton(
+Container(
+  padding: const EdgeInsets.all(0.0),
+  width: 30.0, 
+child:IconButton(
                 icon: Icon(Icons.settings),
                 tooltip: 'Configure',
                 onPressed: () => showModalBottomSheet(
@@ -81,7 +84,7 @@ class _EventView extends State<EventView> {
                     statConfig: widget.event.statConfig,
                   ),
                 ),
-              ),
+              )),
             IconButton(
               icon: Icon(widget.event.shared ? Icons.share : Icons.upload),
               tooltip: 'Share',
