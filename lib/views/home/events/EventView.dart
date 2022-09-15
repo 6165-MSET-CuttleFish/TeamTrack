@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
@@ -17,7 +18,7 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:teamtrack/functions/Statistics.dart';
 import 'package:teamtrack/views/home/events/EventShare.dart';
 import 'package:provider/provider.dart';
-import '../../../api/APIKEYS.dart';
+import 'package:teamtrack/functions/APIMethods.dart';
 
 class EventView extends StatefulWidget {
   EventView({
@@ -54,10 +55,10 @@ class _EventView extends State<EventView> {
 
   _getMatches() async {
     if (widget.event.hasKey()) {
-      final response = await APIKEYS.getMatches(widget.event.getKey() ?? '');
+      final response = await APIMethods.getMatches(widget.event.getKey() ?? '');
       setState(() {
         bod = (json.decode(response.body).toList());
-        //print(bod);
+       // log(bod.toString());
       });
     }
   }
@@ -69,7 +70,10 @@ class _EventView extends State<EventView> {
           backgroundColor: Theme.of(context).colorScheme.primary,
           actions: [
             if (_tab == 0)
-              IconButton(
+Container(
+  padding: const EdgeInsets.all(0.0),
+  width: 30.0, 
+child:IconButton(
                 icon: Icon(Icons.settings),
                 tooltip: 'Configure',
                 onPressed: () => showModalBottomSheet(
@@ -80,7 +84,7 @@ class _EventView extends State<EventView> {
                     statConfig: widget.event.statConfig,
                   ),
                 ),
-              ),
+              )),
             IconButton(
               icon: Icon(widget.event.shared ? Icons.share : Icons.upload),
               tooltip: 'Share',
@@ -94,7 +98,7 @@ class _EventView extends State<EventView> {
                     //print(widget.event.getKey());
                     await _getMatches();
                     int p = 1;
-                    print(bod.toString());
+                    //print(bod.toString());
                     List<Match> bruh = widget.event.getSortedMatches(ascending);
                     for (var x in bod) {
                       if (widget.event.matches.length < p) {
@@ -103,6 +107,7 @@ class _EventView extends State<EventView> {
                             Match(
                               Alliance(
                                 widget.event.teams.findAdd(
+
                                     x['participants'][0]['team']['team_number']
                                         .toString(),
                                     x['participants'][0]['team']

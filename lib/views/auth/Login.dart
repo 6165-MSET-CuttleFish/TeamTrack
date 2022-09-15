@@ -96,8 +96,26 @@ class _LoginView extends State<LoginView> {
                     ),
                   ),
                   Spacer(),
-                  PlatformButton(
-                    color: Theme.of(context).colorScheme.primary,
+OutlinedButton(
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(
+                            Theme.of(context).platform == TargetPlatform.iOS? Theme.of(context).colorScheme.primary?.withOpacity(1):Theme.of(context).colorScheme.primary?.withOpacity(.6),
+                          ),
+                          foregroundColor: MaterialStateProperty.all(
+                              Theme.of(context).textTheme.bodyText2?.color),
+                          side: MaterialStateProperty.all(
+                            BorderSide(color: Theme.of(context).colorScheme.primary ),
+                          ),
+                          shape: MaterialStateProperty.all(
+                            RoundedRectangleBorder(
+                              borderRadius:Theme.of(context).platform == TargetPlatform.iOS? BorderRadius.all(
+                                Radius.elliptical(10, 10),
+                              ):BorderRadius.all(
+                                Radius.elliptical(50 , 50),
+                              ),
+                            ),
+                          ),
+                        ),
                     onPressed: () async {
                       await showModalBottomSheet(
                         context: context,
@@ -113,12 +131,30 @@ class _LoginView extends State<LoginView> {
                       children: [Icon(Icons.person), Text('Sign Up')],
                     ),
                   ),
-                  PlatformButton(
+                  OutlinedButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(
+                        Theme.of(context).platform == TargetPlatform.iOS? Colors.purple?.withOpacity(1):Colors.purple?.withOpacity(0.6),
+                      ),
+                      foregroundColor: MaterialStateProperty.all(
+                          Theme.of(context).textTheme.bodyText2?.color),
+                      side: MaterialStateProperty.all(
+                        BorderSide(color: Colors.purple ?? Colors.transparent),
+                      ),
+                      shape: MaterialStateProperty.all(
+                        RoundedRectangleBorder(
+                          borderRadius:Theme.of(context).platform == TargetPlatform.iOS? BorderRadius.all(
+                            Radius.elliptical(10, 10),
+                          ):BorderRadius.all(
+                            Radius.elliptical(50 , 50),
+                          ),
+                        ),
+                      ),
+                    ),
                     child: Text(
                       "Forgot Password",
                       style: TextStyle(fontSize: 14),
                     ),
-                    color: Colors.purple,
                     onPressed: () async {
                       String? s = await context
                           .read<AuthenticationService>()
