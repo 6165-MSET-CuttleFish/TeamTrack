@@ -70,11 +70,11 @@ class _AutonPainterState extends State<AutonPainter> {
   void uploadFile(Uint8List image) async {
     FirebaseStorage storage = FirebaseStorage.instance;
     if(pointsRight>0&&pointsLeft>0){
-      scope="Both";
+      scope="Both_Side";
     }else if(pointsLeft>(pointsRight+20)){
-      scope="Carousel";
+      scope="Blue_Side";
     }else if(pointsRight>(pointsLeft+20)){
-      scope="Cycling";
+      scope="Red_Side";
     }
     Reference ref = storage.ref().child('${_teamNumber} - ${scope}.png');
     UploadTask uploadTask = ref.putData(image, SettableMetadata(contentType: 'image/png'));
@@ -105,9 +105,9 @@ class _AutonPainterState extends State<AutonPainter> {
                             onPanDown: (details) {
                               final localPosition = context.findRenderObject() as RenderBox;
                               final renderBox = localPosition.globalToLocal(details.globalPosition);
-                              if(renderBox.dx<((xLow+xHigh)/2-100)){
+                              if(renderBox.dx<((xLow+xHigh)/2)){
                                 pointsLeft++;
-                              }else if(renderBox.dx>((xLow+xHigh)/2+100)){
+                              }else if(renderBox.dx>((xLow+xHigh)/2)){
                                 pointsRight++;
                               }
                               if(renderBox.dx>=xLow&&renderBox.dy>=yLow&&renderBox.dx<=xHigh&&renderBox.dy<=yHigh) {
