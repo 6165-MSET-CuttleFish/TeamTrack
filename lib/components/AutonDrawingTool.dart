@@ -71,9 +71,9 @@ class _AutonPainterState extends State<AutonPainter> {
     FirebaseStorage storage = FirebaseStorage.instance;
     if(pointsRight>0&&pointsLeft>0){
       scope="Both";
-    }else if(pointsLeft-pointsRight>(pointsRight+pointsLeft)/2){
+    }else if(pointsLeft>(pointsRight+20)){
       scope="Carousel";
-    }else if(pointsLeft-pointsRight<(pointsRight+pointsLeft)/2){
+    }else if(pointsRight>(pointsLeft+20)){
       scope="Cycling";
     }
     Reference ref = storage.ref().child('${_teamNumber} - ${scope}.png');
@@ -105,9 +105,9 @@ class _AutonPainterState extends State<AutonPainter> {
                             onPanDown: (details) {
                               final localPosition = context.findRenderObject() as RenderBox;
                               final renderBox = localPosition.globalToLocal(details.globalPosition);
-                              if(renderBox.dx<((xLow+xHigh)/2-10)){
+                              if(renderBox.dx<((xLow+xHigh)/2-100)){
                                 pointsLeft++;
-                              }else if(renderBox.dx>((xLow+xHigh)/2+10)){
+                              }else if(renderBox.dx>((xLow+xHigh)/2+100)){
                                 pointsRight++;
                               }
                               if(renderBox.dx>=xLow&&renderBox.dy>=yLow&&renderBox.dx<=xHigh&&renderBox.dy<=yHigh) {

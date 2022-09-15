@@ -431,8 +431,7 @@ class _TeamViewState extends State<TeamView> {
                            builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
                              if(snapshot.connectionState == ConnectionState.done && snapshot.hasData){
                                return Container(
-                                 height: 300,
-                                 width: 300,
+                                 height: 390,
                                  child: Image.network(snapshot.data!, fit: BoxFit.cover,),
                                );
                              }
