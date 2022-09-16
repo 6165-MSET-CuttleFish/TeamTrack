@@ -26,7 +26,7 @@ double xLow=50.0, xHigh=290.0;
 double yLow=10.0, yHigh=250.0;
 double kCanvasSize = 800.0;
 String _teamNumber="6165";
-String scope="Carousel";
+String scope="None";
 double pointsLeft=0;
 double pointsRight=0;
 var  _offsets = <Offset>[];
