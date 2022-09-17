@@ -22,8 +22,8 @@ class AutonPainter extends StatefulWidget {
 }
 final GlobalKey _key = GlobalKey();
 double magicOffset=0.0;
-double xLow=50.0, xHigh=290.0;
-double yLow=10.0, yHigh=250.0;
+double xLow=95.0, xHigh=295.0;
+double yLow=0, yHigh=210.0;
 double kCanvasSize = 800.0;
 String _teamNumber="6165";
 String scope="None";
@@ -71,9 +71,9 @@ class _AutonPainterState extends State<AutonPainter> {
     FirebaseStorage storage = FirebaseStorage.instance;
     if(pointsRight>0&&pointsLeft>0){
       scope="Both_Side";
-    }else if(pointsLeft>(pointsRight+20)){
+    }else if(pointsLeft>(pointsRight)){
       scope="Blue_Side";
-    }else if(pointsRight>(pointsLeft+20)){
+    }else if(pointsRight>(pointsLeft)){
       scope="Red_Side";
     }
     Reference ref = storage.ref().child('${_teamNumber} - ${scope}.png');
@@ -99,7 +99,7 @@ class _AutonPainterState extends State<AutonPainter> {
                     children: <Widget>[
                       Container(
                         height: 250,
-                        child: Stack( children: <Widget>[
+                        child: Stack(children: <Widget>[
                           Opacity(opacity: 1,child: Image.asset('assets/images/field.jpg')),
                           GestureDetector(
                             onPanDown: (details) {
@@ -119,9 +119,9 @@ class _AutonPainterState extends State<AutonPainter> {
                             onPanUpdate: (details) {
                               final localPosition = context.findRenderObject() as RenderBox;
                               final renderBox = localPosition.globalToLocal(details.globalPosition);
-                              if(renderBox.dx<((xLow+xHigh)/2-100)){
+                              if(renderBox.dx<((xLow+xHigh)/2)){
                                 pointsLeft++;
-                              }else if(renderBox.dx>((xLow+xHigh)/2+100)){
+                              }else if(renderBox.dx>((xLow+xHigh)/2)){
                                 pointsRight++;
                               }
                               if(renderBox.dx>=xLow&&renderBox.dy>=yLow&&renderBox.dx<=xHigh&&renderBox.dy<=yHigh) {
