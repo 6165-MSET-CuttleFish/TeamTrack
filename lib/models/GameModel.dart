@@ -19,12 +19,13 @@ import 'package:teamtrack/functions/Statistics.dart';
 
 class Statics {
   static String gameName =
-      'FreightFrenzy'; // default gameName (can be changed remotely)
+      'PowerPlay'; // default gameName (can be changed remotely)
 }
 
 enum EventType {
   local,
   remote,
+  analysis,
 }
 
 enum Dice {
@@ -210,7 +211,7 @@ class Event {
       e.red?.team1?.scores.addScore(
         Score(e.id, e.dice, gameName),
       );
-      if (type != EventType.remote) {
+      if (type != EventType.remote && type != EventType.analysis) {
         e.red?.team2?.scores.addScore(
           Score(e.id, e.dice, gameName),
         );
@@ -227,11 +228,11 @@ class Event {
 
   String? deleteTeam(Team team) {
     String? x;
-    if (type != EventType.remote) {
+    if (type != EventType.remote && type != EventType.analysis) {
       for (Match match in matches.values) {
         if ((match.red?.hasTeam(team) ?? false) ||
             (match.blue?.hasTeam(team) ?? false)) {
-          if (type == EventType.remote)
+          if (type == EventType.remote||type == EventType.analysis)
             match.red?.team1 = null;
           else
             x = 'some';
@@ -436,7 +437,7 @@ class Event {
     role = Role.editor;
     gameName = json?['gameName'] ?? Statics.gameName;
     type = getTypeFromString(json?['type']);
-    statConfig.allianceTotal = type == EventType.remote;
+    statConfig.allianceTotal = (type == EventType.remote||type==EventType.analysis);
     name = json?['name'] ?? "";
     eventKey = json?['event_key'];
     try {

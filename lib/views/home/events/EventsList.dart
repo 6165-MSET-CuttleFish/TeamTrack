@@ -35,6 +35,12 @@ class _EventsList extends State<EventsList> {
               title: Text('Remote Events'),
               children: remoteEvents(),
             ),
+            ExpansionTile(
+              leading: Icon(CupertinoIcons.rectangle_stack_person_crop),
+              initiallyExpanded: true,
+              title: Text('Driver Analysis'),
+              children: driverAnalysis(),
+            ),
           ],
         ),
       );
@@ -43,6 +49,9 @@ class _EventsList extends State<EventsList> {
 
   List<Widget> remoteEvents() =>
       dataModel.remoteEvents().map(eventTile).toList();
+
+  List<Widget> driverAnalysis() =>
+      dataModel.driverAnalysis().map(eventTile).toList();
 
   Slidable eventTile(Event e) => Slidable(
         startActionPane: ActionPane(

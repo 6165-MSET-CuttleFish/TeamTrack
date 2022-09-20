@@ -27,6 +27,9 @@ class DataModel {
   List<Event> remoteEvents() =>
       allEvents().where((e) => e.type == EventType.remote).toList();
 
+  List<Event> driverAnalysis() =>
+      allEvents().where((e) => e.type == EventType.analysis).toList();
+
   Future<void> saveEvents() async {
     final coded = events.map((e) => e.toJson()).toList();
     final prefs = await SharedPreferences.getInstance();
