@@ -628,6 +628,21 @@ class _LandingPageState extends State<LandingPage> {
                     Text('')
                   ]),
             ),
+            CupertinoActionSheetAction(
+              onPressed: () {
+                _newType = EventType.analysis;
+                Navigator.pop(context);
+                _chosen();
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Icon(CupertinoIcons.rocket),
+                  Text('Driver Analysis'),
+                  Text(''),
+                ],
+              ),
+            ),
           ],
           cancelButton: CupertinoActionSheetAction(
             child: Text('Cancel'),
@@ -684,6 +699,26 @@ class _LandingPageState extends State<LandingPage> {
                 ),
               ),
             ),
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Theme.of(context).splashColor,
+                  width: 1,
+                ),
+              ),
+              child: ListTileTheme(
+                iconColor: Theme.of(context).colorScheme.primary,
+                child: ListTile(
+                  onTap: () {
+                    _newType = EventType.analysis;
+                    Navigator.pop(context);
+                    _chosen();
+                  },
+                  leading: Icon(CupertinoIcons.rocket),
+                  title: Text('Driver Analysis'),
+                ),
+              ),
+            ),
           ],
         ),
       );
@@ -693,7 +728,7 @@ class _LandingPageState extends State<LandingPage> {
     context: context,
     builder: (BuildContext context) => PlatformAlert(
       title: Text(
-          'New ${_newType == EventType.remote ? 'Remote' : 'In-Person'} Event'),
+          'New ${_newType == EventType.remote ? 'Remote Event' :(_newType == EventType.remote ? 'In Person Event': 'Driver Analysis')}'),
       content: PlatformTextField(
         textInputAction: TextInputAction.done,
         keyboardType: TextInputType.name,

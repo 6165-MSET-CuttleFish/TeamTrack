@@ -228,11 +228,11 @@ class Event {
 
   String? deleteTeam(Team team) {
     String? x;
-    if (type != EventType.remote && type != EventType.analysis) {
+    if (type != EventType.remote) {
       for (Match match in matches.values) {
         if ((match.red?.hasTeam(team) ?? false) ||
             (match.blue?.hasTeam(team) ?? false)) {
-          if (type == EventType.remote||type == EventType.analysis)
+          if (type == EventType.remote)
             match.red?.team1 = null;
           else
             x = 'some';
@@ -790,7 +790,7 @@ class Team {
   }
 
   String? getWLT(Event event) {
-    if (event.type == EventType.remote) return null;
+    if (event.type == EventType.remote||event.type == EventType.analysis) return null;
     int wins = 0;
     int losses = 0;
     int ties = 0;

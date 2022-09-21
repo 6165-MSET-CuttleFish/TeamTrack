@@ -26,7 +26,7 @@ class _EventsList extends State<EventsList> {
             ExpansionTile(
               leading: Icon(CupertinoIcons.person_3),
               initiallyExpanded: true,
-              title: Text('In-Person Events'),
+              title: Text('In Person Events'),
               children: localEvents(),
             ),
             ExpansionTile(
@@ -36,7 +36,7 @@ class _EventsList extends State<EventsList> {
               children: remoteEvents(),
             ),
             ExpansionTile(
-              leading: Icon(CupertinoIcons.rectangle_stack_person_crop),
+              leading: Icon(CupertinoIcons.rocket_fill),
               initiallyExpanded: true,
               title: Text('Driver Analysis'),
               children: driverAnalysis(),
@@ -120,9 +120,10 @@ class _EventsList extends State<EventsList> {
             leading: Icon(
               e.type == EventType.remote
                   ? CupertinoIcons.rectangle_stack_person_crop_fill
-                  : CupertinoIcons.person_3_fill,
+                  :CupertinoIcons.person_3_fill,
               color: Theme.of(context).colorScheme.primary,
             ),
+
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
