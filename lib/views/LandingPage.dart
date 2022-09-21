@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -40,6 +41,7 @@ var tab = Tab.events;
 class _LandingPageState extends State<LandingPage> {
   EventType? _newType;
   String? _newName;
+  Double? _newNum;
 
   @override
   void initState() {
@@ -729,14 +731,27 @@ class _LandingPageState extends State<LandingPage> {
     builder: (BuildContext context) => PlatformAlert(
       title: Text(
           'New ${_newType == EventType.remote ? 'Remote Event' :(_newType == EventType.remote ? 'In Person Event': 'Driver Analysis')}'),
-      content: PlatformTextField(
-        textInputAction: TextInputAction.done,
-        keyboardType: TextInputType.name,
-        textCapitalization: TextCapitalization.words,
-        onChanged: (String input) {
-          _newName = input;
-        },
-        placeholder: 'Enter name',
+        content: Column(
+          children:[
+            PlatformTextField(
+              textInputAction: TextInputAction.done,
+              keyboardType: TextInputType.name,
+              textCapitalization: TextCapitalization.words,
+              onChanged: (String input) {
+                _newName = input;
+              },
+              placeholder: 'Enter name',
+            ),
+            PlatformTextField(
+              textInputAction: TextInputAction.done,
+              keyboardType: TextInputType.number,
+              textCapitalization: TextCapitalization.words,
+              onChanged: (String input) {
+                _newNum = input as Double?;
+              },
+              placeholder: 'Enter team number',
+            ),
+          ],
       ),
       actions: [
         PlatformDialogAction(
@@ -744,6 +759,7 @@ class _LandingPageState extends State<LandingPage> {
           child: Text('Cancel'),
           onPressed: () {
             _newName = '';
+            _newNum = 0.0 as Double?;
             Navigator.of(context).pop();
           },
         ),

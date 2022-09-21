@@ -349,7 +349,7 @@ class _MatchView extends State<MatchView> {
                       child: Center(
                         child: Column(
                           children: [
-                            if (_match?.type != EventType.remote &&
+                            if ((_match?.type != EventType.remote || _match?.type != EventType.analysis) &&
                                 widget.match != null)
                               Row(
                                 mainAxisAlignment:
@@ -436,7 +436,7 @@ class _MatchView extends State<MatchView> {
                                   ),
                                 ],
                               ),
-                            if (_match?.type != EventType.remote &&
+                            if ((_match?.type != EventType.remote || _match?.type != EventType.analysis) &&
                                 _match != null)
                               buttonRow(),
                             Column(
@@ -686,7 +686,7 @@ class _MatchView extends State<MatchView> {
   }
 
   Alliance? getPenaltyAlliance() {
-    if (_match?.type == EventType.remote) return _selectedAlliance;
+    if (_match?.type == EventType.remote|| _match?.type == EventType.analysis) return _selectedAlliance;
     if (_selectedAlliance == _match?.red) return _match?.blue;
     if (_selectedAlliance == _match?.blue) return _match?.red;
     return null;
@@ -707,7 +707,7 @@ class _MatchView extends State<MatchView> {
     return ListView(
       children: !_paused || _allowView || type == OpModeType.auto
           ? [
-              if (widget.event.type != EventType.remote && _match != null)
+              if ((widget.event.type != EventType.remote || widget.event.type != EventType.analysis) && _match != null)
                 RawMaterialButton(
                   onPressed: () {
                     setState(() {

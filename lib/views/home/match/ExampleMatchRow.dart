@@ -27,7 +27,7 @@ class ExampleMatchRow extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (event.type != EventType.remote)
+                  if (event.type != EventType.remote && event.type != EventType.analysis)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 20),
                       child: Row(

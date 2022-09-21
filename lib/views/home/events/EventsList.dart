@@ -120,7 +120,9 @@ class _EventsList extends State<EventsList> {
             leading: Icon(
               e.type == EventType.remote
                   ? CupertinoIcons.rectangle_stack_person_crop_fill
-                  :CupertinoIcons.person_3_fill,
+                  :( e.type == EventType.analysis
+                    ? CupertinoIcons.rocket_fill
+                    :CupertinoIcons.person_3_fill),
               color: Theme.of(context).colorScheme.primary,
             ),
 

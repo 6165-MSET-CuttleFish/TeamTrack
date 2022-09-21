@@ -297,7 +297,7 @@ child:IconButton(
             ),
           ],
         ),
-        bottomNavigationBar: widget.event.type != EventType.remote
+        bottomNavigationBar: (widget.event.type != EventType.remote && widget.event.type != EventType.analysis)
             ? CurvedNavigationBar(
                 animationCurve: Curves.easeOutQuint,
                 animationDuration: const Duration(milliseconds: 1000),
@@ -404,7 +404,7 @@ child:IconButton(
               placeholder: 'Team name',
               keyboardType: TextInputType.name,
               textCapitalization: TextCapitalization.words,
-              onChanged: (input) => _newName = input,
+              onChanged: (input) => _newName = widget.event != EventType.analysis?input:widget.event.name,
             ),
           ],
         ),
