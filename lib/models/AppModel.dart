@@ -34,7 +34,7 @@ class DataModel {
     final coded = events.map((e) => e.toJson()).toList();
     final prefs = await SharedPreferences.getInstance();
     prefs.setString("Events", jsonEncode(coded));
-    print(coded);
+
   }
 
   void restoreEvents() async {

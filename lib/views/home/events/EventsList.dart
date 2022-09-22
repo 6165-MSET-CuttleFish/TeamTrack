@@ -11,6 +11,8 @@ import 'package:teamtrack/views/home/events/EventView.dart';
 import 'package:provider/provider.dart';
 import 'package:teamtrack/functions/Extensions.dart';
 
+import '../team/TeamView.dart';
+
 class EventsList extends StatefulWidget {
   EventsList({Key? key, this.onTap}) : super(key: key);
   final void Function(Event)? onTap;
@@ -151,15 +153,36 @@ class _EventsList extends State<EventsList> {
                   context,
                 );
                 widget.onTap!(e);
-              } else
+              } else if(e.type!=EventType.analysis) {
                 Navigator.push(
                   context,
                   platformPageRoute(
-                    builder: (_) => EventView(
+                    builder: (_) =>
+                        EventView(
+                          event: e,
+                        ),
+                  ),
+                );
+              }
+              else if(e.type==EventType.analysis) {
+                String _newName =e.name;
+                String _newNumber = 0.toString();
+                if(e.getAllTeams().length==0) {
+                  e.addTeam(
+                    Team(_newNumber, _newName),
+                  );
+                }
+                dataModel.saveEvents();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => TeamView(
+                      team: e.getAllTeams().first,
                       event: e,
                     ),
                   ),
                 );
+              }
             },
           ),
         ),

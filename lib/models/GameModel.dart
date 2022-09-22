@@ -127,7 +127,13 @@ class Event {
       arr.sort((a, b) => b.timeStamp.compareTo(a.timeStamp));
     return arr;
   }
-
+  List<Team> getAllTeams() {
+    var arr = <Team>[];
+    for (var team in teams.values.toList()) {
+      arr.add(team);
+    }
+    return arr;
+  }
   List<Match> getAllMatches(T) {
     var arr = <Match>[];
     final matches = getSortedMatches(true);

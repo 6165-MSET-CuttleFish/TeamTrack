@@ -43,7 +43,6 @@ class _TemplateView extends State<TemplateView> {
     APIMethods.getInfo(widget.event_key).then((response) {
       setState(() {
         data = (json.decode(response.body).toList());
-        print(data);
       });
     });
   }

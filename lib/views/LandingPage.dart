@@ -21,6 +21,9 @@ import 'package:teamtrack/views/inbox/Inbox.dart';
 import 'package:teamtrack/views/templates/TemplatesList.dart';
 import 'package:collection/collection.dart';
 
+import 'home/events/EventView.dart';
+import 'home/team/TeamView.dart';
+
 
 class LandingPage extends StatefulWidget {
   const LandingPage({Key? key}) : super(key: key);
@@ -732,6 +735,7 @@ class _LandingPageState extends State<LandingPage> {
       title: Text(
           'New ${_newType == EventType.remote ? 'Remote Event' :(_newType == EventType.remote ? 'In Person Event': 'Driver Analysis')}'),
         content: Column(
+          mainAxisSize: MainAxisSize.min,
           children:[
             PlatformTextField(
               textInputAction: TextInputAction.done,
@@ -741,15 +745,6 @@ class _LandingPageState extends State<LandingPage> {
                 _newName = input;
               },
               placeholder: 'Enter name',
-            ),
-            PlatformTextField(
-              textInputAction: TextInputAction.done,
-              keyboardType: TextInputType.number,
-              textCapitalization: TextCapitalization.words,
-              onChanged: (String input) {
-                _newNum = input as Double?;
-              },
-              placeholder: 'Enter team number',
             ),
           ],
       ),
@@ -769,12 +764,19 @@ class _LandingPageState extends State<LandingPage> {
           onPressed: () {
             setState(
                   () {
-                if (_newName!.isNotEmpty)
+                if (_newName!.isNotEmpty&&_newType!=EventType.analysis)
                   dataModel.events.add(Event(
                     name: _newName ?? Statics.gameName,
                     type: _newType ?? EventType.remote,
                     gameName: Statics.gameName,
                   ));
+                if(_newName!.isNotEmpty&&_newType==EventType.analysis){
+                  dataModel.events.add(Event(
+                    name: _newName ?? Statics.gameName,
+                    type: _newType ?? EventType.remote,
+                    gameName: Statics.gameName,
+                  ));
+                }
                 dataModel.saveEvents();
                 _newName = '';
               },
