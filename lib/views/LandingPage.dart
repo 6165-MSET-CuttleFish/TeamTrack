@@ -733,7 +733,7 @@ class _LandingPageState extends State<LandingPage> {
     context: context,
     builder: (BuildContext context) => PlatformAlert(
       title: Text(
-          'New ${_newType == EventType.remote ? 'Remote Event' :(_newType == EventType.remote ? 'In Person Event': 'Driver Analysis')}'),
+          'New ${_newType == EventType.remote ? 'Remote Event' :(_newType == EventType.local ? 'In Person Event': 'Driver Analysis')}'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children:[
