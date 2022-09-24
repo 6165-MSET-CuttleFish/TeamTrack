@@ -140,7 +140,6 @@ class _TeamTrack extends State<TeamTrack> {
             debugShowCheckedModeBanner: false,
             title: 'TeamTrack',
             theme: themeChangeProvider.darkTheme ? darkTheme : lightTheme,
-            darkTheme: darkTheme,
             home: AuthenticationWrapper(),
           ),
         ),

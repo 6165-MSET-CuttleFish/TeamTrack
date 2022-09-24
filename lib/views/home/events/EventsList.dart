@@ -11,6 +11,8 @@ import 'package:teamtrack/views/home/events/EventView.dart';
 import 'package:provider/provider.dart';
 import 'package:teamtrack/functions/Extensions.dart';
 
+import '../team/TeamView.dart';
+
 class EventsList extends StatefulWidget {
   EventsList({Key? key, this.onTap}) : super(key: key);
   final void Function(Event)? onTap;
@@ -26,7 +28,7 @@ class _EventsList extends State<EventsList> {
             ExpansionTile(
               leading: Icon(CupertinoIcons.person_3),
               initiallyExpanded: true,
-              title: Text('In-Person Events'),
+              title: Text('In Person Events'),
               children: localEvents(),
             ),
             ExpansionTile(
@@ -34,6 +36,12 @@ class _EventsList extends State<EventsList> {
               initiallyExpanded: true,
               title: Text('Remote Events'),
               children: remoteEvents(),
+            ),
+            ExpansionTile(
+              leading: Icon(CupertinoIcons.rocket_fill),
+              initiallyExpanded: true,
+              title: Text('Driver Analysis'),
+              children: driverAnalysis(),
             ),
           ],
         ),
@@ -43,6 +51,9 @@ class _EventsList extends State<EventsList> {
 
   List<Widget> remoteEvents() =>
       dataModel.remoteEvents().map(eventTile).toList();
+
+  List<Widget> driverAnalysis() =>
+      dataModel.driverAnalysis().map(eventTile).toList();
 
   Slidable eventTile(Event e) => Slidable(
         startActionPane: ActionPane(
@@ -111,9 +122,12 @@ class _EventsList extends State<EventsList> {
             leading: Icon(
               e.type == EventType.remote
                   ? CupertinoIcons.rectangle_stack_person_crop_fill
-                  : CupertinoIcons.person_3_fill,
+                  :( e.type == EventType.analysis
+                    ? CupertinoIcons.rocket_fill
+                    :CupertinoIcons.person_3_fill),
               color: Theme.of(context).colorScheme.primary,
             ),
+
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -139,15 +153,36 @@ class _EventsList extends State<EventsList> {
                   context,
                 );
                 widget.onTap!(e);
-              } else
+              } else if(e.type!=EventType.analysis) {
                 Navigator.push(
                   context,
                   platformPageRoute(
-                    builder: (_) => EventView(
+                    builder: (_) =>
+                        EventView(
+                          event: e,
+                        ),
+                  ),
+                );
+              }
+              else if(e.type==EventType.analysis) {
+                String _newName =e.name;
+                String _newNumber = 0.toString();
+                if(e.getAllTeams().length==0) {
+                  e.addTeam(
+                    Team(_newNumber, _newName),
+                  );
+                }
+                dataModel.saveEvents();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => TeamView(
+                      team: e.getAllTeams().first,
                       event: e,
                     ),
                   ),
                 );
+              }
             },
           ),
         ),

@@ -48,7 +48,7 @@ class MatchRow extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (event.type != EventType.remote)
+                  if (event.type != EventType.remote && event.type != EventType.analysis)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 20),
                       child: Row(
@@ -95,7 +95,7 @@ class MatchRow extends StatelessWidget {
             : Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [scoreDisplay(), Icon(Icons.navigate_next)]),
-        tileColor: event.type != EventType.remote
+        tileColor: (event.type != EventType.remote && event.type != EventType.analysis)
             ? _getColor(allianceTotal ?? 0, opposingTotal ?? 0)
             : null,
         onTap: onTap,

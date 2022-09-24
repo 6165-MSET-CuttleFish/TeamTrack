@@ -15,7 +15,6 @@ void main() async {
     },
   );
   final bo = (json.decode(respon.body) as List);
-  print(bo);
 
   final response = await http.get(
     Uri.parse('$url/event'),
@@ -28,7 +27,6 @@ void main() async {
   final body = (json.decode(response.body) as List)
       .where((element) => element['state_prov'] == 'CA')
       .toList();
-  print(body);
 
   final respons = await http.get(
     Uri.parse('$url/team/8802'),
@@ -39,5 +37,4 @@ void main() async {
     },
   );
   final bod = (json.decode(respons.body) as List);
-  print(bod);
 }

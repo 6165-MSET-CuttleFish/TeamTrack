@@ -91,7 +91,7 @@ class _MatchList extends State<MatchList> {
                     ),
                   ),
                 ),
-                if (widget.event.type != EventType.remote)
+                if (widget.event.type != EventType.remote&&widget.event.type != EventType.analysis)
                   IconButton(
                     icon: Icon(
                       Icons.search,
@@ -125,7 +125,7 @@ class _MatchList extends State<MatchList> {
                     ? FloatingActionButton(
                         tooltip: 'Add Match',
                         onPressed: () async {
-                          if (widget.event.type == EventType.remote)
+                          if (widget.event.type == EventType.remote || widget.event.type == EventType.analysis)
                             showPlatformDialog(
                               context: context,
                               builder: (context) => PlatformAlert(

@@ -19,12 +19,13 @@ import 'package:teamtrack/functions/Statistics.dart';
 
 class Statics {
   static String gameName =
-      'FreightFrenzy'; // default gameName (can be changed remotely)
+      'PowerPlay'; // default gameName (can be changed remotely)
 }
 
 enum EventType {
   local,
   remote,
+  analysis,
 }
 
 enum Dice {
@@ -86,6 +87,7 @@ class Event {
           'type': type.toString(),
           'gameName': gameName,
           'role': role.toRep(),
+          'eventKey':eventKey,
         },
       );
 
@@ -109,7 +111,13 @@ class Event {
       arr.sort((a, b) => b.timeStamp.compareTo(a.timeStamp));
     return arr;
   }
-
+  List<Team> getAllTeams() {
+    var arr = <Team>[];
+    for (var team in teams.values.toList()) {
+      arr.add(team);
+    }
+    return arr;
+  }
   List<Match> getAllMatches(T) {
     var arr = <Match>[];
     final matches = getSortedMatches(true);
@@ -193,7 +201,7 @@ class Event {
       e.red?.team1?.scores.addScore(
         Score(e.id, e.dice, gameName),
       );
-      if (type != EventType.remote) {
+      if (type != EventType.remote && type != EventType.analysis) {
         e.red?.team2?.scores.addScore(
           Score(e.id, e.dice, gameName),
         );
@@ -419,7 +427,7 @@ class Event {
     role = Role.editor;
     gameName = json?['gameName'] ?? Statics.gameName;
     type = getTypeFromString(json?['type']);
-    statConfig.allianceTotal = type == EventType.remote;
+    statConfig.allianceTotal = (type == EventType.remote||type==EventType.analysis);
     name = json?['name'] ?? "";
     eventKey = json?['event_key'];
     try {
@@ -772,7 +780,7 @@ class Team {
   }
 
   String? getWLT(Event event) {
-    if (event.type == EventType.remote) return null;
+    if (event.type == EventType.remote||event.type == EventType.analysis) return null;
     int wins = 0;
     int losses = 0;
     int ties = 0;
