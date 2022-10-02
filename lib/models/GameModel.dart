@@ -158,6 +158,20 @@ class Event {
     await getRef()?.child('teams/${team.number}/changes/${change.id}').remove();
     if (!shared) team.deleteChange(change);
   }
+  Future<HttpsCallableResult<dynamic>> modifyUser({
+    required String? uid,
+    required Role? role,
+  }) {
+    debugPrint('AHHHHHHHHHHHHHHHHHHHHHHHHHHHHH Events/$gameName/$id/Permissions/$uid');
+    return functions.httpsCallable('modifyUserRole').call(
+      {
+        'uid': uid,
+        'id': id,
+        'gameName': gameName,
+        'role': role?.toRep(),
+      },
+    );
+  }
 
   void addMatch(Match e) async {
     await getRef()?.child('matches/${e.id}').set(e.toJson());
