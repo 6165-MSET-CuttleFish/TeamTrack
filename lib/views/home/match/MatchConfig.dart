@@ -4,10 +4,10 @@ import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/functions/Statistics.dart';
 
 class MatchConfig extends StatefulWidget {
-  const MatchConfig({Key? key, required this.event}) : super(key: key);
+  const MatchConfig({super.key, required this.event});
   final Event event;
   @override
-  _MatchConfigState createState() => _MatchConfigState();
+  State<MatchConfig> createState() => _MatchConfigState();
 }
 
 class _MatchConfigState extends State<MatchConfig> {

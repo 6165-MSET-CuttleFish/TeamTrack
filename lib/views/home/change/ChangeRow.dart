@@ -7,12 +7,12 @@ import 'package:teamtrack/models/GameModel.dart';
 
 class ChangeRow extends StatelessWidget {
   const ChangeRow({
-    Key? key,
+    super.key,
     required this.change,
     required this.event,
     this.onTap,
     required this.team,
-  }) : super(key: key);
+  });
   final Change change;
   final Event event;
   final Team team;

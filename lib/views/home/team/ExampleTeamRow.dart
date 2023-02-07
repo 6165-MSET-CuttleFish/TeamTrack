@@ -6,8 +6,7 @@ import 'package:teamtrack/functions/Extensions.dart';
 
 class ExampleTeamRow extends StatelessWidget {
   ExampleTeamRow(
-      {Key? key, this.sortMode, this.elementSort, required this.statistics})
-      : super(key: key);
+      {super.key, this.sortMode, this.elementSort, required this.statistics});
   final Team team = Team('Team #', 'Team Name');
   final OpModeType? sortMode;
   final ScoringElement? elementSort;

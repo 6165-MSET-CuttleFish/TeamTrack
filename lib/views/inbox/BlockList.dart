@@ -8,9 +8,9 @@ import 'package:provider/provider.dart';
 import 'package:teamtrack/components/misc/EmptyList.dart';
 
 class BlockList extends StatefulWidget {
-  const BlockList({Key? key}) : super(key: key);
+  const BlockList({super.key});
   @override
-  _BlockList createState() => _BlockList();
+  State<BlockList> createState() => _BlockList();
 }
 
 class _BlockList extends State<BlockList> {

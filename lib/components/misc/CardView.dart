@@ -7,20 +7,20 @@ import 'package:teamtrack/functions/Extensions.dart';
 
 class CardView extends StatefulWidget {
   CardView({
-    Key? key,
+    super.key,
     required this.child,
     required this.collapsed,
     this.isActive = true,
     required this.title,
     this.type,
-  }) : super(key: key);
+  });
   final Widget child;
   final String title;
   final List<Widget> collapsed;
   final bool isActive;
   final OpModeType? type;
   @override
-  State<StatefulWidget> createState() => _CardView();
+  State<CardView> createState() => _CardView();
 }
 
 class _CardView extends State<CardView> {

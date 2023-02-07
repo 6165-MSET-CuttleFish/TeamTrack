@@ -9,13 +9,12 @@ import 'package:date_format/date_format.dart';
 
 class ChangeConfig extends StatefulWidget {
   const ChangeConfig(
-      {Key? key, required this.team, this.change, required this.event})
-      : super(key: key);
+      {super.key, required this.team, this.change, required this.event});
   final Team team;
   final Change? change;
   final Event event;
   @override
-  _ChangeConfigState createState() => _ChangeConfigState(change);
+  State<ChangeConfig> createState() => _ChangeConfigState(change);
 }
 
 class _ChangeConfigState extends State<ChangeConfig> {

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 /// Class to display an empty list
 class EmptyList extends StatelessWidget {
-  const EmptyList({Key? key}) : super(key: key);
+  const EmptyList({super.key});
 
   @override
   Widget build(BuildContext context) => Center(

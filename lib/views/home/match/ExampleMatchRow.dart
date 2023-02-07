@@ -5,10 +5,10 @@ import 'package:teamtrack/models/GameModel.dart';
 
 class ExampleMatchRow extends StatelessWidget {
   ExampleMatchRow({
-    Key? key,
+    super.key,
     required this.event,
     this.team,
-  }) : super(key: key);
+  });
   final Event event;
   final Team? team;
 

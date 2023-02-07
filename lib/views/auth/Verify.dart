@@ -6,9 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class Verify extends StatefulWidget {
-  Verify({Key? key}) : super(key: key);
+  Verify({super.key});
   @override
-  _Verify createState() => _Verify();
+  State<Verify> createState() => _Verify();
 }
 
 class _Verify extends State<Verify> {

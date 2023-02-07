@@ -12,9 +12,9 @@ import 'package:teamtrack/functions/Extensions.dart';
 import 'package:teamtrack/views/LandingPage.dart' as LandingPage;
 
 class Inbox extends StatefulWidget {
-  const Inbox({Key? key}) : super(key: key);
+  const Inbox({super.key});
   @override
-  _InboxState createState() => _InboxState();
+  State<Inbox> createState() => _InboxState();
 }
 
 class _InboxState extends State<Inbox> {

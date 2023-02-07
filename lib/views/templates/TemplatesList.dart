@@ -9,7 +9,7 @@ import 'package:teamtrack/functions/APIMethods.dart';
 import 'TemplateView.dart';
 import 'package:skeletons/skeletons.dart';
 class TemplatesList extends StatefulWidget {
-  TemplatesList({Key? key, this.onTap}) : super(key: key);
+  TemplatesList({super.key, this.onTap});
   final void Function(Event)? onTap;
   @override
   _TemplatesList createState() => _TemplatesList();

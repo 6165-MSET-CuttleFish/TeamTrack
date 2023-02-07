@@ -6,16 +6,12 @@ import 'Verify.dart';
 import 'Login.dart';
 
 class AuthenticationWrapper extends StatefulWidget {
+  const AuthenticationWrapper({super.key});
   @override
-  State<StatefulWidget> createState() => _AuthenticationWrapper();
+  State<AuthenticationWrapper> createState() => _AuthenticationWrapper();
 }
 
 class _AuthenticationWrapper extends State<AuthenticationWrapper> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     final firebaseUser = context.watch<User?>();

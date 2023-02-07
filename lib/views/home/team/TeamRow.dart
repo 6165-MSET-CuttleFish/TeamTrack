@@ -9,7 +9,7 @@ import 'package:teamtrack/functions/Extensions.dart';
 
 class TeamRow extends StatelessWidget {
   const TeamRow({
-    Key? key,
+    super.key,
     required this.team,
     required this.event,
     required this.max,
@@ -18,7 +18,7 @@ class TeamRow extends StatelessWidget {
     required this.statConfig,
     required this.elementSort,
     required this.statistics,
-  }) : super(key: key);
+  });
   final Team team;
   final Event event;
   final double max;

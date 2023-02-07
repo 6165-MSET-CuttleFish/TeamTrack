@@ -7,7 +7,7 @@ import 'package:teamtrack/components/misc/PlatformGraphics.dart';
 /// Used to show proportion of [val]/[max] in a color coded format
 class BarGraph extends StatelessWidget {
   BarGraph({
-    Key? key,
+    super.key,
     this.max = 2,
     this.val = 9,
     this.height = 120,
@@ -21,7 +21,7 @@ class BarGraph extends StatelessWidget {
     this.showPercentage = true, // whether to show the percentage or not
     this.lessIsBetter = false, // if true, lower numbers are better
     this.titleWidthConstraint,
-  }) : super(key: key) {
+  }) {
     percentage = ((max != 0 ? (val / max).clamp(0, 1) : 0) * 100.0).toInt();
     if (!vertical) {
       double temp = width;

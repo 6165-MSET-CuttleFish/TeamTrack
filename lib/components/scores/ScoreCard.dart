@@ -10,7 +10,7 @@ import 'package:teamtrack/functions/Statistics.dart';
 
 class ScoreCard extends StatelessWidget {
   ScoreCard({
-    Key? key,
+    super.key,
     required this.scoreDivisions,
     required this.dice,
     required this.team,
@@ -21,7 +21,7 @@ class ScoreCard extends StatelessWidget {
     required this.allianceTotal,
     required this.title,
     this.targetScore,
-  }) : super(key: key);
+  });
   final List<ScoreDivision> scoreDivisions;
   final Dice dice;
   final Team team;

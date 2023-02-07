@@ -9,12 +9,11 @@ import 'dart:convert';
 import 'package:teamtrack/views/home/change/ChangeRow.dart';
 
 class ChangeList extends StatefulWidget {
-  ChangeList({Key? key, required this.team, required this.event})
-      : super(key: key);
+  ChangeList({super.key, required this.team, required this.event});
   final Team team;
   final Event event;
   @override
-  State<StatefulWidget> createState() => _ChangeList(team);
+  State<ChangeList> createState() => _ChangeList(team);
 }
 
 class _ChangeList extends State<ChangeList> {

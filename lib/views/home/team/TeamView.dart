@@ -20,16 +20,16 @@ import 'package:teamtrack/functions/Extensions.dart';
 
 class TeamView extends StatefulWidget {
   TeamView({
-    Key? key,
+    super.key,
     required this.team,
     required this.event,
     this.isSoleWindow = true,
-  }) : super(key: key);
+  });
   final Team team;
   final Event event;
   final bool isSoleWindow;
   @override
-  _TeamViewState createState() => _TeamViewState(team);
+  State<TeamView> createState() => _TeamViewState(team);
 }
 
 class _TeamViewState extends State<TeamView> {

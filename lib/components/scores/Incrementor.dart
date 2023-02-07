@@ -9,7 +9,7 @@ import 'package:teamtrack/models/ScoreModel.dart';
 
 class Incrementor extends StatefulWidget {
   Incrementor({
-    Key? key,
+    super.key,
     required this.element,
     required this.onPressed,
     required this.getTime,
@@ -22,7 +22,7 @@ class Incrementor extends StatefulWidget {
     this.mutableDecrement,
     this.path,
     this.max = 0,
-  }) : super(key: key);
+  });
   final ScoringElement element;
   final void Function() onPressed;
   final void Function(ScoringElement)? onIncrement, onDecrement;

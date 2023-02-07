@@ -21,8 +21,7 @@ import 'package:teamtrack/functions/Extensions.dart';
 import 'package:provider/provider.dart';
 
 class MatchView extends StatefulWidget {
-  MatchView({Key? key, this.match, this.team, required this.event})
-      : super(key: key);
+  MatchView({super.key, this.match, this.team, required this.event});
   @required
   final Match? match;
   final Team? team;

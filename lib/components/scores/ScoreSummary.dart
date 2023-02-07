@@ -6,7 +6,7 @@ import 'package:teamtrack/functions/Extensions.dart';
 
 class ScoreSummary extends StatelessWidget {
   const ScoreSummary({
-    Key? key,
+    super.key,
     required this.event,
     required this.score,
     required this.maxes,
@@ -16,7 +16,7 @@ class ScoreSummary extends StatelessWidget {
     this.shortenedNames = false,
     this.titleWidthConstraint,
     this.units = '',
-  }) : super(key: key);
+  });
   final Event event;
   final Score? score;
   final bool shortenedNames;

@@ -4,7 +4,7 @@ import 'package:teamtrack/functions/Statistics.dart';
 
 class ScoreTimeline extends StatelessWidget {
   const ScoreTimeline({
-    Key? key,
+    super.key,
     this.minY,
     this.maxY,
     required this.individualTotals,
@@ -12,7 +12,7 @@ class ScoreTimeline extends StatelessWidget {
     this.allianceTotals,
     required this.lineColor,
     required this.lessIsBetter,
-  }) : super(key: key);
+  });
   final double? minY;
   final double? maxY;
   final bool lessIsBetter;

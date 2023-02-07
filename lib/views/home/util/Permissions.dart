@@ -11,18 +11,17 @@ import 'package:teamtrack/models/GameModel.dart';
 /// UI to check and change the role of users in an event
 class Permissions extends StatefulWidget {
   const Permissions(
-      {Key? key,
+      {super.key,
       required this.users,
       required this.ref,
       this.currentUser,
-      required this.event})
-      : super(key: key);
+      required this.event});
   final List<TeamTrackUser> users;
   final TeamTrackUser? currentUser;
   final DatabaseReference? ref;
   final Event event;
   @override
-  _PermissionsState createState() => _PermissionsState();
+  State<Permissions> createState() => _PermissionsState();
 }
 
 class _PermissionsState extends State<Permissions> {

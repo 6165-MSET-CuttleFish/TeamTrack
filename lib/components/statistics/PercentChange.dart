@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 class PercentChange extends StatelessWidget {
   const PercentChange(
     this.percentIncrease, {
-    Key? key,
+    super.key,
     this.label,
     this.lessIsBetter = false,
-  }) : super(key: key);
+  });
   final double percentIncrease;
   final String? label;
   final bool lessIsBetter;

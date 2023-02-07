@@ -56,7 +56,7 @@ PageRoute expandPageRoute({required Widget Function(BuildContext) builder}) {
 
 abstract class PlatformWidget<C extends Widget, M extends Widget,
     W extends Widget?> extends StatelessWidget {
-  PlatformWidget({Key? key}) : super(key: key);
+  PlatformWidget({super.key});
 
   C buildCupertinoWidget(BuildContext context);
   M buildMaterialWidget(BuildContext context);
@@ -76,11 +76,11 @@ abstract class PlatformWidget<C extends Widget, M extends Widget,
 
 class PlatformSwitch extends PlatformWidget<CupertinoSwitch, Switch, Null> {
   PlatformSwitch({
-    Key? key,
+    super.key,
     required this.value,
     required this.onChanged,
     this.highlightColor,
-  }) : super(key: key);
+  });
   final bool value;
   final ValueChanged<bool>? onChanged;
   final Color? highlightColor;
@@ -107,7 +107,7 @@ class PlatformSwitch extends PlatformWidget<CupertinoSwitch, Switch, Null> {
 class PlatformText extends PlatformWidget<Text, Text, SelectableText> {
   PlatformText(
     this.text, {
-    Key? key,
+    super.key,
     this.style,
     this.strutStyle,
     this.textAlign,
@@ -120,7 +120,7 @@ class PlatformText extends PlatformWidget<Text, Text, SelectableText> {
     this.semanticsLabel,
     this.textWidthBasis,
     this.textHeightBehavior,
-  }) : super(key: key);
+  });
   final String text;
   final TextStyle? style;
   final StrutStyle? strutStyle;
@@ -172,11 +172,11 @@ class PlatformText extends PlatformWidget<Text, Text, SelectableText> {
 class PlatformAlert
     extends PlatformWidget<CupertinoAlertDialog, AlertDialog, Null> {
   PlatformAlert({
-    Key? key,
+    super.key,
     this.title,
     this.content,
     this.actions,
-  }) : super(key: key);
+  });
   final Widget? title;
   final Widget? content;
   final List<Widget>? actions;
@@ -206,7 +206,7 @@ class PlatformAlert
 class PlatformTextField
     extends PlatformWidget<CupertinoTextField, TextFormField, Null> {
   PlatformTextField({
-    Key? key,
+    super.key,
     this.onChanged,
     this.keyboardType,
     this.textCapitalization = TextCapitalization.none,
@@ -215,7 +215,7 @@ class PlatformTextField
     this.controller,
     this.autoCorrect = true,
     this.textInputAction,
-  }) : super(key: key);
+  });
   final ValueChanged<String>? onChanged;
   final TextInputType? keyboardType;
   final TextCapitalization textCapitalization;
@@ -258,12 +258,12 @@ class PlatformTextField
 class PlatformDialogAction
     extends PlatformWidget<CupertinoDialogAction, TextButton, Null> {
   PlatformDialogAction({
-    Key? key,
+    super.key,
     this.child,
     this.isDefaultAction = false,
     this.onPressed,
     this.isDestructive = false,
-  }) : super(key: key);
+  });
   final Widget? child;
   final bool isDefaultAction;
   final void Function()? onPressed;
@@ -297,12 +297,12 @@ class PlatformDialogAction
 class PlatformButton
     extends PlatformWidget<CupertinoButton, OutlinedButton, Null> {
   PlatformButton({
-    Key? key,
+    super.key,
     required this.child,
     this.onPressed,
     this.disabledColor = Colors.transparent,
     this.color,
-  }) : super(key: key);
+  });
   final Widget child;
   final void Function()? onPressed;
   final Color? color;
@@ -346,7 +346,7 @@ class PlatformButton
 
 class PlatformSlider extends PlatformWidget<CupertinoSlider, Slider, Null> {
   PlatformSlider({
-    Key? key,
+    super.key,
     required this.value,
     required this.onChanged,
     this.onChangeStart,
@@ -362,7 +362,7 @@ class PlatformSlider extends PlatformWidget<CupertinoSlider, Slider, Null> {
     this.semanticFormatterCallback,
     this.focusNode,
     this.autofocus = false,
-  }) : super(key: key);
+  });
 
   final double value;
   final void Function(double)? onChanged;
@@ -430,12 +430,12 @@ class PlatformProgressIndicator extends PlatformWidget<
 class PlatformPicker<T>
     extends PlatformWidget<CupertinoPicker, DropdownButton, Null> {
   PlatformPicker({
-    Key? key,
+    super.key,
     required this.items,
     this.onSelectedItemChanged,
     required this.value,
     required this.arr,
-  }) : super(key: key) {
+  }) {
     for (int i = 0; i < arr.length; i++) {
       dropdownItems.add(
         DropdownMenuItem<T>(
@@ -472,10 +472,10 @@ class PlatformPicker<T>
 
 class PlatformForm extends PlatformWidget<CupertinoFormSection, Form, Null> {
   PlatformForm({
-    Key? key,
+    super.key,
     required this.children,
     this.header,
-  }) : super(key: key);
+  });
   final List<Widget> children;
   final Widget? header;
   @override
@@ -501,14 +501,14 @@ class PlatformForm extends PlatformWidget<CupertinoFormSection, Form, Null> {
 class PlatformFormField
     extends PlatformWidget<CupertinoTextFormFieldRow, TextFormField, Null> {
   PlatformFormField({
-    Key? key,
+    super.key,
     required this.controller,
     this.validator,
     this.placeholder,
     this.keyboardType,
     this.prefix,
     this.obscureText = false,
-  }) : super(key: key);
+  });
   final TextEditingController controller;
   final String? Function(String?)? validator;
   final String? placeholder;
@@ -549,11 +549,11 @@ class PlatformFormField
 class PlatformDatePicker
     extends PlatformWidget<CupertinoDatePicker, CalendarDatePicker, Null> {
   PlatformDatePicker({
-    Key? key,
+    super.key,
     required this.minimumDate,
     required this.maximumDate,
     required this.onDateChanged,
-  }) : super(key: key);
+  });
   final DateTime maximumDate, minimumDate;
   final void Function(DateTime) onDateChanged;
   @override

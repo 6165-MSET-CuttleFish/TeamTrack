@@ -9,7 +9,7 @@ import 'package:teamtrack/functions/Statistics.dart';
 
 class ScoringElementStats extends StatefulWidget {
   ScoringElementStats({
-    Key? key,
+    super.key,
     required this.element,
     required this.elementList,
     required this.allElements,
@@ -17,7 +17,7 @@ class ScoringElementStats extends StatefulWidget {
     required this.removeOutliers,
     this.target,
     required this.lessIsBetter,
-  }) : super(key: key);
+  });
   final ScoringElement element;
   final Color? backgroundColor;
   final List<ScoringElement> elementList;

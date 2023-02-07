@@ -19,16 +19,16 @@ import 'package:teamtrack/components/statistics/CheckList.dart';
 
 class MatchList extends StatefulWidget {
   MatchList({
-    Key? key,
+    super.key,
     required this.event,
     this.team,
     required this.ascending,
-  }) : super(key: key);
+  });
   final Event event;
   final Team? team;
   final bool ascending;
   @override
-  State<StatefulWidget> createState() => _MatchList();
+  State<MatchList> createState() => _MatchList();
 }
 
 class _MatchList extends State<MatchList> {

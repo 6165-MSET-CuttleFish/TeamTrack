@@ -6,9 +6,9 @@ import 'package:teamtrack/functions/Statistics.dart';
 
 class ScoreRangeSummary extends StatelessWidget {
   const ScoreRangeSummary({
-    Key? key,
+    super.key,
     required this.scores,
-  }) : super(key: key);
+  });
   final List<Score> scores;
   @override
   Widget build(BuildContext context) {

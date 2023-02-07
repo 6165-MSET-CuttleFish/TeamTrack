@@ -15,20 +15,20 @@ import 'dart:convert';
 
 class TeamList extends StatefulWidget {
   TeamList({
-    Key? key,
+    super.key,
     required this.event,
     required this.sortMode,
     required this.statConfig,
     required this.elementSort,
     required this.statistic,
-  }) : super(key: key);
+  });
   final Event event;
   final OpModeType? sortMode;
   final ScoringElement? elementSort;
   final StatConfig statConfig;
   final Statistics statistic;
   @override
-  State<StatefulWidget> createState() => _TeamList();
+  State<TeamList> createState() => _TeamList();
 }
 
 class _TeamList extends State<TeamList> {

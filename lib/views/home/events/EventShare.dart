@@ -13,12 +13,12 @@ import 'package:provider/provider.dart';
 
 class EventShare extends StatefulWidget {
   const EventShare({
-    Key? key,
+    super.key,
     required this.event,
-  }) : super(key: key);
+  });
   final Event event;
   @override
-  _EventShareState createState() => _EventShareState();
+  State<EventShare> createState() => _EventShareState();
 }
 
 Role shareRole = Role.editor;

@@ -6,11 +6,11 @@ import 'package:teamtrack/models/AppModel.dart';
 /// Displays [users] profile pictures in a row
 class UsersRow extends StatelessWidget {
   const UsersRow({
-    Key? key,
+    super.key,
     required this.users,
     this.showRole = false,
     this.size = 28,
-  }) : super(key: key);
+  });
   final List<TeamTrackUser> users;
   final bool showRole;
   final double size;

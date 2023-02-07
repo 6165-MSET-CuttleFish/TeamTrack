@@ -9,7 +9,7 @@ import 'package:teamtrack/components/scores/ScoreSummary.dart';
 
 class MatchRow extends StatelessWidget {
   const MatchRow({
-    Key? key,
+    super.key,
     required this.event,
     required this.match,
     required this.index,
@@ -17,7 +17,7 @@ class MatchRow extends StatelessWidget {
     this.team,
     this.maxes = const {},
     required this.statConfig,
-  }) : super(key: key);
+  });
   final Event event;
   final Match match;
   final int index;

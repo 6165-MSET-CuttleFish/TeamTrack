@@ -22,13 +22,13 @@ import 'package:teamtrack/functions/APIMethods.dart';
 
 class EventView extends StatefulWidget {
   EventView({
-    Key? key,
+    super.key,
     required this.event,
-  }) : super(key: key);
+  });
   final Event event;
 
   @override
-  _EventView createState() => _EventView();
+  State<EventView> createState() => _EventView();
 }
 
 class _EventView extends State<EventView> {

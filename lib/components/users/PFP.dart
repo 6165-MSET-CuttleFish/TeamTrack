@@ -6,11 +6,11 @@ import 'package:teamtrack/functions/Extensions.dart';
 /// Displays a [user]'s profile picture
 class PFP extends StatelessWidget {
   const PFP({
-    Key? key,
+    super.key,
     required this.user,
     this.showRole = true,
     this.size = 28,
-  }) : super(key: key);
+  });
   final TeamTrackUser user;
   final bool showRole;
   final double size;

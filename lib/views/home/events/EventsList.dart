@@ -14,10 +14,10 @@ import 'package:teamtrack/functions/Extensions.dart';
 import '../team/TeamView.dart';
 
 class EventsList extends StatefulWidget {
-  EventsList({Key? key, this.onTap}) : super(key: key);
+  EventsList({super.key, this.onTap});
   final void Function(Event)? onTap;
   @override
-  _EventsList createState() => _EventsList();
+  State<EventsList> createState() => _EventsList();
 }
 
 class _EventsList extends State<EventsList> {

@@ -11,11 +11,11 @@ import 'package:teamtrack/functions/APIMethods.dart';
 
 class TemplateView extends StatefulWidget {
   TemplateView({
-    Key? key,
+    super.key,
     required this.event_key,
     required this.event_name,
     this.isPreview = false,
-  }) : super(key: key);
+  });
   final String event_key;
   final String event_name;
   final bool isPreview;

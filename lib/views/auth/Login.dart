@@ -8,10 +8,10 @@ import 'package:auth_buttons/auth_buttons.dart';
 import 'package:provider/provider.dart';
 
 class LoginView extends StatefulWidget {
-  LoginView({Key? key, this.returnBack}) : super(key: key);
+  LoginView({super.key, this.returnBack});
   final bool? returnBack;
   @override
-  _LoginView createState() => _LoginView();
+  State<LoginView> createState() => _LoginView();
 }
 
 class _LoginView extends State<LoginView> {

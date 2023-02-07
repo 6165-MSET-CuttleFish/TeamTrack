@@ -5,12 +5,12 @@ import 'package:teamtrack/models/StatConfig.dart';
 
 class CheckList extends StatefulWidget {
   const CheckList({
-    Key? key,
+    super.key,
     required this.state,
     required this.event,
     required this.statConfig,
     this.showSorting = true,
-  }) : super(key: key);
+  });
   final StatConfig statConfig;
   final State state;
   final Event event;
