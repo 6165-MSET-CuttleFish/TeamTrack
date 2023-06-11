@@ -293,7 +293,7 @@ class _TeamViewState extends State<TeamView> {
                               spacing: 0,
                               children: [
                                 for (final opModeType in opModeExt.getAll())
-                                  FlatButton(
+                                  MaterialButton(
                                     color: getSelection(opModeType)
                                         ? opModeType.getColor()
                                         : null,
