@@ -36,7 +36,7 @@ static Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) a
             playSound: true,
             icon: android.smallIcon,
           ),
-          iOS: IOSNotificationDetails(
+          iOS: DarwinNotificationDetails(
             presentSound: true,
             presentBadge: true,
             presentAlert: true,
@@ -61,13 +61,13 @@ static Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) a
 
     var initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
-    var initializationSettingsiOS = IOSInitializationSettings();
+    var initializationSettingsiOS = DarwinInitializationSettings();
     var initializationSettings = InitializationSettings(
         android: initializationSettingsAndroid, iOS: initializationSettingsiOS);
     flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
-      onSelectNotification: (payload) async {
-        onNotifications.add(payload);
+      onDidReceiveNotificationResponse: (response) async {
+        onNotifications.add(response.payload);
       },
     );
 
@@ -92,7 +92,7 @@ static Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) a
               playSound: true,
               icon: android?.smallIcon,
             ),
-            iOS: IOSNotificationDetails(
+            iOS: DarwinNotificationDetails(
               presentSound: true,
               presentBadge: true,
               presentAlert: true,
