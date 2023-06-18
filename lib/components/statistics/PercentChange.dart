@@ -37,7 +37,7 @@ class PercentChange extends StatelessWidget {
           if (label != null)
             Text(
               label!,
-              style: Theme.of(context).textTheme.caption,
+              style: Theme.of(context).textTheme.bodySmall,
             ),
         ],
       );

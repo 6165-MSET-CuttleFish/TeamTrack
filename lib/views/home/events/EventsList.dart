@@ -133,11 +133,11 @@ class _EventsList extends State<EventsList> {
               children: [
                 Text(
                   e.name,
-                  style: Theme.of(context).textTheme.bodyText1,
+                  style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 Text(
                   e.gameName.spaceBeforeCapital(),
-                  style: Theme.of(context).textTheme.caption,
+                  style: Theme.of(context).textTheme.bodySmall,
                 ),
               ],
             ),

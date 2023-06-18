@@ -80,7 +80,7 @@ class _PermissionsState extends State<Permissions> {
                   ),
                   subtitle: Text(
                     user.email ?? "Unknown",
-                    style: Theme.of(context).textTheme.caption,
+                    style: Theme.of(context).textTheme.bodySmall,
                   ),
                   trailing: DropdownButton<Role>(
                     value: user.role,

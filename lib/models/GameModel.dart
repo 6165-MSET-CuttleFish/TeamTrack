@@ -5,7 +5,6 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart' as Db;
 import 'package:flutter/cupertino.dart';
-import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:teamtrack/functions/Functions.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/models/Change.dart';
@@ -19,15 +18,17 @@ import 'package:teamtrack/functions/Statistics.dart';
 
 class Statics {
   static String gameName =
-      'PowerPlay'; // default gameName (can be changed remotely)
+      'PowerPlay'; // default gameName (can be changed via firebase remote config)
 }
 
+/// Represents the type of event being played
 enum EventType {
   local,
   remote,
   analysis,
 }
 
+/// Represents the random dice roll for the autonomous period (which can sometimes inform other periods) and so is useful to track
 enum Dice {
   one,
   two,
@@ -70,7 +71,6 @@ class Event {
   Timestamp? sendTime;
 
   TeamTrackUser? sender;
-  GeoFirePoint? loc;
 
   List<TeamTrackUser> users = [];
 
@@ -87,7 +87,7 @@ class Event {
           'type': type.toString(),
           'gameName': gameName,
           'role': role.toRep(),
-          'eventKey':eventKey,
+          'eventKey': eventKey,
         },
       );
 
@@ -111,6 +111,7 @@ class Event {
       arr.sort((a, b) => b.timeStamp.compareTo(a.timeStamp));
     return arr;
   }
+
   List<Team> getAllTeams() {
     var arr = <Team>[];
     for (var team in teams.values.toList()) {
@@ -118,6 +119,7 @@ class Event {
     }
     return arr;
   }
+
   List<Match> getAllMatches(T) {
     var arr = <Match>[];
     final matches = getSortedMatches(true);
@@ -158,11 +160,13 @@ class Event {
     await getRef()?.child('teams/${team.number}/changes/${change.id}').remove();
     if (!shared) team.deleteChange(change);
   }
+
   Future<HttpsCallableResult<dynamic>> modifyUser({
     required String? uid,
     required Role? role,
   }) {
-    debugPrint('AHHHHHHHHHHHHHHHHHHHHHHHHHHHHH Events/$gameName/$id/Permissions/$uid');
+    debugPrint(
+        'AHHHHHHHHHHHHHHHHHHHHHHHHHHHHH Events/$gameName/$id/Permissions/$uid');
     return functions.httpsCallable('modifyUserRole').call(
       {
         'uid': uid,
@@ -320,10 +324,9 @@ class Event {
 
   void deleteMatch(Match e) {
     if (!shared) {
-      e.red?.team1?.scores.removeWhere((f, _) => f == e.id);
-      e.red?.team2?.scores.removeWhere((f, _) => f == e.id);
-      e.blue?.team1?.scores.removeWhere((f, _) => f == e.id);
-      e.blue?.team2?.scores.removeWhere((f, _) => f == e.id);
+      e.getTeams().forEach((element) {
+        element?.scores.removeWhere((key, value) => key == e.id);
+      });
       matches.remove(e.id);
       dataModel.saveEvents();
     }
@@ -432,6 +435,7 @@ class Event {
     }
   }
 
+  // Reference to the database
   Db.DatabaseReference? getRef() {
     if (!shared) return null;
     return firebaseDatabase.ref().child('Events/$gameName').child(id);
@@ -441,7 +445,8 @@ class Event {
     role = Role.editor;
     gameName = json?['gameName'] ?? Statics.gameName;
     type = getTypeFromString(json?['type']);
-    statConfig.allianceTotal = (type == EventType.remote||type==EventType.analysis);
+    statConfig.allianceTotal =
+        (type == EventType.remote || type == EventType.analysis);
     name = json?['name'] ?? "";
     eventKey = json?['event_key'];
     try {
@@ -527,6 +532,7 @@ class Alliance {
     sharedScore =
         Score(Uuid().v4(), Dice.none, gameName, isAllianceScore: true);
   }
+  Set<Team?> get teams => Set.from([team1, team2]);
   int getPenalty() {
     if (eventType == EventType.remote)
       return team1?.scores[id]?.penalties.total() ?? 0;
@@ -539,34 +545,30 @@ class Alliance {
       return penaltyTotal();
   }
 
-  bool hasTeam(Team team) =>
-      (team1 != null && team1!.equals(team)) ||
-      (team2 != null && team2!.equals(team));
+  bool hasTeam(Team team) => teams.contains(team);
 
-  int penaltyTotal() =>
-      (team1?.scores[id]?.penalties.total() ?? 0) +
-      (team2?.scores[id]?.penalties.total() ?? 0);
+  int penaltyTotal() => teams
+      .map((team) => team?.scores[id]?.penalties.total() ?? 0)
+      .reduce((value, element) => value + element);
 
-  Score combinedScore() {
-    Score returnVal = (team1?.scores[id] ?? Score('', Dice.none, gameName)) +
-        (team2?.scores[id] ?? Score('', Dice.none, gameName)) +
-        (sharedScore);
-    return returnVal;
-  }
+  Score combinedScore() =>
+      teams
+          .map((team) => team?.scores[id] ?? Score('', Dice.none, gameName))
+          .reduce((value, element) => value + element) +
+      sharedScore;
 
   int allianceTotal(
     bool? showPenalties, {
     OpModeType? type,
     ScoringElement? element,
   }) =>
-      (((team1?.scores[id]
-                          ?.getScoreDivision(type)
-                          .getScoringElementCount(element?.key) ??
-                      0) +
-                  (team2?.scores[id]
-                          ?.getScoreDivision(type)
-                          .getScoringElementCount(element?.key) ??
-                      0) +
+      ((teams
+                      .map((e) =>
+                          e?.scores[id]
+                              ?.getScoreDivision(type)
+                              .getScoringElementCount(element?.key) ??
+                          0)
+                      .reduce((value, element) => value + element) +
                   ((showPenalties ?? false) && type == null
                       ? getPenalty()
                       : 0)) +
@@ -794,7 +796,8 @@ class Team {
   }
 
   String? getWLT(Event event) {
-    if (event.type == EventType.remote||event.type == EventType.analysis) return null;
+    if (event.type == EventType.remote || event.type == EventType.analysis)
+      return null;
     int wins = 0;
     int losses = 0;
     int ties = 0;

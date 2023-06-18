@@ -53,6 +53,7 @@ class Score extends ScoreDivision implements Comparable<Score> {
     return list.sum().toInt().clamp(0, 999);
   }
 
+  /// Returns the total division score specified by the [type]
   ScoreDivision getScoreDivision(OpModeType? type) {
     switch (type) {
       case OpModeType.auto:
@@ -68,6 +69,7 @@ class Score extends ScoreDivision implements Comparable<Score> {
     }
   }
 
+  /// Resets all the scores in the score division
   void reset() =>
       OpModeType.values.forEach((type) => getScoreDivision(type).reset());
 
@@ -449,6 +451,11 @@ class Penalty extends ScoreDivision {
       };
 }
 
+enum ScoreELement {
+  Incrementable,
+
+}
+
 /// This class is used to represent a Scoring Element of an FTC event.
 class ScoringElement implements Scorable {
   ScoringElement({
@@ -585,7 +592,8 @@ class ScoringElement implements Scorable {
   bool didAttempt() =>
       totalMisses() > 0 ||
       totalCount() > 0 ||
-      (nestedElements?.reduce(
+      (nestedElements
+      ?.reduce(
             (value, element) {
               if (element.didAttempt()) value.normalCount = 1;
               return value;
@@ -681,12 +689,11 @@ abstract class ScoreDivision implements Scorable {
           : getElements().length == 0
               ? 0
               : getElements()
-                  .map((e) => e
-                      .scoreValue()) // map scoring elements to an array of their score values
+                  .map((e) => e.scoreValue())
                   .sum()
-                  .toInt(); // sum the array
+                  .toInt();
 
-  Dice getDice(); // get the dice object
+  Dice getDice();
   List<ScoringElement> getElements() =>
       elements.values.toList(); // get the scoring elements
   dynamic ref; // get the reference object

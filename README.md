@@ -9,11 +9,18 @@ A mobile scouting app made for the FIRST Tech Challenge with the goal of making 
 
 ## Setup
 
-Download and add the firebase config files to your respective platform: iOS, Android, or Web.
+- Run the firebase cli commands in the root directory of the project to setup firebase. `firebase login` 
 
-- iOS: `ios/Runner/GoogleService-Info.plist`
-- Android: `android/app/google-services.json`
-- Web: `web/api/firebaseConfig.js`
+- Open the terminal and navigate to the root directory of your project.
+Run the following command to install the FlutterFire CLI: `dart pub global activate flutterfire_cli`
+
+- Run the following command to generate the Firebase configuration file: `flutterfire configure`
+
+- Follow the prompts to select the Firebase project and the platforms you want to configure (web, Android, and/or iOS).
+
+- Once the configuration is complete, you should see a message indicating that the configuration file was generated successfully.
+
+- Add files to .gitignore if needed
 
 ## Common Issues
 

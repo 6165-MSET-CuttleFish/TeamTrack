@@ -3,8 +3,6 @@ import 'dart:ffi';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
-import 'package:teamtrack/functions/Extensions.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:teamtrack/components/misc/PlatformGraphics.dart';
@@ -21,8 +19,6 @@ import 'package:teamtrack/views/inbox/Inbox.dart';
 import 'package:teamtrack/views/templates/TemplatesList.dart';
 import 'package:collection/collection.dart';
 
-import 'home/events/EventView.dart';
-import 'home/team/TeamView.dart';
 
 
 class LandingPage extends StatefulWidget {
@@ -85,15 +81,11 @@ class _LandingPageState extends State<LandingPage> {
   Widget build(BuildContext context) {
     final themeChange = context.watch<DarkThemeProvider>();
     final TextEditingController controller = new TextEditingController();
-    final TextEditingController controller2 = new TextEditingController();
     for (var event in dataModel.events.where((e) => !e.shared)) {
       final user = context.read<User?>();
       event.author = TeamTrackUser.fromUser(user);
       event.role = Role.admin;
     }
-
-
-
     return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>?>
       (
 
@@ -456,7 +448,7 @@ class _LandingPageState extends State<LandingPage> {
 
                                     User? user=FirebaseAuth.instance.currentUser;
                                     final uid = user?.uid;
-                                    final email=FirebaseAuth.instance.currentUser?.email;
+                                    final email = FirebaseAuth.instance.currentUser?.email;
 
                                     setState(() => dataModel.events.clear());
                                     dataModel.saveEvents();

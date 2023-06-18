@@ -229,7 +229,7 @@ class PlatformTextField
     return CupertinoTextField(
       textInputAction: textInputAction,
       controller: controller,
-      style: TextStyle(color: Theme.of(context).textTheme.bodyText2!.color),
+      style: TextStyle(color: Theme.of(context).textTheme.bodyMedium!.color),
       onChanged: onChanged,
       keyboardType: keyboardType,
       textCapitalization: textCapitalization,
@@ -244,7 +244,7 @@ class PlatformTextField
     return TextFormField(
       textInputAction: textInputAction,
       controller: controller,
-      style: TextStyle(color: Theme.of(context).textTheme.bodyText2!.color),
+      style: TextStyle(color: Theme.of(context).textTheme.bodyMedium!.color),
       onChanged: onChanged,
       keyboardType: keyboardType,
       textCapitalization: textCapitalization,
@@ -287,7 +287,7 @@ class PlatformDialogAction
         foregroundColor: MaterialStateProperty.all(
           isDestructive
               ? Colors.red
-              : Theme.of(context).textTheme.bodyText2?.color,
+              : Theme.of(context).textTheme.bodyMedium?.color,
         ),
       ),
     );
@@ -328,7 +328,7 @@ class PlatformButton
           color?.withOpacity(0.6),
         ),
         foregroundColor: MaterialStateProperty.all(
-            Theme.of(context).textTheme.bodyText2?.color),
+            Theme.of(context).textTheme.bodyMedium?.color),
         side: MaterialStateProperty.all(
           BorderSide(color: color ?? Colors.transparent),
         ),
@@ -520,7 +520,7 @@ class PlatformFormField
     return CupertinoTextFormFieldRow(
         decoration: BoxDecoration(
           border: Border.all(
-            color: Theme.of(context).textTheme.bodyText2?.color ??
+            color: Theme.of(context).textTheme.bodyMedium?.color ??
                 Colors.deepPurple,
             width: 1,
           ),
@@ -531,7 +531,7 @@ class PlatformFormField
         keyboardType: keyboardType,
         prefix: prefix,
         obscureText: obscureText,
-        style: TextStyle(color: Theme.of(context).textTheme.bodyText2?.color));
+        style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color));
   }
 
   @override

@@ -4,7 +4,6 @@ import 'package:teamtrack/views/auth/SignUpScreen.dart';
 import 'package:teamtrack/providers/Auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:auth_buttons/auth_buttons.dart';
 import 'package:provider/provider.dart';
 
 class LoginView extends StatefulWidget {
@@ -96,26 +95,38 @@ class _LoginView extends State<LoginView> {
                     ),
                   ),
                   Spacer(),
-OutlinedButton(
-                        style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(
-                            Theme.of(context).platform == TargetPlatform.iOS? Theme.of(context).colorScheme.primary?.withOpacity(1):Theme.of(context).colorScheme.primary?.withOpacity(.6),
-                          ),
-                          foregroundColor: MaterialStateProperty.all(
-                              Theme.of(context).textTheme.bodyText2?.color),
-                          side: MaterialStateProperty.all(
-                            BorderSide(color: Theme.of(context).colorScheme.primary ),
-                          ),
-                          shape: MaterialStateProperty.all(
-                            RoundedRectangleBorder(
-                              borderRadius:Theme.of(context).platform == TargetPlatform.iOS? BorderRadius.all(
-                                Radius.elliptical(10, 10),
-                              ):BorderRadius.all(
-                                Radius.elliptical(50 , 50),
-                              ),
-                            ),
-                          ),
+                  OutlinedButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(
+                        Theme.of(context).platform == TargetPlatform.iOS
+                            ? Theme.of(context)
+                                .colorScheme
+                                .primary
+                                .withOpacity(1)
+                            : Theme.of(context)
+                                .colorScheme
+                                .primary
+                                .withOpacity(.6),
+                      ),
+                      foregroundColor: MaterialStateProperty.all(
+                          Theme.of(context).textTheme.bodyMedium?.color),
+                      side: MaterialStateProperty.all(
+                        BorderSide(
+                            color: Theme.of(context).colorScheme.primary),
+                      ),
+                      shape: MaterialStateProperty.all(
+                        RoundedRectangleBorder(
+                          borderRadius:
+                              Theme.of(context).platform == TargetPlatform.iOS
+                                  ? BorderRadius.all(
+                                      Radius.elliptical(10, 10),
+                                    )
+                                  : BorderRadius.all(
+                                      Radius.elliptical(50, 50),
+                                    ),
                         ),
+                      ),
+                    ),
                     onPressed: () async {
                       await showModalBottomSheet(
                         context: context,
@@ -134,20 +145,25 @@ OutlinedButton(
                   OutlinedButton(
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all(
-                        Theme.of(context).platform == TargetPlatform.iOS? Colors.purple?.withOpacity(1):Colors.purple?.withOpacity(0.6),
+                        Theme.of(context).platform == TargetPlatform.iOS
+                            ? Colors.purple.withOpacity(1)
+                            : Colors.purple.withOpacity(0.6),
                       ),
                       foregroundColor: MaterialStateProperty.all(
-                          Theme.of(context).textTheme.bodyText2?.color),
+                          Theme.of(context).textTheme.bodyMedium?.color),
                       side: MaterialStateProperty.all(
-                        BorderSide(color: Colors.purple ?? Colors.transparent),
+                        BorderSide(color: Colors.purple),
                       ),
                       shape: MaterialStateProperty.all(
                         RoundedRectangleBorder(
-                          borderRadius:Theme.of(context).platform == TargetPlatform.iOS? BorderRadius.all(
-                            Radius.elliptical(10, 10),
-                          ):BorderRadius.all(
-                            Radius.elliptical(50 , 50),
-                          ),
+                          borderRadius:
+                              Theme.of(context).platform == TargetPlatform.iOS
+                                  ? BorderRadius.all(
+                                      Radius.elliptical(10, 10),
+                                    )
+                                  : BorderRadius.all(
+                                      Radius.elliptical(50, 50),
+                                    ),
                         ),
                       ),
                     ),
@@ -168,7 +184,7 @@ OutlinedButton(
                             title: Text('Error'),
                             content: Text(
                               s ?? 'Something went wrong',
-                              style: Theme.of(context).textTheme.bodyText1,
+                              style: Theme.of(context).textTheme.bodyLarge,
                             ),
                             actions: [
                               PlatformDialogAction(
@@ -188,7 +204,7 @@ OutlinedButton(
                             title: Text('Success'),
                             content: Text(
                               'Reset email sent',
-                              style: Theme.of(context).textTheme.bodyText1,
+                              style: Theme.of(context).textTheme.bodyLarge,
                             ),
                             actions: [
                               PlatformDialogAction(
@@ -243,7 +259,7 @@ OutlinedButton(
                       title: Text('Error'),
                       content: Text(
                         s ?? 'Something went wrong',
-                        style: Theme.of(context).textTheme.bodyText1,
+                        style: Theme.of(context).textTheme.bodyLarge,
                       ),
                       actions: [
                         PlatformDialogAction(
@@ -330,48 +346,49 @@ OutlinedButton(
                 ],
               ),
             ),
-          GoogleAuthButton(
+          TextButton(
             onPressed: () async {
               await context.read<AuthenticationService>().signInWithGoogle();
               if (widget.returnBack ?? false) Navigator.of(context).pop();
             },
-            darkMode: true,
-            style: AuthButtonStyle(
-              iconSize: 20,
-              textStyle: TextStyle(fontSize: 14, color: Colors.white),
-              width: size.width - 80,
-            ),
+            child: Text("Google Sign In"),
+            // darkMode: true,
+            // style: AuthButtonStyle(
+            //   iconSize: 20,
+            //   textStyle: TextStyle(fontSize: 14, color: Colors.white),
+            //   width: size.width - 80,
+            // ),
           ),
-          if (NewPlatform.isIOS)
-            AppleAuthButton(
-              onPressed: () async {
-                await context.read<AuthenticationService>().signInWithApple();
-                if (widget.returnBack ?? false) Navigator.of(context).pop();
-              },
-              darkMode: true,
-              style: AuthButtonStyle(
-                iconSize: 20,
-                width: size.width - 80,
-              ),
-            ),
-          if (!(context.read<User?>()?.isAnonymous ?? false))
-            EmailAuthButton(
-              onPressed: () {
-                setState(
-                  () {
-                    _controller.nextPage(
-                      duration: Duration(milliseconds: 200),
-                      curve: Curves.linear,
-                    );
-                  },
-                );
-              },
-              style: AuthButtonStyle(
-                iconSize: 20,
-                textStyle: TextStyle(fontSize: 14),
-                width: size.width - 80,
-              ),
-            ),
+          // if (NewPlatform.isIOS)
+          //   AppleAuthButton(
+          //     onPressed: () async {
+          //       await context.read<AuthenticationService>().signInWithApple();
+          //       if (widget.returnBack ?? false) Navigator.of(context).pop();
+          //     },
+          //     darkMode: true,
+          //     style: AuthButtonStyle(
+          //       iconSize: 20,
+          //       width: size.width - 80,
+          //     ),
+          //   ),
+          // if (!(context.read<User?>()?.isAnonymous ?? false))
+          //   EmailAuthButton(
+          //     onPressed: () {
+          //       setState(
+          //         () {
+          //           _controller.nextPage(
+          //             duration: Duration(milliseconds: 200),
+          //             curve: Curves.linear,
+          //           );
+          //         },
+          //       );
+          //     },
+          //     style: AuthButtonStyle(
+          //       iconSize: 20,
+          //       textStyle: TextStyle(fontSize: 14),
+          //       width: size.width - 80,
+          //     ),
+          //   ),
         ],
       );
 }

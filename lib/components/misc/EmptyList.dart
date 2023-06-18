@@ -14,7 +14,7 @@ class EmptyList extends StatelessWidget {
             ),
             Text(
               "No Data",
-              style: Theme.of(context).textTheme.bodyText2,
+              style: Theme.of(context).textTheme.bodyMedium,
             )
           ],
         ),

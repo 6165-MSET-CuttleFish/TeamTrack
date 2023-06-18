@@ -44,10 +44,7 @@ class _ScoringElementStatsState extends State<ScoringElementStats> {
             children: [
               Text(widget.element.name),
               Spacer(),
-              if (!widget.element.isBool)
-                buildIntegerGraph(context)
-              else
-                buildAccuracyGraph(context)
+              widget.element.isBool ? buildAccuracyGraph(context) : buildIntegerGraph(context),
             ],
           ),
           children: [
@@ -144,7 +141,7 @@ class _ScoringElementStatsState extends State<ScoringElementStats> {
                       ),
                       child: Text(
                         'Show Cycle Times',
-                        style: Theme.of(context).textTheme.button,
+                        style: Theme.of(context).textTheme.labelLarge,
                         textAlign: TextAlign.center,
                       ),
                       style: ButtonStyle(

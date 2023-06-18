@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
@@ -58,7 +57,7 @@ class _EventView extends State<EventView> {
       final response = await APIMethods.getMatches(widget.event.getKey() ?? '');
       setState(() {
         bod = (json.decode(response.body).toList());
-       // log(bod.toString());
+        // log(bod.toString());
       });
     }
   }
@@ -70,21 +69,21 @@ class _EventView extends State<EventView> {
           backgroundColor: Theme.of(context).colorScheme.primary,
           actions: [
             if (_tab == 0)
-Container(
-  padding: const EdgeInsets.all(0.0),
-  width: 30.0, 
-child:IconButton(
-                icon: Icon(Icons.settings),
-                tooltip: 'Configure',
-                onPressed: () => showModalBottomSheet(
-                  context: context,
-                  builder: (_) => CheckList(
-                    state: this,
-                    event: widget.event,
-                    statConfig: widget.event.statConfig,
-                  ),
-                ),
-              )),
+              Container(
+                  padding: const EdgeInsets.all(0.0),
+                  width: 30.0,
+                  child: IconButton(
+                    icon: Icon(Icons.settings),
+                    tooltip: 'Configure',
+                    onPressed: () => showModalBottomSheet(
+                      context: context,
+                      builder: (_) => CheckList(
+                        state: this,
+                        event: widget.event,
+                        statConfig: widget.event.statConfig,
+                      ),
+                    ),
+                  )),
             IconButton(
               icon: Icon(widget.event.shared ? Icons.share : Icons.upload),
               tooltip: 'Share',
@@ -107,7 +106,6 @@ child:IconButton(
                             Match(
                               Alliance(
                                 widget.event.teams.findAdd(
-
                                     x['participants'][0]['team']['team_number']
                                         .toString(),
                                     x['participants'][0]['team']
@@ -250,7 +248,8 @@ child:IconButton(
                                 ),
                               );
                           },
-                          items: opModeExt.getAll()
+                          items: opModeExt
+                              .getAll()
                               .map(
                                 (value) => DropdownMenuItem<OpModeType?>(
                                   value: value,
@@ -297,18 +296,17 @@ child:IconButton(
             ),
           ],
         ),
-        bottomNavigationBar: (widget.event.type != EventType.remote && widget.event.type != EventType.analysis)
+        bottomNavigationBar: (widget.event.type != EventType.remote &&
+                widget.event.type != EventType.analysis)
             ? CurvedNavigationBar(
                 animationCurve: Curves.easeOutQuint,
                 animationDuration: const Duration(milliseconds: 1000),
                 buttonBackgroundColor: Theme.of(context).colorScheme.secondary,
-                color: Theme.of(context).textTheme.bodyText1?.color ??
+                color: Theme.of(context).textTheme.bodyLarge?.color ??
                     Colors.black,
                 index: _tab,
                 backgroundColor: Colors.transparent,
-                onTap: (index) => setState(
-                  () => _tab = index,
-                ),
+                onTap: (index) => setState(() => _tab = index),
                 items: [
                   Column(
                     mainAxisSize: MainAxisSize.min,
@@ -401,10 +399,13 @@ child:IconButton(
             ),
             PlatformTextField(
               textInputAction: TextInputAction.done,
-              placeholder: 'Team name',
+              placeholder: 'Team Name',
               keyboardType: TextInputType.name,
               textCapitalization: TextCapitalization.words,
-              onChanged: (input) => _newName = widget.event != EventType.analysis?input:widget.event.name,
+              onChanged: (input) => _newName =
+                  widget.event != EventType.analysis
+                      ? input
+                      : widget.event.name,
             ),
           ],
         ),

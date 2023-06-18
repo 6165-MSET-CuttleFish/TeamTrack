@@ -1,11 +1,9 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:skeletons/skeletons.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/models/AppModel.dart';
-import 'package:teamtrack/components/misc/PlatformGraphics.dart';
 import 'package:intl/intl.dart';
 import 'package:teamtrack/functions/APIMethods.dart';
 

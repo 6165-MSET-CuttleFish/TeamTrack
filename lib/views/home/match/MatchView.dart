@@ -132,12 +132,14 @@ class _MatchView extends State<MatchView> {
     } else {
       _allianceTotal = false;
       try {
-        http
-            .get(
+        http.get(
           Uri.parse('${APIKEYS.TOA_URL}/team/${widget.team?.number}'),
-          headers: APIKEYS.TOA_HEADER,
-        )
-            .then((value) {
+          headers: {
+            'X-TOA-Key': APIKEYS.TOA_KEY,
+            'X-Application-Origin': 'TeamTrack',
+            'Content-Type': 'application/json',
+          },
+        ).then((value) {
           final body = (json.decode(value.body) as List);
           if (body.length != 0)
             setState(() => widget.team?.updateWithTOA(body[0]));
@@ -348,7 +350,8 @@ class _MatchView extends State<MatchView> {
                       child: Center(
                         child: Column(
                           children: [
-                            if ((_match?.type != EventType.remote || _match?.type != EventType.analysis) &&
+                            if ((_match?.type != EventType.remote ||
+                                    _match?.type != EventType.analysis) &&
                                 widget.match != null)
                               Row(
                                 mainAxisAlignment:
@@ -364,8 +367,9 @@ class _MatchView extends State<MatchView> {
                                               )
                                               .toString() ??
                                           '0',
-                                      style:
-                                          Theme.of(context).textTheme.headline4,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headlineMedium,
                                     ),
                                   ),
                                   DropdownButton<Dice>(
@@ -414,7 +418,7 @@ class _MatchView extends State<MatchView> {
                                                   ),
                                               style: Theme.of(context)
                                                   .textTheme
-                                                  .bodyText1,
+                                                  .bodyLarge,
                                             ),
                                           ),
                                         )
@@ -429,13 +433,15 @@ class _MatchView extends State<MatchView> {
                                                   showPenalties: _showPenalties)
                                               .toString() ??
                                           '0',
-                                      style:
-                                          Theme.of(context).textTheme.headline4,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headlineMedium,
                                     ),
                                   ),
                                 ],
                               ),
-                            if ((_match?.type != EventType.remote || _match?.type != EventType.analysis) &&
+                            if ((_match?.type != EventType.remote ||
+                                    _match?.type != EventType.analysis) &&
                                 _match != null)
                               buttonRow(),
                             Column(
@@ -452,7 +458,7 @@ class _MatchView extends State<MatchView> {
                                 ),
                                 Text(
                                   ("${_selectedTeam?.number} : ${_selectedTeam?.name ?? ''}"),
-                                  style: Theme.of(context).textTheme.headline6,
+                                  style: Theme.of(context).textTheme.titleLarge,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -468,14 +474,14 @@ class _MatchView extends State<MatchView> {
                                             "from ${widget.team?.city}",
                                             style: Theme.of(context)
                                                 .textTheme
-                                                .caption,
+                                                .bodySmall,
                                           ),
                                         if (widget.team?.established != null)
                                           Text(
                                             "est. ${widget.team?.established}",
                                             style: Theme.of(context)
                                                 .textTheme
-                                                .caption,
+                                                .bodySmall,
                                           ),
                                       ],
                                     ),
@@ -685,7 +691,8 @@ class _MatchView extends State<MatchView> {
   }
 
   Alliance? getPenaltyAlliance() {
-    if (_match?.type == EventType.remote|| _match?.type == EventType.analysis) return _selectedAlliance;
+    if (_match?.type == EventType.remote || _match?.type == EventType.analysis)
+      return _selectedAlliance;
     if (_selectedAlliance == _match?.red) return _match?.blue;
     if (_selectedAlliance == _match?.blue) return _match?.red;
     return null;
@@ -706,7 +713,9 @@ class _MatchView extends State<MatchView> {
     return ListView(
       children: !_paused || _allowView || type == OpModeType.auto
           ? [
-              if ((widget.event.type != EventType.remote || widget.event.type != EventType.analysis) && _match != null)
+              if ((widget.event.type != EventType.remote ||
+                      widget.event.type != EventType.analysis) &&
+                  _match != null)
                 RawMaterialButton(
                   onPressed: () {
                     setState(() {

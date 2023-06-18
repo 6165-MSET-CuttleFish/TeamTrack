@@ -136,7 +136,7 @@ class MatchRow extends StatelessWidget {
             (match.red?.team1?.name ?? '?') +
                 ' & ' +
                 (match.red?.team2?.name ?? '?'),
-            style: Theme.of(context).textTheme.caption,
+            style: Theme.of(context).textTheme.bodySmall,
           ),
           Text(
             'VS',
@@ -150,7 +150,7 @@ class MatchRow extends StatelessWidget {
             (match.blue?.team1?.name ?? '?') +
                 ' & ' +
                 (match.blue?.team2?.name ?? '?'),
-            style: Theme.of(context).textTheme.caption,
+            style: Theme.of(context).textTheme.bodySmall,
           )
         ],
       );

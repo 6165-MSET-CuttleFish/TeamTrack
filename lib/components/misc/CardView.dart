@@ -58,7 +58,7 @@ class _CardView extends State<CardView> {
                 title: Text('Not Enough Data'),
                 content: Text(
                   'Add more scores',
-                  style: Theme.of(context).textTheme.bodyText1,
+                  style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 actions: [
                   PlatformDialogAction(
@@ -120,7 +120,7 @@ class _CardView extends State<CardView> {
                 tag: widget.type ?? Null,
                 child: Text(
                   widget.title,
-                  style: Theme.of(context).textTheme.caption,
+                  style: Theme.of(context).textTheme.bodySmall,
                 ),
               )
             ],

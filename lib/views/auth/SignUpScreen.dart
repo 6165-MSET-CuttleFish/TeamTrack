@@ -153,7 +153,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             title: Text('Error'),
                             content: Text(
                               s ?? 'Something went wrong',
-                              style: Theme.of(context).textTheme.bodyText1,
+                              style: Theme.of(context).textTheme.bodyLarge,
                             ),
                             actions: [
                               PlatformDialogAction(

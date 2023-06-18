@@ -57,7 +57,7 @@ class _MatchConfigState extends State<MatchConfig> {
             alignment: Alignment.center,
             child: Text(
               'Red Alliance',
-              style: Theme.of(context).textTheme.headline6,
+              style: Theme.of(context).textTheme.titleLarge,
             ),
           ),
         );
@@ -75,7 +75,7 @@ class _MatchConfigState extends State<MatchConfig> {
             alignment: Alignment.center,
             child: Text(
               'Blue Alliance',
-              style: Theme.of(context).textTheme.headline6,
+              style: Theme.of(context).textTheme.titleLarge,
             ),
           ),
         );

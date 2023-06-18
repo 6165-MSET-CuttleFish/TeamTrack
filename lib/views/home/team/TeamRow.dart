@@ -64,7 +64,7 @@ class TeamRow extends StatelessWidget {
             children: [
               Text(
                 team.name,
-                style: Theme.of(context).textTheme.bodyText1,
+                style: Theme.of(context).textTheme.bodyLarge,
               ),
               Row(
                 children: [
@@ -85,7 +85,7 @@ class TeamRow extends StatelessWidget {
         ),
         leading: Text(
           team.number,
-          style: Theme.of(context).textTheme.caption,
+          style: Theme.of(context).textTheme.bodySmall,
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,

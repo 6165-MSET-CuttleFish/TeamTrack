@@ -41,7 +41,7 @@ class ExampleTeamRow extends StatelessWidget {
             children: [
               Text(
                 team.name,
-                style: Theme.of(context).textTheme.caption,
+                style: Theme.of(context).textTheme.bodySmall,
               ),
               Row(
                 children: [
@@ -62,7 +62,7 @@ class ExampleTeamRow extends StatelessWidget {
         ),
         leading: Text(
           team.number,
-          style: Theme.of(context).textTheme.caption,
+          style: Theme.of(context).textTheme.bodySmall,
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,

@@ -50,7 +50,7 @@ class ChangeRow extends StatelessWidget {
                       yyyy,
                     ],
                   ) : "Present"}',
-                style: Theme.of(context).textTheme.caption,
+                style: Theme.of(context).textTheme.bodySmall,
               ),
               ScoreRangeSummary(
                 scores: team.scores.values

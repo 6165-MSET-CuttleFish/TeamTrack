@@ -102,7 +102,7 @@ class ScoreTimeline extends StatelessWidget {
                               color: lessIsBetter
                                   ? Colors.redAccent.withOpacity(0.5)
                                   : Colors.lightGreenAccent.withOpacity(0.5),
-                              cutOffY: target,
+                              cutOffY: target!,
                               applyCutOffY: true,
                             )
                           : null,
@@ -112,11 +112,11 @@ class ScoreTimeline extends StatelessWidget {
                               color: lessIsBetter
                                   ? Colors.lightGreenAccent.withOpacity(0.5)
                                   : Colors.redAccent.withOpacity(0.5),
-                              cutOffY: target,
+                              cutOffY: target!,
                               applyCutOffY: true,
                             )
                           : null,
-                      spots: allianceTotals?.spots(),
+                      spots: allianceTotals?.spots() ?? [],
                       color: Colors.yellow,
                       isCurved: true,
                       preventCurveOverShooting: true,
@@ -129,7 +129,7 @@ class ScoreTimeline extends StatelessWidget {
                             color: lessIsBetter
                                 ? Colors.redAccent.withOpacity(0.5)
                                 : Colors.lightGreenAccent.withOpacity(0.5),
-                            cutOffY: target,
+                            cutOffY: target!,
                             applyCutOffY: true,
                           )
                         : null,
@@ -139,7 +139,7 @@ class ScoreTimeline extends StatelessWidget {
                             color: lessIsBetter
                                 ? Colors.lightGreenAccent.withOpacity(0.5)
                                 : Colors.redAccent.withOpacity(0.5),
-                            cutOffY: target,
+                            cutOffY: target!,
                             applyCutOffY: true,
                           )
                         : null,

@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:teamtrack/components/misc/PlatformGraphics.dart';
 
 /// Used to show proportion of [val]/[max] in a color coded format
+// ignore: must_be_immutable
 class BarGraph extends StatelessWidget {
   BarGraph({
     super.key,
@@ -53,7 +54,7 @@ class BarGraph extends StatelessWidget {
               child: Center(
                 child: Text(
                   title,
-                  style: Theme.of(context).textTheme.caption,
+                  style: Theme.of(context).textTheme.bodySmall,
                   textAlign: TextAlign.center,
                   maxLines: 2,
                 ),
@@ -112,7 +113,7 @@ class BarGraph extends StatelessWidget {
           if (!compressed)
             Text(
               val.toInt().toString() + units,
-              style: Theme.of(context).textTheme.caption,
+              style: Theme.of(context).textTheme.bodySmall,
             ),
         ],
       );

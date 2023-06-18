@@ -41,6 +41,7 @@ class Incrementor extends StatefulWidget {
 class _Incrementor extends State<Incrementor> {
   String get countName => widget.getTime() < 90 ? 'count' : 'endgameCount';
   String get missesName => widget.getTime() < 90 ? 'misses' : 'endgameMisses';
+  /// Builds a widget for an enumerable scoring element
   CupertinoSegmentedControl buildPicker() => CupertinoSegmentedControl<int>(
         groupValue:
             widget.element.didAttempt() ? widget.element.netCount() : null,
@@ -129,6 +130,7 @@ class _Incrementor extends State<Incrementor> {
             });
         },
       );
+  /// Builds a switch widget for the element
   PlatformSwitch buildSwitch() => PlatformSwitch(
         value: widget.element.asBool(),
         onChanged: widget.event?.role != Role.viewer
@@ -178,6 +180,7 @@ class _Incrementor extends State<Incrementor> {
               }
             : null,
       );
+  /// Incrementor for an element that can inrement for a min to a max value
   Row buildIncrementor() => Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -550,7 +553,7 @@ class _Incrementor extends State<Incrementor> {
                                     Text(
                                       "Missed: ${widget.element.totalMisses()}",
                                       style:
-                                          Theme.of(context).textTheme.caption,
+                                          Theme.of(context).textTheme.bodySmall,
                                     ),
                                 ],
                               ),

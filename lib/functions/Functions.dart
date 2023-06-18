@@ -77,5 +77,6 @@ void navigateToMatch(
       ),
     ),
   );
+  // ignore: invalid_use_of_protected_member
   state?.setState(() {});
 }

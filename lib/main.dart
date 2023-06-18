@@ -85,11 +85,11 @@ class _TeamTrack extends State<TeamTrack> {
     splashColor: NewPlatform.isAndroid ? Colors.cyan : Colors.transparent,
     visualDensity: VisualDensity.adaptivePlatformDensity,
     textTheme: TextTheme(
-      bodyText1: GoogleFonts.gugi(),
-      bodyText2: GoogleFonts.gugi(),
-      caption: GoogleFonts.gugi(),
-      headline6: GoogleFonts.gugi(),
-      headline4: GoogleFonts.gugi(color: Colors.black),
+      bodyLarge: GoogleFonts.gugi(),
+      bodyMedium: GoogleFonts.gugi(),
+      bodySmall: GoogleFonts.gugi(),
+      titleLarge: GoogleFonts.gugi(),
+      headlineMedium: GoogleFonts.gugi(color: Colors.black),
     ),
     colorScheme: ColorScheme.light(
       primary: Colors.deepPurple,
@@ -99,28 +99,25 @@ class _TeamTrack extends State<TeamTrack> {
 
   final darkTheme = ThemeData(
     textTheme: TextTheme(
-      bodyText1: GoogleFonts.gugi(color: Colors.white),
-      bodyText2: GoogleFonts.gugi(color: Colors.white),
-      caption: GoogleFonts.gugi(color: Colors.white),
-      headline6: GoogleFonts.gugi(color: Colors.white),
-      headline4: GoogleFonts.gugi(color: Colors.white),
+      bodyLarge: GoogleFonts.gugi(color: Colors.white),
+      bodyMedium: GoogleFonts.gugi(color: Colors.white),
+      bodySmall: GoogleFonts.gugi(color: Colors.white),
+      titleLarge: GoogleFonts.gugi(color: Colors.white),
+      headlineMedium: GoogleFonts.gugi(color: Colors.white),
     ),
-    backgroundColor: Colors.black,
     splashColor: NewPlatform.isAndroid ? Colors.deepPurple : Colors.transparent,
     shadowColor: Colors.white,
     brightness: Brightness.dark,
     canvasColor: Colors.black,
-    colorScheme: ColorScheme.dark(
-      primary: Colors.cyan,
-      primaryVariant: Colors.blue,
-      secondary: Colors.deepPurple,
-    ),
     floatingActionButtonTheme: FloatingActionButtonThemeData(
       focusElevation: 0,
       backgroundColor: Colors.cyan,
       elevation: 0,
     ),
-    visualDensity: VisualDensity.adaptivePlatformDensity,
+    visualDensity: VisualDensity.adaptivePlatformDensity, colorScheme: ColorScheme.dark(
+      primary: Colors.cyan,
+      secondary: Colors.deepPurple,
+    ).copyWith(background: Colors.black),
   );
 
   void getCurrentAppTheme() async => themeChangeProvider.darkTheme =

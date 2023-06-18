@@ -35,29 +35,23 @@ extension RoleExtension on Role {
     }
   }
 
-  // icon for showing to the user
-  Icon getIcon({Color? color, double? size = 14}) {
+  IconData _iconData() {
     switch (this) {
       case Role.viewer:
-        return Icon(
-          Icons.visibility,
-          color: color,
-          size: size,
-        );
+        return Icons.remove_red_eye;
       case Role.editor:
-        return Icon(
-          Icons.edit,
-          color: color,
-          size: size,
-        );
-      default:
-        return Icon(
-          Icons.admin_panel_settings,
-          color: color,
-          size: size,
-        );
+        return Icons.edit;
+      case Role.admin:
+        return Icons.admin_panel_settings;
     }
   }
+
+  // icon for showing to the user
+  Icon getIcon({Color? color, double? size = 14}) => Icon(
+        _iconData(),
+        color: color,
+        size: size,
+      );
 }
 
 extension ExTeam on Team? {
@@ -119,12 +113,10 @@ extension MergeExt on List<ScoringElement> {
 }
 
 extension TimestampExt on Timestamp {
-  Map<String, dynamic> toJson() {
-    return {
-      'seconds': this.seconds,
-      'nanoseconds': this.nanoseconds,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+        'seconds': this.seconds,
+        'nanoseconds': this.nanoseconds,
+      };
 }
 
 extension opModeExt on OpModeType? {
@@ -193,17 +185,8 @@ extension eventTypeExt on EventType {
 
 extension StrExt on String {
   // return new string with spaces added before capital letters
-  String spaceBeforeCapital() {
-    var returnString = "";
-    for (var i = 0; i < this.length; i++) {
-      var currentChar = this[i];
-      if (currentChar.toUpperCase() == currentChar && i != 0) {
-        returnString += " ";
-      }
-      returnString += currentChar;
-    }
-    return returnString;
-  }
+  String spaceBeforeCapital() =>
+      replaceAllMapped(RegExp(r'([A-Z])'), (match) => ' ${match.group(1)}');
 }
 
 extension extOp on OpModeType {

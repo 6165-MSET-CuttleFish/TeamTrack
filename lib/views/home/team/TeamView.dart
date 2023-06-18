@@ -193,7 +193,7 @@ class _TeamViewState extends State<TeamView> {
                 _team.number,
                 style: widget.team.number == '6165'
                     ? TextStyle(fontSize: 12, fontFamily: 'Revival Gothic')
-                    : Theme.of(context).textTheme.caption,
+                    : Theme.of(context).textTheme.bodySmall,
               ),
             ],
           ),
@@ -498,7 +498,7 @@ class _TeamViewState extends State<TeamView> {
                             lineBarsData: [
                               for (final opModeType in opModeExt.getAll())
                                 LineChartBarData(
-                                  show: _selections[opModeType],
+                                  show: _selections[opModeType] ?? false,
                                   spots: widget.event.statConfig.allianceTotal
                                       ? widget.event
                                           .getSortedMatches(true)

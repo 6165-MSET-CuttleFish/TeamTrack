@@ -63,7 +63,7 @@ class ExampleMatchRow extends StatelessWidget {
         children: [
           Text(
             'Red Alliance',
-            style: Theme.of(context).textTheme.caption,
+            style: Theme.of(context).textTheme.bodySmall,
           ),
           Text(
             'VS',
@@ -75,7 +75,7 @@ class ExampleMatchRow extends StatelessWidget {
           ),
           Text(
             'Blue Alliance',
-            style: Theme.of(context).textTheme.caption,
+            style: Theme.of(context).textTheme.bodySmall,
           )
         ],
       );
