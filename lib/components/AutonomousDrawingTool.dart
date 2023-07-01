@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:teamtrack/views/home/team/TeamView.dart';
 
 import 'dart:ui' as ui;
 
@@ -31,6 +32,8 @@ String _teamNumber="6165";
 String scope="None";
 double pointsLeft=0;
 double pointsRight=0;
+var accuracyMarks = <String>[" ","< 25%", "26-50%", "51-75%", ">75%"];
+String dropdownValue=accuracyMarks.first;
 var  _offsets = <Offset>[];
 class _AutonPainterState extends State<AutonPainter> {
   Team team;
@@ -45,6 +48,7 @@ class _AutonPainterState extends State<AutonPainter> {
   void savePath() {
     print("Saving...");
     _takeScreenshot(); //Get picture
+    dropdownValue=accuracyMarks.first;
     print("Uploaded!");
   }
   void _takeScreenshot() async {
@@ -53,7 +57,7 @@ class _AutonPainterState extends State<AutonPainter> {
 
     if (boundary.debugNeedsPaint) {
       print("Waiting for boundary to be painted.");
-      await Future.delayed(const Duration(milliseconds: 20));
+      await Future.delayed(const Duration(milliseconds: 1000));
       return _takeScreenshot();
     }
 
@@ -148,14 +152,29 @@ class _AutonPainterState extends State<AutonPainter> {
                                   onPressed: savePath,
                                   icon: const Icon(Icons.cloud)
                               ),
-                              const Spacer(flex: 2),
+                              const Spacer(flex: 1),
+                              DropdownButton(
+                                  value: dropdownValue,
+                                  items: accuracyMarks.map<DropdownMenuItem<String>>((String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Text(value),
+                                    );
+                                  }).toList(),
+                                  onChanged: (String? value) {
+                                    // This is called when the user selects an item.
+                                    setState(() {
+                                      dropdownValue = value!;
+                                    });
+                                  }),
+                              const Spacer(flex: 1),
                               IconButton(
                                 onPressed: clearPath,
                                 icon: const Icon(Icons.clear_sharp),
                               ),
                             ],
-                          )
-                      ),
+                          ),
+                        ),
                     ]
                 )
             )

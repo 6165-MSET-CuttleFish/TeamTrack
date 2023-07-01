@@ -33,7 +33,8 @@ class TeamView extends StatefulWidget {
   @override
   _TeamViewState createState() => _TeamViewState(team);
 }
-
+var scopeMarks = <String>["","Both_Side", "Red_Side", "Blue_Side"];
+String dropdownScope=scopeMarks.first;
 class _TeamViewState extends State<TeamView> {
   _TeamViewState(this._team);
   Dice _dice = Dice.none;
@@ -415,7 +416,7 @@ class _TeamViewState extends State<TeamView> {
                     Container(
                       //Put in the gallery stuff
                       child: FutureBuilder(
-                        future: FirebaseStorage.instance.ref().child('${_team.number} - ${painter.getScope()}.png').getDownloadURL(),
+                        future: FirebaseStorage.instance.ref().child('${_team.number} - ${dropdownScope}.png').getDownloadURL(),
                         builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
                           if(snapshot.connectionState == ConnectionState.done && snapshot.hasData){
                             return Container(
@@ -434,6 +435,22 @@ class _TeamViewState extends State<TeamView> {
                         },
 
                       ),
+                    ),
+                    Container(
+                      child:DropdownButton(
+                          value: dropdownScope,
+                          items: scopeMarks.map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                          onChanged: (String? value) {
+                            // This is called when the user selects an item.
+                            setState(() {
+                              dropdownScope = value!;
+                            });
+                          }),
                     )
                   ]
               ),
