@@ -38,6 +38,7 @@ dependencies:
   skeletons: ^0.0.3
   google_fonts: ^5.0.0
 
+
   firebase_core: ^2.14.0
   firebase_messaging: ^14.6.3
   firebase_remote_config: ^4.2.3
@@ -49,7 +50,7 @@ dependencies:
   # sign_in_with_apple: ^5.0.0
   crypto: ^3.0.3
   flutter_local_notifications: ^14.1.1
-
+  auth_buttons: ^1.0.1+4
   flutter:
     sdk: flutter
 
@@ -57,8 +58,7 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.5
-  firebase_storage: ^11.2.4
-  auth_buttons: ^1.0.1+4
+  sign_in_with_apple_web: ^1.0.1
 
 dev_dependencies:
   flutter_launcher_icons: ^0.9.0
@@ -158,7 +158,6 @@ flutter:
         - asset: assets/fonts/Revival_Gothic.otf
   assets:
     - assets/images/LoadingScreen.png
-    - assets/images/field.jpg
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg
