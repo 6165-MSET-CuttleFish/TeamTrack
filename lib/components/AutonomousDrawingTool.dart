@@ -4,32 +4,31 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:teamtrack/views/home/team/TeamView.dart';
 
 import 'dart:ui' as ui;
 
 import '../models/GameModel.dart';
 
 class AutonPainter extends StatefulWidget {
-  final Event event;
   final Team team;
 
   const AutonPainter({
     Key? key,
-    required this.event,
     required this.team,
   }) : super(key: key);
   String getScope(){
     return scope;
   }
   @override
-  _AutonPainterState createState() => _AutonPainterState(team, event);
+  _AutonPainterState createState() => _AutonPainterState(team);
 }
 final GlobalKey _key = GlobalKey();
 double magicOffset=0.0;
 double xLow=85.0, xHigh=xLow+245.0;
 double yLow=5.0, yHigh=245.0;
 double kCanvasSize = 800.0;
-String _eKey="";
+String _teamNumber="6165";
 String scope="None";
 double pointsLeft=0;
 double pointsRight=0;
@@ -37,9 +36,8 @@ var accuracyMarks = <String>[" ","< 25%", "26-50%", "51-75%", ">75%"];
 String dropdownValue=accuracyMarks.first;
 var  _offsets = <Offset>[];
 class _AutonPainterState extends State<AutonPainter> {
-  Event event;
   Team team;
-  _AutonPainterState(this.team, this.event);
+  _AutonPainterState(this.team);
   void clearPath() {
     setState(() {
       _offsets.clear();
@@ -72,8 +70,8 @@ class _AutonPainterState extends State<AutonPainter> {
       });
     }
   }
-  void setTeam(String? key){
-    _eKey=key!;
+  void setTeam(String team){
+    _teamNumber=team;
   }
   void uploadFile(Uint8List image) async {
     FirebaseStorage storage = FirebaseStorage.instance;
@@ -84,7 +82,7 @@ class _AutonPainterState extends State<AutonPainter> {
     }else if(pointsRight>(pointsLeft)){
       scope="Red_Side";
     }
-    Reference ref = storage.ref().child('${_eKey} - ${team.number} - ${scope}.png');
+    Reference ref = storage.ref().child('${_teamNumber} - ${scope}.png');
     UploadTask uploadTask = ref.putData(image, SettableMetadata(contentType: 'image/png'));
     try{
       await uploadTask
@@ -97,7 +95,7 @@ class _AutonPainterState extends State<AutonPainter> {
     String url = await ref.getDownloadURL();
   }
   Widget build(BuildContext context) {
-    setTeam(event.id);
+    setTeam(team.number);
     return RepaintBoundary(
         key: _key,
         child: Scaffold(
