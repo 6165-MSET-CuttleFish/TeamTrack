@@ -1,4 +1,7 @@
+import 'dart:typed_data';
+
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:teamtrack/components/AutonomousDrawingTool.dart';
 import 'package:teamtrack/components/misc/Collapsible.dart';
 import 'package:teamtrack/components/misc/EmptyList.dart';
@@ -31,12 +34,12 @@ class TeamView extends StatefulWidget {
   final Event event;
   final bool isSoleWindow;
   @override
-  _TeamViewState createState() => _TeamViewState(team);
+  _TeamViewState createState() => _TeamViewState(team,event);
 }
 var scopeMarks = <String>["","Both_Side", "Red_Side", "Blue_Side"];
 String dropdownScope=scopeMarks.first;
 class _TeamViewState extends State<TeamView> {
-  _TeamViewState(this._team);
+  _TeamViewState(this._team, this._event);
   Dice _dice = Dice.none;
   final _selections = {
     null: true,
@@ -46,6 +49,7 @@ class _TeamViewState extends State<TeamView> {
     OpModeType.penalty: false,
   };
   Team _team;
+  Event _event;
   bool _showCycles = false;
 
   Score? maxScore;
@@ -87,7 +91,7 @@ class _TeamViewState extends State<TeamView> {
             .toInt();
       },
     );
-    painter=new AutonPainter(team: _team,);
+    painter=new AutonPainter(team: _team,event: _event,);
     super.initState();
   }
 
@@ -416,7 +420,7 @@ class _TeamViewState extends State<TeamView> {
                     Container(
                       //Put in the gallery stuff
                       child: FutureBuilder(
-                        future: FirebaseStorage.instance.ref().child('${_team.number} - ${dropdownScope}.png').getDownloadURL(),
+                        future: FirebaseStorage.instance.ref().child('${_event.id} - ${_team.number} - ${dropdownScope}.svg').getDownloadURL(),
                         builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
                           if(snapshot.connectionState == ConnectionState.done && snapshot.hasData){
                             return Container(
