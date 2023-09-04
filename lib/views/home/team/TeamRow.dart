@@ -65,6 +65,7 @@ class TeamRow extends StatelessWidget {
               Text(
                 team.name,
                 style: Theme.of(context).textTheme.bodyLarge,
+                overflow: TextOverflow.ellipsis
               ),
               Row(
                 children: [
@@ -83,9 +84,16 @@ class TeamRow extends StatelessWidget {
             ],
           ),
         ),
-        leading: Text(
+        leading: SizedBox(
+          width: MediaQuery.of(context).size.width*.17,
+          child:
+          Center(
+    child:Text(
           team.number,
-          style: Theme.of(context).textTheme.bodySmall,
+          style: Theme.of(context).textTheme.titleLarge,
+            textScaleFactor: .8,
+        ),
+        ),
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
@@ -97,7 +105,7 @@ class TeamRow extends StatelessWidget {
               ),
             Padding(
               padding: EdgeInsets.all(
-                10,
+                15,
               ),
             ),
             BarGraph(
@@ -126,6 +134,7 @@ class TeamRow extends StatelessWidget {
                     ),
               max: max,
               title: '',
+              compressed:true,
               lessIsBetter: (statistics.getLessIsBetter() ||
                       sortMode.getLessIsBetter()) &&
                   !(statistics.getLessIsBetter() && sortMode.getLessIsBetter()),

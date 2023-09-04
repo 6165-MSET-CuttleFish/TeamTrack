@@ -220,7 +220,7 @@ class _MatchList extends State<MatchList> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.only(bottom: 8.0),
+          padding: const EdgeInsets.only(bottom: 0),
           child: ExampleMatchRow(
             event: widget.event,
             team: widget.team,

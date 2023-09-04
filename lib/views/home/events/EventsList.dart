@@ -28,19 +28,23 @@ class _EventsList extends State<EventsList> {
             ExpansionTile(
               leading: Icon(CupertinoIcons.person_3),
               initiallyExpanded: true,
-              title: Text('In Person Events'),
+              title: Text(
+                'In Person Events',
+                style: Theme.of(context).textTheme.titleMedium),
               children: localEvents(),
             ),
             ExpansionTile(
               leading: Icon(CupertinoIcons.rectangle_stack_person_crop),
               initiallyExpanded: true,
-              title: Text('Remote Events'),
+              title: Text('Remote Events',
+                  style: Theme.of(context).textTheme.titleMedium),
               children: remoteEvents(),
             ),
             ExpansionTile(
               leading: Icon(CupertinoIcons.rocket_fill),
               initiallyExpanded: true,
-              title: Text('Driver Analysis'),
+              title: Text('Driver Analysis',
+                  style: Theme.of(context).textTheme.titleMedium),
               children: driverAnalysis(),
             ),
           ],
@@ -136,9 +140,10 @@ class _EventsList extends State<EventsList> {
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 Text(
-                  e.gameName.spaceBeforeCapital(),
-                  style: Theme.of(context).textTheme.bodySmall,
+                  e.gameName.spaceBeforeCapital().trimLeft(),
+                  style: Theme.of(context).textTheme.bodySmall?.apply(color: Theme.of(context).colorScheme.primary),
                 ),
+
               ],
             ),
             onTap: () async {

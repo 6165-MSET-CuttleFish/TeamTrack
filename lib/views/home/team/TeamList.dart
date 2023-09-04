@@ -84,7 +84,7 @@ class _TeamList extends State<TeamList> {
           return Column(
             children: [
               Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
+                padding: const EdgeInsets.only(bottom: 0),
                 child: ExampleTeamRow(
                   sortMode: widget.sortMode,
                   elementSort: widget.elementSort,

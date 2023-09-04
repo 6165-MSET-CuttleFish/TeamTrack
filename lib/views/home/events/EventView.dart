@@ -161,7 +161,8 @@ class _EventView extends State<EventView> {
                   children: [
                     DropdownButton<Statistics>(
                       value: statistics,
-                      icon: Icon(Icons.functions),
+                      icon: Icon(Icons.functions,
+                          color: Colors.white),
                       iconSize: 24,
                       elevation: 16,
                       underline: Container(
@@ -178,7 +179,8 @@ class _EventView extends State<EventView> {
                           .map(
                             (value) => DropdownMenuItem<Statistics>(
                               value: value,
-                              child: Text(value.name),
+                              child: Text(value.name,
+                              textScaleFactor: .9,),
                             ),
                           )
                           .toList(),
@@ -192,7 +194,9 @@ class _EventView extends State<EventView> {
                     icon: Icon(
                       ascending
                           ? CupertinoIcons.sort_up
-                          : CupertinoIcons.sort_down,
+                          : CupertinoIcons.sort_down
+,
+color: Colors.white
                     ),
                     onPressed: () {
                       setState(() {
@@ -206,7 +210,8 @@ class _EventView extends State<EventView> {
                       children: [
                         DropdownButton<OpModeType?>(
                           value: sortingModifier,
-                          icon: Icon(Icons.sort),
+                          icon: Icon(Icons.sort,
+                            color: Colors.white),
                           iconSize: 24,
                           elevation: 16,
                           underline: Container(
@@ -236,7 +241,8 @@ class _EventView extends State<EventView> {
                                   ]
                                       .map(
                                         (e) => ListTile(
-                                          title: Text(e?.name ?? "Total"),
+                                          title: Text(e?.name ?? "Total",
+                                            textScaleFactor: .9,),
                                           onTap: () {
                                             HapticFeedback.lightImpact();
                                             setState(() => elementSort = e);
@@ -253,7 +259,8 @@ class _EventView extends State<EventView> {
                               .map(
                                 (value) => DropdownMenuItem<OpModeType?>(
                                   value: value,
-                                  child: Text(value?.toVal() ?? "Total"),
+                                  child: Text(value?.toVal() ?? "Total",
+                                    textScaleFactor: .9,),
                                 ),
                               )
                               .toList(),
@@ -313,15 +320,16 @@ class _EventView extends State<EventView> {
                     children: [
                       Icon(
                         CupertinoIcons.person_3_fill,
-                        size: 20,
+                        size: 18,
                         color: _tab == 1 ? Theme.of(context).canvasColor : null,
                       ),
                       Text(
                         'Teams',
                         style: TextStyle(
-                          fontSize: 10,
+                          fontSize: 8,
                           color:
                               _tab == 1 ? Theme.of(context).canvasColor : null,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ],
@@ -331,15 +339,16 @@ class _EventView extends State<EventView> {
                     children: [
                       Icon(
                         CupertinoIcons.sportscourt_fill,
-                        size: 20,
+                        size: 18,
                         color: _tab == 0 ? Theme.of(context).canvasColor : null,
                       ),
                       Text(
                         'Matches',
                         style: TextStyle(
-                          fontSize: 10,
+                          fontSize: 8,
                           color:
                               _tab == 0 ? Theme.of(context).canvasColor : null,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ],

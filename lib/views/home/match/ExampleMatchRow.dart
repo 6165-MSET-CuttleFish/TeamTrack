@@ -22,6 +22,16 @@ class ExampleMatchRow extends StatelessWidget {
         ),
       ),
       child: ListTile(
+        leading: SizedBox(
+            width: 35,
+            child:Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children:[
+                  Text('#',style: Theme.of(context).textTheme.titleLarge, textScaleFactor: .8,)
+                ]
+            )
+        ),
         title: team != null
             ? Column(
                 mainAxisSize: MainAxisSize.min,
@@ -46,13 +56,17 @@ class ExampleMatchRow extends StatelessWidget {
                 ],
               )
             : Column(
+
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
+
                   matchSummary(context),
                 ],
               ),
-        trailing: team != null ? null : scoreDisplay(),
+        trailing: team != null ? null : Padding(
+          padding: EdgeInsets.only(right:10),
+            child:scoreDisplay()),
         tileColor: Colors.grey.withOpacity(0.3),
       ),
     );
@@ -90,19 +104,19 @@ class ExampleMatchRow extends StatelessWidget {
           children: [
             Text(
               'Red',
-              style: GoogleFonts.gugi(
-                fontSize: 17,
+              style: GoogleFonts.montserrat(
+                fontSize: 15,
                 fontWeight: FontWeight.bold,
                 color:
                     team == null ? (CupertinoColors.systemRed) : (Colors.grey),
               ),
             ),
-            Text(" - ", style: GoogleFonts.gugi()),
+            Text(" - ", style: GoogleFonts.montserrat()),
             Text(
               'Blue',
-              style: GoogleFonts.gugi(
+              style: GoogleFonts.montserrat(
                 fontWeight: null,
-                fontSize: 17,
+                fontSize: 15,
                 color: team == null
                     ? (Colors.blue)
                     : (CupertinoColors.activeOrange),
@@ -113,7 +127,7 @@ class ExampleMatchRow extends StatelessWidget {
         if (event.eventKey != null)
           Text(
             'API Score',
-            style: GoogleFonts.gugi(
+            style: GoogleFonts.montserrat(
               fontSize: 10.5,
               color: Colors.green,
             ),

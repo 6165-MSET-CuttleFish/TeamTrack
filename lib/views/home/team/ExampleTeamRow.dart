@@ -40,8 +40,8 @@ class ExampleTeamRow extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                team.name,
-                style: Theme.of(context).textTheme.bodySmall,
+                'Team Name',
+                style: Theme.of(context).textTheme.bodyLarge,
               ),
               Row(
                 children: [
@@ -50,7 +50,7 @@ class ExampleTeamRow extends StatelessWidget {
                       children: [
                         Text(
                           wlt[i],
-                          style: TextStyle(color: wltColor(i), fontSize: 12),
+                          style: TextStyle(color: wltColor(i), fontSize: 14),
                         ),
                         if (i < wlt.length - 1) Text('-')
                       ],
@@ -60,9 +60,15 @@ class ExampleTeamRow extends StatelessWidget {
             ],
           ),
         ),
-        leading: Text(
+        leading:
+        Center(
+          widthFactor: 1.1,
+    child:Text(
           team.number,
-          style: Theme.of(context).textTheme.bodySmall,
+          style: Theme.of(context).textTheme.titleLarge,
+          textAlign: TextAlign.center,
+          textScaleFactor: .8,
+        ),
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
@@ -72,18 +78,15 @@ class ExampleTeamRow extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                      '${elementName.isEmpty ? sortMode.getName(shortened: true) : elementName} '),
                   Text('% Change'),
                 ],
               ),
             ),
             Padding(
-              padding: EdgeInsets.all(
-                10,
-              ),
+
+              padding: EdgeInsets.fromLTRB(0, 0, 20, 0),
             ),
-            Text('% Max ${statistics.name}')
+            Text('% ${statistics.name}')
           ],
         ),
       ),

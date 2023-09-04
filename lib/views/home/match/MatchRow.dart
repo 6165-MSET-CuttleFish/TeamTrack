@@ -42,7 +42,16 @@ class MatchRow extends StatelessWidget {
         ),
       ),
       child: ListTile(
-        leading: team == null ? Text(index.toString()) : null,
+        leading: team == null ? SizedBox(
+          width: 35,
+            child:Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children:[
+              Text(index.toString(),style: Theme.of(context).textTheme.titleLarge, textScaleFactor: .8,)
+            ]
+        )
+        ): null,
         title: team != null
             ? Column(
                 mainAxisSize: MainAxisSize.min,
@@ -54,7 +63,9 @@ class MatchRow extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(index.toString()),
+                          Text(index.toString(),
+                            style: Theme.of(context).textTheme.titleLarge, textScaleFactor: .8
+                          ),
                           Container(
                             child: matchSummary(context),
                             width: 150,
@@ -79,6 +90,7 @@ class MatchRow extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  Padding(padding:EdgeInsets.all(0)),
                   matchSummary(context),
                   Hero(
                     tag: match.id,
@@ -137,6 +149,7 @@ class MatchRow extends StatelessWidget {
                 ' & ' +
                 (match.red?.team2?.name ?? '?'),
             style: Theme.of(context).textTheme.bodySmall,
+            overflow: TextOverflow.ellipsis
           ),
           Text(
             'VS',
@@ -151,6 +164,7 @@ class MatchRow extends StatelessWidget {
                 ' & ' +
                 (match.blue?.team2?.name ?? '?'),
             style: Theme.of(context).textTheme.bodySmall,
+              overflow: TextOverflow.ellipsis
           )
         ],
       );
@@ -170,7 +184,7 @@ class MatchRow extends StatelessWidget {
           children: [
             Text(
               match.redScore(showPenalties: true).toString(),
-              style: GoogleFonts.gugi(
+              style: GoogleFonts.montserrat(
                 fontSize: 17,
                 fontWeight: redIsGreater ? FontWeight.bold : null,
                 color: team == null
@@ -178,10 +192,10 @@ class MatchRow extends StatelessWidget {
                     : (teamIsRed ? CupertinoColors.activeOrange : Colors.grey),
               ),
             ),
-            Text(" - ", style: GoogleFonts.gugi()),
+            Text(" - ", style: GoogleFonts.montserrat()),
             Text(
               match.blueScore(showPenalties: true).toString(),
-              style: GoogleFonts.gugi(
+              style: GoogleFonts.montserrat(
                 fontWeight: blueIsGreater ? FontWeight.bold : null,
                 fontSize: 17,
                 color: team == null
@@ -198,7 +212,7 @@ class MatchRow extends StatelessWidget {
                     ' - ' +
                     match.getBlueAPI().toString()
                 : 'Not on API',
-            style: GoogleFonts.gugi(
+            style: GoogleFonts.montserrat(
               fontSize: match.getRedAPI() == null ? 10.5 : 12,
               color: match.getRedAPI() == null ? Colors.amber : Colors.green,
             ),
