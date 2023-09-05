@@ -39,20 +39,13 @@ class ExampleMatchRow extends StatelessWidget {
                 children: [
                   if (event.type != EventType.remote && event.type != EventType.analysis)
                     Padding(
-                      padding: const EdgeInsets.only(bottom: 20),
+                      padding: const EdgeInsets.only(bottom: 00),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Qual #'),
-                          Container(
-                            child: matchSummary(context),
-                            width: 150,
-                          ),
-                          scoreDisplay(),
+                        children: [matchSummary(context),
                         ],
                       ),
                     ),
-                  Text(''),
                 ],
               )
             : Column(
@@ -64,7 +57,7 @@ class ExampleMatchRow extends StatelessWidget {
                   matchSummary(context),
                 ],
               ),
-        trailing: team != null ? null : Padding(
+        trailing: Padding(
           padding: EdgeInsets.only(right:10),
             child:scoreDisplay()),
         tileColor: Colors.grey.withOpacity(0.3),

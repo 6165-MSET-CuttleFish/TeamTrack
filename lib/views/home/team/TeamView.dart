@@ -1,3 +1,5 @@
+import 'package:dice_icons/dice_icons.dart';
+import 'package:flutter/services.dart';
 import 'package:teamtrack/components/misc/Collapsible.dart';
 import 'package:teamtrack/components/misc/EmptyList.dart';
 import 'package:teamtrack/components/misc/PlatformGraphics.dart';
@@ -90,95 +92,7 @@ class _TeamViewState extends State<TeamView> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        bottomNavigationBar: NewPlatform.isIOS
-            ? SafeArea(
-                child: CupertinoSlidingSegmentedControl(
-                  groupValue: _dice,
-                  children: Dice.values.asMap().map(
-                        (key, value) => MapEntry(
-                          value,
-                          Text(
-                            value == Dice.none
-                                ? 'All Cases'
-                                : value.toVal(
-                                    widget.event.gameName,
-                                  ),
-                          ),
-                        ),
-                      ),
-                  onValueChanged: (Dice? newDice) => setState(
-                    () => _dice = newDice ?? Dice.none,
-                  ),
-                ),
-              )
-            : ButtonBar(
-                alignment: MainAxisAlignment.center,
-                children: [
-                  OutlinedButton(
-                    style: ButtonStyle(
-                      backgroundColor: _dice == Dice.one
-                          ? MaterialStateProperty.all(
-                              Theme.of(context).colorScheme.primary)
-                          : null,
-                    ),
-                    child: Text(Dice.one.toVal(widget.event.gameName)),
-                    onPressed: _dice != Dice.one
-                        ? () {
-                            setState(
-                              () {
-                                _dice = Dice.one;
-                              },
-                            );
-                          }
-                        : null,
-                  ),
-                  OutlinedButton(
-                    style: ButtonStyle(
-                      backgroundColor: _dice == Dice.two
-                          ? MaterialStateProperty.all(
-                              Theme.of(context).colorScheme.primary)
-                          : null,
-                    ),
-                    child: Text(Dice.two.toVal(widget.event.gameName)),
-                    onPressed: _dice != Dice.two
-                        ? () {
-                            setState(
-                              () {
-                                _dice = Dice.two;
-                              },
-                            );
-                          }
-                        : null,
-                  ),
-                  OutlinedButton(
-                    style: ButtonStyle(
-                      backgroundColor: _dice == Dice.three
-                          ? MaterialStateProperty.all(
-                              Theme.of(context).colorScheme.primary)
-                          : null,
-                    ),
-                    child: Text(Dice.three.toVal(widget.event.gameName)),
-                    onPressed: _dice != Dice.three
-                        ? () {
-                            setState(
-                              () {
-                                _dice = Dice.three;
-                              },
-                            );
-                          }
-                        : null,
-                  ),
-                  MaterialButton(
-                    color: _dice == Dice.none
-                        ? Theme.of(context).colorScheme.primary
-                        : null,
-                    child: Text('All Cases'),
-                    onPressed: () => setState(
-                      () => _dice = Dice.none,
-                    ),
-                  ),
-                ],
-              ),
+
         appBar: AppBar(
           title: Column(
             crossAxisAlignment: NewPlatform.isAndroid
@@ -199,6 +113,39 @@ class _TeamViewState extends State<TeamView> {
           ),
           backgroundColor: Theme.of(context).colorScheme.primary,
           actions: [
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children:[
+
+            DropdownButton<Dice>(
+              value: _dice,
+              icon:   Icon(Icons.height_rounded,
+                  color: Colors.white),
+              iconSize: 24,
+              elevation: 16,
+              underline: Container(
+                height: 0.5,
+                color: Colors.deepPurple,
+              ),
+              onChanged: (newValue) {
+                HapticFeedback.lightImpact();
+                setState(() {
+                  _dice = newValue!;
+                });
+              },
+              items: DiceExtension
+                  .getAll()
+                  .map(
+                    (value) => DropdownMenuItem<Dice>(
+                  value: value,
+                  child: Text(value?.toVal(Statics.gameName) ?? "All Cases",
+                    style: Theme.of(context).textTheme.titleMedium?.apply(color: Colors.white),
+                    textScaleFactor: .9,),
+                ),
+              )
+                  .toList(),
+            ),
+            ],),
             IconButton(
               tooltip: "Configure",
               icon: Icon(Icons.settings),
@@ -226,7 +173,8 @@ class _TeamViewState extends State<TeamView> {
                 ),
               ),
           ],
-        ),
+        )
+  ,
         body: StreamBuilder<DatabaseEvent>(
           stream: widget.isSoleWindow ? widget.event.getRef()?.onValue : null,
           builder: (context, eventHandler) {

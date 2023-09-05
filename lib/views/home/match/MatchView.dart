@@ -39,7 +39,7 @@ class _MatchView extends State<MatchView> {
   final blue = Colors.blue;
   final red = CupertinoColors.systemRed;
   bool _showPenalties = true,
-      _allianceTotal = true,
+      _allianceTotal = false,
       _showRoles = false,
       _paused = true,
       _allowView = false,
@@ -378,7 +378,7 @@ class _MatchView extends State<MatchView> {
                                     icon: Icon(Icons.height_rounded),
                                     iconSize: 24,
                                     iconEnabledColor:
-                                        Theme.of(context).colorScheme.primary,
+                                        Theme.of(context).shadowColor,
                                     elevation: 16,
                                     style: TextStyle(
                                         color: Theme.of(context)

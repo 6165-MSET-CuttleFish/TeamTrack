@@ -218,6 +218,7 @@ extension extOp on OpModeType {
 }
 
 extension DiceExtension on Dice {
+  static List<Dice> getAll() => [ ...Dice.values];
   String toVal(String gameName) {
     final skeleton = json.decode(
       remoteConfig.getString(

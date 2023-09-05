@@ -93,7 +93,7 @@ class _TeamTrack extends State<TeamTrack> {
       titleSmall: GoogleFonts.montserrat(fontWeight: FontWeight.w700),
       headlineMedium: GoogleFonts.montserrat(fontWeight: FontWeight.w700,color: Colors.black),
     ),
-
+shadowColor:Colors.black,
     colorScheme: ColorScheme.light(
       primary: Color.fromRGBO(80, 64, 153,1),
       secondary: Color.fromRGBO(151, 78, 195,1),

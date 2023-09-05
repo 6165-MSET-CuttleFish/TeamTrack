@@ -201,6 +201,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.8"
+  dice_icons:
+    dependency: "direct main"
+    description:
+      name: dice_icons
+      sha256: "3c62cafff3e27285b9074bc43a2d468d37bf2b70c80dd7a4eb63e21238a2e49a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.5"
   equatable:
     dependency: transitive
     description:
