@@ -180,6 +180,7 @@ class _EventView extends State<EventView> {
                             (value) => DropdownMenuItem<Statistics>(
                               value: value,
                               child: Text(value.name,
+                              style: Theme.of(context).textTheme.titleMedium?.apply(color: Colors.white),
                               textScaleFactor: .9,),
                             ),
                           )
@@ -242,6 +243,7 @@ color: Colors.white
                                       .map(
                                         (e) => ListTile(
                                           title: Text(e?.name ?? "Total",
+                                            style: Theme.of(context).textTheme.titleMedium?.apply(color: Colors.white),
                                             textScaleFactor: .9,),
                                           onTap: () {
                                             HapticFeedback.lightImpact();
@@ -260,6 +262,7 @@ color: Colors.white
                                 (value) => DropdownMenuItem<OpModeType?>(
                                   value: value,
                                   child: Text(value?.toVal() ?? "Total",
+                                    style: Theme.of(context).textTheme.titleMedium?.apply(color: Colors.white),
                                     textScaleFactor: .9,),
                                 ),
                               )
