@@ -19,6 +19,9 @@ import 'package:teamtrack/views/home/events/EventShare.dart';
 import 'package:provider/provider.dart';
 import 'package:teamtrack/functions/APIMethods.dart';
 
+
+import '../team/AllianceSelection.dart';
+
 class EventView extends StatefulWidget {
   EventView({
     super.key,
@@ -84,6 +87,23 @@ class _EventView extends State<EventView> {
                       ),
                     ),
                   )),
+            IconButton(
+              icon: Icon(widget.event.shared ? Icons.share : Icons.upload),
+              tooltip: 'Share',
+              onPressed: () {
+                // Redirect to the new page when the IconButton is pressed
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AllianceSelection(
+                    event: widget.event,
+                    sortMode: sortingModifier,
+                    statConfig: widget.event.statConfig,
+                    elementSort: elementSort,
+                    statistic: statistics,
+                  )),
+                );
+              },
+            ),
             IconButton(
               icon: Icon(widget.event.shared ? Icons.share : Icons.upload),
               tooltip: 'Share',
@@ -261,6 +281,7 @@ class _EventView extends State<EventView> {
                       ],
                     ),
                   ),
+
             IconButton(
               icon: Icon(
                 Icons.search,
@@ -522,4 +543,82 @@ class _EventView extends State<EventView> {
       );
     }
   }
+  void _onAlliance(Event e) {
+    if (!(context.read<User?>()?.isAnonymous ?? true)) {
+      if (!e.shared) {
+        showPlatformDialog(
+          context: context,
+          builder: (context) => PlatformAlert(
+            title: Text('Upload Event'),
+            content: Text(
+              'Your event will still be private',
+            ),
+            actions: [
+              PlatformDialogAction(
+                child: Text('Cancel'),
+                isDefaultAction: true,
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              PlatformDialogAction(
+                child: Text('Upload'),
+                onPressed: () async {
+                  showPlatformDialog(
+                    context: context,
+                    builder: (_) => PlatformAlert(
+                      content: Center(child: PlatformProgressIndicator()),
+                      actions: [
+                        PlatformDialogAction(
+                          child: Text('Back'),
+                          isDefaultAction: true,
+                          onPressed: () => Navigator.of(context).pop(),
+                        ),
+                      ],
+                    ),
+                  );
+                  e.shared = true;
+                  final json = e.toJson();
+                  await firebaseDatabase
+                      .ref()
+                      .child("Events/${e.gameName}/${e.id}")
+                      .set(json);
+                  dataModel.events.remove(e);
+                  setState(() => dataModel.saveEvents);
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        );
+      } else {
+        Navigator.of(context).push(
+          platformPageRoute(
+            builder: (context) => EventShare(
+              event: e,
+            ),
+          ),
+        );
+      }
+    } else {
+      showPlatformDialog(
+        context: context,
+        builder: (context) => PlatformAlert(
+          title: Text('Cannot Share Event'),
+          content: Text('You must be logged in to share an event.'),
+          actions: [
+            PlatformDialogAction(
+              child: Text('OK'),
+              isDefaultAction: true,
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
 }

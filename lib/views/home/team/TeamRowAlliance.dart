@@ -4,8 +4,8 @@ import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/models/ScoreModel.dart';
 import 'package:teamtrack/functions/Extensions.dart';
 
-class ExampleTeamRow extends StatelessWidget {
-  ExampleTeamRow(
+class TeamRowAlliance extends StatelessWidget {
+  TeamRowAlliance(
       {super.key, this.sortMode, this.elementSort, required this.statistics});
   final Team team = Team('Team #', 'Team Name');
   final OpModeType? sortMode;
@@ -23,8 +23,6 @@ class ExampleTeamRow extends StatelessWidget {
 
   @override
   Widget build(context) {
-    final elementName = elementSort?.name ?? "";
-    final wlt = ['W', 'L', 'T'];
     return Container(
       decoration: BoxDecoration(
         border: Border.all(
@@ -41,49 +39,47 @@ class ExampleTeamRow extends StatelessWidget {
             children: [
               Text(
                 team.name,
-                style: Theme.of(context).textTheme.bodySmall,
+
               ),
-              Row(
-                children: [
-                  for (int i = 0; i < wlt.length; i++)
-                    Row(
-                      children: [
-                        Text(
-                          wlt[i],
-                          style: TextStyle(color: wltColor(i), fontSize: 12),
-                        ),
-                        if (i < wlt.length - 1) Text('-')
-                      ],
-                    ),
-                ],
-              )
+
             ],
           ),
         ),
-        leading: Text(
-          team.number,
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
+
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(
               width: 80,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                      '${elementName.isEmpty ? sortMode.getName(shortened: true) : elementName} '),
-                  Text('% Change'),
-                ],
-              ),
             ),
             Padding(
               padding: EdgeInsets.all(
-                10,
+                30,
               ),
             ),
-            Text('% Max ${statistics.name}')
+            IconButton(
+              icon: Icon(Icons.info),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text('Score Calculator'),
+                      content: Text('Score is calculated by taking the wins, amount of points, and tendencies on the field, and weighing their importance accordingly, totalling all the factors into one final score.'),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: Text('Close'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+            ),
+            Text('Score')
           ],
         ),
       ),

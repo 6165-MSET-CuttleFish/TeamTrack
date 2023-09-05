@@ -99,7 +99,7 @@ class _TeamViewState extends State<TeamView> {
                           value,
                           Text(
                             value == Dice.none
-                                ? 'All Cases'
+                                 ? 'All Cases'
                                 : value.toVal(
                                     widget.event.gameName,
                                   ),
@@ -199,19 +199,8 @@ class _TeamViewState extends State<TeamView> {
           ),
           backgroundColor: Theme.of(context).colorScheme.primary,
           actions: [
-            IconButton(
-              tooltip: "Configure",
-              icon: Icon(Icons.settings),
-              onPressed: () => showModalBottomSheet(
-                context: context,
-                builder: (context) => CheckList(
-                  state: this,
-                  statConfig: widget.event.statConfig,
-                  event: widget.event,
-                  showSorting: false,
-                ),
-              ),
-            ),
+
+
             if (widget.event.type == EventType.remote)
               IconButton(
                 icon: Icon(Icons.list_alt),

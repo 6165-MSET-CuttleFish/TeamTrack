@@ -1,25 +1,18 @@
-import 'package:teamtrack/components/misc/EmptyList.dart';
-import 'package:teamtrack/models/GameModel.dart';
-import 'package:teamtrack/models/ScoreModel.dart';
-import 'package:teamtrack/models/StatConfig.dart';
-import 'package:teamtrack/views/home/team/ExampleTeamRow.dart';
-import 'package:teamtrack/views/home/team/TeamRow.dart';
-import 'package:teamtrack/views/home/team/TeamView.dart';
-import 'package:teamtrack/models/AppModel.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:teamtrack/components/misc/PlatformGraphics.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:teamtrack/functions/Statistics.dart';
-import 'dart:convert';
+import '../../../models/GameModel.dart';
+import '../../../models/ScoreModel.dart';
+import '../../../models/StatConfig.dart';
+import 'TeamAllianceRecommend.dart';
+import 'TeamRowAlliance.dart';
 
-class TeamList extends StatefulWidget {
-  TeamList({
+class AllianceSelection extends StatefulWidget {
+  AllianceSelection({
     super.key,
     required this.event,
     required this.sortMode,
-    required this.statConfig,
     required this.elementSort,
+    required this.statConfig,
     required this.statistic,
   });
   final Event event;
@@ -28,256 +21,311 @@ class TeamList extends StatefulWidget {
   final StatConfig statConfig;
   final Statistics statistic;
   @override
-  State<TeamList> createState() => _TeamList();
+  State<AllianceSelection> createState() => _AllianceSelection();
 }
 
-class _TeamList extends State<TeamList> {
+class _AllianceSelection extends State<AllianceSelection> {
+  int recommendedIndex = 0;
+  String _sortBy = 'Score';
+
+  void updateRecommended(int index) {
+    setState(() {
+      recommendedIndex = index;
+    });
+  }
+
+  Future<void> _showSortOptions(BuildContext context) async {
+    final RenderBox button = context.findRenderObject() as RenderBox;
+    await showMenu(
+      context: context,
+      position: RelativeRect.fromLTRB(
+        button.localToGlobal(button.size.bottomRight(Offset.zero)).dx - 120,
+        button.localToGlobal(Offset.zero).dy,
+        button.localToGlobal(button.size.bottomRight(Offset.zero)).dx,
+        button.localToGlobal(button.size.bottomRight(Offset.zero)).dy + 10,
+      ),
+      items: [
+        PopupMenuItem(
+          value: 'Score',
+          child: Text('Score'),
+        ),
+        PopupMenuItem(
+          value: 'Wins',
+          child: Text('Wins'),
+        ),
+      ],
+    ).then((selectedSort) {
+      if (selectedSort != null) {
+        setState(() {
+          _sortBy = selectedSort;
+        });
+      }
+    });
+  }
+
   @override
-  Widget build(BuildContext context) => StreamBuilder<DatabaseEvent>(
-        stream: widget.event.getRef()?.onValue,
-        builder: (context, eventHandler) {
-          if (eventHandler.hasData && !eventHandler.hasError) {
-            widget.event.updateLocal(
-              json.decode(
-                json.encode(
-                  eventHandler.data?.snapshot.value,
-                ),
-              ),
-              context,
-            );
+  Widget build(BuildContext context) {
+    final teams = widget.statConfig.sorted
+        ? widget.event.teams.sortedTeams(
+      widget.sortMode,
+      widget.elementSort,
+      widget.statConfig,
+      widget.event.matches.values.toList(),
+      widget.statistic,
+    )
+        : widget.event.teams.orderedTeams();
+
+    final autonomousTeams = List.from(teams);
+    final teleOpTeams = List.from(teams);
+    final endgameTeams = List.from(teams);
+
+     if (_sortBy == 'Wins') {
+      // Sort the teams based on wins and losses
+      teams.sort((a, b) {
+        final aWLT = a.getWLT(widget.event)?.split('-').map(int.parse).toList() ?? [0, 0, 0];
+        final bWLT = b.getWLT(widget.event)?.split('-').map(int.parse).toList() ?? [0, 0, 0];
+
+        if (aWLT[0] != bWLT[0]) {
+          return bWLT[0].compareTo(aWLT[0]); // Sort by wins
+        } else if (aWLT[1] != bWLT[1]) {
+          return aWLT[1].compareTo(bWLT[1]); // Sort by losses (lower is better)
+        } else {
+          final aScore = a.getTotalScore(widget.event);
+          final bScore = b.getTotalScore(widget.event);
+          if (aScore != bScore) {
+            return bScore.compareTo(aScore); // Sort by wins
+          } else if (aScore != bScore) {
+            return aScore.compareTo(bScore); // Sort by losses (lower is better)
+          } else {
+            return teams.indexOf(a) - teams.indexOf(b); // Sort by team index
           }
-          if (!eventHandler.hasData && widget.event.shared) {
-            return Center(
-              child: PlatformProgressIndicator(),
-            );
-          }
-          var max = widget.event.teams.maxCustomStatisticScore(
-            Dice.none,
-            widget.statConfig.removeOutliers,
-            widget.statistic,
-            widget.sortMode,
-            widget.elementSort,
-          );
-          final teams = widget.statConfig.sorted
-              ? widget.event.teams.sortedTeams(
-                  widget.sortMode,
-                  widget.elementSort,
-                  widget.statConfig,
-                  widget.event.matches.values.toList(),
-                  widget.statistic,
-                )
-              : widget.event.teams.orderedTeams();
-          if (widget.statConfig.allianceTotal) {
-            max = teams
-                .map(
-                  (e) => widget.event.matches.values
-                      .toList()
-                      .spots(e, Dice.none, widget.statConfig.showPenalties,
-                          type: widget.sortMode)
-                      .removeOutliers(widget.statConfig.removeOutliers)
-                      .map((spot) => spot.y)
-                      .getStatistic(widget.statistic.getFunction()),
-                )
-                .maxValue();
-          }
-          if (teams.length == 0) return EmptyList();
-          return Column(
+        }
+      });
+     } else {
+       teams.sort((a, b) {
+         final aScore = a.getTotalScore(widget.event);
+         final bScore = b.getTotalScore(widget.event);
+
+         if (aScore != bScore) {
+           return bScore.compareTo(aScore); // Sort by wins
+         } else if (aScore != bScore) {
+           return aScore.compareTo(bScore); // Sort by losses (lower is better)
+         } else {
+           return teams.indexOf(a) - teams.indexOf(b); // Sort by team index
+         }
+       });
+     }
+
+
+    autonomousTeams.sort((a, b) {
+      final aScore = a.getSpecificScore(widget.event, OpModeType.auto);
+      final bScore = b.getSpecificScore(widget.event, OpModeType.auto);
+
+      if (aScore != bScore) {
+        return bScore.compareTo(aScore); // Sort by autonomous scores (higher is better)
+      } else {
+        return a.name.compareTo(b.name); // Sort by team name (for stability)
+      }
+    });
+
+    teleOpTeams.sort((a, b) {
+      final aScore = a.getSpecificScore(widget.event, OpModeType.tele);
+      final bScore = b.getSpecificScore(widget.event, OpModeType.tele);
+
+      if (aScore != bScore) {
+        return bScore.compareTo(aScore); // Sort by teleop scores (higher is better)
+      } else {
+        return a.name.compareTo(b.name); // Sort by team name (for stability)
+      }
+    });
+
+
+
+    endgameTeams.sort((a, b) {
+      final aScore = a.getSpecificScore(widget.event, OpModeType.endgame);
+      final bScore = b.getSpecificScore(widget.event, OpModeType.endgame);
+
+      if (aScore != bScore) {
+        return bScore.compareTo(aScore); // Sort by wins
+      } else if (aScore != bScore) {
+        return aScore.compareTo(bScore); // Sort by losses (lower is better)
+      } else {
+        return endgameTeams.indexOf(a) - endgameTeams.indexOf(b); // Sort by team index
+      }
+    });
+
+     teams[0].isRecommended = true;
+
+
+
+
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            SizedBox(), // Empty SizedBox to push the title to the right
+            Text('Alliance Selection'),
+            SizedBox(), // Adjust the width as needed
+          ],
+        ),
+        actions: [
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: ExampleTeamRow(
-                  sortMode: widget.sortMode,
-                  elementSort: widget.elementSort,
-                  statistics: widget.statistic,
-                ),
+              Text(
+                '$_sortBy',
+                style: TextStyle(fontSize: 14.0),
               ),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: teams.length,
-                  itemBuilder: (context, index) {
-                    final team = teams[index];
-                    return Slidable(
-                      child: TeamRow(
-                        team: team,
-                        event: widget.event,
-                        sortMode: widget.sortMode,
-                        statConfig: widget.statConfig,
-                        elementSort: widget.elementSort,
-                        max: max,
-                        statistics: widget.statistic,
-                        onTap: () async {
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => TeamView(
-                                team: team,
-                                event: widget.event,
-                              ),
-                            ),
-                          );
-                          setState(() {});
-                        },
-                      ),
-                      endActionPane: ActionPane(
-                        // A motion is a widget used to control how the pane animates.
-                        motion: const StretchMotion(),
-                        children: [
-                          SlidableAction(
-                            icon: Icons.delete,
-                            backgroundColor: Colors.red,
-                            onPressed: (_) {
-                              showPlatformDialog(
-                                context: context,
-                                builder: (BuildContext context) =>
-                                    PlatformAlert(
-                                  title: Text('Delete Team'),
-                                  content: Text('Are you sure?'),
-                                  actions: [
-                                    PlatformDialogAction(
-                                      isDefaultAction: true,
-                                      child: Text('Cancel'),
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                    ),
-                                    PlatformDialogAction(
-                                      isDefaultAction: false,
-                                      isDestructive: true,
-                                      child: Text('Confirm'),
-                                      onPressed: () {
-                                        String? s;
-                                        setState(() {
-                                          s = widget.event.deleteTeam(team);
-                                        });
-                                        dataModel.saveEvents();
-                                        Navigator.of(context).pop();
-                                        if (s != null)
-                                          showPlatformDialog(
-                                            context: context,
-                                            builder: (context) => PlatformAlert(
-                                              title: Text('Error'),
-                                              content: Text(
-                                                  'Team is present in matches'),
-                                              actions: [
-                                                PlatformDialogAction(
-                                                  child: Text('Okay'),
-                                                  isDefaultAction: true,
-                                                  onPressed: () =>
-                                                      Navigator.of(context)
-                                                          .pop(),
-                                                )
-                                              ],
-                                            ),
-                                          );
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          )
-                        ],
+            ],
+          ),
+          IconButton(
+            icon: Icon(Icons.sort),
+            onPressed: () {
+              _showSortOptions(context);
+            },
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              recommendedIndex == -1
+                  ? ''
+                  : generateRecommendation(teams[recommendedIndex].name),
+              style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: TeamRowAlliance(
+              sortMode: widget.sortMode,
+              elementSort: widget.elementSort,
+              statistics: widget.statistic,
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: teams.length,
+              itemBuilder: (context, index) {
+                Team team = teams[index];
+                final partnerName = team.name;
+
+                final wlt = team.getWLT(widget.event)?.split('-') ??
+                    ['', '', ''];
+
+                final teamTotalScore = team.getTotalScore(widget.event);
+
+                final indexAuto = autonomousTeams.indexOf(team);
+
+                final indexTele = teleOpTeams.indexOf(team);
+
+                final indexEndgame = endgameTeams.indexOf(team);
+
+
+
+                List<int> parsedList = [indexAuto + 1, indexTele + 1, indexEndgame + 1, index + 1];
+                return InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => TeamAllianceRecommend(
+                          teamName: partnerName,
+                          ranks: parsedList,
+                          numTeams: teams.length
+                        ),
                       ),
                     );
                   },
-                ),
-              ),
-            ],
-          );
-        },
-      );
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Colors.grey,
+                          width: 1.0,
+                        ),
+                      ),
+                    ),
+                    child: ListTile(
+                      title: Text(
+                        partnerName,
+                        style: TextStyle(fontSize: 18),
+                      ),
+                      subtitle: Row(
+                        children: [
+                          for (int i = 0; i < wlt.length; i++)
+                            Row(
+                              children: [
+                                Text(
+                                  wlt[i],
+                                  style: TextStyle(color: wltColor(i)),
+                                ),
+                                if (i < wlt.length - 1) Text('-')
+                              ],
+                            ),
+                        ],
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (team.isRecommended != null) // Only show if isRecommended is not null
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.pushNamed(context, '/sample');
+                              },
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                  vertical: 4.0,
+                                  horizontal: 10.0,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.green,
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                child: Text(
+                                  'Recommended',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12.0,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          SizedBox(width: 50),
+                          Text(
+                            '$teamTotalScore',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ],
+                      ),
+
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
-class TeamSearch extends SearchDelegate<String?> {
-  TeamSearch({
-    required this.teams,
-    required this.event,
-    this.sortMode,
-    required this.statConfig,
-    required this.elementSort,
-    required this.statistics,
-  }) {
-    max = event.teams.maxCustomStatisticScore(Dice.none,
-        statConfig.removeOutliers, statistics, sortMode, elementSort);
-    final teams = event.teams.values;
-    if (statConfig.allianceTotal) {
-      max = teams
-          .map(
-            (e) => event.matches.values
-                .toList()
-                .spots(e, Dice.none, statConfig.showPenalties, type: sortMode)
-                .removeOutliers(statConfig.removeOutliers)
-                .map((spot) => spot.y)
-                .getStatistic(statistics.getFunction()),
-          )
-          .maxValue();
-    }
+Color wltColor(int i) {
+  if (i == 0) {
+    return Colors.green;
+  } else if (i == 1) {
+    return Colors.red;
+  } else {
+    return Colors.grey;
   }
-  late double max;
-  OpModeType? sortMode;
-  ScoringElement? elementSort;
-  List<Team> teams;
-  Event event;
-  StatConfig statConfig;
-  Statistics statistics;
+}
 
-  @override
-  List<Widget> buildActions(BuildContext context) => [
-        if (query.isNotEmpty)
-          IconButton(
-            icon: Icon(Icons.clear),
-            onPressed: () => query = '',
-          ),
-      ];
-  @override
-  Widget buildLeading(BuildContext context) {
-    return IconButton(
-      icon: AnimatedIcon(
-        icon: AnimatedIcons.menu_arrow,
-        progress: transitionAnimation,
-      ),
-      onPressed: () => close(context, null),
-    );
-  }
-
-  @override
-  Widget buildResults(BuildContext context) => buildSuggestions(context);
-
-  @override
-  Widget buildSuggestions(BuildContext context) {
-    final suggestionList = query.isNotEmpty
-        ? [
-            ...teams.where(
-              (q) => q.number.contains(query),
-            ),
-            ...teams.where(
-              (q) => q.name.toLowerCase().contains(query.toLowerCase()),
-            ),
-          ].toList()
-        : teams;
-    return ListView.builder(
-      itemCount: suggestionList.length,
-      itemBuilder: (context, index) => TeamRow(
-        statistics: statistics,
-        statConfig: statConfig,
-        team: suggestionList[index],
-        event: event,
-        max: max,
-        sortMode: sortMode,
-        elementSort: elementSort,
-        onTap: () async {
-          close(context, null);
-          await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => TeamView(
-                team: suggestionList[index],
-                event: event,
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
+String generateRecommendation(String partnerName) {
+  return "$partnerName is the recommended alliance partner because... idk";
 }

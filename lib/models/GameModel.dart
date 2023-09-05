@@ -763,7 +763,7 @@ class Match {
     return null;
   }
 
-  Score? getAllianceScore(String? number) {
+  Score? getAllianceScore(String number) {
     if (number == red?.team1?.number || number == red?.team2?.number)
       return red?.combinedScore();
     else if (number == blue?.team1?.number || number == blue?.team2?.number)
@@ -781,6 +781,8 @@ class Team {
   Map<String, Score> scores = Map();
   List<Change> changes = [];
   Score? targetScore;
+  bool? isRecommended;
+
   Team(this.number, this.name);
   static Team nullTeam() {
     return Team("?", "?");
@@ -814,6 +816,44 @@ class Team {
     }
     return '$wins-$losses-$ties';
   }
+
+  int getTotalScore(Event event) {
+    if (event.type == EventType.remote || event.type == EventType.analysis) {
+      return 0;
+    }
+
+    int totalScore = 0;
+
+    for (final match in event.matches.values) {
+      for (var alliance in match.getAlliances()) {
+        if (alliance != null && alliance.hasTeam(this)) {
+          totalScore += alliance.allianceTotal(false);
+        }
+      }
+    }
+
+    return totalScore;
+  }
+
+  int getSpecificScore(Event event, OpModeType opModeType) {
+    if (event.type == EventType.remote || event.type == EventType.analysis) {
+      return 0;
+    }
+
+    int autonomousScore = 0;
+
+    for (final match in event.matches.values) {
+      for (var alliance in match.getAlliances()) {
+        if (alliance != null && alliance.hasTeam(this)) {
+          autonomousScore += alliance.allianceTotal(false, type: opModeType);
+        }
+      }
+    }
+
+    return autonomousScore;
+  }
+
+
 
   Team.fromJson(Map<String, dynamic> json, String gameName) {
     number = json['number'];
