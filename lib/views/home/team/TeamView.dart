@@ -220,7 +220,7 @@ class _TeamViewState extends State<TeamView> {
             return ListView(
               children: [
                 Padding(
-                  padding: EdgeInsets.only(left: 5, right: 5),
+                  padding: EdgeInsets.only(top:15,left: 5, right: 5),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -229,6 +229,7 @@ class _TeamViewState extends State<TeamView> {
                         isCollapsed: _team.scores.diceScores(_dice).length <= 1,
                         child: Column(
                           children: [
+
                             Wrap(
                               alignment: WrapAlignment.center,
                               crossAxisAlignment: WrapCrossAlignment.center,
@@ -242,8 +243,8 @@ class _TeamViewState extends State<TeamView> {
                                     splashColor: opModeType.getColor(),
                                     onPressed: () {
                                       setState(
-                                        () => _selections[opModeType] =
-                                            !(_selections[opModeType] ?? true),
+                                            () => _selections[opModeType] =
+                                        !(_selections[opModeType] ?? true),
                                       );
                                     },
                                     shape: RoundedRectangleBorder(
@@ -252,7 +253,8 @@ class _TeamViewState extends State<TeamView> {
                                         color: opModeType.getColor(),
                                       ),
                                     ),
-                                    child: Text(opModeType.getName()),
+                                    child: Text(opModeType.getName(),
+                                        style:Theme.of(context).textTheme.titleSmall),
                                   ),
                               ],
                             ),
@@ -260,9 +262,13 @@ class _TeamViewState extends State<TeamView> {
                           ],
                         ),
                       ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+
                       if (widget.isSoleWindow)
                         Container(
-                          width: MediaQuery.of(context).size.width,
+                          width: MediaQuery.of(context).size.width/3,
                           child: PlatformButton(
                             onPressed: () async {
                               await Navigator.push(
@@ -278,7 +284,8 @@ class _TeamViewState extends State<TeamView> {
                               setState(() {});
                             },
                             color: CupertinoColors.systemGreen,
-                            child: Text('Matches'),
+                            child: Text('Matches',
+                                style:Theme.of(context).textTheme.titleSmall),
                           ),
                         ),
                       Padding(
@@ -286,7 +293,7 @@ class _TeamViewState extends State<TeamView> {
                       ),
                       if (widget.isSoleWindow)
                         Container(
-                          width: MediaQuery.of(context).size.width / 2,
+                          width: MediaQuery.of(context).size.width / 3,
                           child: PlatformButton(
                             onPressed: () async {
                               if (_team.targetScore == null) {
@@ -320,9 +327,11 @@ class _TeamViewState extends State<TeamView> {
                               setState(() {});
                             },
                             color: Colors.indigoAccent,
-                            child: Text('Target'),
+                            child: Text('Target',
+                                style:Theme.of(context).textTheme.titleSmall),
                           ),
                         ),
+                      ],),
                       for (final opModeType in opModeExt.getAll())
                         Padding(
                           padding: const EdgeInsets.only(top: 20, bottom: 10),
@@ -468,7 +477,7 @@ class _TeamViewState extends State<TeamView> {
                                                 .removeOutliers,
                                           ),
                                   color: opModeType.getColor(),
-                                  isCurved: true,
+                                //  isCurved: true,
                                   isStrokeCapRound: true,
                                   preventCurveOverShooting: true,
                                   barWidth: 5,

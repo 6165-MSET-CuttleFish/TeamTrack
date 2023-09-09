@@ -111,7 +111,7 @@ class ScoreCard extends StatelessWidget {
         Padding(
           padding: EdgeInsets.only(left: 15, right: 10),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: Statistics.values
                 .map(
                   (statistic) => BarGraph(

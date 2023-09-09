@@ -53,7 +53,21 @@ class _ScoringElementStatsState extends State<ScoringElementStats> {
               children: [
                 _showCycles
                     ? SfCartesianChart(
-                        tooltipBehavior: TooltipBehavior(enable: true),
+                        tooltipBehavior: TooltipBehavior(
+                            enable: true,
+format:'point.y seconds'
+                        ),
+
+                      primaryXAxis: NumericAxis(
+                        title:AxisTitle(
+                          text: 'Match #'
+                        )
+                      ),
+                  primaryYAxis: NumericAxis(
+                      title:AxisTitle(
+                          text: 'Cycle Time (Seconds)'
+                      )
+                  ),
                         title: ChartTitle(
                           text: 'Cycle Times and Misses',
                           borderWidth: 2,
@@ -82,6 +96,8 @@ class _ScoringElementStatsState extends State<ScoringElementStats> {
                                 cycles.length != 0 ? cycles : [0, 0, 0, 0],
                           ),
                           LineSeries<int, int>(
+                            name: "Misses",
+                            legendItemText: "Misses",
                             xAxisName: "Match",
                             yAxisName: "Total Misses",
                             //dashArray: [10],
@@ -94,6 +110,8 @@ class _ScoringElementStatsState extends State<ScoringElementStats> {
                             yValueMapper: (misses, _) => misses,
                           ),
                           LineSeries<int, int>(
+                            name: "Tele-Op",
+                            legendItemText: "Tele-Op",
                             xAxisName: "Match",
                             yAxisName: "Total Tele-Op Cycles",
                             width: 2,
@@ -106,6 +124,8 @@ class _ScoringElementStatsState extends State<ScoringElementStats> {
                             yValueMapper: (misses, _) => misses,
                           ),
                           LineSeries<int, int>(
+                            name: "Endgame",
+                            legendItemText: "Endgame",
                             xAxisName: "Match",
                             yAxisName: "Total Endgame Cycles",
                             width: 2,
@@ -132,9 +152,12 @@ class _ScoringElementStatsState extends State<ScoringElementStats> {
                         lessIsBetter: widget.lessIsBetter,
                       ),
                 if (!widget.element.isBool)
+                  Padding(
+                    padding: EdgeInsets.all(10),
+                    child:
                   SizedBox(
-                    width: 45,
-                    height: 90,
+                    width: 150,
+                    height: 25,
                     child: OutlinedButton(
                       onPressed: () => setState(
                         () => _showCycles = !_showCycles,
@@ -163,6 +186,7 @@ class _ScoringElementStatsState extends State<ScoringElementStats> {
                         ),
                       ),
                     ),
+                  ),
                   ),
               ],
             )

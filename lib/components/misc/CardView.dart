@@ -122,7 +122,9 @@ class _CardView extends State<CardView> {
                   widget.title,
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
-              )
+              ),
+              Text("tap for details",
+              style:Theme.of(context).textTheme.bodySmall)
             ],
           ),
         ),

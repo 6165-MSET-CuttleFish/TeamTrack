@@ -236,8 +236,18 @@ class _TemplateView extends State<TemplateView> {
                   : ListView.builder(
                   itemCount: bod.length,
                   itemBuilder: (context, index) {
-                    return Card(
-                      child: ListTile(
+                    return  Container(
+                      decoration: BoxDecoration(
+                        border: Border.symmetric(
+                          horizontal: BorderSide(
+                            color: Colors.grey,
+                            width: 1,),
+
+                        ),
+                      ),
+                      child:ListTile(
+                        dense:true,
+                        minVerticalPadding: 0,
                         title: Text(bod[index]['team']
                         ['team_name_short']
                             .toString()),
