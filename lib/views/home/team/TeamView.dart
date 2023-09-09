@@ -420,7 +420,7 @@ class _TeamViewState extends State<TeamView> {
                     Container(
                       //Put in the gallery stuff
                       child: FutureBuilder(
-                        future: FirebaseStorage.instance.ref().child('${_event.id} - ${_team.number} - ${dropdownScope}.svg').getDownloadURL(),
+                        future: FirebaseStorage.instance.ref().child('${_event.id} - ${_team.number} - ${dropdownScope}.png').getDownloadURL(),
                         builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
                           if(snapshot.connectionState == ConnectionState.done && snapshot.hasData){
                             return Container(

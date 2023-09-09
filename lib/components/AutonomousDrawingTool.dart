@@ -76,8 +76,8 @@ class _AutonPainterState extends State<AutonPainter> {
     if (byteData != null) {
       Uint8List pngBytes = byteData.buffer.asUint8List();
       setState(() {
-        //uploadFile(pngBytes);
-        uploadFile2(image);
+        uploadFile(pngBytes);
+        //uploadFile2(image);
       });
     }
   }
@@ -117,7 +117,7 @@ class _AutonPainterState extends State<AutonPainter> {
       scope="Red_Side";
     }
     Reference ref = storage.ref().child('${_eKey} - ${team.number} - ${scope}.svg');
-    UploadTask uploadTask = ref.putData(temp, SettableMetadata(contentType: 'image/png'));
+    UploadTask uploadTask = ref.putData(temp, SettableMetadata(contentType: 'image/svg'));
     try{
       await uploadTask
           .whenComplete((){
