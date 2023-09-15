@@ -149,13 +149,22 @@ class _AllianceSimulatorState extends State<AllianceSimulator> {
       }
     });
 
-    setState(() {
-      widget.event.rankedTeams = List.from(teams);
-    });
+    if (widget.event.rankedTeams.isEmpty) {
+      setState(() {
+        widget.event.createRankedList(teams);
+      });
+    }
+
     if (widget.event.alliances[0][0].name == "") {
       widget.event.addAllianceTeam(widget.event.rankedTeams[0], 0, 0);
     }
 
+    for (List<Team> teams in widget.event.alliances) {
+      print ("____");
+      for (Team team in teams) {
+        print (team.name);
+      }
+    }
   }
 
   void _searchForTeam(String query) {
@@ -176,14 +185,14 @@ class _AllianceSimulatorState extends State<AllianceSimulator> {
 
   void _addToAlliance() {
     showLocal = false;
-    if (widget.event.rankedTeams.contains(localTeam) && localTeam != widget.event.rankedTeams[0]) {
+    if (!widget.event.alliances.contains(localTeam) && widget.event.rankedTeams.contains(localTeam) && localTeam != widget.event.rankedTeams[0]) {
       if (currentPartner == 1) {
-        widget.event.rankedTeams.remove(widget.event.rankedTeams[0]);
+        widget.event.removeFromRankedList(widget.event.rankedTeams[0]);
       }
 
       setState(() {
         widget.event.addAllianceTeam(localTeam, currentTurn - 1, currentPartner);
-        widget.event.rankedTeams.remove(localTeam);
+        widget.event.removeFromRankedList(localTeam);
       });
       if (currentPartner == 1) {
         widget.event.addAllianceTeam(widget.event.rankedTeams[0], currentTurn, 0);

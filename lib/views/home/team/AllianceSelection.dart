@@ -35,6 +35,7 @@ class _AllianceSelection extends State<AllianceSelection> {
   String _sortBy = 'Score';
 
 
+
   void updateRecommended(int index) {
     setState(() {
       recommendedIndex = index;
@@ -86,6 +87,12 @@ class _AllianceSelection extends State<AllianceSelection> {
     final teleOpTeams = List.from(teams);
     final endgameTeams = List.from(teams);
 
+    for (List<Team> teams in widget.event.alliances) {
+      print ("____");
+      for (Team team in teams) {
+        print (team.name);
+      }
+    }
      if (_sortBy == 'Wins') {
       // Sort the teams based on wins and losses
       teams.sort((a, b) {

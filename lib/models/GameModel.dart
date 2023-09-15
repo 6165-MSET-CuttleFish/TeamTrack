@@ -130,6 +130,21 @@ class Event {
     dataModel.saveEvents();
   }
 
+  Future<void> createRankedList(List<Team> teams) async {
+    rankedTeams = List.from(teams);
+
+    await getRef()?.child('rankedTeams').update({"rankedTeams": rankedTeams});
+
+    dataModel.saveEvents();
+  }
+  Future<void> removeFromRankedList(Team team) async {
+    rankedTeams.remove(team);
+
+    await getRef()?.child('rankedTeams').update({"rankedTeams": rankedTeams});
+
+    dataModel.saveEvents();
+  }
+
   List<Match> getSortedMatches(bool ascending) {
     var arr = matches.values.toList();
     if (ascending)
