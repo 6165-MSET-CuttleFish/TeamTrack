@@ -1,8 +1,12 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:teamtrack/functions/Statistics.dart';
+import 'package:teamtrack/models/GPTModel.dart';
 import '../../../models/GameModel.dart';
 import '../../../models/ScoreModel.dart';
 import '../../../models/StatConfig.dart';
+import 'AllianceSimulator.dart';
 import 'TeamAllianceRecommend.dart';
 import 'TeamRowAlliance.dart';
 
@@ -20,6 +24,8 @@ class AllianceSelection extends StatefulWidget {
   final ScoringElement? elementSort;
   final StatConfig statConfig;
   final Statistics statistic;
+
+
   @override
   State<AllianceSelection> createState() => _AllianceSelection();
 }
@@ -27,6 +33,7 @@ class AllianceSelection extends StatefulWidget {
 class _AllianceSelection extends State<AllianceSelection> {
   int recommendedIndex = 0;
   String _sortBy = 'Score';
+
 
   void updateRecommended(int index) {
     setState(() {
@@ -90,8 +97,8 @@ class _AllianceSelection extends State<AllianceSelection> {
         } else if (aWLT[1] != bWLT[1]) {
           return aWLT[1].compareTo(bWLT[1]); // Sort by losses (lower is better)
         } else {
-          final aScore = a.getTotalScore(widget.event);
-          final bScore = b.getTotalScore(widget.event);
+          final aScore = a.getAllianceScore(widget.event);
+          final bScore = b.getAllianceScore(widget.event);
           if (aScore != bScore) {
             return bScore.compareTo(aScore); // Sort by wins
           } else if (aScore != bScore) {
@@ -103,8 +110,10 @@ class _AllianceSelection extends State<AllianceSelection> {
       });
      } else {
        teams.sort((a, b) {
-         final aScore = a.getTotalScore(widget.event);
-         final bScore = b.getTotalScore(widget.event);
+         final aScore = a.getAllianceScore(widget.event);
+         final bScore = b.getAllianceScore(widget.event);
+
+
 
          if (aScore != bScore) {
            return bScore.compareTo(aScore); // Sort by wins
@@ -156,18 +165,16 @@ class _AllianceSelection extends State<AllianceSelection> {
 
      teams[0].isRecommended = true;
 
-
-
-
-
     return Scaffold(
       appBar: AppBar(
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            SizedBox(), // Empty SizedBox to push the title to the right
+          SizedBox(width: 30),
             Text('Alliance Selection'),
-            SizedBox(), // Adjust the width as needed
+            SizedBox(width: 10)
+
+
           ],
         ),
         actions: [
@@ -191,15 +198,41 @@ class _AllianceSelection extends State<AllianceSelection> {
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              recommendedIndex == -1
-                  ? ''
-                  : generateRecommendation(teams[recommendedIndex].name),
-              style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
+          SizedBox(height: 30),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AllianceSimulator(
+                      event: widget.event,
+                      sortMode: widget.sortMode,
+                      elementSort: widget.elementSort,
+                      statConfig: widget.statConfig,
+                      statistic: widget.statistic
+                  ),
+                ),
+              );
+            },
+
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.play_arrow, color: Colors.white),
+                  SizedBox(width: 8),
+                  Text(
+                    "Simulate Alliance Selection",
+                    style: TextStyle(fontSize: 20, fontStyle: FontStyle.italic, color: Colors.white),
+                  ),
+                ],
+              ),
             ),
           ),
+
+          SizedBox(height: 30),
+
           Padding(
             padding: const EdgeInsets.only(bottom: 8.0),
             child: TeamRowAlliance(
@@ -214,43 +247,47 @@ class _AllianceSelection extends State<AllianceSelection> {
               itemBuilder: (context, index) {
                 Team team = teams[index];
                 final partnerName = team.name;
+                Color? isYellow = team.number == widget.event.userTeam.number
+                    ? Colors.yellow.withOpacity(0.7)
+                    : null;
 
-                final wlt = team.getWLT(widget.event)?.split('-') ??
-                    ['', '', ''];
+                final wlt = team.getWLT(widget.event)?.split('-') ?? ['', '', ''];
 
-                final teamTotalScore = team.getTotalScore(widget.event);
+                final teamTotalScore = team.getAllianceScore(widget.event);
 
                 final indexAuto = autonomousTeams.indexOf(team);
-
                 final indexTele = teleOpTeams.indexOf(team);
-
                 final indexEndgame = endgameTeams.indexOf(team);
 
-
-
                 List<int> parsedList = [indexAuto + 1, indexTele + 1, indexEndgame + 1, index + 1];
-                return InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => TeamAllianceRecommend(
-                          teamName: partnerName,
-                          ranks: parsedList,
-                          numTeams: teams.length
-                        ),
-                      ),
-                    );
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(
-                          color: Colors.grey,
-                          width: 1.0,
-                        ),
+
+                return Container(
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: Colors.grey,
+                        width: 1.0,
                       ),
                     ),
+                    color: isYellow,
+                  ),
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => TeamAllianceRecommend(
+                              team: team,
+                              ranks: parsedList,
+                              elementSort: widget.elementSort,
+                              event: widget.event,
+                              sortMode: widget.sortMode,
+                              statConfig: widget.statConfig,
+                              statistic: widget.statistic
+                          ),
+                        ),
+                      );
+                    },
                     child: ListTile(
                       title: Text(
                         partnerName,
@@ -273,29 +310,7 @@ class _AllianceSelection extends State<AllianceSelection> {
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          if (team.isRecommended != null) // Only show if isRecommended is not null
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.pushNamed(context, '/sample');
-                              },
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                  vertical: 4.0,
-                                  horizontal: 10.0,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.green,
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                                child: Text(
-                                  'Recommended',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12.0,
-                                  ),
-                                ),
-                              ),
-                            ),
+
                           SizedBox(width: 50),
                           Text(
                             '$teamTotalScore',
@@ -303,13 +318,22 @@ class _AllianceSelection extends State<AllianceSelection> {
                           ),
                         ],
                       ),
-
                     ),
                   ),
                 );
               },
             ),
+          )
+          ,Padding(
+            padding: const EdgeInsets.all(50.0),
+            child: Text(
+              recommendedIndex == -1
+                  ? ''
+                  : GPTModel(team: teams[recommendedIndex]).returnModelFeedback(),
+              style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
+            ),
           ),
+
         ],
       ),
     );
@@ -326,6 +350,3 @@ Color wltColor(int i) {
   }
 }
 
-String generateRecommendation(String partnerName) {
-  return "$partnerName is the recommended alliance partner because... idk";
-}

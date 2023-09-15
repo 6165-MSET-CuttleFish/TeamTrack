@@ -22,17 +22,28 @@ class TeamList extends StatefulWidget {
     required this.elementSort,
     required this.statistic,
   });
+
   final Event event;
   final OpModeType? sortMode;
   final ScoringElement? elementSort;
   final StatConfig statConfig;
   final Statistics statistic;
+
   @override
   State<TeamList> createState() => _TeamList();
 }
 
 class _TeamList extends State<TeamList> {
-  @override
+  late bool isUserTeam;
+
+  void initState() {
+    super.initState();
+    isUserTeam = widget.event.teams.values.any((team) =>
+        widget.event.userTeam?.number != null &&
+        team.number == widget.event.userTeam?.number);
+    print ("heeeee ${widget.event.userTeam.number}");
+  }
+
   Widget build(BuildContext context) => StreamBuilder<DatabaseEvent>(
         stream: widget.event.getRef()?.onValue,
         builder: (context, eventHandler) {
@@ -119,7 +130,6 @@ class _TeamList extends State<TeamList> {
                         },
                       ),
                       endActionPane: ActionPane(
-                        // A motion is a widget used to control how the pane animates.
                         motion: const StretchMotion(),
                         children: [
                           SlidableAction(
@@ -196,6 +206,7 @@ class TeamSearch extends SearchDelegate<String?> {
     required this.statConfig,
     required this.elementSort,
     required this.statistics,
+    required this.isUserTeam, // New parameter added
   }) {
     max = event.teams.maxCustomStatisticScore(Dice.none,
         statConfig.removeOutliers, statistics, sortMode, elementSort);
@@ -213,6 +224,7 @@ class TeamSearch extends SearchDelegate<String?> {
           .maxValue();
     }
   }
+
   late double max;
   OpModeType? sortMode;
   ScoringElement? elementSort;
@@ -220,6 +232,7 @@ class TeamSearch extends SearchDelegate<String?> {
   Event event;
   StatConfig statConfig;
   Statistics statistics;
+  bool isUserTeam; // New parameter
 
   @override
   List<Widget> buildActions(BuildContext context) => [
@@ -229,6 +242,7 @@ class TeamSearch extends SearchDelegate<String?> {
             onPressed: () => query = '',
           ),
       ];
+
   @override
   Widget buildLeading(BuildContext context) {
     return IconButton(
@@ -255,6 +269,7 @@ class TeamSearch extends SearchDelegate<String?> {
             ),
           ].toList()
         : teams;
+
     return ListView.builder(
       itemCount: suggestionList.length,
       itemBuilder: (context, index) => TeamRow(

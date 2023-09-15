@@ -19,7 +19,6 @@ import 'package:teamtrack/views/home/events/EventShare.dart';
 import 'package:provider/provider.dart';
 import 'package:teamtrack/functions/APIMethods.dart';
 
-
 import '../team/AllianceSelection.dart';
 
 class EventView extends StatefulWidget {
@@ -88,28 +87,118 @@ class _EventView extends State<EventView> {
                     ),
                   )),
             IconButton(
-              icon: Icon(widget.event.shared ? Icons.share : Icons.upload),
+              icon: Icon(Icons.share),
               tooltip: 'Share',
               onPressed: () {
-                // Redirect to the new page when the IconButton is pressed
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => AllianceSelection(
-                    event: widget.event,
-                    sortMode: sortingModifier,
-                    statConfig: widget.event.statConfig,
-                    elementSort: elementSort,
-                    statistic: statistics,
-                  )),
-                );
+                if (widget.event.userTeam.number != "0") {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AllianceSelection(
+                        event: widget.event,
+                        sortMode: sortingModifier,
+                        statConfig: widget.event.statConfig,
+                        elementSort: elementSort,
+                        statistic: statistics,
+                      ),
+                    ),
+                  );
+
+                } else {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return StatefulBuilder(
+                        builder: (BuildContext context, StateSetter setState) {
+                          return AlertDialog(
+                            title: Text('Enter Team Number'),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                TextField(
+                                  onChanged: (value) {
+                                    widget.event.updateUserTeam(new Team(value, value)); // Update the user team with the new team number
+                                    setState(() {}); // Trigger a rebuild to update the list
+                                  },
+                                ),
+                                ...widget.event.teams.entries.where(
+                                      (entry) => entry.value.number == widget.event.userTeam.number,
+                                ).map(
+                                      (entry) => ListTile(
+                                    title: Text(entry.value.name),
+                                    onTap: () {
+                                      widget.event.updateUserTeam(entry.value);
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                            actions: [
+                              TextButton(
+                                child: Text('Submit'),
+                                onPressed: () {
+                                  if (widget.event.teams.containsKey(widget.event.userTeam.number)) {
+                                    if (widget.event.userTeam.number != "0") {
+                                      Navigator.pop(context); // Close the dialog
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => AllianceSelection(
+                                            event: widget.event,
+                                            sortMode: sortingModifier,
+                                            statConfig: widget.event.statConfig,
+                                            elementSort: elementSort,
+                                            statistic: statistics,
+                                          ),
+                                        ),
+                                      );
+
+                                    } else {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title: Text('Team Does Not Exist'),
+                                            content: Text('The provided team number does not exist.'),
+                                            actions: <Widget>[
+                                              TextButton(
+                                                child: Text('OK'),
+                                                onPressed: () {
+                                                  Navigator.of(context).pop(); // Close the dialog
+                                                },
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    }
+                                  }
+
+                                  // Reset the displayed team name
+                                  setState(() {
+                                    _newName = '';
+                                  });
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                  );
+                }
               },
             ),
+
+
+
             IconButton(
               icon: Icon(widget.event.shared ? Icons.share : Icons.upload),
               tooltip: 'Share',
               onPressed: () => _onShare(widget.event),
             ),
             if (_tab != 0 && widget.event.hasKey())
+
               IconButton(
                   icon: Icon(Icons.refresh),
                   tooltip: 'Reload Matches',
@@ -304,7 +393,7 @@ class _EventView extends State<EventView> {
                               : widget.event.teams.orderedTeams(),
                           sortMode: sortingModifier,
                           event: widget.event,
-                          statistics: statistics,
+                          statistics: statistics, isUserTeam: false,
                         )
                       : MatchSearch(
                           statConfig: widget.event.statConfig,

@@ -6,7 +6,12 @@ import 'package:teamtrack/functions/Extensions.dart';
 
 class TeamRowAlliance extends StatelessWidget {
   TeamRowAlliance(
-      {super.key, this.sortMode, this.elementSort, required this.statistics});
+      {
+        super.key,
+        this.sortMode,
+        this.elementSort,
+        required this.statistics
+      });
   final Team team = Team('Team #', 'Team Name');
   final OpModeType? sortMode;
   final ScoringElement? elementSort;
@@ -65,7 +70,7 @@ class TeamRowAlliance extends StatelessWidget {
                   builder: (BuildContext context) {
                     return AlertDialog(
                       title: Text('Score Calculator'),
-                      content: Text('Score is calculated by taking the wins, amount of points, and tendencies on the field, and weighing their importance accordingly, totalling all the factors into one final score.'),
+                      content: Text('AI Goofy'),
                       actions: [
                         TextButton(
                           onPressed: () {
