@@ -92,7 +92,6 @@ class _TeamViewState extends State<TeamView> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-
         appBar: AppBar(
           title: Column(
             crossAxisAlignment: NewPlatform.isAndroid

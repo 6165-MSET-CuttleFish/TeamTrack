@@ -58,12 +58,23 @@ class Event {
   StatConfig statConfig = StatConfig();
 
   TeamTrackUser? author;
+  bool d = false;
   String gameName = Statics.gameName;
   Role role =
       Role.editor; // the permissions enabled for the current user in this event
   bool shared = false;
   EventType type = EventType.remote;
   Map<String, Team> teams = {};
+  Team userTeam = new Team("0", "0");
+
+  List<List<Team>> alliances = List.generate(4, (index) {
+    return List.generate(3, (innerIndex) => Team("", ""));
+  });
+  List<dynamic> rankedTeams = [];
+  int currentTurn = 1;
+  int currentPartner = 1;
+
+
   Map<String, Match> matches = {};
   String name = "";
   Timestamp createdAt = Timestamp.now();
@@ -95,11 +106,74 @@ class Event {
 
   bool hasKey() => eventKey != null && !(eventKey?.isEmpty ?? true);
 
+
   void addTeam(Team newTeam) async {
     await getRef()
         ?.child('teams/${newTeam.number}')
         .update({"name": newTeam.name, "number": newTeam.number});
     teams.putIfAbsent(newTeam.number, () => newTeam);
+    dataModel.saveEvents();
+  }
+  void updateUserTeam(Team newTeam) async {
+    await getRef()
+        ?.child('teams/${newTeam.number}')
+        .update({"name": newTeam.name, "number": newTeam.number});
+
+    userTeam = Team(newTeam.number, newTeam.name);
+    dataModel.saveEvents();
+  }
+  void dontShow() async {
+    print ("lalalalalalalalalalalaalalalalal");
+    await getRef()
+        ?.child('d/$d')
+        .update({"d": d});
+
+    d = true;
+    dataModel.saveEvents();
+
+  }
+
+  Future<void> setCurrentTurn(int x) async {
+    await getRef()
+        ?.child('turn/$currentTurn')
+        .update({"turn": x});
+
+    currentTurn = x;
+    dataModel.saveEvents();
+  }
+
+  Future<void> setCurrentPartner(int x) async {
+    await getRef()
+        ?.child('turn/${currentPartner}')
+        .update({"turn": x});
+
+    currentPartner = x;
+    dataModel.saveEvents();
+  }
+  void addAllianceTeam(Team newTeam, int allianceIndex, int rankNum) async {
+
+    if (allianceIndex >= 4 || rankNum >= 3) {
+      return;
+    }
+    alliances[allianceIndex].insert(rankNum, newTeam);
+
+    await getRef()?.child('alliances').update({"alliances": alliances});
+
+    dataModel.saveEvents();
+  }
+
+  Future<void> createRankedList(List<Team> teams) async {
+    rankedTeams = List.from(teams);
+
+    await getRef()?.child('rankedTeams').update({"rankedTeams": rankedTeams});
+
+    dataModel.saveEvents();
+  }
+  Future<void> removeFromRankedList(Team team) async {
+    rankedTeams.remove(team);
+
+    await getRef()?.child('rankedTeams').update({"rankedTeams": rankedTeams});
+
     dataModel.saveEvents();
   }
 
@@ -249,23 +323,23 @@ class Event {
       if (x == null) {
         teams.remove(team.number);
         getRef()?.runTransaction(
-          (mutableData) {
+              (mutableData) {
             bool allowRemove = true;
             List<String> ids;
             try {
               var newTeams = ((mutableData as Map?)?['teams'] as Map?);
               ids = (newTeams?[team.number]?['scores'] as Map<String, dynamic>?)
-                      ?.keys
-                      .toList() ??
+                  ?.keys
+                  .toList() ??
                   [];
             } catch (e) {
               var newTeams = ((mutableData as Map?)?['teams'] as List?);
               ids = (newTeams?.firstWhere(
-                              (element) => element?['number'] == team.number,
-                              orElse: () => null)?['scores']
-                          as Map<String, dynamic>?)
-                      ?.keys
-                      .toList() ??
+                      (element) => element?['number'] == team.number,
+                  orElse: () => null)?['scores']
+              as Map<String, dynamic>?)
+                  ?.keys
+                  .toList() ??
                   [];
             }
             for (final id in ids) {
@@ -280,8 +354,8 @@ class Event {
             } catch (e) {
               var newTeams = allowRemove
                   ? ((mutableData as Map)['teams'] as List?)
-                      ?.where((element) => element?['number'] != team.number)
-                      .toList()
+                  ?.where((element) => element?['number'] != team.number)
+                  .toList()
                   : (mutableData as Map)['teams'] as List?;
               mutableData['teams'] = newTeams;
             }
@@ -303,10 +377,10 @@ class Event {
         } catch (e) {
           var newTeams = ((mutableData as Map)['teams'] as List?);
           ids = (newTeams?.firstWhere((element) =>
-                          element['number'] == team.number)?['scores']
-                      as Map<String, dynamic>?)
-                  ?.keys
-                  .toList() ??
+          element['number'] == team.number)?['scores']
+          as Map<String, dynamic>?)
+              ?.keys
+              .toList() ??
               [];
           newTeams?.removeWhere((element) => element['number'] == team.number);
           mutableData['teams'] = newTeams;
@@ -331,7 +405,7 @@ class Event {
       dataModel.saveEvents();
     }
     getRef()?.runTransaction(
-      (mutableData) {
+          (mutableData) {
         final newMatches = ((mutableData as Map)['matches'] as Map);
         newMatches.removeWhere((key, value) => key == e.id);
         mutableData['matches'] = newMatches;
@@ -369,22 +443,22 @@ class Event {
             map['teams']
                 ?.map(
                   (model) =>
-                      model != null ? Team.fromJson(model, gameName) : null,
-                )
+              model != null ? Team.fromJson(model, gameName) : null,
+            )
                 .where((team) => team != null),
           ).asMap().map(
                 (key, value) => MapEntry(
-                  value.number,
-                  value,
-                ),
-              );
+              value.number,
+              value,
+            ),
+          );
         } catch (e) {
           teams = {};
         }
       }
       try {
         matches = (map['matches'] as Map).map(
-          (key, model) => MapEntry(
+              (key, model) => MapEntry(
             key,
             Match.fromJson(
               model,
@@ -422,15 +496,15 @@ class Event {
       try {
         users = (map['Permissions'] as Map<String, dynamic>)
             .map((key, value) =>
-                MapEntry(key, TeamTrackUser.fromJson(value, key)))
+            MapEntry(key, TeamTrackUser.fromJson(value, key)))
             .values
             .toList();
       } catch (e) {}
       role = users
           .firstWhere(
             (element) => element.uid == context.read<User?>()?.uid,
-            orElse: () => TeamTrackUser(role: Role.editor),
-          )
+        orElse: () => TeamTrackUser(role: Role.editor),
+      )
           .role;
     }
   }
@@ -446,14 +520,14 @@ class Event {
     gameName = json?['gameName'] ?? Statics.gameName;
     type = getTypeFromString(json?['type']);
     statConfig.allianceTotal =
-        (type == EventType.remote || type == EventType.analysis);
+    (type == EventType.remote || type == EventType.analysis);
     name = json?['name'] ?? "";
     eventKey = json?['event_key'];
     try {
       teams = (json?['teams'] as Map)
           .map((key, value) => MapEntry(key, Team.fromJson(value, gameName)));
       matches = (json?['matches'] as Map).map(
-        (key, model) => MapEntry(
+            (key, model) => MapEntry(
           key,
           Match.fromJson(model, teams, type, gameName),
         ),
@@ -495,27 +569,27 @@ class Event {
     }
   }
   Map<String, dynamic> toJson([bool cloudFirestore = false]) => {
-        'gameName': gameName,
-        'name': name,
-        'teams': teams
-            .map<String, dynamic>((num, team) => MapEntry(num, team.toJson())),
-        'matches': matches.map((key, e) => MapEntry(key, e.toJson())),
-        'type': type.toString(),
-        'shared': shared,
-        'id': id,
-        'author': author?.toJson(),
-        'seconds': createdAt.seconds,
-        'nanoSeconds': createdAt.nanoseconds,
-        'createdAt': cloudFirestore ? createdAt : createdAt.toJson(),
-        'event_key': eventKey,
-      };
+    'gameName': gameName,
+    'name': name,
+    'teams': teams
+        .map<String, dynamic>((num, team) => MapEntry(num, team.toJson())),
+    'matches': matches.map((key, e) => MapEntry(key, e.toJson())),
+    'type': type.toString(),
+    'shared': shared,
+    'id': id,
+    'author': author?.toJson(),
+    'seconds': createdAt.seconds,
+    'nanoSeconds': createdAt.nanoseconds,
+    'createdAt': cloudFirestore ? createdAt : createdAt.toJson(),
+    'event_key': eventKey,
+  };
   Map<String, dynamic> toSimpleJson() => {
-        'gameName': gameName,
-        'name': name,
-        'type': type.toString(),
-        'sendTime': sendTime,
-        'id': id,
-      };
+    'gameName': gameName,
+    'name': name,
+    'type': type.toString(),
+    'sendTime': sendTime,
+    'id': id,
+  };
 }
 
 /// Composed of 2 teams [team1] and [team2]
@@ -537,7 +611,7 @@ class Alliance {
     if (eventType == EventType.remote)
       return team1?.scores[id]?.penalties.total() ?? 0;
     final penaltiesAddToOpposingAlliance = json.decode(remoteConfig
-            .getString(gameName))['PenaltiesAddToOpposingAlliance'] ??
+        .getString(gameName))['PenaltiesAddToOpposingAlliance'] ??
         false;
     if (penaltiesAddToOpposingAlliance)
       return -(opposingAlliance?.penaltyTotal() ?? 0);
@@ -555,47 +629,47 @@ class Alliance {
       teams
           .map((team) => team?.scores[id] ?? Score('', Dice.none, gameName))
           .reduce((value, element) => value + element) +
-      sharedScore;
+          sharedScore;
 
   int allianceTotal(
-    bool? showPenalties, {
-    OpModeType? type,
-    ScoringElement? element,
-  }) =>
+      bool? showPenalties, {
+        OpModeType? type,
+        ScoringElement? element,
+      }) =>
       ((teams
-                      .map((e) =>
-                          e?.scores[id]
-                              ?.getScoreDivision(type)
-                              .getScoringElementCount(element?.key) ??
-                          0)
-                      .reduce((value, element) => value + element) +
-                  ((showPenalties ?? false) && type == null
-                      ? getPenalty()
-                      : 0)) +
-              (sharedScore
-                      .getScoreDivision(type)
-                      .getScoringElementCount(element?.key) ??
-                  0))
+          .map((e) =>
+      e?.scores[id]
+          ?.getScoreDivision(type)
+          .getScoringElementCount(element?.key) ??
+          0)
+          .reduce((value, element) => value + element) +
+          ((showPenalties ?? false) && type == null
+              ? getPenalty()
+              : 0)) +
+          (sharedScore
+              .getScoreDivision(type)
+              .getScoringElementCount(element?.key) ??
+              0))
           .clamp(type == null ? 0 : -999, 999);
   Alliance.fromJson(
-    Map<String, dynamic> json,
-    Map<String, Team> teamList,
-    this.eventType,
-    this.gameName,
-  )   : team1 = json['team1'] != null ? teamList[json['team1']] : null,
+      Map<String, dynamic> json,
+      Map<String, Team> teamList,
+      this.eventType,
+      this.gameName,
+      )   : team1 = json['team1'] != null ? teamList[json['team1']] : null,
         team2 = json['team2'] != null ? teamList[json['team2']] : null,
         sharedScore = json['sharedScore'] != null
             ? Score.fromJson(
-                json['sharedScore'],
-                gameName,
-                isAllianceScore: true,
-              )
+          json['sharedScore'],
+          gameName,
+          isAllianceScore: true,
+        )
             : Score(Uuid().v4(), Dice.none, gameName, isAllianceScore: true);
   Map<String, dynamic> toJson() => {
-        'team1': team1?.number,
-        'team2': team2?.number,
-        'sharedScore': sharedScore.toJson(),
-      };
+    'team1': team1?.number,
+    'team2': team2?.number,
+    'sharedScore': sharedScore.toJson(),
+  };
 }
 
 /// Composed of 2 nullable alliances [red] and [blue].
@@ -746,12 +820,12 @@ class Match {
         .toList();
   }
   Map<String, dynamic> toJson() => {
-        'red': red?.toJson(),
-        'blue': blue?.toJson(),
-        'dice': dice.toString(),
-        'id': id.toString(),
-        'createdAt': timeStamp.toJson(),
-      };
+    'red': red?.toJson(),
+    'blue': blue?.toJson(),
+    'dice': dice.toString(),
+    'id': id.toString(),
+    'createdAt': timeStamp.toJson(),
+  };
   Score? getScore(String? number) {
     if (number == red?.team1?.number)
       return red?.team1?.scores[id];
@@ -763,7 +837,7 @@ class Match {
     return null;
   }
 
-  Score? getAllianceScore(String? number) {
+  Score? getAllianceScore(String number) {
     if (number == red?.team1?.number || number == red?.team2?.number)
       return red?.combinedScore();
     else if (number == blue?.team1?.number || number == blue?.team2?.number)
@@ -781,6 +855,8 @@ class Team {
   Map<String, Score> scores = Map();
   List<Change> changes = [];
   Score? targetScore;
+  bool? isRecommended;
+
   Team(this.number, this.name);
   static Team nullTeam() {
     return Team("?", "?");
@@ -815,6 +891,64 @@ class Team {
     return '$wins-$losses-$ties';
   }
 
+  int getTotalScore(Event event) {
+    if (event.type == EventType.remote || event.type == EventType.analysis) {
+      return 0;
+    }
+
+    int totalScore = 0;
+
+    for (final match in event.matches.values) {
+      for (var alliance in match.getAlliances()) {
+        if (alliance != null && alliance.hasTeam(this)) {
+          totalScore += alliance.allianceTotal(false);
+        }
+      }
+    }
+
+    return totalScore;
+  }
+
+  int getAllianceScore(Event event) {
+    if (event.type == EventType.remote || event.type == EventType.analysis) {
+      return 0;
+    }
+
+    int teamScore = 0;
+
+    for (final match in event.matches.values) {
+      Alliance? alliance = match.alliance(this); // Get the alliance that includes this team
+
+      if (this == alliance?.team1) {
+        teamScore += alliance?.team1?.scores[match.id]?.getScoreDivision(null).getScoringElementCount(null) ?? 0;
+      } else if (this == alliance?.team2) {
+        teamScore += alliance?.team2?.scores[match.id]?.getScoreDivision(null).getScoringElementCount(null) ?? 0;
+      }
+    }
+    return teamScore;
+  }
+
+  int getSpecificScore(Event event, OpModeType opModeType) {
+    if (event.type == EventType.remote || event.type == EventType.analysis) {
+      return 0;
+    }
+
+    int teamScore = 0;
+
+    for (final match in event.matches.values) {
+      Alliance? alliance = match.alliance(this); // Get the alliance that includes this team
+
+      if (this == alliance?.team1) {
+        teamScore += alliance?.team1?.scores[match.id]?.getScoreDivision(opModeType).getScoringElementCount(null) ?? 0;
+      } else if (this == alliance?.team2) {
+        teamScore += alliance?.team2?.scores[match.id]?.getScoreDivision(opModeType).getScoringElementCount(null) ?? 0;
+      }
+    }
+    return teamScore;
+  }
+
+
+
   Team.fromJson(Map<String, dynamic> json, String gameName) {
     number = json['number'];
     name = json['name'];
@@ -828,9 +962,9 @@ class Team {
       targetScore = Score.fromJson(json['targetScore'], gameName);
     try {
       changes = (json['changes'] as Map?)
-              ?.map((key, value) => MapEntry(key, Change.fromJson(value)))
-              .values
-              .toList() ??
+          ?.map((key, value) => MapEntry(key, Change.fromJson(value)))
+          .values
+          .toList() ??
           [];
     } catch (e) {
       changes = [];
@@ -845,11 +979,11 @@ class Team {
   }
 
   Map<String, dynamic> toJson() => {
-        'name': name,
-        'number': number,
-        'scores': scores.map((key, value) => MapEntry(key, value.toJson())),
-        'targetScore': targetScore?.toJson(),
-        'changes': Map.fromIterable(changes.map((change) => change.toJson()),
-            key: (change) => change['id']),
-      };
+    'name': name,
+    'number': number,
+    'scores': scores.map((key, value) => MapEntry(key, value.toJson())),
+    'targetScore': targetScore?.toJson(),
+    'changes': Map.fromIterable(changes.map((change) => change.toJson()),
+        key: (change) => change['id']),
+  };
 }

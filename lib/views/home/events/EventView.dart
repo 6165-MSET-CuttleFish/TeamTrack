@@ -19,6 +19,8 @@ import 'package:teamtrack/views/home/events/EventShare.dart';
 import 'package:provider/provider.dart';
 import 'package:teamtrack/functions/APIMethods.dart';
 
+import '../team/AllianceSelection.dart';
+
 class EventView extends StatefulWidget {
   EventView({
     super.key,
@@ -85,11 +87,112 @@ class _EventView extends State<EventView> {
                     ),
                   )),
             IconButton(
+              icon: Icon(Icons.people), // Change the icon to Icons.people (or choose an appropriate icon)
+              tooltip: 'Alliance Selection', // Change the tooltip to indicate the action
+              onPressed: () {
+                if (widget.event.userTeam.number != "0") {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AllianceSelection(
+                        event: widget.event,
+                        sortMode: sortingModifier,
+                        statConfig: widget.event.statConfig,
+                        elementSort: elementSort,
+                        statistic: statistics,
+                      ),
+                    ),
+                  );
+                } else {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return StatefulBuilder(
+                        builder: (BuildContext context, StateSetter setState) {
+                          return AlertDialog(
+                            title: Text('Enter Team Number'),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                TextField(
+                                  onChanged: (value) {
+                                    widget.event.updateUserTeam(new Team(value, value));
+                                    setState(() {});
+                                  },
+                                ),
+                                ...widget.event.teams.entries.where(
+                                      (entry) => entry.value.number == widget.event.userTeam.number,
+                                ).map(
+                                      (entry) => ListTile(
+                                    title: Text(entry.value.name),
+                                    onTap: () {
+                                      widget.event.updateUserTeam(entry.value);
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                            actions: [
+                              TextButton(
+                                child: Text('Submit'),
+                                onPressed: () {
+                                  if (widget.event.teams.containsKey(widget.event.userTeam.number)) {
+                                    if (widget.event.userTeam.number != "0") {
+                                      Navigator.pop(context);
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => AllianceSelection(
+                                            event: widget.event,
+                                            sortMode: sortingModifier,
+                                            statConfig: widget.event.statConfig,
+                                            elementSort: elementSort,
+                                            statistic: statistics,
+                                          ),
+                                        ),
+                                      );
+                                    } else {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title: Text('Team Does Not Exist'),
+                                            content: Text('The provided team number does not exist.'),
+                                            actions: <Widget>[
+                                              TextButton(
+                                                child: Text('OK'),
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    }
+                                  }
+                                  setState(() {
+                                    _newName = '';
+                                  });
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                  );
+                }
+              },
+            ),
+
+            IconButton(
               icon: Icon(widget.event.shared ? Icons.share : Icons.upload),
               tooltip: 'Share',
               onPressed: () => _onShare(widget.event),
             ),
             if (_tab != 0 && widget.event.hasKey())
+
               IconButton(
                   icon: Icon(Icons.refresh),
                   tooltip: 'Reload Matches',
@@ -271,6 +374,7 @@ color: Colors.white
                       ],
                     ),
                   ),
+
             IconButton(
               icon: Icon(
                 Icons.search,
@@ -293,7 +397,7 @@ color: Colors.white
                               : widget.event.teams.orderedTeams(),
                           sortMode: sortingModifier,
                           event: widget.event,
-                          statistics: statistics,
+                          statistics: statistics, isUserTeam: false,
                         )
                       : MatchSearch(
                           statConfig: widget.event.statConfig,
@@ -534,4 +638,82 @@ color: Colors.white
       );
     }
   }
+  void _onAlliance(Event e) {
+    if (!(context.read<User?>()?.isAnonymous ?? true)) {
+      if (!e.shared) {
+        showPlatformDialog(
+          context: context,
+          builder: (context) => PlatformAlert(
+            title: Text('Upload Event'),
+            content: Text(
+              'Your event will still be private',
+            ),
+            actions: [
+              PlatformDialogAction(
+                child: Text('Cancel'),
+                isDefaultAction: true,
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              PlatformDialogAction(
+                child: Text('Upload'),
+                onPressed: () async {
+                  showPlatformDialog(
+                    context: context,
+                    builder: (_) => PlatformAlert(
+                      content: Center(child: PlatformProgressIndicator()),
+                      actions: [
+                        PlatformDialogAction(
+                          child: Text('Back'),
+                          isDefaultAction: true,
+                          onPressed: () => Navigator.of(context).pop(),
+                        ),
+                      ],
+                    ),
+                  );
+                  e.shared = true;
+                  final json = e.toJson();
+                  await firebaseDatabase
+                      .ref()
+                      .child("Events/${e.gameName}/${e.id}")
+                      .set(json);
+                  dataModel.events.remove(e);
+                  setState(() => dataModel.saveEvents);
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        );
+      } else {
+        Navigator.of(context).push(
+          platformPageRoute(
+            builder: (context) => EventShare(
+              event: e,
+            ),
+          ),
+        );
+      }
+    } else {
+      showPlatformDialog(
+        context: context,
+        builder: (context) => PlatformAlert(
+          title: Text('Cannot Share Event'),
+          content: Text('You must be logged in to share an event.'),
+          actions: [
+            PlatformDialogAction(
+              child: Text('OK'),
+              isDefaultAction: true,
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
 }

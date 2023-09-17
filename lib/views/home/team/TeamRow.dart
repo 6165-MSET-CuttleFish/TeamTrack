@@ -9,7 +9,6 @@ import 'package:teamtrack/functions/Extensions.dart';
 
 class TeamRow extends StatelessWidget {
   const TeamRow({
-    super.key,
     required this.team,
     required this.event,
     required this.max,
@@ -18,7 +17,9 @@ class TeamRow extends StatelessWidget {
     required this.statConfig,
     required this.elementSort,
     required this.statistics,
+
   });
+
   final Team team;
   final Event event;
   final double max;
@@ -27,6 +28,8 @@ class TeamRow extends StatelessWidget {
   final Statistics statistics;
   final void Function()? onTap;
   final StatConfig statConfig;
+
+
   Color wltColor(int i) {
     if (i == 0) {
       return Colors.green;
@@ -41,13 +44,13 @@ class TeamRow extends StatelessWidget {
   Widget build(context) {
     final percentIncrease = statConfig.allianceTotal
         ? event
-            .getMatches(team)
-            .map((e) => e.alliance(team)?.combinedScore())
-            .whereType<Score>()
-            .percentIncrease(elementSort)
+        .getMatches(team)
+        .map((e) => e.alliance(team)?.combinedScore())
+        .whereType<Score>()
+        .percentIncrease(elementSort)
         : team.scores.values
-            .map((e) => e.getScoreDivision(sortMode))
-            .percentIncrease(elementSort);
+        .map((e) => e.getScoreDivision(sortMode))
+        .percentIncrease(elementSort);
     final wlt = (team.getWLT(event) ?? '').split('-');
     return Container(
       decoration: BoxDecoration(
@@ -55,6 +58,7 @@ class TeamRow extends StatelessWidget {
           color: Colors.grey,
           width: 1,
         ),
+
       ),
       child: ListTile(
         title: SizedBox(
@@ -114,29 +118,29 @@ class TeamRow extends StatelessWidget {
               vertical: false,
               val: statConfig.allianceTotal
                   ? event.matches.values
-                      .toList()
-                      .spots(
-                        team,
-                        Dice.none,
-                        statConfig.showPenalties,
-                        type: sortMode,
-                        element: elementSort,
-                      )
-                      .removeOutliers(statConfig.removeOutliers)
-                      .map((spot) => spot.y)
-                      .getStatistic(statistics.getFunction())
+                  .toList()
+                  .spots(
+                team,
+                Dice.none,
+                statConfig.showPenalties,
+                type: sortMode,
+                element: elementSort,
+              )
+                  .removeOutliers(statConfig.removeOutliers)
+                  .map((spot) => spot.y)
+                  .getStatistic(statistics.getFunction())
                   : team.scores.customStatisticScore(
-                      Dice.none,
-                      statConfig.removeOutliers,
-                      statistics,
-                      sortMode,
-                      elementSort,
-                    ),
+                Dice.none,
+                statConfig.removeOutliers,
+                statistics,
+                sortMode,
+                elementSort,
+              ),
               max: max,
               title: '',
               compressed:true,
               lessIsBetter: (statistics.getLessIsBetter() ||
-                      sortMode.getLessIsBetter()) &&
+                  sortMode.getLessIsBetter()) &&
                   !(statistics.getLessIsBetter() && sortMode.getLessIsBetter()),
             ),
             Icon(Icons.navigate_next)
