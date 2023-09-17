@@ -1,89 +1,97 @@
-import 'dart:ffi';
 import 'package:flutter/material.dart';
 import '../../../functions/Statistics.dart';
 import '../../../models/GPTModel.dart';
 import '../../../models/GameModel.dart';
 import '../../../models/ScoreModel.dart';
 import '../../../models/StatConfig.dart';
+import 'TeamAllianceRecommend.dart';
 
 class AllianceContainer extends StatefulWidget {
+
+  AllianceContainer({
+    required this.alliance,
+    required this.allianceNumber,
+
+  });
+
   final List<Team> alliance;
   final int allianceNumber;
-
-  AllianceContainer(this.alliance, this.allianceNumber);
 
   @override
   _AllianceContainerState createState() => _AllianceContainerState();
 }
 
-class _AllianceContainerState extends State<AllianceContainer> {
-  bool isExpanded = false;
+// Existing code...
 
-  void toggleExpansion() {
-    setState(() {
-      isExpanded = !isExpanded;
-    });
-  }
+// Existing code...
+
+class _AllianceContainerState extends State<AllianceContainer> {
+  bool isExpanded = true;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: toggleExpansion,
-      child: Container(
-        width: 300,
-        margin: EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Colors.deepPurple, width: 2),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              spreadRadius: 2,
-              blurRadius: 4,
-              offset: Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              if (!isExpanded)
-                Text(
-                  '${widget.alliance[0].number} ${widget.alliance[0].name}',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic, color: Colors.deepPurple),
-                  textAlign: TextAlign.center,
-                ),
-              if (!isExpanded)
-                SizedBox(height: 6),
-              if (!isExpanded)
-                Text(
-                  '${widget.alliance[1].number} ${widget.alliance[1].name}',
-                  style: TextStyle(fontSize: 18),
-                  textAlign: TextAlign.center,
-                ),
-              if (!isExpanded)
-                SizedBox(height: 10),
-              if (!isExpanded)
-                Text(
-                  '${widget.alliance[2].number} ${widget.alliance[2].name}',
-                  style: TextStyle(fontSize: 18),
-                  textAlign: TextAlign.center,
-                ),
-              if (isExpanded)
-                Text(
-                  'Alliance ${widget.allianceNumber}',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic, color: Colors.deepPurple),
-                  textAlign: TextAlign.center,
-                ),
-            ],
+    return Container(
+      width: 300,
+      margin: EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.deepPurple, width: 2),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            spreadRadius: 2,
+            blurRadius: 4,
+            offset: Offset(0, 2),
           ),
-        ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            padding: EdgeInsets.symmetric(vertical: 10), // Add padding here
+            child: GestureDetector(
+              child: Text(
+                '${widget.alliance[0].number} ${widget.alliance[0].name}',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  fontStyle: FontStyle.italic,
+                  color: Colors.deepPurple,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+          GestureDetector(
+            child: Text(
+              '${widget.alliance[1].number} ${widget.alliance[1].name}',
+              style: TextStyle(fontSize: 18),
+              textAlign: TextAlign.center,
+            ),
+          ),
+
+          Container(
+            padding: EdgeInsets.symmetric(vertical: 8), // Add padding here
+            child: GestureDetector(
+              child: Text(
+                '${widget.alliance[2].number} ${widget.alliance[2].name}',
+                style: TextStyle(fontSize: 18),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 }
+
+// Existing code...
+
+
+// Existing code...
+
 
 class AllianceSimulator extends StatefulWidget {
   AllianceSimulator({
@@ -106,12 +114,8 @@ class AllianceSimulator extends StatefulWidget {
 
 class _AllianceSimulatorState extends State<AllianceSimulator> {
   List<int> allianceTurns = [1, 2, 3, 4];
-  int currentTurn = 1;
-  int currentPartner = 1;
-
   Team localTeam = new Team("", "");
   bool showLocal = true;
-
   TextEditingController searchController = TextEditingController();
 
   @override
@@ -158,13 +162,6 @@ class _AllianceSimulatorState extends State<AllianceSimulator> {
     if (widget.event.alliances[0][0].name == "") {
       widget.event.addAllianceTeam(widget.event.rankedTeams[0], 0, 0);
     }
-
-    for (List<Team> teams in widget.event.alliances) {
-      print ("____");
-      for (Team team in teams) {
-        print (team.name);
-      }
-    }
   }
 
   void _searchForTeam(String query) {
@@ -185,23 +182,26 @@ class _AllianceSimulatorState extends State<AllianceSimulator> {
 
   void _addToAlliance() {
     showLocal = false;
-    if (!widget.event.alliances.contains(localTeam) && widget.event.rankedTeams.contains(localTeam) && localTeam != widget.event.rankedTeams[0]) {
-      if (currentPartner == 1) {
+    if (!widget.event.alliances.contains(localTeam) &&
+        widget.event.rankedTeams.contains(localTeam) &&
+        localTeam != widget.event.rankedTeams[0]) {
+      if (widget.event.currentPartner == 1) {
         widget.event.removeFromRankedList(widget.event.rankedTeams[0]);
       }
 
       setState(() {
-        widget.event.addAllianceTeam(localTeam, currentTurn - 1, currentPartner);
+        widget.event.addAllianceTeam(
+            localTeam, widget.event.currentTurn - 1, widget.event.currentPartner);
         widget.event.removeFromRankedList(localTeam);
       });
-      if (currentPartner == 1) {
-        widget.event.addAllianceTeam(widget.event.rankedTeams[0], currentTurn, 0);
+      if (widget.event.currentPartner == 1) {
+        widget.event.addAllianceTeam(widget.event.rankedTeams[0], widget.event.currentTurn, 0);
       }
-      if (currentTurn == 4) {
-        currentPartner++;
-        currentTurn = 1;
+      if (widget.event.currentTurn == 4) {
+        widget.event.setCurrentPartner(widget.event.currentPartner + 1);
+        widget.event.setCurrentTurn(1);
       } else {
-        currentTurn++;
+        widget.event.setCurrentTurn(widget.event.currentTurn + 1);
       }
     } else {
       showDialog(
@@ -250,10 +250,10 @@ class _AllianceSimulatorState extends State<AllianceSimulator> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      currentPartner == 2
+                      widget.event.currentPartner == 2
                           ? (showLocal
-                          ? '${widget.event.alliances[currentTurn - 1][0].name} selects: ${localTeam.name}'
-                          : '${widget.event.alliances[currentTurn - 1][0].name} selects:')
+                          ? '${widget.event.alliances[widget.event.currentTurn - 1][0].name} selects: ${localTeam.name}'
+                          : '${widget.event.alliances[widget.event.currentTurn - 1][0].name} selects:')
                           : (showLocal
                           ? '${widget.event.rankedTeams[0].name} selects: ${localTeam.name}'
                           : '${widget.event.rankedTeams[0].name} selects:'),
@@ -290,27 +290,34 @@ class _AllianceSimulatorState extends State<AllianceSimulator> {
             Column(
               children: [
                 for (var i = 0; i < 4; i++)
-                  AllianceContainer(widget.event.alliances[i], i + 1),
-                SizedBox(height: 50),
+                  AllianceContainer(alliance: widget.event.alliances[i], allianceNumber: i+1),
               ],
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(0.0),
-                  child: Text(
-                    "${GPTModel(team: widget.event.rankedTeams[0]).returnModelFeedback()}",
-                    style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
+            Container(
+              alignment: Alignment.center,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(40.0),
+                    child: Text(
+                      "${GPTModel(
+                        selectorTeam: widget.event.rankedTeams[0],
+                        event: widget.event,
+                        sortMode: widget.sortMode,
+                        elementSort: widget.elementSort,
+                        statConfig: widget.statConfig,
+                        statistic: widget.statistic,
+                      ).returnModelFeedback()}",
+                      style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-
           ],
         ),
-
-
       ),
     );
   }

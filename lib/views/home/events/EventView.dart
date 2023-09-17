@@ -87,8 +87,8 @@ class _EventView extends State<EventView> {
                     ),
                   )),
             IconButton(
-              icon: Icon(Icons.share),
-              tooltip: 'Share',
+              icon: Icon(Icons.people), // Change the icon to Icons.people (or choose an appropriate icon)
+              tooltip: 'Alliance Selection', // Change the tooltip to indicate the action
               onPressed: () {
                 if (widget.event.userTeam.number != "0") {
                   Navigator.push(
@@ -103,7 +103,6 @@ class _EventView extends State<EventView> {
                       ),
                     ),
                   );
-
                 } else {
                   showDialog(
                     context: context,
@@ -117,8 +116,8 @@ class _EventView extends State<EventView> {
                               children: [
                                 TextField(
                                   onChanged: (value) {
-                                    widget.event.updateUserTeam(new Team(value, value)); // Update the user team with the new team number
-                                    setState(() {}); // Trigger a rebuild to update the list
+                                    widget.event.updateUserTeam(new Team(value, value));
+                                    setState(() {});
                                   },
                                 ),
                                 ...widget.event.teams.entries.where(
@@ -139,7 +138,7 @@ class _EventView extends State<EventView> {
                                 onPressed: () {
                                   if (widget.event.teams.containsKey(widget.event.userTeam.number)) {
                                     if (widget.event.userTeam.number != "0") {
-                                      Navigator.pop(context); // Close the dialog
+                                      Navigator.pop(context);
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
@@ -152,7 +151,6 @@ class _EventView extends State<EventView> {
                                           ),
                                         ),
                                       );
-
                                     } else {
                                       showDialog(
                                         context: context,
@@ -164,7 +162,7 @@ class _EventView extends State<EventView> {
                                               TextButton(
                                                 child: Text('OK'),
                                                 onPressed: () {
-                                                  Navigator.of(context).pop(); // Close the dialog
+                                                  Navigator.of(context).pop();
                                                 },
                                               ),
                                             ],
@@ -173,8 +171,6 @@ class _EventView extends State<EventView> {
                                       );
                                     }
                                   }
-
-                                  // Reset the displayed team name
                                   setState(() {
                                     _newName = '';
                                   });
@@ -189,8 +185,6 @@ class _EventView extends State<EventView> {
                 }
               },
             ),
-
-
 
             IconButton(
               icon: Icon(widget.event.shared ? Icons.share : Icons.upload),

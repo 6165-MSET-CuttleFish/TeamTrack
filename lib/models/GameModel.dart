@@ -58,6 +58,7 @@ class Event {
   StatConfig statConfig = StatConfig();
 
   TeamTrackUser? author;
+  bool d = false;
   String gameName = Statics.gameName;
   Role role =
       Role.editor; // the permissions enabled for the current user in this event
@@ -65,10 +66,13 @@ class Event {
   EventType type = EventType.remote;
   Map<String, Team> teams = {};
   Team userTeam = new Team("0", "0");
+
   List<List<Team>> alliances = List.generate(4, (index) {
     return List.generate(3, (innerIndex) => Team("", ""));
   });
   List<dynamic> rankedTeams = [];
+  int currentTurn = 1;
+  int currentPartner = 1;
 
 
   Map<String, Match> matches = {};
@@ -102,6 +106,7 @@ class Event {
 
   bool hasKey() => eventKey != null && !(eventKey?.isEmpty ?? true);
 
+
   void addTeam(Team newTeam) async {
     await getRef()
         ?.child('teams/${newTeam.number}')
@@ -117,7 +122,34 @@ class Event {
     userTeam = Team(newTeam.number, newTeam.name);
     dataModel.saveEvents();
   }
+  void dontShow() async {
+    print ("lalalalalalalalalalalaalalalalal");
+    await getRef()
+        ?.child('d/$d')
+        .update({"d": d});
 
+    d = true;
+    dataModel.saveEvents();
+
+  }
+
+  Future<void> setCurrentTurn(int x) async {
+    await getRef()
+        ?.child('turn/$currentTurn')
+        .update({"turn": x});
+
+    currentTurn = x;
+    dataModel.saveEvents();
+  }
+
+  Future<void> setCurrentPartner(int x) async {
+    await getRef()
+        ?.child('turn/${currentPartner}')
+        .update({"turn": x});
+
+    currentPartner = x;
+    dataModel.saveEvents();
+  }
   void addAllianceTeam(Team newTeam, int allianceIndex, int rankNum) async {
 
     if (allianceIndex >= 4 || rankNum >= 3) {

@@ -208,7 +208,16 @@ class _TeamAllianceRecommendState extends State<TeamAllianceRecommend> {
     int rankNum = widget.ranks[3];
     double rankPercentage = (rankNum / widget.event.teams.length) * 100;
 
-    String allianceExplanation = GPTModel(team: currTeam).returnModelFeedback();
+    String allianceExplanation = "GPT";/*"${GPTModel(
+        selectorTeam: widget.event.rankedTeams[0],
+        event: widget.event,
+        sortMode: widget.sortMode,
+        elementSort: widget.elementSort,
+        statConfig: widget.statConfig,
+        statistic: widget.statistic).
+
+    returnModelFeedback()}";
+    */
     Color explanationColor;
 
     return Container(

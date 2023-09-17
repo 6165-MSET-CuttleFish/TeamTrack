@@ -1,5 +1,4 @@
 import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:teamtrack/functions/Statistics.dart';
 import 'package:teamtrack/models/GPTModel.dart';
@@ -25,7 +24,6 @@ class AllianceSelection extends StatefulWidget {
   final StatConfig statConfig;
   final Statistics statistic;
 
-
   @override
   State<AllianceSelection> createState() => _AllianceSelection();
 }
@@ -33,8 +31,6 @@ class AllianceSelection extends StatefulWidget {
 class _AllianceSelection extends State<AllianceSelection> {
   int recommendedIndex = 0;
   String _sortBy = 'Score';
-
-
 
   void updateRecommended(int index) {
     setState(() {
@@ -88,59 +84,55 @@ class _AllianceSelection extends State<AllianceSelection> {
     final endgameTeams = List.from(teams);
 
     for (List<Team> teams in widget.event.alliances) {
-      print ("____");
       for (Team team in teams) {
         print (team.name);
       }
     }
-     if (_sortBy == 'Wins') {
-      // Sort the teams based on wins and losses
+
+    if (_sortBy == 'Wins') {
       teams.sort((a, b) {
         final aWLT = a.getWLT(widget.event)?.split('-').map(int.parse).toList() ?? [0, 0, 0];
         final bWLT = b.getWLT(widget.event)?.split('-').map(int.parse).toList() ?? [0, 0, 0];
 
         if (aWLT[0] != bWLT[0]) {
-          return bWLT[0].compareTo(aWLT[0]); // Sort by wins
+          return bWLT[0].compareTo(aWLT[0]);
         } else if (aWLT[1] != bWLT[1]) {
-          return aWLT[1].compareTo(bWLT[1]); // Sort by losses (lower is better)
+          return aWLT[1].compareTo(bWLT[1]);
         } else {
           final aScore = a.getAllianceScore(widget.event);
           final bScore = b.getAllianceScore(widget.event);
           if (aScore != bScore) {
-            return bScore.compareTo(aScore); // Sort by wins
+            return bScore.compareTo(aScore);
           } else if (aScore != bScore) {
-            return aScore.compareTo(bScore); // Sort by losses (lower is better)
+            return aScore.compareTo(bScore);
           } else {
-            return teams.indexOf(a) - teams.indexOf(b); // Sort by team index
+            return teams.indexOf(a) - teams.indexOf(b);
           }
         }
       });
-     } else {
-       teams.sort((a, b) {
-         final aScore = a.getAllianceScore(widget.event);
-         final bScore = b.getAllianceScore(widget.event);
+    } else {
+      teams.sort((a, b) {
+        final aScore = a.getAllianceScore(widget.event);
+        final bScore = b.getAllianceScore(widget.event);
 
-
-
-         if (aScore != bScore) {
-           return bScore.compareTo(aScore); // Sort by wins
-         } else if (aScore != bScore) {
-           return aScore.compareTo(bScore); // Sort by losses (lower is better)
-         } else {
-           return teams.indexOf(a) - teams.indexOf(b); // Sort by team index
-         }
-       });
-     }
-
+        if (aScore != bScore) {
+          return bScore.compareTo(aScore);
+        } else if (aScore != bScore) {
+          return aScore.compareTo(bScore);
+        } else {
+          return teams.indexOf(a) - teams.indexOf(b);
+        }
+      });
+    }
 
     autonomousTeams.sort((a, b) {
       final aScore = a.getSpecificScore(widget.event, OpModeType.auto);
       final bScore = b.getSpecificScore(widget.event, OpModeType.auto);
 
       if (aScore != bScore) {
-        return bScore.compareTo(aScore); // Sort by autonomous scores (higher is better)
+        return bScore.compareTo(aScore);
       } else {
-        return a.name.compareTo(b.name); // Sort by team name (for stability)
+        return a.name.compareTo(b.name);
       }
     });
 
@@ -149,39 +141,35 @@ class _AllianceSelection extends State<AllianceSelection> {
       final bScore = b.getSpecificScore(widget.event, OpModeType.tele);
 
       if (aScore != bScore) {
-        return bScore.compareTo(aScore); // Sort by teleop scores (higher is better)
+        return bScore.compareTo(aScore);
       } else {
-        return a.name.compareTo(b.name); // Sort by team name (for stability)
+        return a.name.compareTo(b.name);
       }
     });
-
-
 
     endgameTeams.sort((a, b) {
       final aScore = a.getSpecificScore(widget.event, OpModeType.endgame);
       final bScore = b.getSpecificScore(widget.event, OpModeType.endgame);
 
       if (aScore != bScore) {
-        return bScore.compareTo(aScore); // Sort by wins
+        return bScore.compareTo(aScore);
       } else if (aScore != bScore) {
-        return aScore.compareTo(bScore); // Sort by losses (lower is better)
+        return aScore.compareTo(bScore);
       } else {
-        return endgameTeams.indexOf(a) - endgameTeams.indexOf(b); // Sort by team index
+        return endgameTeams.indexOf(a) - endgameTeams.indexOf(b);
       }
     });
 
-     teams[0].isRecommended = true;
+    teams[0].isRecommended = true;
 
     return Scaffold(
       appBar: AppBar(
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-          SizedBox(width: 30),
+            SizedBox(width: 30),
             Text('Alliance Selection'),
             SizedBox(width: 10)
-
-
           ],
         ),
         actions: [
@@ -221,7 +209,6 @@ class _AllianceSelection extends State<AllianceSelection> {
                 ),
               );
             },
-
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Row(
@@ -237,9 +224,7 @@ class _AllianceSelection extends State<AllianceSelection> {
               ),
             ),
           ),
-
           SizedBox(height: 30),
-
           Padding(
             padding: const EdgeInsets.only(bottom: 8.0),
             child: TeamRowAlliance(
@@ -317,7 +302,6 @@ class _AllianceSelection extends State<AllianceSelection> {
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-
                           SizedBox(width: 50),
                           Text(
                             '$teamTotalScore',
@@ -329,15 +313,6 @@ class _AllianceSelection extends State<AllianceSelection> {
                   ),
                 );
               },
-            ),
-          )
-          ,Padding(
-            padding: const EdgeInsets.all(50.0),
-            child: Text(
-              recommendedIndex == -1
-                  ? ''
-                  : GPTModel(team: teams[recommendedIndex]).returnModelFeedback(),
-              style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
             ),
           ),
 
@@ -356,4 +331,3 @@ Color wltColor(int i) {
     return Colors.grey;
   }
 }
-
