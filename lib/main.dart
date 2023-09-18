@@ -85,25 +85,30 @@ class _TeamTrack extends State<TeamTrack> {
     splashColor: NewPlatform.isAndroid ? Colors.cyan : Colors.transparent,
     visualDensity: VisualDensity.adaptivePlatformDensity,
     textTheme: TextTheme(
-      bodyLarge: GoogleFonts.gugi(),
-      bodyMedium: GoogleFonts.gugi(),
-      bodySmall: GoogleFonts.gugi(),
-      titleLarge: GoogleFonts.gugi(),
-      headlineMedium: GoogleFonts.gugi(color: Colors.black),
+      bodyLarge: GoogleFonts.montserrat(fontWeight: FontWeight.w500),
+      bodyMedium: GoogleFonts.montserrat(fontWeight: FontWeight.w500),
+      bodySmall: GoogleFonts.montserrat(fontWeight: FontWeight.w500),
+      titleLarge: GoogleFonts.montserrat(fontWeight: FontWeight.w700),
+      titleMedium: GoogleFonts.montserrat(fontWeight: FontWeight.w700),
+      titleSmall: GoogleFonts.montserrat(fontWeight: FontWeight.w700),
+      headlineMedium: GoogleFonts.montserrat(fontWeight: FontWeight.w700,color: Colors.black),
     ),
+shadowColor:Colors.black,
     colorScheme: ColorScheme.light(
-      primary: Colors.deepPurple,
-      secondary: Colors.cyan,
+      primary: Color.fromRGBO(80, 64, 153,1),
+      secondary: Color.fromRGBO(151, 78, 195,1),
     ),
   );
 
   final darkTheme = ThemeData(
     textTheme: TextTheme(
-      bodyLarge: GoogleFonts.gugi(color: Colors.white),
-      bodyMedium: GoogleFonts.gugi(color: Colors.white),
-      bodySmall: GoogleFonts.gugi(color: Colors.white),
-      titleLarge: GoogleFonts.gugi(color: Colors.white),
-      headlineMedium: GoogleFonts.gugi(color: Colors.white),
+      bodyLarge: GoogleFonts.montserrat(fontWeight: FontWeight.w600,color: Colors.white),
+      bodyMedium: GoogleFonts.montserrat(fontWeight: FontWeight.w600,color: Colors.white),
+      bodySmall: GoogleFonts.montserrat(fontWeight: FontWeight.w500,color: Colors.white),
+      titleLarge: GoogleFonts.montserrat(fontWeight: FontWeight.w700,color: Colors.white),
+      titleMedium: GoogleFonts.montserrat(fontWeight: FontWeight.w700,color: Colors.white),
+      titleSmall: GoogleFonts.montserrat(fontWeight: FontWeight.w700,color: Colors.white),
+      headlineMedium: GoogleFonts.montserrat(fontWeight: FontWeight.w700,color: Colors.white),
     ),
     splashColor: NewPlatform.isAndroid ? Colors.deepPurple : Colors.transparent,
     shadowColor: Colors.white,
@@ -115,7 +120,7 @@ class _TeamTrack extends State<TeamTrack> {
       elevation: 0,
     ),
     visualDensity: VisualDensity.adaptivePlatformDensity, colorScheme: ColorScheme.dark(
-      primary: Colors.cyan,
+      primary: Color.fromRGBO(25, 167, 206,1),
       secondary: Colors.deepPurple,
     ).copyWith(background: Colors.black),
   );

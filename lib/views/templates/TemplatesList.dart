@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:teamtrack/components/misc/PlatformGraphics.dart';
+import 'package:teamtrack/components/statistics/BarGraph.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/functions/APIMethods.dart';
@@ -54,6 +55,7 @@ class _TemplatesList extends State<TemplatesList> {
           color: themeChangeProvider.darkTheme ? Colors.black:Colors.white,
           child: CupertinoSearchTextField(
             onChanged: (value) => onSearch(value),
+            placeholder: 'Search for Your Event',
             backgroundColor: themeChangeProvider.darkTheme ? Color.fromARGB(255, 50, 50, 50):Color.fromARGB(255, 220, 220, 220),
             /* decoration: InputDecoration(
                 filled: true,
@@ -167,26 +169,40 @@ class _TemplatesList extends State<TemplatesList> {
 
             ],
           )),
-      ):bodvis.isEmpty ? Center(child: Text('No Results Found')):ListView.builder(
+      ):bodvis.isEmpty ? Center(child: Text('No Results Found')):
+      ListView.builder(
+        padding: EdgeInsets.all(0),
         itemCount: bodvis.length,
         itemBuilder: (context, index) {
-          return Card(
-            child:ListTile(
-                title: Text(bodvis[index]['event_name']),
+          return Container(
+              decoration: BoxDecoration(
+              border: Border.symmetric(
+                horizontal: BorderSide(
+                  color: Colors.grey,
+                  width: 1,),
 
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    platformPageRoute(
-                      builder: (_) => TemplateView(
-                        event_key:bodvis[index]['event_key'],
-                        event_name:bodvis[index]['event_name'],
-                      ),
-                    ),
-                  );
-                }
-            ),);
-        },
+          ),
+          ),
+          child:ListTile(
+            dense:true,
+            minVerticalPadding: 0,
+              title: Text(bodvis[index]['event_name']
+                , overflow: TextOverflow.ellipsis,),
+              tileColor: Colors.transparent,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  platformPageRoute(
+                    builder: (_) =>
+                        TemplateView(
+                          event_key: bodvis[index]['event_key'],
+                          event_name: bodvis[index]['event_name'],
+                        ),
+                  ),
+                );
+              }
+          ));
+        }
 
       ),
 

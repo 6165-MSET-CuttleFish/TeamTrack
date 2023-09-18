@@ -39,7 +39,7 @@ class _MatchView extends State<MatchView> {
   final blue = Colors.blue;
   final red = CupertinoColors.systemRed;
   bool _showPenalties = true,
-      _allianceTotal = true,
+      _allianceTotal = false,
       _showRoles = false,
       _paused = true,
       _allowView = false,
@@ -255,6 +255,11 @@ class _MatchView extends State<MatchView> {
                       elevation: 0,
                       actions: widget.match != null
                           ? [
+                            Center(
+                                child:Text("Timer",
+                                style:Theme.of(context).textTheme.titleSmall)
+                            ),
+
                               IconButton(
                                 tooltip: "Reset Score",
                                 icon: Icon(
@@ -355,7 +360,7 @@ class _MatchView extends State<MatchView> {
                                 widget.match != null)
                               Row(
                                 mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
+                                    MainAxisAlignment.spaceAround,
                                 children: [
                                   Container(
                                     alignment: Alignment.center,
@@ -378,7 +383,7 @@ class _MatchView extends State<MatchView> {
                                     icon: Icon(Icons.height_rounded),
                                     iconSize: 24,
                                     iconEnabledColor:
-                                        Theme.of(context).colorScheme.primary,
+                                        Theme.of(context).shadowColor,
                                     elevation: 16,
                                     style: TextStyle(
                                         color: Theme.of(context)
@@ -567,9 +572,12 @@ class _MatchView extends State<MatchView> {
                                     OpModeType>(
                                   groupValue: _view,
                                   children: {
-                                    OpModeType.auto: Text('Autonomous'),
-                                    OpModeType.tele: Text('Tele-Op'),
-                                    OpModeType.endgame: Text('Endgame')
+                                    OpModeType.auto: Text('Autonomous',
+                                    style: Theme.of(context).textTheme.titleSmall),
+                                    OpModeType.tele: Text('Tele-Op',
+                                        style: Theme.of(context).textTheme.titleSmall),
+                                    OpModeType.endgame: Text('Endgame',
+                                        style: Theme.of(context).textTheme.titleSmall)
                                   },
                                   onValueChanged: (OpModeType? type) {
                                     setState(
@@ -589,8 +597,7 @@ class _MatchView extends State<MatchView> {
                                     labelColor:
                                         Theme.of(context).colorScheme.primary,
                                     unselectedLabelColor: Colors.grey,
-                                    labelStyle:
-                                        TextStyle(fontFamily: '.SF UI Display'),
+                                    labelStyle: Theme.of(context).textTheme.titleSmall,
                                     tabs: opModeExt
                                         .getMain()
                                         .map(
@@ -821,23 +828,29 @@ class _MatchView extends State<MatchView> {
             ]
           : [
               Material(
-                child: IconButton(
+                child: Row(
+                  mainAxisAlignment:MainAxisAlignment.spaceAround,
+                    children:[
+                  Text("Begin "+(type==OpModeType.tele?"Tele-Op":"End Game") +" Phase"),
+                  IconButton(
                   icon: Icon(Icons.play_arrow),
                   tooltip: 'Driver Control Play',
                   onPressed: () {
                     _paused = false;
                     _allowView = true;
                   },
-                ),
+                )]),
               ),
-              Material(
-                child: IconButton(
+              Material(child:Row(
+              mainAxisAlignment:MainAxisAlignment.spaceAround,
+    children:[
+    Text("View "+(type==OpModeType.tele?"Tele-Op":"End Game") +" Controls"),IconButton(
                   icon: Icon(Icons.visibility),
                   tooltip: 'View',
                   onPressed: () {
                     _allowView = true;
                   },
-                ),
+                )]),
               ),
             ],
     );

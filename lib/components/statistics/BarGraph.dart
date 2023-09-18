@@ -94,7 +94,7 @@ class BarGraph extends StatelessWidget {
                     ? Center(
                         child: Text(
                           percentage != 0 ? '$percentage%' : '',
-                          style: GoogleFonts.gugi(
+                          style: GoogleFonts.montserrat(
                             textStyle: TextStyle(
                               fontSize: 10,
                               color: Colors.black,

@@ -19,6 +19,8 @@ import 'package:teamtrack/views/home/events/EventShare.dart';
 import 'package:provider/provider.dart';
 import 'package:teamtrack/functions/APIMethods.dart';
 
+import '../team/AllianceSelection.dart';
+
 class EventView extends StatefulWidget {
   EventView({
     super.key,
@@ -85,11 +87,112 @@ class _EventView extends State<EventView> {
                     ),
                   )),
             IconButton(
+              icon: Icon(Icons.people), // Change the icon to Icons.people (or choose an appropriate icon)
+              tooltip: 'Alliance Selection', // Change the tooltip to indicate the action
+              onPressed: () {
+                if (widget.event.userTeam.number != "0") {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AllianceSelection(
+                        event: widget.event,
+                        sortMode: sortingModifier,
+                        statConfig: widget.event.statConfig,
+                        elementSort: elementSort,
+                        statistic: statistics,
+                      ),
+                    ),
+                  );
+                } else {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return StatefulBuilder(
+                        builder: (BuildContext context, StateSetter setState) {
+                          return AlertDialog(
+                            title: Text('Enter Team Number'),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                TextField(
+                                  onChanged: (value) {
+                                    widget.event.updateUserTeam(new Team(value, value));
+                                    setState(() {});
+                                  },
+                                ),
+                                ...widget.event.teams.entries.where(
+                                      (entry) => entry.value.number == widget.event.userTeam.number,
+                                ).map(
+                                      (entry) => ListTile(
+                                    title: Text(entry.value.name),
+                                    onTap: () {
+                                      widget.event.updateUserTeam(entry.value);
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                            actions: [
+                              TextButton(
+                                child: Text('Submit'),
+                                onPressed: () {
+                                  if (widget.event.teams.containsKey(widget.event.userTeam.number)) {
+                                    if (widget.event.userTeam.number != "0") {
+                                      Navigator.pop(context);
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => AllianceSelection(
+                                            event: widget.event,
+                                            sortMode: sortingModifier,
+                                            statConfig: widget.event.statConfig,
+                                            elementSort: elementSort,
+                                            statistic: statistics,
+                                          ),
+                                        ),
+                                      );
+                                    } else {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title: Text('Team Does Not Exist'),
+                                            content: Text('The provided team number does not exist.'),
+                                            actions: <Widget>[
+                                              TextButton(
+                                                child: Text('OK'),
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    }
+                                  }
+                                  setState(() {
+                                    _newName = '';
+                                  });
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                  );
+                }
+              },
+            ),
+
+            IconButton(
               icon: Icon(widget.event.shared ? Icons.share : Icons.upload),
               tooltip: 'Share',
               onPressed: () => _onShare(widget.event),
             ),
             if (_tab != 0 && widget.event.hasKey())
+
               IconButton(
                   icon: Icon(Icons.refresh),
                   tooltip: 'Reload Matches',
@@ -161,7 +264,8 @@ class _EventView extends State<EventView> {
                   children: [
                     DropdownButton<Statistics>(
                       value: statistics,
-                      icon: Icon(Icons.functions),
+                      icon: Icon(Icons.functions,
+                          color: Colors.white),
                       iconSize: 24,
                       elevation: 16,
                       underline: Container(
@@ -178,7 +282,9 @@ class _EventView extends State<EventView> {
                           .map(
                             (value) => DropdownMenuItem<Statistics>(
                               value: value,
-                              child: Text(value.name),
+                              child: Text(value.name,
+                              style: Theme.of(context).textTheme.titleMedium?.apply(color: Colors.white),
+                              textScaleFactor: .9,),
                             ),
                           )
                           .toList(),
@@ -192,7 +298,9 @@ class _EventView extends State<EventView> {
                     icon: Icon(
                       ascending
                           ? CupertinoIcons.sort_up
-                          : CupertinoIcons.sort_down,
+                          : CupertinoIcons.sort_down
+,
+color: Colors.white
                     ),
                     onPressed: () {
                       setState(() {
@@ -206,7 +314,8 @@ class _EventView extends State<EventView> {
                       children: [
                         DropdownButton<OpModeType?>(
                           value: sortingModifier,
-                          icon: Icon(Icons.sort),
+                          icon: Icon(Icons.sort,
+                            color: Colors.white),
                           iconSize: 24,
                           elevation: 16,
                           underline: Container(
@@ -236,7 +345,9 @@ class _EventView extends State<EventView> {
                                   ]
                                       .map(
                                         (e) => ListTile(
-                                          title: Text(e?.name ?? "Total"),
+                                          title: Text(e?.name ?? "Total",
+                                            style: Theme.of(context).textTheme.titleMedium?.apply(color: Colors.white),
+                                            textScaleFactor: .9,),
                                           onTap: () {
                                             HapticFeedback.lightImpact();
                                             setState(() => elementSort = e);
@@ -253,7 +364,9 @@ class _EventView extends State<EventView> {
                               .map(
                                 (value) => DropdownMenuItem<OpModeType?>(
                                   value: value,
-                                  child: Text(value?.toVal() ?? "Total"),
+                                  child: Text(value?.toVal() ?? "Total",
+                                    style: Theme.of(context).textTheme.titleMedium?.apply(color: Colors.white),
+                                    textScaleFactor: .9,),
                                 ),
                               )
                               .toList(),
@@ -261,6 +374,7 @@ class _EventView extends State<EventView> {
                       ],
                     ),
                   ),
+
             IconButton(
               icon: Icon(
                 Icons.search,
@@ -283,7 +397,7 @@ class _EventView extends State<EventView> {
                               : widget.event.teams.orderedTeams(),
                           sortMode: sortingModifier,
                           event: widget.event,
-                          statistics: statistics,
+                          statistics: statistics, isUserTeam: false,
                         )
                       : MatchSearch(
                           statConfig: widget.event.statConfig,
@@ -313,15 +427,16 @@ class _EventView extends State<EventView> {
                     children: [
                       Icon(
                         CupertinoIcons.person_3_fill,
-                        size: 20,
+                        size: 18,
                         color: _tab == 1 ? Theme.of(context).canvasColor : null,
                       ),
                       Text(
                         'Teams',
                         style: TextStyle(
-                          fontSize: 10,
+                          fontSize: 8,
                           color:
                               _tab == 1 ? Theme.of(context).canvasColor : null,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ],
@@ -331,15 +446,16 @@ class _EventView extends State<EventView> {
                     children: [
                       Icon(
                         CupertinoIcons.sportscourt_fill,
-                        size: 20,
+                        size: 18,
                         color: _tab == 0 ? Theme.of(context).canvasColor : null,
                       ),
                       Text(
                         'Matches',
                         style: TextStyle(
-                          fontSize: 10,
+                          fontSize: 8,
                           color:
                               _tab == 0 ? Theme.of(context).canvasColor : null,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ],
@@ -522,4 +638,82 @@ class _EventView extends State<EventView> {
       );
     }
   }
+  void _onAlliance(Event e) {
+    if (!(context.read<User?>()?.isAnonymous ?? true)) {
+      if (!e.shared) {
+        showPlatformDialog(
+          context: context,
+          builder: (context) => PlatformAlert(
+            title: Text('Upload Event'),
+            content: Text(
+              'Your event will still be private',
+            ),
+            actions: [
+              PlatformDialogAction(
+                child: Text('Cancel'),
+                isDefaultAction: true,
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              PlatformDialogAction(
+                child: Text('Upload'),
+                onPressed: () async {
+                  showPlatformDialog(
+                    context: context,
+                    builder: (_) => PlatformAlert(
+                      content: Center(child: PlatformProgressIndicator()),
+                      actions: [
+                        PlatformDialogAction(
+                          child: Text('Back'),
+                          isDefaultAction: true,
+                          onPressed: () => Navigator.of(context).pop(),
+                        ),
+                      ],
+                    ),
+                  );
+                  e.shared = true;
+                  final json = e.toJson();
+                  await firebaseDatabase
+                      .ref()
+                      .child("Events/${e.gameName}/${e.id}")
+                      .set(json);
+                  dataModel.events.remove(e);
+                  setState(() => dataModel.saveEvents);
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        );
+      } else {
+        Navigator.of(context).push(
+          platformPageRoute(
+            builder: (context) => EventShare(
+              event: e,
+            ),
+          ),
+        );
+      }
+    } else {
+      showPlatformDialog(
+        context: context,
+        builder: (context) => PlatformAlert(
+          title: Text('Cannot Share Event'),
+          content: Text('You must be logged in to share an event.'),
+          actions: [
+            PlatformDialogAction(
+              child: Text('OK'),
+              isDefaultAction: true,
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
 }

@@ -206,12 +206,15 @@ class _LandingPageState extends State<LandingPage> {
                                     context.read<User?>()?.displayName ??
                                         "Guest",
                                     style: TextStyle(color: Colors.white,
-                                        fontSize: 18
+                                        fontSize: 18,
+                                      fontWeight: FontWeight.w700,
                                     ),
                                   ),
                                   Text(
                                     context.read<User?>()?.email ?? "",
-                                    style: TextStyle(color: Colors.white),
+                                    style: TextStyle(color: Colors.black,
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 14,),
                                   ),
                                 ],
                               ),
@@ -222,7 +225,8 @@ class _LandingPageState extends State<LandingPage> {
                         Column(
                           children: [
                             IconButton(
-                              icon: Icon(Icons.edit),
+                              icon: Icon(Icons.edit,
+                            color: Theme.of(context).colorScheme.onBackground),
                               onPressed: () {
                                 showPlatformDialog(
                                   context: context,
@@ -310,7 +314,8 @@ class _LandingPageState extends State<LandingPage> {
 
                       //Events button
                       ListTile(
-                        leading: Icon(Icons.list),
+                        leading: Icon(Icons.list,
+                            color: Theme.of(context).colorScheme.onBackground),
                         title: Text("Events"),
                         onTap: () {
                           setState(() => tab = Tab.events);
@@ -322,7 +327,8 @@ class _LandingPageState extends State<LandingPage> {
                       //Templates button
                       if (!NewPlatform.isWeb)
                         ListTile(
-                          leading: Icon(CupertinoIcons.square_stack),
+                          leading: Icon(CupertinoIcons.square_stack,
+        color: Theme.of(context).colorScheme.onBackground),
                           title: Text("Templates"),
                           onTap: () {
                             setState(() => tab = Tab.templates);
@@ -334,7 +340,8 @@ class _LandingPageState extends State<LandingPage> {
                       //Inbox button
                       if (!(context.read<User?>()?.isAnonymous ?? true))
                         ListTile(
-                          leading: Icon(Icons.inbox_rounded),
+                          leading: Icon(Icons.inbox_rounded,
+        color: Theme.of(context).colorScheme.onBackground),
                           title: Text("Inbox"),
                           trailing:
                           (data?['inbox'] as Map?)?.entries.length == 0
@@ -365,7 +372,8 @@ class _LandingPageState extends State<LandingPage> {
                       //If user isn't anon than list blocked users
                       if (!(context.read<User?>()?.isAnonymous ?? true))
                         ListTile(
-                          leading: Icon(Icons.people_alt),
+                          leading: Icon(Icons.people_alt,
+        color: Theme.of(context).colorScheme.onBackground),
                           title: Text("Blocked Users"),
                           onTap: () {
                             setState(() => tab = Tab.blocked_users);
@@ -377,7 +385,8 @@ class _LandingPageState extends State<LandingPage> {
                       //if user anon then list link acc
                       if (context.read<User?>()?.isAnonymous ?? false)
                         ListTile(
-                          leading: Icon(Icons.link),
+                          leading: Icon(Icons.link,
+        color: Theme.of(context).colorScheme.onBackground),
                           title: Text("Link Account"),
                           onTap: () => Navigator.of(context).push(
                             platformPageRoute(
@@ -389,7 +398,8 @@ class _LandingPageState extends State<LandingPage> {
 
                       //Sign out button
                       ListTile(
-                        leading: Icon(Icons.logout),
+                        leading: Icon(Icons.logout,
+                        color: Theme.of(context).colorScheme.onBackground),
                         title: Text('Sign Out'),
                         onTap: () {
                           showPlatformDialog(
@@ -421,7 +431,8 @@ class _LandingPageState extends State<LandingPage> {
 
                       //delete acc button
                       ListTile(
-                        leading: Icon(Icons.delete_forever),
+                        leading: Icon(Icons.delete_forever,
+        color: Theme.of(context).colorScheme.onBackground),
                         title: Text('Delete Account'),
                         onTap: () {
                           showPlatformDialog(
