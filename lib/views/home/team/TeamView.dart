@@ -1,4 +1,3 @@
-import 'package:dice_icons/dice_icons.dart';
 import 'package:flutter/services.dart';
 import 'package:teamtrack/components/misc/Collapsible.dart';
 import 'package:teamtrack/components/misc/EmptyList.dart';
@@ -19,6 +18,11 @@ import 'package:firebase_database/firebase_database.dart';
 import 'dart:convert';
 import 'package:teamtrack/functions/Statistics.dart';
 import 'package:teamtrack/functions/Extensions.dart';
+import 'dart:typed_data';
+
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:teamtrack/components/AutonomousDrawingTool.dart';
 
 class TeamView extends StatefulWidget {
   TeamView({
@@ -31,11 +35,14 @@ class TeamView extends StatefulWidget {
   final Event event;
   final bool isSoleWindow;
   @override
-  State<TeamView> createState() => _TeamViewState(team);
+  State<TeamView> createState() => _TeamViewState(team,event);
 }
 
+var scopeMarks = <String>["","Both_Side", "Red_Side", "Blue_Side"];
+String dropdownScope=scopeMarks.first;
+
 class _TeamViewState extends State<TeamView> {
-  _TeamViewState(this._team);
+  _TeamViewState(this._team, this._event);
   Dice _dice = Dice.none;
   final _selections = {
     null: true,
@@ -45,10 +52,12 @@ class _TeamViewState extends State<TeamView> {
     OpModeType.penalty: false,
   };
   Team _team;
+  Event _event;
   bool _showCycles = false;
 
   Score? maxScore;
   Score? teamMaxScore;
+  late AutonPainter painter;
 
   @override
   void initState() {
@@ -85,6 +94,7 @@ class _TeamViewState extends State<TeamView> {
             .toInt();
       },
     );
+    painter=new AutonPainter(team: _team,event: _event,);
     super.initState();
   }
 
@@ -330,32 +340,88 @@ class _TeamViewState extends State<TeamView> {
                                 style:Theme.of(context).textTheme.titleSmall),
                           ),
                         ),
-                      ],),
+                      ],
+                      ),
                       for (final opModeType in opModeExt.getAll())
                         Padding(
                           padding: const EdgeInsets.only(top: 20, bottom: 10),
                           child: ScoreCard(
                             allianceTotal:
-                                widget.event.statConfig.allianceTotal,
+                            widget.event.statConfig.allianceTotal,
                             team: _team,
                             event: widget.event,
                             targetScore:
-                                _team.targetScore?.getScoreDivision(opModeType),
+                            _team.targetScore?.getScoreDivision(opModeType),
                             scoreDivisions: _team.scores
                                 .sortedScores()
                                 .map((e) => e.getScoreDivision(opModeType))
                                 .toList(),
                             dice: _dice,
                             removeOutliers:
-                                widget.event.statConfig.removeOutliers,
+                            widget.event.statConfig.removeOutliers,
                             matches: widget.event.getSortedMatches(true),
                             title: opModeType.getName(),
                             type: opModeType,
                           ),
                         ),
+
                     ],
                   ),
-                )
+                ),
+                Container(
+                  height: 300,
+                  child: painter,
+                ),
+                Container(
+                    width: 300,
+                    child: Column(
+                    children:[
+                    Container(
+                    //Put in the gallery stuff
+                    child: FutureBuilder(
+                    future: FirebaseStorage.instance.ref().child('${_event.id} - ${_team.number} - ${dropdownScope}.png').getDownloadURL(),
+                builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done &&
+                      snapshot.hasData) {
+                    return Container(
+                      height: 390,
+                      child: Image.network(snapshot.data!, fit: BoxFit.cover,),
+                    );
+                  }
+                  if (snapshot.connectionState == ConnectionState.waiting ||
+                      !snapshot.hasData) {
+                    return Container(
+                      height: 0,
+                    );
+                  }
+                  return Container(
+                    height: 0,
+                  );
+                },
+                  )
+                  )
+                  ]
+                  )),
+            Container(
+              child: Row(
+                  children: <Widget>[
+              const Spacer(flex: 1),
+             DropdownButton(
+                value: dropdownScope,
+                items: scopeMarks.map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                onChanged: (String? value) {
+                    // This is called when the user selects an item.
+                    setState(() {
+                      dropdownScope = value!;
+                    });
+                }),
+                const Spacer(flex: 1),
+                ]))
               ],
             );
           },
