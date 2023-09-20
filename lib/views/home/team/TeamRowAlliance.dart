@@ -70,7 +70,7 @@ class TeamRowAlliance extends StatelessWidget {
                   builder: (BuildContext context) {
                     return AlertDialog(
                       title: Text('Score Calculator'),
-                      content: Text('AI Goofy'),
+                      content: Text("Score is calculated from individual contribution of a team in all their matches."),
                       actions: [
                         TextButton(
                           onPressed: () {

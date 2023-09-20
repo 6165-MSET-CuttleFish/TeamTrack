@@ -27,6 +27,10 @@ class GPTModel {
 
   String returnModelFeedback() {
 
+
+    if (event.hide) {
+      return "";
+    }
     if (existsPartner (event.userTeam) || selectorTeam.number == event.userTeam.number) {
       return returnBestAlliance();
     } else if (selectorTeam.number != event.userTeam.number && exists(event.userTeam)) {
@@ -35,13 +39,15 @@ class GPTModel {
       return "";
     }
     else {
-      if (!event.d) {
+      if (event.hide) {
+        return "";
 
-        return acceptOrDecline(selectorTeam);
       }
-     return "";
+      return acceptOrDecline(selectorTeam);
     }
   }
+
+
 
   bool exists(Team team) {
     for (int i = 0; i < 4; i++) {
@@ -147,8 +153,10 @@ class GPTModel {
   }
 
   String returnBestAlliance() {
+    int bestIndex1 = 0;
+    int bestScore1 = 0;
 
-    int i = event.rankedTeams.length - 1;
+    int i = 0;
     for (int m = 0; m < event.rankedTeams.length; m++) {
       if (event.rankedTeams[m].number == event.userTeam.number) {
         i = m;
@@ -156,17 +164,25 @@ class GPTModel {
       }
     }
 
-    int index = event.rankedTeams.length - 1;
     for (int k = i + 1; k < event.rankedTeams.length; k++) {
-      if (event.rankedTeams[k].getAllianceScore(event) > event.rankedTeams[index].getAllianceScore(event)) {
-        if (!searchInAlliances(event.rankedTeams[k])) {
-          index = k;
-        }
+      int allianceScore = event.rankedTeams[k].getAllianceScore(event);
+
+
+      if (allianceScore > bestScore1) {
+        bestIndex1 = k;
+        bestScore1 = allianceScore;
       }
     }
 
-    return "Select ${event.rankedTeams[index].name} to be your alliance partner!";
+
+
+    String result = '';
+    result += 'Select ${event.rankedTeams[bestIndex1].number} ${event.rankedTeams[bestIndex1].name} to be your alliance partner!\n';
+
+    return result;
   }
+
+
 
   String acceptOrDecline(Team selectorTeam) {
 
@@ -190,7 +206,7 @@ class GPTModel {
         "However, take into account the inspire chances of $num $name before declining a potential offer.";
     String mustAccept = "Try to alliance with $num $name to guarantee a chance of appearing in elimination rounds!";
     String shouldAccept = "You have a great chance to advance working with $num $name!";
-    String youAreBetter = "You may have a better chance to qualify in another alliance!";
+    String youAreBetter = "You may have a better chance to qualify in another alliance rather than working with $num $name!";
 
     if (i == 1) { // has to be first
 
