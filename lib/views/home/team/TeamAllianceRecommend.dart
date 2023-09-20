@@ -58,20 +58,23 @@ class _TeamAllianceRecommendState extends State<TeamAllianceRecommend> {
       ),
       body: SingleChildScrollView(
         child: Column(
+
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            SizedBox(height: 20),
             ListTile(
               title: Text('Game Period',
                   style: TextStyle(
-                      fontSize: 22,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: Colors.black)),
               trailing: Text('Rank',
                   style: TextStyle(
-                      fontSize: 22,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: Colors.black)),
             ),
+            SizedBox(height: 10),
             _buildScoreRow('Autonomous', widget.ranks[0]),
             _buildDivider(),
             _buildScoreRow('Teleop', widget.ranks[1]),
@@ -79,11 +82,11 @@ class _TeamAllianceRecommendState extends State<TeamAllianceRecommend> {
             _buildScoreRow('Endgame', widget.ranks[2]),
             _buildDivider(),
             SizedBox(height: 20),
-            _buildExpandableGames(categories),
+           // _buildExpandableGames(categories),
             SizedBox(height: 20),
             _buildDivisionRank(),
             SizedBox(height: 20),
-            _buildExplanation(widget.team)
+           // _buildExplanation(widget.team)
           ],
         ),
       ),
@@ -118,11 +121,12 @@ class _TeamAllianceRecommendState extends State<TeamAllianceRecommend> {
   }
 
   Widget _buildDivider() {
+
     return Divider(
       color: Colors.grey[300],
-      height: 0.5,
-      indent: 16,
-      endIndent: 16,
+      height: 30,
+      indent: 30,
+      endIndent: 30,
     );
   }
 

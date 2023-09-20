@@ -278,7 +278,7 @@ class _TeamViewState extends State<TeamView> {
                       if (widget.isSoleWindow)
                         Container(
                           width: MediaQuery.of(context).size.width/3,
-                          child: PlatformButton(
+                          child: MaterialButton(
                             onPressed: () async {
                               await Navigator.push(
                                 context,
@@ -303,7 +303,7 @@ class _TeamViewState extends State<TeamView> {
                       if (widget.isSoleWindow)
                         Container(
                           width: MediaQuery.of(context).size.width / 3,
-                          child: PlatformButton(
+                          child: MaterialButton(
                             onPressed: () async {
                               if (_team.targetScore == null) {
                                 _team.targetScore = Score(

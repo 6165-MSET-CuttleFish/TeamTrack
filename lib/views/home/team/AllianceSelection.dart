@@ -193,8 +193,8 @@ class _AllianceSelection extends State<AllianceSelection> {
       ),
       body: Column(
         children: [
-          SizedBox(height: 30),
-          ElevatedButton(
+          //SizedBox(height: 30),
+          /*ElevatedButton(
             onPressed: () {
               Navigator.push(
                 context,
@@ -224,7 +224,9 @@ class _AllianceSelection extends State<AllianceSelection> {
               ),
             ),
           ),
-          SizedBox(height: 30),
+
+           */
+
           Padding(
             padding: const EdgeInsets.only(bottom: 8.0),
             child: TeamRowAlliance(

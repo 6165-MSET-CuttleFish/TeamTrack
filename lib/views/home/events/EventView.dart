@@ -39,13 +39,122 @@ class _EventView extends State<EventView> {
   bool ascending = false;
 
   List<Widget> materialTabs() => [
-        TeamList(
-          event: widget.event,
-          sortMode: sortingModifier,
-          statConfig: widget.event.statConfig,
-          elementSort: elementSort,
-          statistic: statistics,
-        ),
+
+       Scaffold(
+         body: TeamList(
+           event: widget.event,
+           sortMode: sortingModifier,
+           statConfig: widget.event.statConfig,
+           elementSort: elementSort,
+           statistic: statistics,
+         ),
+         floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+         floatingActionButton: FloatingActionButton(
+             child:
+               Text(
+                 'Alliance Selection',
+                style: Theme.of(context).textTheme.titleSmall?.apply(color: Colors.white),
+                 textAlign: TextAlign.center,
+                 textScaleFactor: .7,
+               ),
+
+           onPressed: () {
+             if (widget.event.userTeam.number != "0") {
+               Navigator.push(
+                 context,
+                 MaterialPageRoute(
+                   builder: (context) => AllianceSelection(
+                     event: widget.event,
+                     sortMode: sortingModifier,
+                     statConfig: widget.event.statConfig,
+                     elementSort: elementSort,
+                     statistic: statistics,
+                   ),
+                 ),
+               );
+             } else {
+               showDialog(
+                 context: context,
+                 builder: (BuildContext context) {
+                   return StatefulBuilder(
+                     builder: (BuildContext context, StateSetter setState) {
+                       return AlertDialog(
+                         title: Text('Enter Team Number'),
+                         content: Column(
+                           mainAxisSize: MainAxisSize.min,
+                           children: [
+                             TextField(
+                               onChanged: (value) {
+                                 widget.event.updateUserTeam(new Team(value, value));
+                                 setState(() {});
+                               },
+                             ),
+                             ...widget.event.teams.entries.where(
+                                   (entry) => entry.value.number == widget.event.userTeam.number,
+                             ).map(
+                                   (entry) => ListTile(
+                                 title: Text(entry.value.name),
+                                 onTap: () {
+                                   widget.event.updateUserTeam(entry.value);
+                                 },
+                               ),
+                             ),
+                           ],
+                         ),
+                         actions: [
+                           TextButton(
+                             child: Text('Submit'),
+                             onPressed: () {
+                               if (widget.event.teams.containsKey(widget.event.userTeam.number)) {
+                                 if (widget.event.userTeam.number != "0") {
+                                   Navigator.pop(context);
+                                   Navigator.push(
+                                     context,
+                                     MaterialPageRoute(
+                                       builder: (context) => AllianceSelection(
+                                         event: widget.event,
+                                         sortMode: sortingModifier,
+                                         statConfig: widget.event.statConfig,
+                                         elementSort: elementSort,
+                                         statistic: statistics,
+                                       ),
+                                     ),
+                                   );
+                                 } else {
+                                   showDialog(
+                                     context: context,
+                                     builder: (BuildContext context) {
+                                       return AlertDialog(
+                                         title: Text('Team Does Not Exist'),
+                                         content: Text('The provided team number does not exist.'),
+                                         actions: <Widget>[
+                                           TextButton(
+                                             child: Text('OK'),
+                                             onPressed: () {
+                                               Navigator.of(context).pop();
+                                             },
+                                           ),
+                                         ],
+                                       );
+                                     },
+                                   );
+                                 }
+                               }
+                               setState(() {
+                                 _newName = '';
+                               });
+                             },
+                           ),
+                         ],
+                       );
+                     },
+                   );
+                 },
+               );
+             }
+           },
+         ),
+       ),
         MatchList(
           event: widget.event,
           ascending: ascending,
@@ -86,105 +195,7 @@ class _EventView extends State<EventView> {
                       ),
                     ),
                   )),
-            IconButton(
-              icon: Icon(Icons.people), // Change the icon to Icons.people (or choose an appropriate icon)
-              tooltip: 'Alliance Selection', // Change the tooltip to indicate the action
-              onPressed: () {
-                if (widget.event.userTeam.number != "0") {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => AllianceSelection(
-                        event: widget.event,
-                        sortMode: sortingModifier,
-                        statConfig: widget.event.statConfig,
-                        elementSort: elementSort,
-                        statistic: statistics,
-                      ),
-                    ),
-                  );
-                } else {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return StatefulBuilder(
-                        builder: (BuildContext context, StateSetter setState) {
-                          return AlertDialog(
-                            title: Text('Enter Team Number'),
-                            content: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                TextField(
-                                  onChanged: (value) {
-                                    widget.event.updateUserTeam(new Team(value, value));
-                                    setState(() {});
-                                  },
-                                ),
-                                ...widget.event.teams.entries.where(
-                                      (entry) => entry.value.number == widget.event.userTeam.number,
-                                ).map(
-                                      (entry) => ListTile(
-                                    title: Text(entry.value.name),
-                                    onTap: () {
-                                      widget.event.updateUserTeam(entry.value);
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                            actions: [
-                              TextButton(
-                                child: Text('Submit'),
-                                onPressed: () {
-                                  if (widget.event.teams.containsKey(widget.event.userTeam.number)) {
-                                    if (widget.event.userTeam.number != "0") {
-                                      Navigator.pop(context);
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => AllianceSelection(
-                                            event: widget.event,
-                                            sortMode: sortingModifier,
-                                            statConfig: widget.event.statConfig,
-                                            elementSort: elementSort,
-                                            statistic: statistics,
-                                          ),
-                                        ),
-                                      );
-                                    } else {
-                                      showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return AlertDialog(
-                                            title: Text('Team Does Not Exist'),
-                                            content: Text('The provided team number does not exist.'),
-                                            actions: <Widget>[
-                                              TextButton(
-                                                child: Text('OK'),
-                                                onPressed: () {
-                                                  Navigator.of(context).pop();
-                                                },
-                                              ),
-                                            ],
-                                          );
-                                        },
-                                      );
-                                    }
-                                  }
-                                  setState(() {
-                                    _newName = '';
-                                  });
-                                },
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    },
-                  );
-                }
-              },
-            ),
+
 
             IconButton(
               icon: Icon(widget.event.shared ? Icons.share : Icons.upload),
@@ -463,6 +474,7 @@ color: Colors.white
                 ],
               )
             : null,
+
         body: materialTabs()[_tab],
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: widget.event.role != Role.viewer
