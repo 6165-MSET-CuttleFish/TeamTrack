@@ -196,6 +196,7 @@ class _AllianceSimulatorState extends State<AllianceSimulator> {
       });
       if (widget.event.currentPartner == 1) {
         widget.event.addAllianceTeam(widget.event.rankedTeams[0], widget.event.currentTurn, 0);
+
       }
       if (widget.event.currentTurn == 4) {
         widget.event.setCurrentPartner(widget.event.currentPartner + 1);
@@ -279,7 +280,13 @@ class _AllianceSimulatorState extends State<AllianceSimulator> {
                       ),
                       IconButton(
                         icon: Icon(Icons.add),
-                        onPressed: _addToAlliance,
+                        onPressed: () {
+                          setState(() {
+                            searchController.text = ''; // Reset text to an empty string
+                          });
+                          _addToAlliance(); // Add your _addToAlliance function here
+                          widget.event.checkDontShow(widget.event.userTeam);
+                        },
                       ),
                     ],
                   ),

@@ -54,8 +54,8 @@ class _AllianceSelection extends State<AllianceSelection> {
           child: Text('Score'),
         ),
         PopupMenuItem(
-          value: 'Wins',
-          child: Text('Wins'),
+          value: 'Rank',
+          child: Text('Rank'),
         ),
       ],
     ).then((selectedSort) {
@@ -83,11 +83,7 @@ class _AllianceSelection extends State<AllianceSelection> {
     final teleOpTeams = List.from(teams);
     final endgameTeams = List.from(teams);
 
-    for (List<Team> teams in widget.event.alliances) {
-      for (Team team in teams) {
-        print (team.name);
-      }
-    }
+
 
     if (_sortBy == 'Wins') {
       teams.sort((a, b) {
@@ -210,7 +206,7 @@ class _AllianceSelection extends State<AllianceSelection> {
               );
             },
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(18.0),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [

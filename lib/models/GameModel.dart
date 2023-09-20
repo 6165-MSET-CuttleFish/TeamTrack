@@ -58,7 +58,7 @@ class Event {
   StatConfig statConfig = StatConfig();
 
   TeamTrackUser? author;
-  bool d = false;
+  bool hide = false;
   String gameName = Statics.gameName;
   Role role =
       Role.editor; // the permissions enabled for the current user in this event
@@ -125,11 +125,25 @@ class Event {
   void dontShow() async {
     print ("lalalalalalalalalalalaalalalalal");
     await getRef()
-        ?.child('d/$d')
-        .update({"d": d});
+        ?.child('hide/$hide')
+        .update({"hide": hide});
 
-    d = true;
+    hide = true;
     dataModel.saveEvents();
+
+  }
+  void checkDontShow(Team team) {
+
+    if (currentPartner == 2) {
+
+      if (team.number == alliances[currentTurn - 1][0].number) {
+        print (hide);
+
+        print ("");
+        print (alliances[currentTurn][0].number);
+        dontShow();
+      }
+    }
 
   }
 
