@@ -86,7 +86,11 @@ class _TeamAllianceRecommendState extends State<TeamAllianceRecommend> {
             SizedBox(height: 20),
             _buildDivisionRank(),
             SizedBox(height: 20),
+
            // _buildExplanation(widget.team)
+
+            //_buildExplanation(widget.team)
+
           ],
         ),
       ),
@@ -94,14 +98,18 @@ class _TeamAllianceRecommendState extends State<TeamAllianceRecommend> {
   }
 
   Widget _buildScoreRow(String label, int rank) {
+
+    double rankPercentage = (rank / widget.event.teams.length) * 100;
+
     Color color;
-    if ((rank / widget.event.teams.length) < (1 / 2.999)) {
+    if (rankPercentage <= 20 || rank == 1) {
       color = Colors.green;
-    } else if (rank / widget.event.teams.length < (2 / 2.999)) {
+    } else if (rankPercentage <= 50) {
       color = Colors.yellow.shade700;
     } else {
       color = Colors.red;
     }
+
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
