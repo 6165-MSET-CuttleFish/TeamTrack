@@ -30,8 +30,8 @@ class AutonPainter extends StatefulWidget {
 }
 final GlobalKey _key = GlobalKey();
 double magicOffset=0.0;
-double xLow=85.0, xHigh=xLow+245.0;
-double yLow=5.0, yHigh=245.0;
+double xLow=85.0, xHigh=xLow+300.0;
+double yLow=0.0, yHigh=300.0;
 double kCanvasSize = 800.0;
 String _eKey="";
 String scope="None";
@@ -138,13 +138,13 @@ class _AutonPainterState extends State<AutonPainter> {
                 child:Column(
                     children: <Widget>[
                       Container(
-                        height: 250,
+                        height: 350,
                         child: Stack(children: <Widget>[
                           Align(
-                            alignment: Alignment.bottomCenter,
+                            alignment: Alignment.center,
                             child: Image.asset(
                               "assets/images/field.jpg",
-                              height: 250,
+                              height: 350,
                             ),
                           ),
                           GestureDetector(

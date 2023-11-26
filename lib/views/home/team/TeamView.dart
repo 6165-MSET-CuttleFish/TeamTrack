@@ -13,6 +13,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:teamtrack/components/statistics/CheckList.dart';
+import 'package:teamtrack/views/home/team/AutonDrawer.dart';
 import 'package:uuid/uuid.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'dart:convert';
@@ -277,7 +278,7 @@ class _TeamViewState extends State<TeamView> {
 
                       if (widget.isSoleWindow)
                         Container(
-                          width: MediaQuery.of(context).size.width/3,
+                          width: MediaQuery.of(context).size.width/4,
                           child: MaterialButton(
                             onPressed: () async {
                               await Navigator.push(
@@ -297,12 +298,9 @@ class _TeamViewState extends State<TeamView> {
                                 style:Theme.of(context).textTheme.titleSmall),
                           ),
                         ),
-                      Padding(
-                        padding: EdgeInsets.all(5),
-                      ),
                       if (widget.isSoleWindow)
                         Container(
-                          width: MediaQuery.of(context).size.width / 3,
+                          width: MediaQuery.of(context).size.width / 4,
                           child: MaterialButton(
                             onPressed: () async {
                               if (_team.targetScore == null) {
@@ -340,6 +338,28 @@ class _TeamViewState extends State<TeamView> {
                                 style:Theme.of(context).textTheme.titleSmall),
                           ),
                         ),
+
+                          if (widget.isSoleWindow)
+                            Container(
+                              width: MediaQuery.of(context).size.width / 4,
+                              child: MaterialButton(
+                                onPressed: () async {
+                                  await Navigator.push(
+                                    context,
+                                    platformPageRoute(
+                                      builder: (context) => AutonDrawer(
+                                        event: widget.event,
+                                        team: _team,
+                                      ),
+                                    ),
+                                  );
+                                  setState(() {});
+                                },
+                                color: Colors.pinkAccent,
+                                child: Text('Auton',
+                                    style:Theme.of(context).textTheme.titleSmall),
+                              ),
+                            ),
                       ],
                       ),
                       for (final opModeType in opModeExt.getAll())
@@ -368,60 +388,6 @@ class _TeamViewState extends State<TeamView> {
                     ],
                   ),
                 ),
-                Container(
-                  height: 300,
-                  child: painter,
-                ),
-                Container(
-                    width: 300,
-                    child: Column(
-                    children:[
-                    Container(
-                    //Put in the gallery stuff
-                    child: FutureBuilder(
-                    future: FirebaseStorage.instance.ref().child('${_event.id} - ${_team.number} - ${dropdownScope}.png').getDownloadURL(),
-                builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done &&
-                      snapshot.hasData) {
-                    return Container(
-                      height: 390,
-                      child: Image.network(snapshot.data!, fit: BoxFit.cover,),
-                    );
-                  }
-                  if (snapshot.connectionState == ConnectionState.waiting ||
-                      !snapshot.hasData) {
-                    return Container(
-                      height: 0,
-                    );
-                  }
-                  return Container(
-                    height: 0,
-                  );
-                },
-                  )
-                  )
-                  ]
-                  )),
-            Container(
-              child: Row(
-                  children: <Widget>[
-              const Spacer(flex: 1),
-             DropdownButton(
-                value: dropdownScope,
-                items: scopeMarks.map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                onChanged: (String? value) {
-                    // This is called when the user selects an item.
-                    setState(() {
-                      dropdownScope = value!;
-                    });
-                }),
-                const Spacer(flex: 1),
-                ]))
               ],
             );
           },
