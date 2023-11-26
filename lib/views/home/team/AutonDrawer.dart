@@ -146,11 +146,11 @@ class _AutonDrawerState extends State<AutonDrawer> {
             return ListView(
               children: [
                 Container(
-                  height: 400,
+                  height: 300,
                   child: painter,
                 ),
                 Container(
-                    width: 350,
+                    width: 300,
                     child: Column(
                     children:[
                     Container(
@@ -161,7 +161,7 @@ class _AutonDrawerState extends State<AutonDrawer> {
                   if (snapshot.connectionState == ConnectionState.done &&
                       snapshot.hasData) {
                     return Container(
-                      height: 440,
+                      height: 300,
                       child: Image.network(snapshot.data!, fit: BoxFit.cover,),
                     );
                   }
