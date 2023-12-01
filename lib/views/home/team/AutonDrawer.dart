@@ -41,8 +41,8 @@ class AutonDrawer extends StatefulWidget {
 var scopeMarks = <String>["Path Side","Both_Side", "Red_Side", "Blue_Side"];
 String dropdownScope=scopeMarks.first;
 String infoBubble=
-    '\nThis feature allows your team to share the autonomous paths for different '
-    'teams. All of this data is public only to members on your event.\n';
+    'This feature allows your team to share the autonomous paths for different '
+    'teams. All of this data is public only to members on your event.';
 
 class _AutonDrawerState extends State<AutonDrawer> {
   _AutonDrawerState(this._team, this._event);
@@ -148,19 +148,21 @@ class _AutonDrawerState extends State<AutonDrawer> {
             _team = widget.team;
             return ListView(
               children: [
+                Padding(padding: EdgeInsets.all(10.0),
+                  child: Column(
+                    children: <Widget>[
                 SizedBox(
                   width: double.infinity,
                   child: Center(
                     child: Text('Autonomous Drawing Tool', style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
                   ),
                 ),Container(
-                    margin: const EdgeInsets.all(10.0),
                     child: Row(
                       children: <Widget>[
                         Icon(Icons.info),
                         Spacer(flex:1),
                         SizedBox(
-                          width: 380,
+                          width: 350,
                           child: Center(
                             child: Text(infoBubble),
                           ),
@@ -227,7 +229,8 @@ class _AutonDrawerState extends State<AutonDrawer> {
                     });
                 }),
                 const Spacer(flex: 1),
-                ]))
+                ]))]
+                  ),)
                 ],
             );
           },
