@@ -38,8 +38,11 @@ class AutonDrawer extends StatefulWidget {
   State<AutonDrawer> createState() => _AutonDrawerState(team,event);
 }
 
-var scopeMarks = <String>["","Both_Side", "Red_Side", "Blue_Side"];
+var scopeMarks = <String>["Path Side","Both_Side", "Red_Side", "Blue_Side"];
 String dropdownScope=scopeMarks.first;
+String infoBubble=
+    '\nThis feature allows your team to share the autonomous paths for different '
+    'teams. All of this data is public only to members on your event.\n';
 
 class _AutonDrawerState extends State<AutonDrawer> {
   _AutonDrawerState(this._team, this._event);
@@ -145,9 +148,35 @@ class _AutonDrawerState extends State<AutonDrawer> {
             _team = widget.team;
             return ListView(
               children: [
-                Container(
+                SizedBox(
+                  width: double.infinity,
+                  child: Center(
+                    child: Text('Autonomous Drawing Tool', style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
+                  ),
+                ),Container(
+                    margin: const EdgeInsets.all(10.0),
+                    child: Row(
+                      children: <Widget>[
+                        Icon(Icons.info),
+                        Spacer(flex:1),
+                        SizedBox(
+                          width: 380,
+                          child: Center(
+                            child: Text(infoBubble),
+                          ),
+                        )]
+                      )
+            ),
+
+            Container(
                   height: 300,
                   child: painter,
+                ),
+                SizedBox(
+                  width: double.infinity,
+                  child: Center(
+                    child: Text('Previous Paths', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  ),
                 ),
                 Container(
                     width: 300,
@@ -161,7 +190,7 @@ class _AutonDrawerState extends State<AutonDrawer> {
                   if (snapshot.connectionState == ConnectionState.done &&
                       snapshot.hasData) {
                     return Container(
-                      height: 300,
+                      height: 250,
                       child: Image.network(snapshot.data!, fit: BoxFit.cover,),
                     );
                   }
@@ -179,7 +208,7 @@ class _AutonDrawerState extends State<AutonDrawer> {
                   )
                   ]
                   )),
-            Container(
+                Container(
               child: Row(
                   children: <Widget>[
               const Spacer(flex: 1),
@@ -199,7 +228,7 @@ class _AutonDrawerState extends State<AutonDrawer> {
                 }),
                 const Spacer(flex: 1),
                 ]))
-              ],
+                ],
             );
           },
         ),
