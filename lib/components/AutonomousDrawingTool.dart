@@ -30,14 +30,14 @@ class AutonPainter extends StatefulWidget {
 }
 final GlobalKey _key = GlobalKey();
 double magicOffset=0.0;
-double xLow=85.0, xHigh=xLow+245.0;
-double yLow=5.0, yHigh=245.0;
+double xLow=90.0, xHigh=xLow+225.0;
+double yLow=25.0, yHigh=245.0;
 double kCanvasSize = 800.0;
 String _eKey="";
 String scope="None";
 double pointsLeft=0;
 double pointsRight=0;
-var accuracyMarks = <String>[" ","< 25%", "26-50%", "51-75%", ">75%"];
+var accuracyMarks = <String>["Accuracy","< 25%", "26-50%", "51-75%", ">75%"];
 String dropdownValue=accuracyMarks.first;
 var  _offsets = <Offset>[];
 String pictureInfo="";
@@ -141,7 +141,7 @@ class _AutonPainterState extends State<AutonPainter> {
                         height: 250,
                         child: Stack(children: <Widget>[
                           Align(
-                            alignment: Alignment.bottomCenter,
+                            alignment: Alignment.center,
                             child: Image.asset(
                               "assets/images/field.jpg",
                               height: 250,
@@ -184,30 +184,32 @@ class _AutonPainterState extends State<AutonPainter> {
                           children: <Widget>[
                             IconButton(
                                 onPressed: savePath,
-                                icon: const Icon(Icons.cloud)
+                                icon: Icon(Icons.cloud),
                             ),
-                            const Spacer(flex: 1),
+                            Text('Save Path '),
+                            Spacer(flex:1),
                             DropdownButton(
-                                value: dropdownValue,
-                                items: accuracyMarks.map<DropdownMenuItem<String>>((String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(value),
-                                  );
-                                }).toList(),
-                                onChanged: (String? value) {
-                                  // This is called when the user selects an item.
-                                  setState(() {
-                                    dropdownValue = value!;
-                                  });
-                                }),
-                            const Spacer(flex: 1),
+                              value: dropdownValue,
+                              items: accuracyMarks.map<DropdownMenuItem<String>>((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value),
+                              );
+                            }).toList(),
+                            onChanged: (String? value) {
+                            // This is called when the user selects an item.
+                              setState(() {
+                                dropdownValue = value!;
+                              });
+                            }),
+
+                            Spacer(flex:1),
                             IconButton(
-                              onPressed: clearPath,
-                              icon: const Icon(Icons.clear_sharp),
+                                onPressed: clearPath,
+                                icon:Icon(Icons.clear),
                             ),
-                          ],
-                        ),
+                            Text('Clear Path '),
+                        ])
                       ),
                     ]
                 )
