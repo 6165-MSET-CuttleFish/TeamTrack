@@ -41,8 +41,9 @@ class AutonDrawer extends StatefulWidget {
 var scopeMarks = <String>["Path Side","Both_Side", "Red_Side", "Blue_Side"];
 String dropdownScope=scopeMarks.first;
 String infoBubble=
-    'This feature allows your team to share the autonomous paths for different '
-    'teams. All of this data is public only to members on your event.';
+    '\nOur autonomous drawing feature is an integrated mark-up tool that allows you to '
+    'track the autonomous paths of other teams, privately, with teammates you '
+    'are collaborating with.\n';
 
 class _AutonDrawerState extends State<AutonDrawer> {
   _AutonDrawerState(this._team, this._event);
@@ -192,7 +193,7 @@ class _AutonDrawerState extends State<AutonDrawer> {
                   if (snapshot.connectionState == ConnectionState.done &&
                       snapshot.hasData) {
                     return Container(
-                      height: 250,
+                      height: 300,
                       child: Image.network(snapshot.data!, fit: BoxFit.cover,),
                     );
                   }
