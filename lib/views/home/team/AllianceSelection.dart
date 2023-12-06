@@ -1,7 +1,11 @@
-import 'dart:ffi';
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:teamtrack/api/APIKEYS.dart';
 import 'package:teamtrack/functions/Statistics.dart';
 import 'package:teamtrack/models/GPTModel.dart';
+import 'package:http/http.dart' as http;
+import '../../../functions/ResponseModel.dart';
 import '../../../models/GameModel.dart';
 import '../../../models/ScoreModel.dart';
 import '../../../models/StatConfig.dart';
@@ -32,10 +36,151 @@ class _AllianceSelection extends State<AllianceSelection> {
   int recommendedIndex = 0;
   String _sortBy = 'Score';
 
+  String returnResponse = "Initial response";
+  String prompt = "No Data";
+  late ResponseModel _responseModel;
+
+  Future<void> _showPromptDialog(BuildContext context, String prompt) async {
+    final GlobalKey<State> key = GlobalKey<State>();
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          key: key,
+          title: Text('AI Recommendation'),
+          content: FutureBuilder<void>(
+            future: completionFunc(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Text('Loading...');
+              } else if (snapshot.hasError) {
+                return Text('Error fetching response');
+              } else {
+                return Text(returnResponse);
+              }
+            },
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+    // Close the dialog when the operation is complete
+    Navigator.of(key.currentContext!, rootNavigator: true).pop();
+  }
+
+
+  completionFunc() async {
+    if (returnResponse == 'Loading...') {
+      setState(() => returnResponse = 'Loading...');
+    }
+    final response = await http.post(
+      Uri.parse(APIKEYS.GPT_URL),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${APIKEYS.GPT_KEY}',
+      },
+      body: jsonEncode(
+        {
+          "model": "text-davinci-003",
+          "prompt": prompt,
+          "max_tokens": 150,
+          "temperature": 0.7,
+          "top_p": 0.7,
+        },
+      ),
+    );
+
+    setState(() {
+      _responseModel = ResponseModel.fromJson(response.body);
+      returnResponse = _responseModel.choices[0]['text'];
+    });
+  }
+
+
   void updateRecommended(int index) {
     setState(() {
       recommendedIndex = index;
     });
+  }
+
+  void _generatePromptForTeam(Team selectedTeam, List<dynamic> autonomousTeams, List<dynamic> teleOpTeams, List<dynamic> endgameTeams, List<Team> teams) {
+    final indexAuto = autonomousTeams.indexOf(selectedTeam) + 1;
+    final indexTele = teleOpTeams.indexOf(selectedTeam) + 1;
+    final indexEndgame = endgameTeams.indexOf(selectedTeam) + 1;
+    final index = teams.indexOf(selectedTeam) + 1;
+
+    prompt = craftPrompt(
+        teams.length, index, indexAuto, indexTele, indexEndgame, selectedTeam);
+    print(returnResponse);
+
+  }
+
+
+  static String craftPrompt(int teamLength, int index, int indexAuto, int indexTele, int indexEndgame, Team displayTeam) {
+    String prompt = "";
+    String rankTone = "";
+    String indexTone = "";
+    String collaborative = "";
+
+    if (indexAuto <= teamLength / 3) {
+      rankTone += "{high ranking autonomous(Rank$indexAuto),";
+    } else if (indexAuto <= teamLength * 2 / 3) {
+      rankTone += "{neutral ranking autonomous(Rank$indexAuto),";
+    } else {
+      rankTone += "low ranking autonomous(Rank$indexAuto)}";
+    }
+
+    if (indexTele <= teamLength / 3) {
+      rankTone += "{high ranking teleOp(Rank$indexTele),";
+    } else if (indexTele <= teamLength * 2 / 3) {
+      rankTone += "{neutral ranking teleOp(Rank$indexTele),";
+    } else {
+      rankTone += "low ranking teleOp(Rank$indexTele)}";
+    }
+
+    if (indexEndgame <= teamLength / 3) {
+      rankTone += "{high ranking endgame(Rank$indexEndgame),";
+    } else if (indexEndgame <= teamLength * 2 / 3) {
+      rankTone += "{neutral ranking endgame(Rank$indexEndgame),";
+    } else {
+      rankTone += "low ranking endgame(Rank$indexEndgame)}";
+    }
+
+    if (index <= teamLength / 6) {
+      indexTone = "highly recommended";
+      collaborative = "great collaborative";
+    } else if (index <= teamLength * 2 / 6) {
+      indexTone = "recommended";
+      collaborative = "good collaborative";
+    } else if (index <= teamLength * 3 / 6) {
+      indexTone = "moderately recommended";
+      collaborative = "average collaborative";
+    } else if (index <= teamLength * 4 / 6) {
+      indexTone = "cautiously recommended";
+      collaborative = "mediocre collaborative";
+    } else if (index <= teamLength * 5 / 6) {
+      indexTone = "not strongly recommended";
+      collaborative = "low collaborative";
+    } else {
+      indexTone = "not recommended";
+      collaborative = "low collaborative";
+    }
+
+    String GPTRecoTeam = "{${displayTeam.number} ${displayTeam.name}}";
+    String startInstruct = "Provide a concise evaluation of $GPTRecoTeam for alliance selection. Considered $indexTone for alliance collaboration due to their performance in autonomous, teleOp, and endgame. Specifically,";
+    String justifyRanks = "their rankings are $rankTone, reflecting a $collaborative approach.";
+
+    prompt = startInstruct + justifyRanks;
+    return prompt;
   }
 
   Future<void> _showSortOptions(BuildContext context) async {
@@ -82,8 +227,6 @@ class _AllianceSelection extends State<AllianceSelection> {
     final autonomousTeams = List.from(teams);
     final teleOpTeams = List.from(teams);
     final endgameTeams = List.from(teams);
-
-
 
     if (_sortBy == 'Wins') {
       teams.sort((a, b) {
@@ -156,7 +299,28 @@ class _AllianceSelection extends State<AllianceSelection> {
       }
     });
 
+    Team displayTeam;
     teams[0].isRecommended = true;
+
+    if (teams.length >= 2) {
+      if (teams[0].number == widget.event.userTeam.number) {
+        displayTeam = teams[1];
+      } else {
+        displayTeam = teams[0];
+      }
+    } else {
+      displayTeam = teams[0];
+      prompt = "Repeat: Please Add More Data";
+    }
+
+    final indexAuto = autonomousTeams.indexOf(displayTeam) + 1;
+    final indexTele = teleOpTeams.indexOf(displayTeam) + 1;
+    final indexEndgame = endgameTeams.indexOf(displayTeam) + 1;
+    final index = teams.indexOf(displayTeam) + 1;
+
+    if (teams.length >= 2) {
+      prompt = craftPrompt(teams.length, index, indexAuto, indexTele, indexEndgame, displayTeam);
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -165,7 +329,7 @@ class _AllianceSelection extends State<AllianceSelection> {
           children: [
             SizedBox(width: 30),
             Text('Alliance Selection'),
-            SizedBox(width: 10)
+            SizedBox(width: 10),
           ],
         ),
         actions: [
@@ -189,40 +353,6 @@ class _AllianceSelection extends State<AllianceSelection> {
       ),
       body: Column(
         children: [
-          //SizedBox(height: 30),
-          /*ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => AllianceSimulator(
-                      event: widget.event,
-                      sortMode: widget.sortMode,
-                      elementSort: widget.elementSort,
-                      statConfig: widget.statConfig,
-                      statistic: widget.statistic
-                  ),
-                ),
-              );
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(18.0),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.play_arrow, color: Colors.white),
-                  SizedBox(width: 8),
-                  Text(
-                    "Simulate Alliance Selection",
-                    style: TextStyle(fontSize: 20, fontStyle: FontStyle.italic, color: Colors.white),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-           */
-
           Padding(
             padding: const EdgeInsets.only(bottom: 8.0),
             child: TeamRowAlliance(
@@ -233,6 +363,7 @@ class _AllianceSelection extends State<AllianceSelection> {
           ),
           Expanded(
             child: ListView.builder(
+              physics: AlwaysScrollableScrollPhysics(),
               itemCount: teams.length,
               itemBuilder: (context, index) {
                 Team team = teams[index];
@@ -263,20 +394,8 @@ class _AllianceSelection extends State<AllianceSelection> {
                   ),
                   child: InkWell(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => TeamAllianceRecommend(
-                              team: team,
-                              ranks: parsedList,
-                              elementSort: widget.elementSort,
-                              event: widget.event,
-                              sortMode: widget.sortMode,
-                              statConfig: widget.statConfig,
-                              statistic: widget.statistic
-                          ),
-                        ),
-                      );
+                      _generatePromptForTeam(team, autonomousTeams, teleOpTeams, endgameTeams, teams);
+                      _showPromptDialog(context, returnResponse);
                     },
                     child: ListTile(
                       title: Text(
@@ -313,12 +432,14 @@ class _AllianceSelection extends State<AllianceSelection> {
               },
             ),
           ),
-
         ],
       ),
     );
   }
+
 }
+
+
 
 Color wltColor(int i) {
   if (i == 0) {

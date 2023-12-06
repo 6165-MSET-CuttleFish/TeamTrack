@@ -3,14 +3,16 @@ import 'package:teamtrack/functions/Statistics.dart';
 import 'package:teamtrack/models/GameModel.dart';
 import 'package:teamtrack/models/ScoreModel.dart';
 import 'package:teamtrack/functions/Extensions.dart';
+import 'package:teamtrack/functions/GPT.dart';
 
 class TeamRowAlliance extends StatelessWidget {
+
   TeamRowAlliance(
       {
         super.key,
         this.sortMode,
         this.elementSort,
-        required this.statistics
+        required this.statistics,
       });
   final Team team = Team('Team #', 'Team Name');
   final OpModeType? sortMode;
