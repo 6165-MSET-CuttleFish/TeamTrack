@@ -32,7 +32,7 @@ class ScoreTimeline extends StatelessWidget {
           ),
           child: Padding(
             padding: const EdgeInsets.only(
-                right: 50.0, left: 12.0, top: 24, bottom: 12),
+                right: 50.0, left: 12.0, top:48, bottom: 12),
             child: LineChart(
               LineChartData(
                 gridData: FlGridData(
