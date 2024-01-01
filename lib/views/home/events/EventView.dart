@@ -19,6 +19,7 @@ import 'package:teamtrack/views/home/events/EventShare.dart';
 import 'package:provider/provider.dart';
 import 'package:teamtrack/functions/APIMethods.dart';
 
+import '../../../providers/Theme.dart';
 import '../team/AllianceSelection.dart';
 
 class EventView extends StatefulWidget {
@@ -279,6 +280,7 @@ class _EventView extends State<EventView> {
                           color: Colors.white),
                       iconSize: 24,
                       elevation: 16,
+                      dropdownColor: Theme.of(context).colorScheme.primary,
                       underline: Container(
                         height: 0.5,
                         color: Colors.deepPurple,
@@ -370,6 +372,7 @@ color: Colors.white
                                 ),
                               );
                           },
+                          dropdownColor: Theme.of(context).colorScheme.primary,
                           items: opModeExt
                               .getAll()
                               .map(
