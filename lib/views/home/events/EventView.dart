@@ -20,6 +20,7 @@ import 'package:provider/provider.dart';
 import 'package:teamtrack/functions/APIMethods.dart';
 
 import '../team/AllianceSelection.dart';
+import 'CameraView.dart';
 
 class EventView extends StatefulWidget {
   EventView({
@@ -205,68 +206,16 @@ class _EventView extends State<EventView> {
             if (_tab != 0 && widget.event.hasKey())
 
               IconButton(
-                  icon: Icon(Icons.refresh),
-                  tooltip: 'Reload Matches',
+                  icon: Icon(Icons.photo_camera),
+                  tooltip: 'Import Match Schedule',
                   onPressed: () async {
-                    //print(widget.event.getKey());
-                    await _getMatches();
-                    int p = 1;
-                    //print(bod.toString());
-                    List<Match> bruh = widget.event.getSortedMatches(ascending);
-                    for (var x in bod) {
-                      if (widget.event.matches.length < p) {
-                        setState(() {
-                          widget.event.addMatch(
-                            Match(
-                              Alliance(
-                                widget.event.teams.findAdd(
-                                    x['participants'][0]['team']['team_number']
-                                        .toString(),
-                                    x['participants'][0]['team']
-                                            ['team_name_short']
-                                        .toString(),
-                                    widget.event),
-                                widget.event.teams.findAdd(
-                                    x['participants'][1]['team']['team_number']
-                                        .toString(),
-                                    x['participants'][1]['team']
-                                            ['team_name_short']
-                                        .toString(),
-                                    widget.event),
-                                widget.event.type,
-                                widget.event.gameName,
-                              ),
-                              Alliance(
-                                widget.event.teams.findAdd(
-                                    x['participants'][2]['team']['team_number']
-                                        .toString(),
-                                    x['participants'][2]['team']
-                                            ['team_name_short']
-                                        .toString(),
-                                    widget.event),
-                                widget.event.teams.findAdd(
-                                    x['participants'][3]['team']['team_number']
-                                        .toString(),
-                                    x['participants'][3]['team']
-                                            ['team_name_short']
-                                        .toString(),
-                                    widget.event),
-                                widget.event.type,
-                                widget.event.gameName,
-                              ),
-                              widget.event.type,
-                            ),
-                          );
-                        });
-                        setState(() {});
-                      }
-                      if (widget.event.matches.length > p - 1) {
-                        bruh[widget.event.matches.length - p]
-                            .setAPIScore(x['red_score'], x['blue_score']);
-                      }
-                      p++;
-                    }
-                    dataModel.saveEvents();
+                    Navigator.of(context).push(
+                      platformPageRoute(
+                        builder: (context) => CameraView(
+                          event: widget.event,
+                        ),
+                      ),
+                    );
                   }),
             if (_tab == 0)
               Center(
