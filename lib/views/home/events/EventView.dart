@@ -21,6 +21,7 @@ import 'package:teamtrack/functions/APIMethods.dart';
 
 import '../team/AllianceSelection.dart';
 import 'CameraView.dart';
+import 'ImageView.dart';
 
 class EventView extends StatefulWidget {
   EventView({
@@ -211,7 +212,7 @@ class _EventView extends State<EventView> {
                   onPressed: () async {
                     Navigator.of(context).push(
                       platformPageRoute(
-                        builder: (context) => CameraView(
+                        builder: (context) => ImageView(
                           event: widget.event,
                         ),
                       ),
