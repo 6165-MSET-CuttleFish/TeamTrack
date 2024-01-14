@@ -9,6 +9,7 @@ import 'package:fluttercontactpicker/fluttercontactpicker.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:teamtrack/components/misc/PlatformGraphics.dart';
+import 'package:teamtrack/functions/Statistics.dart';
 import 'package:teamtrack/models/AppModel.dart';
 import 'package:teamtrack/functions/Extensions.dart';
 import 'package:teamtrack/models/GameModel.dart';
@@ -121,7 +122,10 @@ class _ImageViewState extends State<ImageView> {
   }
   Widget build(BuildContext context) => Scaffold(
   appBar: AppBar(
-    title: Text("Import Match Schedule"),
+    title: FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Text("Import Match Schedule")
+    ),
     backgroundColor: Theme.of(context).colorScheme.primary,
     leading:
       IconButton(onPressed: (){Navigator.of(context).pop();}, icon: Icon(Icons.arrow_back)),
@@ -134,7 +138,15 @@ class _ImageViewState extends State<ImageView> {
     ,
     body: imageFile!=null ? Column(
         children:[
-          Image.file(imageFile!),
+          SizedBox(
+
+            height:MediaQuery.of(context).size.height*.8,
+     width: MediaQuery.of(context).size.width,
+     child: FittedBox(
+       fit: BoxFit.fill,
+              child: Center(child:Image.file(imageFile!))
+      )
+          ),
           IconButton(onPressed:() async {
         await Navigator.of(context).push(
       MaterialPageRoute(
@@ -142,12 +154,13 @@ class _ImageViewState extends State<ImageView> {
           // Pass the automatically generated path to
           // the DisplayPictureScreen widget.
           imagePath: imageFile!.path,
+          event: widget.event
         ),
       ),
     );}
     ,icon:
         Icon(Icons.arrow_circle_right_outlined)
-    )]) : Text("Select a photo to begin")
+    )]) : Center(child:Text("Select a photo above to begin"))
 
   );
 }
@@ -156,12 +169,15 @@ List<String> redOne = [];
 List<String> redTwo = [];
 List<String> blueOne = [];
 List<String> blueTwo = [];
-
+var returnedState = "No Response, try again!";
 
 class AnalyzingDataScreen extends StatefulWidget {
   final String imagePath;
-
-  const AnalyzingDataScreen({super.key, required this.imagePath});
+  final Event event;
+  const AnalyzingDataScreen({
+    super.key,
+    required this.imagePath,
+    required this.event});
 
   @override
   State<AnalyzingDataScreen> createState() => _AnalyzingDataState();
@@ -181,23 +197,26 @@ class _AnalyzingDataState extends State<AnalyzingDataScreen>{
       appBar: AppBar(title: const Text('Analyzing Matches')),
       // The image is stored as a file on the device. Use the `Image.file`
       // constructor with the given path to display the image.
-      body: redone!= ""?
-      Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children:[Text(
-        redone,textScaleFactor: 1,
+      body: redOne.isNotEmpty?Center(
+          child:Text(returnedState)):
+      Center(
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+    children:[
+      PlatformProgressIndicator(),
+      SizedBox(
+        height: 20,
       ),
-            Text(
-              redtwo,textScaleFactor: 1,
-            ),Text(
-              blueone,textScaleFactor:1,
-            ),Text(
-              bluetwo,textScaleFactor: 1,
-            ),]):PlatformProgressIndicator()
+      Text("Hold On, We're Processing your Image"),
+              ]
+          )
+      )
     );
   }
   Future<void> _processImage(InputImage inputImage) async {
+
+     returnedState = "No Response, try again!";
     redOne = [];
     redTwo = [];
     blueOne = [];
@@ -206,43 +225,88 @@ class _AnalyzingDataState extends State<AnalyzingDataScreen>{
     recognizedText = await _textRecognizer.processImage(inputImage);
     print(recognizedText.blocks.length);
 int z = 0;
-    for(TextBlock x in recognizedText.blocks){
-      for(TextLine y in x.lines){
-        if(y.text == "Red 1"){
-          z=1;
+    for(TextBlock x in recognizedText.blocks) {
+      for (TextLine y in x.lines) {
+        if (y.text == "Red 1") {
+          z = 1;
         }
-        if(y.text == "Red 2"){
-          z=2;
+        if (y.text == "Red 2") {
+          z = 2;
         }
-        if(y.text == "Blue 1"){
-          z=3;
+        if (y.text == "Blue 1") {
+          z = 3;
         }
-        if(y.text == "Blue 2"){
-          z=4;
+        if (y.text == "Blue 2") {
+          z = 4;
         }
-if(_isNumeric(y.text)) {
-  if (z == 1) {
-    redOne.add(y.text)
-  }
-  if (z == 2) {
-    redtwo = redtwo  + y.text+ "\n";
-  }
+        var text = y.text;
+        print(y.text);
+        if (text.endsWith("*")) {
+          text = text.substring(0, text.length - 2);
+        }
+        if (_isNumeric(text)) {
+          if (z == 1) {
+            redOne.add(text);
+          }
+          if (z == 2) {
+            redTwo.add(text);
+          }
 
-  if (z == 3) {
-    blueone = blueone + y.text + "\n";
-  }
-  if (z == 4) {
-    bluetwo = bluetwo  + y.text+ "\n";
-  }
-
-}
-
+          if (z == 3) {
+            blueOne.add(text);
+          }
+          if (z == 4) {
+            blueTwo.add(text);
+          }
+        }
       }
     }
-    print(redone);
-    print(redtwo);
-    print(blueone);
-    print(bluetwo);
+  if(blueOne.length==redTwo.length&&redOne.length==blueTwo.length&&redTwo.length==blueTwo.length){
+  for (int row = 0; row<blueOne.length;row++) {
+      setState(() {
+        widget.event.addMatch(
+          Match(
+            Alliance(
+              widget.event.teams.findAdd(
+                  redOne[row],
+                  "Number DNE",
+                  widget.event),
+              widget.event.teams.findAdd(
+                  redTwo[row],
+                  "Number DNE",
+                  widget.event),
+              widget.event.type,
+              widget.event.gameName,
+            ),
+            Alliance(
+              widget.event.teams.findAdd(
+                  blueOne[row],
+                  "Number DNE",
+                  widget.event),
+              widget.event.teams.findAdd(
+                  blueTwo[row],
+                  "Number DNE",
+                  widget.event),
+              widget.event.type,
+              widget.event.gameName,
+            ),
+            widget.event.type,
+          ),
+        );
+      });
+    }
+  setState(() {});
+  dataModel.saveEvents();
+  returnedState = "Completed succesfully. Return to Events!";
+  }else{
+    returnedState = "Numbers did not match, try again!";
+  }
+
+
+    print(redOne);
+    print(redTwo);
+    print(blueOne);
+    print(blueTwo);
     setState(() {});
   }
 }
