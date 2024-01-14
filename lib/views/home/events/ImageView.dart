@@ -152,10 +152,12 @@ class _ImageViewState extends State<ImageView> {
   );
 }
 var recognizedText;
-var redone = "";
-var redtwo = "";
-var blueone = "";
-var bluetwo = "";
+List<String> redOne = [];
+List<String> redTwo = [];
+List<String> blueOne = [];
+List<String> blueTwo = [];
+
+
 class AnalyzingDataScreen extends StatefulWidget {
   final String imagePath;
 
@@ -196,10 +198,10 @@ class _AnalyzingDataState extends State<AnalyzingDataScreen>{
     );
   }
   Future<void> _processImage(InputImage inputImage) async {
-    redone = "";
-    redtwo = "";
-    blueone = "";
-    bluetwo = "";
+    redOne = [];
+    redTwo = [];
+    blueOne = [];
+    blueTwo = [];
     var _textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
     recognizedText = await _textRecognizer.processImage(inputImage);
     print(recognizedText.blocks.length);
@@ -220,7 +222,7 @@ int z = 0;
         }
 if(_isNumeric(y.text)) {
   if (z == 1) {
-    redone = redone  + y.text+ "\n";
+    redOne.add(y.text)
   }
   if (z == 2) {
     redtwo = redtwo  + y.text+ "\n";
