@@ -248,6 +248,22 @@ extension TeamsExtension on Map<String, Team> {
       return newTeam;
     }
   }
+  Team? findAddModified(String number, String name, Event event) {
+    if (this.containsKey(number)) {
+      var team = this[number
+          .replaceAll(new RegExp(r' -,[^\w\s]+'), '')
+          .replaceAll(' ', '')];
+      team?.name = event.teams[number]?.name ?? name;
+      return team;
+    } else {
+      var newTeam = Team(
+        number.replaceAll(new RegExp(r' -,[^\w\s]+'), '').replaceAll(' ', ''),
+        name,
+      );
+      event.teams[newTeam.number] = newTeam;
+      return newTeam;
+    }
+  }
 
   List<Team> orderedTeams() {
     final arr = this.values.toList();

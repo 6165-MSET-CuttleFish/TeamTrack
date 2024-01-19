@@ -1,20 +1,12 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:camera/camera.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:fluttercontactpicker/fluttercontactpicker.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:teamtrack/components/misc/PlatformGraphics.dart';
 import 'package:teamtrack/functions/Statistics.dart';
 import 'package:teamtrack/models/AppModel.dart';
-import 'package:teamtrack/functions/Extensions.dart';
 import 'package:teamtrack/models/GameModel.dart';
-import 'package:teamtrack/views/home/util/Permissions.dart';
-import 'package:provider/provider.dart';
 
 class ImageView extends StatefulWidget {
 
@@ -29,62 +21,10 @@ class ImageView extends StatefulWidget {
   State<ImageView> createState() => _ImageViewState();
 }
 
-Widget _liveFeed(){
-  if (_cameras.isEmpty) return Container(
-
-      child: Center(child: PlatformProgressIndicator())
-  );
-  if (_controller == null) return Container(child: Center(child: PlatformProgressIndicator()));
-  if (_controller?.value.isInitialized == false) return Container(child: Center(child: PlatformProgressIndicator()));
-  return Container(
-    color: Colors.black,
-    child: Stack(
-      fit: StackFit.expand,
-      children: <Widget>[
-        Center(
-          child: CameraPreview(
-              _controller!
-          ),
-        ),
-      ],
-    ),
-  );
-}
-late CameraController? _controller;
-List<CameraDescription> _cameras=[];
 class _ImageViewState extends State<ImageView> {
 
   File ? imageFile;
-
-  int _cameraIndex = -1;
-  void _initialize() async {
-    if (_cameras.isEmpty) {
-      _cameras = await availableCameras();
-    }
-    for (var i = 0; i < _cameras.length; i++) {
-      if (_cameras[i].lensDirection == CameraLensDirection.back) {
-        _cameraIndex = i;
-        break;
-      }
-    }
-    if (_cameraIndex != -1) {
-      _controller = CameraController(
-        // Get a specific camera from the list of available cameras.
-        _cameras[_cameraIndex],
-        // Define the resolution to use.
-        ResolutionPreset.medium,
-      );
-      _controller?.initialize().then((_) {
-        if (!mounted) {
-          return;
-        }
-        setState(() {});
-      });
-    }
-
-  }
   _getFromGallery() async {
-    print("OIEJOFEJW");
     final pickedFile = await ImagePicker().pickImage(
       source: ImageSource.gallery,
     );
@@ -97,7 +37,6 @@ class _ImageViewState extends State<ImageView> {
 
   }
   _getFromCamera() async {
-    print("af");
     final pickedFile = await ImagePicker().pickImage(
       source: ImageSource.camera,
     );
@@ -114,12 +53,6 @@ class _ImageViewState extends State<ImageView> {
     // create a CameraController.
   }
 
-  @override
-  void dispose() {
-    // Dispose of the controller when the widget is disposed.
-    _controller!.dispose();
-    super.dispose();
-  }
   Widget build(BuildContext context) => Scaffold(
   appBar: AppBar(
     title: FittedBox(
@@ -147,6 +80,7 @@ class _ImageViewState extends State<ImageView> {
               child: Center(child:Image.file(imageFile!))
       )
           ),
+          Text("Begin Analysis"),
           IconButton(onPressed:() async {
         await Navigator.of(context).push(
       MaterialPageRoute(
@@ -160,7 +94,9 @@ class _ImageViewState extends State<ImageView> {
     );}
     ,icon:
         Icon(Icons.arrow_circle_right_outlined)
-    )]) : Center(child:Text("Select a photo above to begin"))
+    )
+
+        ]) : Center(child:Text("Select a photo above to begin"))
 
   );
 }
@@ -183,13 +119,11 @@ class AnalyzingDataScreen extends StatefulWidget {
   State<AnalyzingDataScreen> createState() => _AnalyzingDataState();
 }
 bool _isNumeric(String str) {
-  if(str == null) {
-    return false;
-  }
   return double.tryParse(str) != null;
 }
 class _AnalyzingDataState extends State<AnalyzingDataScreen>{
   void initState(){
+    super.initState();
     _processImage(InputImage.fromFile(File(widget.imagePath)));
   }
   Widget build(BuildContext context) {
@@ -240,7 +174,6 @@ int z = 0;
           z = 4;
         }
         var text = y.text;
-        print(y.text);
         if (text.endsWith("*")) {
           text = text.substring(0, text.length - 2);
         }
@@ -267,11 +200,11 @@ int z = 0;
         widget.event.addMatch(
           Match(
             Alliance(
-              widget.event.teams.findAdd(
+              widget.event.teams.findAddModified(
                   redOne[row],
                   "Number DNE",
                   widget.event),
-              widget.event.teams.findAdd(
+              widget.event.teams.findAddModified(
                   redTwo[row],
                   "Number DNE",
                   widget.event),
@@ -279,11 +212,11 @@ int z = 0;
               widget.event.gameName,
             ),
             Alliance(
-              widget.event.teams.findAdd(
+              widget.event.teams.findAddModified(
                   blueOne[row],
                   "Number DNE",
                   widget.event),
-              widget.event.teams.findAdd(
+              widget.event.teams.findAddModified(
                   blueTwo[row],
                   "Number DNE",
                   widget.event),
@@ -295,18 +228,25 @@ int z = 0;
         );
       });
     }
-  setState(() {});
   dataModel.saveEvents();
-  returnedState = "Completed succesfully. Return to Events!";
+  setState(() {});
+  returnedState = "Completed succesfully.";
   }else{
     returnedState = "Numbers did not match, try again!";
   }
-
-
-    print(redOne);
-    print(redTwo);
-    print(blueOne);
-    print(blueTwo);
-    setState(() {});
+     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+       behavior: SnackBarBehavior.floating,
+       duration: const Duration(milliseconds: 1500),
+       content: Text(returnedState),
+       shape: RoundedRectangleBorder(
+         borderRadius: BorderRadius.circular(25.0),
+       ),
+     ));
+  if(returnedState == "Completed succesfully.") {
+    Navigator.popUntil(
+        context, (route) => route.settings.name == "/activeEvent");
+  }else{
+    Navigator.pop(context);
+  }
   }
 }

@@ -30,10 +30,10 @@ Future<void> showPlatformDialog({
             barrierDismissible: barrierDismissible ?? true,
           );
 
-PageRoute platformPageRoute({required Widget Function(BuildContext) builder}) =>
+PageRoute platformPageRoute({required Widget Function(BuildContext) builder,RouteSettings ?settings}) =>
     NewPlatform.isIOS
-        ? CupertinoPageRoute(builder: builder)
-        : MaterialPageRoute(builder: builder);
+        ? CupertinoPageRoute(builder: builder,settings:settings??null)
+        : MaterialPageRoute(builder: builder,settings:settings??null);
 
 PageRoute expandPageRoute({required Widget Function(BuildContext) builder}) {
   return PageRouteBuilder(
