@@ -43,8 +43,9 @@ class _Incrementor extends State<Incrementor> {
   String get missesName => widget.getTime() < 90 ? 'misses' : 'endgameMisses';
   /// Builds a widget for an enumerable scoring element
   CupertinoSegmentedControl buildPicker() => CupertinoSegmentedControl<int>(
+
         groupValue:
-            widget.element.didAttempt() ? widget.element.netCount() : null,
+            widget.element.didAttempt() ? widget.element.netCount() : widget.element.netCount(),
         children: widget.element.nestedElements?.asMap().map(
                   (key, value) => MapEntry(
                     key,
@@ -380,6 +381,7 @@ class _Incrementor extends State<Incrementor> {
                           });
                           if (widget.onDecrement != null)
                             widget.onDecrement!(widget.element);
+
                         }
                         widget.onPressed();
                         if (widget.path != null)
@@ -387,7 +389,9 @@ class _Incrementor extends State<Incrementor> {
                               ?.getRef()
                               ?.child(widget.path!)
                               .runTransaction(
+
                             (mutableData) {
+
                               if (widget.element.isBool &&
                                   widget.element.nestedElements != null) {
                                 for (final nestedElement
@@ -413,6 +417,7 @@ class _Incrementor extends State<Incrementor> {
                               }
                               final ref =
                                   (mutableData as Map?)?[widget.element.key];
+
                               if (ref is Map) {
                                 mutableData?[widget.element.key] = {
                                   'count': widget.element.min!(),

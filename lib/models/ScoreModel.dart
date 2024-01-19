@@ -563,8 +563,11 @@ class ScoringElement implements Scorable {
   }
 
   void resetCount() {
+    print(netCount());
     normalCount = 0;
     endgameCount = 0;
+
+    print(netCount());
   }
 
   void resetMisses() {

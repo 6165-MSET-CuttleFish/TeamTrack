@@ -165,7 +165,7 @@ class _EventsList extends State<EventsList> {
                     builder: (_) =>
                         EventView(
                           event: e,
-                        ),
+                        ), settings: RouteSettings(name: "/activeEvent"),
                   ),
                 );
               }

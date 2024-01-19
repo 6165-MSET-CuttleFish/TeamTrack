@@ -491,41 +491,7 @@ class _MatchView extends State<MatchView> {
                                       ],
                                     ),
                                   ),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                    top: 5.0,
-                                    bottom: 5.0,
-                                  ),
-                                  child: RawMaterialButton(
-                                    fillColor: _allianceTotal &&
-                                            widget.event.type !=
-                                                EventType.remote
-                                        ? getAllianceColor().withOpacity(0.3)
-                                        : null,
-                                    onPressed: (widget.match != null &&
-                                            widget.event.type !=
-                                                EventType.remote)
-                                        ? () => _allianceTotal = !_allianceTotal
-                                        : null,
-                                    child: ScoreSummary(
-                                      event: widget.event,
-                                      score: (widget.event.type ==
-                                                      EventType.remote &&
-                                                  widget.match != null) ||
-                                              _allianceTotal
-                                          ? _selectedAlliance?.combinedScore()
-                                          : _score,
-                                      maxes: (widget.event.type ==
-                                                      EventType.remote &&
-                                                  widget.match != null) ||
-                                              _allianceTotal
-                                          ? getMaxScoreTotal()
-                                          : getMaxScoreInd(),
-                                      showPenalties: _showPenalties,
-                                      height: 40,
-                                    ),
-                                  ),
-                                ),
+
                               ],
                             ),
                             if (getPenaltyAlliance() != null &&
@@ -750,7 +716,7 @@ class _MatchView extends State<MatchView> {
                   child: BarGraph(
                     title: "Contribution",
                     vertical: false,
-                    height: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.width*.9,
                     width: 15,
                     val: _score
                             ?.getScoreDivision(type)
