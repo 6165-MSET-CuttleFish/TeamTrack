@@ -328,7 +328,7 @@ class _EventView extends State<EventView> {
                 });
               },
             )
-                : Center(
+                :  Center(
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -352,107 +352,45 @@ class _EventView extends State<EventView> {
                         showModalBottomSheet(
                           isScrollControlled: true,
                           context: context,
-                          builder: (_) =>
-                              Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  null,
-                                  if (sortingModifier != null)
-                                    ...Score("", Dice.none,
-                                        widget.event.gameName)
-                                        .getScoreDivision(sortingModifier)
-                                        .getElements()
-                                        .parse()
-                                ]
-                                    .map(
-                                      (e) =>
-                                      ListTile(
-                                        title: Text(e?.name ?? "Total",
-                                          style: Theme
-                                              .of(context)
-                                              .textTheme
-                                              .titleMedium
-                                              ?.apply(color: Colors.white),
-                                          textScaleFactor: .9,),
-                                        onTap: () {
-                                          HapticFeedback.lightImpact();
-                                          setState(() => elementSort = e);
-                                          Navigator.pop(context);
-                                        },
-                                      ),
-                                )
-                                    .toList(),
+                          builder: (_) => Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              null,
+                              if (sortingModifier != null)
+                                ...Score("", Dice.none,
+                                    widget.event.gameName)
+                                    .getScoreDivision(sortingModifier)
+                                    .getElements()
+                                    .parse()
+                            ]
+                                .map(
+                                  (e) => ListTile(
+                                title: Text(e?.name ?? "Total",
+                                  style: Theme.of(context).textTheme.titleMedium?.apply(color: Colors.white),
+                                  textScaleFactor: .9,),
+                                onTap: () {
+                                  HapticFeedback.lightImpact();
+                                  setState(() => elementSort = e);
+                                  Navigator.pop(context);
+                                },
                               ),
+                            )
+                                .toList(),
+                          ),
                         );
                     },
+                    dropdownColor: Theme.of(context).colorScheme.primary,
                     items: opModeExt
                         .getAll()
                         .map(
-                          (value) =>
-                          DropdownMenuItem<OpModeType?>(
-                            value: value,
-                            child: Text(value?.toVal() ?? "Total",
-                              style: Theme
-                                  .of(context)
-                                  .textTheme
-                                  .titleMedium
-                                  ?.apply(color: Colors.white),
-                              textScaleFactor: .9,),
-                          ),
+                          (value) => DropdownMenuItem<OpModeType?>(
+                        value: value,
+                        child: Text(value?.toVal() ?? "Total",
+                          style: Theme.of(context).textTheme.titleMedium?.apply(color: Colors.white),
+                          textScaleFactor: .9,),
+                      ),
                     )
                         .toList(),
-                          onChanged: (newValue) {
-                            HapticFeedback.lightImpact();
-                            setState(() {
-                              elementSort = null;
-                              sortingModifier = newValue;
-                            });
-                            if (sortingModifier != null)
-                              showModalBottomSheet(
-                                isScrollControlled: true,
-                                context: context,
-                                builder: (_) => Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    null,
-                                    if (sortingModifier != null)
-                                      ...Score("", Dice.none,
-                                              widget.event.gameName)
-                                          .getScoreDivision(sortingModifier)
-                                          .getElements()
-                                          .parse()
-                                  ]
-                                      .map(
-                                        (e) => ListTile(
-                                          title: Text(e?.name ?? "Total",
-                                            style: Theme.of(context).textTheme.titleMedium?.apply(color: Colors.white),
-                                            textScaleFactor: .9,),
-                                          onTap: () {
-                                            HapticFeedback.lightImpact();
-                                            setState(() => elementSort = e);
-                                            Navigator.pop(context);
-                                          },
-                                        ),
-                                      )
-                                      .toList(),
-                                ),
-                              );
-                          },
-                          dropdownColor: Theme.of(context).colorScheme.primary,
-                          items: opModeExt
-                              .getAll()
-                              .map(
-                                (value) => DropdownMenuItem<OpModeType?>(
-                                  value: value,
-                                  child: Text(value?.toVal() ?? "Total",
-                                    style: Theme.of(context).textTheme.titleMedium?.apply(color: Colors.white),
-                                    textScaleFactor: .9,),
-                                ),
-                              )
-                              .toList(),
-                        ),
-                      ],
-                    ),
                   ),
                 ],
               ),
@@ -480,8 +418,7 @@ class _EventView extends State<EventView> {
                         : widget.event.teams.orderedTeams(),
                     sortMode: sortingModifier,
                     event: widget.event,
-                    statistics: statistics,
-                    isUserTeam: false,
+                    statistics: statistics, isUserTeam: false,
                   )
                       : MatchSearch(
                     statConfig: widget.event.statConfig,
@@ -499,15 +436,8 @@ class _EventView extends State<EventView> {
             ? CurvedNavigationBar(
           animationCurve: Curves.easeOutQuint,
           animationDuration: const Duration(milliseconds: 1000),
-          buttonBackgroundColor: Theme
-              .of(context)
-              .colorScheme
-              .secondary,
-          color: Theme
-              .of(context)
-              .textTheme
-              .bodyLarge
-              ?.color ??
+          buttonBackgroundColor: Theme.of(context).colorScheme.secondary,
+          color: Theme.of(context).textTheme.bodyLarge?.color ??
               Colors.black,
           index: _tab,
           backgroundColor: Colors.transparent,
@@ -519,18 +449,14 @@ class _EventView extends State<EventView> {
                 Icon(
                   CupertinoIcons.person_3_fill,
                   size: 18,
-                  color: _tab == 1 ? Theme
-                      .of(context)
-                      .canvasColor : null,
+                  color: _tab == 1 ? Theme.of(context).canvasColor : null,
                 ),
                 Text(
                   'Teams',
                   style: TextStyle(
                     fontSize: 8,
                     color:
-                    _tab == 1 ? Theme
-                        .of(context)
-                        .canvasColor : null,
+                    _tab == 1 ? Theme.of(context).canvasColor : null,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -542,28 +468,23 @@ class _EventView extends State<EventView> {
                 Icon(
                   CupertinoIcons.sportscourt_fill,
                   size: 18,
-                  color: _tab == 0 ? Theme
-                      .of(context)
-                      .canvasColor : null,
+                  color: _tab == 0 ? Theme.of(context).canvasColor : null,
                 ),
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                child: Text(
+                Text(
                   'Matches',
                   style: TextStyle(
                     fontSize: 8,
                     color:
-                    _tab == 0 ? Theme
-                        .of(context)
-                        .canvasColor : null,
+                    _tab == 0 ? Theme.of(context).canvasColor : null,
                     fontWeight: FontWeight.w700,
                   ),
-                )),
+                ),
               ],
             )
           ],
         )
             : null,
+
 
         body: materialTabs()[_tab],
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
