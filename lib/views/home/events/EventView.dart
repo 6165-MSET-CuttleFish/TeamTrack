@@ -19,6 +19,7 @@ import 'package:teamtrack/views/home/events/EventShare.dart';
 import 'package:provider/provider.dart';
 import 'package:teamtrack/functions/APIMethods.dart';
 
+import '../../../providers/Theme.dart';
 import '../team/AllianceSelection.dart';
 import 'ImageView.dart';
 
@@ -281,6 +282,7 @@ class _EventView extends State<EventView> {
                           color: Colors.white),
                       iconSize: 24,
                       elevation: 16,
+                      dropdownColor: Theme.of(context).colorScheme.primary,
                       underline: Container(
                         height: 0.5,
                         color: Colors.deepPurple,
@@ -399,6 +401,58 @@ class _EventView extends State<EventView> {
                           ),
                     )
                         .toList(),
+                          onChanged: (newValue) {
+                            HapticFeedback.lightImpact();
+                            setState(() {
+                              elementSort = null;
+                              sortingModifier = newValue;
+                            });
+                            if (sortingModifier != null)
+                              showModalBottomSheet(
+                                isScrollControlled: true,
+                                context: context,
+                                builder: (_) => Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    null,
+                                    if (sortingModifier != null)
+                                      ...Score("", Dice.none,
+                                              widget.event.gameName)
+                                          .getScoreDivision(sortingModifier)
+                                          .getElements()
+                                          .parse()
+                                  ]
+                                      .map(
+                                        (e) => ListTile(
+                                          title: Text(e?.name ?? "Total",
+                                            style: Theme.of(context).textTheme.titleMedium?.apply(color: Colors.white),
+                                            textScaleFactor: .9,),
+                                          onTap: () {
+                                            HapticFeedback.lightImpact();
+                                            setState(() => elementSort = e);
+                                            Navigator.pop(context);
+                                          },
+                                        ),
+                                      )
+                                      .toList(),
+                                ),
+                              );
+                          },
+                          dropdownColor: Theme.of(context).colorScheme.primary,
+                          items: opModeExt
+                              .getAll()
+                              .map(
+                                (value) => DropdownMenuItem<OpModeType?>(
+                                  value: value,
+                                  child: Text(value?.toVal() ?? "Total",
+                                    style: Theme.of(context).textTheme.titleMedium?.apply(color: Colors.white),
+                                    textScaleFactor: .9,),
+                                ),
+                              )
+                              .toList(),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
