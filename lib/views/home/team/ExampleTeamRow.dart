@@ -41,7 +41,7 @@ class ExampleTeamRow extends StatelessWidget {
             children: [
               Text(
                 'Team Name',
-                style: Theme.of(context).textTheme.bodyLarge,
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
               Row(
                 children: [
@@ -74,7 +74,7 @@ class ExampleTeamRow extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(
-              width: 80,
+              width: 0.15*MediaQuery.of(context).size.width,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -84,9 +84,12 @@ class ExampleTeamRow extends StatelessWidget {
             ),
             Padding(
 
-              padding: EdgeInsets.fromLTRB(0, 0, 20, 0),
+              padding: EdgeInsets.fromLTRB(0, 0, 15, 0),
             ),
-            Text('% ${statistics.name}')
+            SizedBox(
+              width: 0.15*MediaQuery.of(context).size.width,
+             child: Text('% ${statistics.name}')
+            ),
           ],
         ),
       ),

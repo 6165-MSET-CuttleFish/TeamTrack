@@ -163,9 +163,13 @@ class _AllianceSelection extends State<AllianceSelection> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            SizedBox(width: 30),
-            Text('Alliance Selection'),
-            SizedBox(width: 10)
+            SizedBox(
+                width: 0.55*MediaQuery.of(context).size.width,
+              child: FittedBox (
+                fit: BoxFit.scaleDown,
+                child: Text('Alliance Selection')
+              ),
+            ),
           ],
         ),
         actions: [

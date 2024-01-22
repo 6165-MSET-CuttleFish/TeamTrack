@@ -413,7 +413,7 @@ class _TeamViewState extends State<TeamView> {
                       ? LineChart(
                           LineChartData(
                             gridData: FlGridData(
-                              horizontalInterval: 1.0,
+                              horizontalInterval: 1,
                               show: true,
                               drawVerticalLine: true,
                               getDrawingHorizontalLine: (value) {

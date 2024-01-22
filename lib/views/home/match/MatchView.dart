@@ -358,7 +358,11 @@ class _MatchView extends State<MatchView> {
                             if ((_match?.type != EventType.remote ||
                                     _match?.type != EventType.analysis) &&
                                 widget.match != null)
-                              Row(
+                              SizedBox(
+                                  width: 0.9*MediaQuery.of(context).size.width,
+                                  child: FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
                                 children: [
@@ -445,7 +449,9 @@ class _MatchView extends State<MatchView> {
                                   ),
                                 ],
                               ),
-                            if ((_match?.type != EventType.remote ||
+                            ),
+                           ),
+                            if ((_match?.type != EventType.remote &&
                                     _match?.type != EventType.analysis) &&
                                 _match != null)
                               buttonRow(),
