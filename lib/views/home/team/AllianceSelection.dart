@@ -1,15 +1,19 @@
+import 'dart:convert';
 import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:teamtrack/api/APIKEYS.dart';
 import 'package:teamtrack/functions/Extensions.dart';
 import 'package:teamtrack/functions/Statistics.dart';
 import 'package:teamtrack/models/GPTModel.dart';
+import '../../../functions/ResponseModel.dart';
 import '../../../models/GameModel.dart';
 import '../../../models/ScoreModel.dart';
 import '../../../models/StatConfig.dart';
 import 'AllianceSimulator.dart';
 import 'TeamAllianceRecommend.dart';
 import 'TeamRowAlliance.dart';
+import 'package:http/http.dart' as http;
+
 
 class AllianceSelection extends StatefulWidget {
   AllianceSelection({
@@ -476,6 +480,7 @@ class _AllianceSelection extends State<AllianceSelection> {
       }
     });
 
+    Team displayTeam;
     teams[0].isRecommended = true;
 
     if (teams.length >= 2) {
