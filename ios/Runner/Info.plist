@@ -50,6 +50,10 @@
 	<string>Need location for finding events near the user</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Need location for finding events near the user</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Need photo picker for match schedule text recognition</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Need camera for match schedule text recognition</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
