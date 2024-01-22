@@ -497,45 +497,7 @@ class _MatchView extends State<MatchView> {
                                       ],
                                     ),
                                   ),
-<<<<<<< Updated upstream
 
-=======
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                    top: 5.0,
-                                    bottom: 5.0,
-                                  ),
-                                  child: RawMaterialButton(
-                                    fillColor: _allianceTotal &&
-                                            widget.event.type !=
-                                                EventType.remote
-                                        ? getAllianceColor().withOpacity(0)
-                                        : null,
-                                    onPressed: (widget.match != null &&
-                                            widget.event.type !=
-                                                EventType.remote)
-                                        ? () => _allianceTotal = !_allianceTotal
-                                        : null,
-                                    child: ScoreSummary(
-                                      event: widget.event,
-                                      score: (widget.event.type ==
-                                                      EventType.remote &&
-                                                  widget.match != null) ||
-                                              _allianceTotal
-                                          ? _selectedAlliance?.combinedScore()
-                                          : _score,
-                                      maxes: (widget.event.type ==
-                                                      EventType.remote &&
-                                                  widget.match != null) ||
-                                              _allianceTotal
-                                          ? getMaxScoreTotal()
-                                          : getMaxScoreInd(),
-                                      showPenalties: _showPenalties,
-                                      height: 40,
-                                    ),
-                                  ),
-                                ),
->>>>>>> Stashed changes
                               ],
                             ),
                             if (getPenaltyAlliance() != null &&
@@ -837,7 +799,7 @@ class _MatchView extends State<MatchView> {
                     [],
             ]
           : [
-            Material(
+              Material(
                 child: Row(
                   mainAxisAlignment:MainAxisAlignment.spaceAround,
                     children:[
@@ -851,16 +813,17 @@ class _MatchView extends State<MatchView> {
                   },
                 )]),
               ),
-            Material(child:Row(
-            mainAxisAlignment:MainAxisAlignment.spaceAround,
-            children:[
-              Text("View "+(type==OpModeType.tele?"Tele-Op":"End Game") +" Controls"),IconButton(
-                icon: Icon(Icons.visibility),
-                tooltip: 'View',
-                onPressed: () {
-                  _allowView = true;
-                },
-              )]),),
+              Material(child:Row(
+              mainAxisAlignment:MainAxisAlignment.spaceAround,
+    children:[
+    Text("View "+(type==OpModeType.tele?"Tele-Op":"End Game") +" Controls"),IconButton(
+                  icon: Icon(Icons.visibility),
+                  tooltip: 'View',
+                  onPressed: () {
+                    _allowView = true;
+                  },
+                )]),
+              ),
             ],
     );
   }

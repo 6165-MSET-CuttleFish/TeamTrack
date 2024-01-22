@@ -961,6 +961,8 @@ class Team {
     return teamScore;
   }
 
+
+
   Team.fromJson(Map<String, dynamic> json, String gameName) {
     number = json['number'];
     name = json['name'];
