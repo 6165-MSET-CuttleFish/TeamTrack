@@ -497,9 +497,6 @@ class _MatchView extends State<MatchView> {
                                       ],
                                     ),
                                   ),
-<<<<<<< Updated upstream
-
-=======
                                 Padding(
                                   padding: const EdgeInsets.only(
                                     top: 5.0,
@@ -535,7 +532,6 @@ class _MatchView extends State<MatchView> {
                                     ),
                                   ),
                                 ),
->>>>>>> Stashed changes
                               ],
                             ),
                             if (getPenaltyAlliance() != null &&

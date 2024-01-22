@@ -163,12 +163,8 @@
 		97C146E61CF9000F007C117D /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-<<<<<<< Updated upstream
-				LastUpgradeCheck = 1300;
-=======
 				BuildIndependentTargetsInParallel = NO;
 				LastUpgradeCheck = 1430;
->>>>>>> Stashed changes
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
 					97C146ED1CF9000F007C117D = {
@@ -382,11 +378,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-<<<<<<< Updated upstream
-				MARKETING_VERSION = 6.0.1;
-=======
 				MARKETING_VERSION = 7.2.0;
->>>>>>> Stashed changes
 				PRODUCT_BUNDLE_IDENTIFIER = "MSET-CuttleFish.ScoutingApp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -519,11 +511,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-<<<<<<< Updated upstream
-				MARKETING_VERSION = 6.0.1;
-=======
 				MARKETING_VERSION = 7.2.0;
->>>>>>> Stashed changes
 				PRODUCT_BUNDLE_IDENTIFIER = "MSET-CuttleFish.ScoutingApp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -550,11 +538,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-<<<<<<< Updated upstream
-				MARKETING_VERSION = 6.0.1;
-=======
 				MARKETING_VERSION = 7.2.0;
->>>>>>> Stashed changes
 				PRODUCT_BUNDLE_IDENTIFIER = "MSET-CuttleFish.ScoutingApp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";

@@ -1,10 +1,7 @@
 import 'dart:ffi';
 import 'package:flutter/material.dart';
-<<<<<<< Updated upstream
-=======
 import 'package:teamtrack/api/APIKEYS.dart';
 import 'package:teamtrack/functions/Extensions.dart';
->>>>>>> Stashed changes
 import 'package:teamtrack/functions/Statistics.dart';
 import 'package:teamtrack/models/GPTModel.dart';
 import '../../../models/GameModel.dart';
@@ -37,8 +34,6 @@ class _AllianceSelection extends State<AllianceSelection> {
   int recommendedIndex = 0;
   String _sortBy = 'Score';
 
-<<<<<<< Updated upstream
-=======
   String returnResponse = "Initial response";
   String prompt = "No Data";
   late ResponseModel _responseModel;
@@ -285,15 +280,12 @@ class _AllianceSelection extends State<AllianceSelection> {
   }
 
 
->>>>>>> Stashed changes
   void updateRecommended(int index) {
     setState(() {
       recommendedIndex = index;
     });
   }
 
-<<<<<<< Updated upstream
-=======
   void _generatePromptForTeam(Team selectedTeam, List<dynamic> autonomousTeams, List<dynamic> teleOpTeams, List<dynamic> endgameTeams, List<Team> teams) {
     final indexAuto = autonomousTeams.indexOf(selectedTeam) + 1;
     final indexTele = teleOpTeams.indexOf(selectedTeam) + 1;
@@ -365,7 +357,6 @@ class _AllianceSelection extends State<AllianceSelection> {
     return prompt;
   }
 
->>>>>>> Stashed changes
   Future<void> _showSortOptions(BuildContext context) async {
     final RenderBox button = context.findRenderObject() as RenderBox;
     await showMenu(
@@ -487,8 +478,6 @@ class _AllianceSelection extends State<AllianceSelection> {
 
     teams[0].isRecommended = true;
 
-<<<<<<< Updated upstream
-=======
     if (teams.length >= 2) {
       if (teams[0].number == widget.event.userTeam.number) {
         displayTeam = teams[1];
@@ -510,7 +499,6 @@ class _AllianceSelection extends State<AllianceSelection> {
       prompt = craftPrompt(teams.length, index, indexAuto, indexTele, indexEndgame, displayTeam);
     }
 
->>>>>>> Stashed changes
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -620,7 +608,6 @@ class _AllianceSelection extends State<AllianceSelection> {
                   ),
                   child: InkWell(
                     onTap: () {
-<<<<<<< Updated upstream
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -635,10 +622,8 @@ class _AllianceSelection extends State<AllianceSelection> {
                           ),
                         ),
                       );
-=======
                       _generatePromptForTeam(team, autonomousTeams, teleOpTeams, endgameTeams, teams);
                       _showPromptDialog(context, returnResponse, team, );
->>>>>>> Stashed changes
                     },
                     child: ListTile(
                       title: Text(
@@ -680,8 +665,6 @@ class _AllianceSelection extends State<AllianceSelection> {
       ),
     );
   }
-<<<<<<< Updated upstream
-=======
   List<double> getRanks(Event event, Team team, OpModeType type) {
     List<int> total = [];
     List<int> user = [];
@@ -806,7 +789,6 @@ class _AllianceSelection extends State<AllianceSelection> {
     return percent;
   }
 
->>>>>>> Stashed changes
 }
 
 Color wltColor(int i) {
