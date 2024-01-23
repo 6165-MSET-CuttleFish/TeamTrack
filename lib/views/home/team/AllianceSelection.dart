@@ -64,9 +64,9 @@ class _AllianceSelection extends State<AllianceSelection> {
         ),
         centerTitle: true,
       ),
-      body: Container(
-        color: Colors.white,
-        width: double.infinity,
+      body: SingleChildScrollView(
+        //color: Colors.white,
+        //width: double.infinity,
         padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
