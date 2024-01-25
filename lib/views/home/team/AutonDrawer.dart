@@ -107,7 +107,7 @@ class _AutonDrawerState extends State<AutonDrawer> {
                     (value) => DropdownMenuItem<Dice>(
                   value: value,
                   child: Text(value?.toVal(Statics.gameName) ?? "All Cases",
-                    style: Theme.of(context).textTheme.titleMedium?.apply(color: Colors.white),
+                    style: Theme.of(context).textTheme.titleMedium?.apply(color: Colors.white),//TODO: change color
                     textScaleFactor: .9,),
                 ),
               )
@@ -163,7 +163,7 @@ class _AutonDrawerState extends State<AutonDrawer> {
                         Icon(Icons.info),
                         Spacer(flex:1),
                         SizedBox(
-                          width: 350,
+                          width: 0.85*MediaQuery.of(context).size.width,
                           child: Center(
                             child: Text(infoBubble),
                           ),
