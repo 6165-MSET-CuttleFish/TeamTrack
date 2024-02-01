@@ -10,7 +10,8 @@ import 'package:teamtrack/components/misc/PlatformGraphics.dart';
 import 'package:teamtrack/views/home/events/EventView.dart';
 import 'package:provider/provider.dart';
 import 'package:teamtrack/functions/Extensions.dart';
-
+import 'package:intl/intl.dart';
+import '../../../components/misc/InfoPills.dart';
 import '../team/TeamView.dart';
 
 class EventsList extends StatefulWidget {
@@ -21,35 +22,113 @@ class EventsList extends StatefulWidget {
 }
 
 class _EventsList extends State<EventsList> {
+  var format = new DateFormat("MMMM dd, yyyy");
+  String? _newName;
+  double? _newNum;
   @override
   Widget build(BuildContext context) => SafeArea(
+    child:Container(
+      color: Theme.of(context).colorScheme.primary,
+    padding: EdgeInsets.all(8),
+    child:Container(
+
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.background,
+          borderRadius: BorderRadius.circular(12),
+        ),
         child: ListView(
           children: [
-            ExpansionTile(
-              leading: Icon(CupertinoIcons.person_3),
-              initiallyExpanded: true,
-              title: Text(
-                'In Person Events',
-                style: Theme.of(context).textTheme.titleMedium),
+            Padding(
+                padding: EdgeInsets.fromLTRB(40, 20, 40, 20),
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children:[
+                      Text(
+                          'My Events',
+                          style: Theme.of(context).textTheme.titleLarge),
+                      Align(
+                          alignment: Alignment.centerLeft,
+                          child:MaterialButton(
+                              shape:RoundedRectangleBorder(side: BorderSide.none,borderRadius: BorderRadius.all(Radius.circular(12))),
+                              color: Theme.of(context).colorScheme.primary,
+                              onPressed: () { _chosen(EventType.local); },
+                              child:Row(children:[
+                                Icon(Icons.add,color:Colors.white),
+                                Text("ADD",textAlign:TextAlign.right,style:Theme.of(context).textTheme.bodySmall?.apply(color:Colors.white),)
+                              ]
+                              )
+                          )
+                      )
+                    ]
+                )),
+            Padding(
+  padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+  child:SizedBox(
+              height: MediaQuery.of(context).size.height*.4,
+        child:
+
+            ReorderableListView(
+              onReorder: (int oldIndex, int newIndex) {
+                setState(() {
+                  if (oldIndex < newIndex) {
+                    newIndex -= 1;
+                  }
+                  var realNewIndex = dataModel.events.indexOf(dataModel.localEvents().elementAt(newIndex));
+
+                  var realOldIndex = dataModel.events.indexOf(dataModel.localEvents().elementAt(oldIndex));
+                  final Event item = dataModel.events.removeAt(realOldIndex);
+                  dataModel.events.insert(realNewIndex, item);
+                  dataModel.saveEvents();
+                });
+              },
               children: localEvents(),
-            ),
-            ExpansionTile(
-              leading: Icon(CupertinoIcons.rectangle_stack_person_crop),
-              initiallyExpanded: true,
-              title: Text('Remote Events',
-                  style: Theme.of(context).textTheme.titleMedium),
-              children: remoteEvents(),
-            ),
-            ExpansionTile(
-              leading: Icon(CupertinoIcons.rocket_fill),
-              initiallyExpanded: true,
-              title: Text('Driver Analysis',
-                  style: Theme.of(context).textTheme.titleMedium),
-              children: driverAnalysis(),
-            ),
+            ))),
+            Padding(
+                padding: EdgeInsets.fromLTRB(40, 20, 40, 20),
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children:[
+                      Text(
+                          'Driver Practice',
+                          style: Theme.of(context).textTheme.titleLarge),
+                      Align(
+                          alignment: Alignment.centerLeft,
+                          child:MaterialButton(
+                              shape:RoundedRectangleBorder(side: BorderSide.none,borderRadius: BorderRadius.all(Radius.circular(12))),
+                              color: Theme.of(context).colorScheme.primary,
+                              onPressed: () { _chosen(EventType.analysis); },
+                              child:Row(children:[
+                                Icon(Icons.add,color:Colors.white),
+                                Text( "ADD",textAlign:TextAlign.right,style:Theme.of(context).textTheme.bodySmall?.apply(color:Colors.white))
+                              ]
+                              )
+                          )
+                      )
+                    ]
+                )),
+  Padding(
+  padding: EdgeInsets.fromLTRB(20, 0, 20, 0),child:SizedBox(
+                height: MediaQuery.of(context).size.height*.3,
+                child:
+                ReorderableListView(
+                  onReorder: (int oldIndex, int newIndex) {
+                    setState(() {
+                      if (oldIndex < newIndex) {
+                        newIndex -= 1;
+                      }
+                      var realNewIndex = dataModel.events.indexOf(dataModel.driverAnalysis().elementAt(newIndex));
+
+                      var realOldIndex = dataModel.events.indexOf(dataModel.driverAnalysis().elementAt(oldIndex));
+                      final Event item = dataModel.events.removeAt(realOldIndex);
+                      dataModel.events.insert(realNewIndex, item);
+                      dataModel.saveEvents();
+                    });
+                  },
+                  children: driverAnalysis(),
+                ))),
           ],
         ),
-      );
+    )));
 
   List<Widget> localEvents() => dataModel.localEvents().map(eventTile).toList();
 
@@ -59,7 +138,10 @@ class _EventsList extends State<EventsList> {
   List<Widget> driverAnalysis() =>
       dataModel.driverAnalysis().map(eventTile).toList();
 
-  Slidable eventTile(Event e) => Slidable(
+  Card eventTile(Event e) => Card(
+color: themeChangeProvider.darkTheme? Colors.white12:Colors.black87.withOpacity(.65),
+      key: Key(e.id),
+      child:Slidable(
         startActionPane: ActionPane(
           // A motion is a widget used to control how the pane animates.
           motion: const StretchMotion(),
@@ -123,13 +205,12 @@ class _EventsList extends State<EventsList> {
                   : CupertinoIcons.lock_shield_fill,
               color: Theme.of(context).colorScheme.primary,
             ),
-            leading: Icon(
-              e.type == EventType.remote
-                  ? CupertinoIcons.rectangle_stack_person_crop_fill
-                  :( e.type == EventType.analysis
-                    ? CupertinoIcons.rocket_fill
-                    :CupertinoIcons.person_3_fill),
-              color: Theme.of(context).colorScheme.primary,
+            leading: ReorderableDragStartListener(
+
+              index: e.type == EventType.local?dataModel.localEvents().indexOf(e):dataModel.driverAnalysis().indexOf(e),
+              child: const Icon(
+                  Icons.drag_handle_rounded,
+              color: Colors.white),
             ),
 
             title: Column(
@@ -137,11 +218,15 @@ class _EventsList extends State<EventsList> {
               children: [
                 Text(
                   e.name,
-                  style: Theme.of(context).textTheme.bodyLarge,
+                  style:Theme.of(context).textTheme.bodyLarge?.apply(color:Colors.white),
                 ),
-                Text(
-                  e.gameName.spaceBeforeCapital().trimLeft(),
-                  style: Theme.of(context).textTheme.bodySmall?.apply(color: Theme.of(context).colorScheme.primary),
+                Row(
+                  children:[
+                  InfoPills(text:e.gameName.spaceBeforeCapital().trimLeft(),color:Colors.lightBlue),
+
+                    e.type == EventType.analysis? Row():InfoPills(text:format.format(e.createdAt.toDate()),color:Colors.red),
+                    e.type == EventType.analysis? InfoPills(text:"Matches: "+e.matches.length.toString(),color:Colors.purple):Row()
+            ]
                 ),
 
               ],
@@ -191,7 +276,7 @@ class _EventsList extends State<EventsList> {
             },
           ),
         ),
-      );
+      ));
 
   void _onShare(Event e) {
     if (!(context.read<User?>()?.isAnonymous ?? true)) {
@@ -270,6 +355,64 @@ class _EventsList extends State<EventsList> {
       );
     }
   }
+  void _chosen(EventType _newType) => showPlatformDialog(
+    context: context,
+    builder: (BuildContext context) => PlatformAlert(
+      title: Text(
+          'New ${_newType == EventType.remote ? 'Remote Event' :(_newType == EventType.local ? 'In Person Event': 'Driver Analysis')}'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children:[
+          PlatformTextField(
+            textInputAction: TextInputAction.done,
+            keyboardType: TextInputType.name,
+            textCapitalization: TextCapitalization.words,
+            onChanged: (String input) {
+              _newName = input;
+            },
+            placeholder: 'Enter name',
+          ),
+        ],
+      ),
+      actions: [
+        PlatformDialogAction(
+          isDefaultAction: true,
+          child: Text('Cancel'),
+          onPressed: () {
+            _newName = '';
+            _newNum = 0.0;
+            Navigator.of(context).pop();
+          },
+        ),
+        PlatformDialogAction(
+          isDefaultAction: false,
+          child: Text('Add'),
+          onPressed: () {
+            setState(
+                  () {
+                if (_newName!.isNotEmpty&&_newType!=EventType.analysis)
+                  dataModel.events.add(Event(
+                    name: _newName ?? Statics.gameName,
+                    type: _newType ?? EventType.remote,
+                    gameName: Statics.gameName,
+                  ));
+                if(_newName!.isNotEmpty&&_newType==EventType.analysis){
+                  dataModel.events.add(Event(
+                    name: _newName ?? Statics.gameName,
+                    type: _newType ?? EventType.remote,
+                    gameName: Statics.gameName,
+                  ));
+                }
+                dataModel.saveEvents();
+                _newName = '';
+              },
+            );
+            Navigator.of(context).pop();
+          },
+        ),
+      ],
+    ),
+  );
 
   void onRemove(Event e) async {
     final uid = context.read<User?>()?.uid;

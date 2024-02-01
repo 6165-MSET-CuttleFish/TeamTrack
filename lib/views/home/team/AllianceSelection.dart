@@ -251,10 +251,10 @@ class _AllianceSelection extends State<AllianceSelection> {
       setState(() => returnResponse = 'Loading...');
     }
     final response = await http.post(
-      Uri.parse(APIKEYS.GPT_URL),
+      Uri.parse("i3.com"),
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ${APIKEYS.GPT_KEY}',
+        'Authorization': 'Bearer 3}',
       },
       body: jsonEncode(<String, dynamic>{
         "model": "gpt-3.5-turbo",

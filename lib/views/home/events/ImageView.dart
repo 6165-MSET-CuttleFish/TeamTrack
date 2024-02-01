@@ -177,7 +177,9 @@ int z = 0;
         if (text.endsWith("*")) {
           text = text.substring(0, text.length - 2);
         }
-        if (_isNumeric(text)) {
+        if (_isNumeric(text)&&text!="5"&&text!="20") {
+
+          print(text);
           if (z == 1) {
             redOne.add(text);
           }
