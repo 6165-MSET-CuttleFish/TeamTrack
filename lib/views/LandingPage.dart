@@ -103,7 +103,7 @@ class _LandingPageState extends State<LandingPage> {
           try {
             final event = Event.fromJson(value);
             event.shared = true;
-            dataModel.events.add(event);
+            dataModel.sharedEvents.add(event);
           } catch (e) {}
         });
         (data?['inbox'] as Map?)?.values.forEach((value) {

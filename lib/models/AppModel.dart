@@ -19,7 +19,7 @@ class DataModel {
   List<Event> inbox = [];
   List<TeamTrackUser> blockedUsers = [];
 
-  List<Event> allEvents() => events + sharedEvents;
+  List<Event> allEvents() => sharedEvents + events;
 
   List<Event> localEvents() =>
       allEvents().where((e) => e.type == EventType.local).toList();

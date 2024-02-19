@@ -177,9 +177,9 @@ int z = 0;
         if (text.endsWith("*")) {
           text = text.substring(0, text.length - 2);
         }
-        if (_isNumeric(text)&&text!="5"&&text!="20") {
 
-          print(text);
+        if(_isNumeric(text)) {
+
           if (z == 1) {
             redOne.add(text);
           }
@@ -195,6 +195,10 @@ int z = 0;
           }
         }
       }
+    }
+    if(redOne.length+1 == redTwo.length){
+      redTwo.removeAt(redTwo.length-1);
+      blueOne.removeAt(blueOne.length-1);
     }
   if(blueOne.length==redTwo.length&&redOne.length==blueTwo.length&&redTwo.length==blueTwo.length){
   for (int row = 0; row<blueOne.length;row++) {

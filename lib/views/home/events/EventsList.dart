@@ -39,7 +39,7 @@ class _EventsList extends State<EventsList> {
         child: ListView(
           children: [
             Padding(
-                padding: EdgeInsets.fromLTRB(40, 20, 40, 20),
+                padding: EdgeInsets.fromLTRB(30, 20, 30, 20),
                 child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children:[
@@ -67,24 +67,11 @@ class _EventsList extends State<EventsList> {
               height: MediaQuery.of(context).size.height*.4,
         child:
 
-            ReorderableListView(
-              onReorder: (int oldIndex, int newIndex) {
-                setState(() {
-                  if (oldIndex < newIndex) {
-                    newIndex -= 1;
-                  }
-                  var realNewIndex = dataModel.events.indexOf(dataModel.localEvents().elementAt(newIndex));
-
-                  var realOldIndex = dataModel.events.indexOf(dataModel.localEvents().elementAt(oldIndex));
-                  final Event item = dataModel.events.removeAt(realOldIndex);
-                  dataModel.events.insert(realNewIndex, item);
-                  dataModel.saveEvents();
-                });
-              },
+            ListView(
               children: localEvents(),
             ))),
             Padding(
-                padding: EdgeInsets.fromLTRB(40, 20, 40, 20),
+                padding: EdgeInsets.fromLTRB(30, 20, 30, 20),
                 child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children:[
@@ -110,20 +97,8 @@ class _EventsList extends State<EventsList> {
   padding: EdgeInsets.fromLTRB(20, 0, 20, 0),child:SizedBox(
                 height: MediaQuery.of(context).size.height*.3,
                 child:
-                ReorderableListView(
-                  onReorder: (int oldIndex, int newIndex) {
-                    setState(() {
-                      if (oldIndex < newIndex) {
-                        newIndex -= 1;
-                      }
-                      var realNewIndex = dataModel.events.indexOf(dataModel.driverAnalysis().elementAt(newIndex));
+                ListView(
 
-                      var realOldIndex = dataModel.events.indexOf(dataModel.driverAnalysis().elementAt(oldIndex));
-                      final Event item = dataModel.events.removeAt(realOldIndex);
-                      dataModel.events.insert(realNewIndex, item);
-                      dataModel.saveEvents();
-                    });
-                  },
                   children: driverAnalysis(),
                 ))),
           ],
@@ -140,7 +115,6 @@ class _EventsList extends State<EventsList> {
 
   Card eventTile(Event e) => Card(
 color: themeChangeProvider.darkTheme? Colors.white12:Colors.black87.withOpacity(.65),
-      key: Key(e.id),
       child:Slidable(
         startActionPane: ActionPane(
           // A motion is a widget used to control how the pane animates.
@@ -199,19 +173,6 @@ color: themeChangeProvider.darkTheme? Colors.white12:Colors.black87.withOpacity(
         child: ListTileTheme(
           iconColor: Theme.of(context).primaryColor,
           child: ListTile(
-            trailing: Icon(
-              e.shared
-                  ? CupertinoIcons.cloud_fill
-                  : CupertinoIcons.lock_shield_fill,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            leading: ReorderableDragStartListener(
-
-              index: e.type == EventType.local?dataModel.localEvents().indexOf(e):dataModel.driverAnalysis().indexOf(e),
-              child: const Icon(
-                  Icons.drag_handle_rounded,
-              color: Colors.white),
-            ),
 
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -222,10 +183,10 @@ color: themeChangeProvider.darkTheme? Colors.white12:Colors.black87.withOpacity(
                 ),
                 Row(
                   children:[
-                  InfoPills(text:e.gameName.spaceBeforeCapital().trimLeft(),color:Colors.lightBlue),
-
+                    e.shared? InfoPills(text: "Shared", color: Colors.blueAccent):InfoPills(text: "Private", color: Colors.grey),
                     e.type == EventType.analysis? Row():InfoPills(text:format.format(e.createdAt.toDate()),color:Colors.red),
                     e.type == EventType.analysis? InfoPills(text:"Matches: "+e.matches.length.toString(),color:Colors.purple):Row()
+
             ]
                 ),
 
@@ -248,7 +209,7 @@ color: themeChangeProvider.darkTheme? Colors.white12:Colors.black87.withOpacity(
                   context,
                   platformPageRoute(
                     builder: (_) =>
-                        EventView(
+                         EventView(
                           event: e,
                         ), settings: RouteSettings(name: "/activeEvent"),
                   ),
