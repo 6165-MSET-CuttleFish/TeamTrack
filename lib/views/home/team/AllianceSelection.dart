@@ -130,7 +130,7 @@ class _AllianceSelection extends State<AllianceSelection> {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                'Percent VS Average',
+                'Average Points',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
@@ -156,7 +156,7 @@ class _AllianceSelection extends State<AllianceSelection> {
                 child: Text(
                   (ranks[i] == -1)
                       ? "not enough data"
-                      : '${(ranks[i] * 100).toString()}%', // Add percent sign
+                      : '${(ranks[i]).toString()}', // Add percent sign
                   style: TextStyle(
                     color: (ranks[i] == -1)
                         ? Colors.black // Text color for "not enough data"
@@ -224,9 +224,9 @@ class _AllianceSelection extends State<AllianceSelection> {
                   MaterialPageRoute(
                     builder: (context) => _buildTable(
                       team,
-                      getRanks(widget.event, team, OpModeType.auto),
-                      getRanks(widget.event, team, OpModeType.tele),
-                      getRanks(widget.event, team, OpModeType.endgame),
+                      getRanks(widget.event, team, OpModeType.auto, true, false),
+                      getRanks(widget.event, team, OpModeType.tele, true, false),
+                      getRanks(widget.event, team, OpModeType.endgame, true, false),
                       autoNames,
                       teleNames,
                       endgameNames,
@@ -670,9 +670,9 @@ class _AllianceSelection extends State<AllianceSelection> {
       ),
     );
   }
-  List<double> getRanks(Event event, Team team, OpModeType type) {
-    List<int> total = [];
-    List<int> user = [];
+  List<double> getRanks(Event event, Team team, OpModeType type, bool isUser, bool isPercent) {
+    List<double> total = [];
+    List<double> user = [];
     List<double> percent = [];
 
     int plays = 0;
@@ -706,15 +706,15 @@ class _AllianceSelection extends State<AllianceSelection> {
             for (int i = 0; i < length; i++) {
               teleNames[i] = teleScores.elements.values.toList()[i].name;
             }
-          } else {
+          } else if (type == OpModeType.endgame) {
             length = endgameScores.elements.values.toList().length;
             endgameNames = List<String>.filled(length, "");
             for (int i = 0; i < length; i++) {
               endgameNames[i] = endgameScores.elements.values.toList()[i].name;
             }
           }
-          total = List<int>.filled(length, 0);
-          user = List<int>.filled(length, 0);
+          total = List<double>.filled(length, 0);
+          user = List<double>.filled(length, 0);
           percent = List<double>.filled(length, 0.0);
 
           doOnce = true;
@@ -726,17 +726,14 @@ class _AllianceSelection extends State<AllianceSelection> {
           if (newTeam == team) {
             for (int i = 0; i < elementList.length; i++) {
               ScoringElement element = elementList[i];
-              user[i] = element.scoreValue();
+              user[i] += element.scoreValue();
             }
           } else {
             for (int i = 0; i < elementList.length; i++) {
               ScoringElement element = elementList[i];
-              total[i] = element.scoreValue();
+              total[i] += element.scoreValue();
             }
           }
-
-// Now 'user' list contains the scoreValue of each element in the corresponding index
-
         }
         else if (type == OpModeType.tele && teleScores != null) {
           List<ScoringElement> elementList = teleScores.elements.values
@@ -744,12 +741,12 @@ class _AllianceSelection extends State<AllianceSelection> {
           if (newTeam == team) {
             for (int i = 0; i < elementList.length; i++) {
               ScoringElement element = elementList[i];
-              user[i] = element.scoreValue();
+              user[i] += element.scoreValue();
             }
           } else {
             for (int i = 0; i < elementList.length; i++) {
               ScoringElement element = elementList[i];
-              total[i] = element.scoreValue();
+              total[i] += element.scoreValue();
             }
           }
         }
@@ -759,41 +756,40 @@ class _AllianceSelection extends State<AllianceSelection> {
           if (newTeam == team) {
             for (int i = 0; i < elementList.length; i++) {
               ScoringElement element = elementList[i];
-              user[i] = element.scoreValue();
+              user[i] += element.scoreValue();
             }
           } else {
             for (int i = 0; i < elementList.length; i++) {
               ScoringElement element = elementList[i];
-              total[i] = element.scoreValue();
+              total[i] += element.scoreValue();
             }
           }
-
-// Now 'user' list contains the scoreValue of each element in the corresponding index
 
         }
       }
     }
     for (int i = 0; i < user.length; i++) {
-      user[i] = (user[i] / userPlays).round();
+      user[i] = (user[i] / userPlays).roundToDouble();
     }
     for (int i = 0; i < total.length; i++) {
-      total[i] = (total[i] / plays).round();
+      total[i] = (total[i] / plays).roundToDouble();
     }
     for (int i = 0; i < percent.length; i++) {
       print (user[i]);
       print (total[i]);
       if (total[i] != 0) {
-        percent[i] = (((user[i]/total[i]) * 10).roundToDouble()) / 10;
+        percent[i] = (user[i]/total[i] * 100).roundToDouble();
       } else {
         percent[i] = -1;
       }
-
-
     }
-
-    return percent;
+    if (isUser) {
+      return user;
+    } else if (isPercent) {
+      return percent;
+    }
+    return total;
   }
-
 }
 
 Color wltColor(int i) {
