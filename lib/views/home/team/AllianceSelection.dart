@@ -254,7 +254,7 @@ class _AllianceSelection extends State<AllianceSelection> {
       Uri.parse(APIKEYS.GPT_URL),
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ${APIKEYS.GPT_KEY}',
+        'Authorization': 'Bearer ${APIKEYS.GPT_KEY}}',
       },
       body: jsonEncode(<String, dynamic>{
         "model": "gpt-3.5-turbo",

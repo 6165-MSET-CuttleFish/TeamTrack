@@ -51,7 +51,7 @@ class _LandingPageState extends State<LandingPage> {
   void onClickedNotification(String? payload) =>
       setState(() => tab = Tab.inbox);
 
-  Text title() {
+  Widget title() {
     switch (tab) {
       case Tab.inbox:
         return Text("Inbox");
@@ -60,7 +60,7 @@ class _LandingPageState extends State<LandingPage> {
       case Tab.templates:
         return Text("Templates");
       case Tab.events:
-        return Text("Events");
+        return Center(child:Text("TeamTrack",textScaleFactor: 1.5,));
     }
   }
 
@@ -150,12 +150,7 @@ class _LandingPageState extends State<LandingPage> {
           //idk
           body: body(),
           floatingActionButton: tab == Tab.events
-              ? FloatingActionButton(
-            tooltip: "Add Event",
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            child: Icon(Icons.add),
-            onPressed: _onPressed,
-          )
+              ? null
               : null,
 
 
