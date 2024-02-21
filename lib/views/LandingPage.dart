@@ -80,6 +80,10 @@ class _LandingPageState extends State<LandingPage> {
   @override
   Widget build(BuildContext context) {
     final themeChange = context.watch<DarkThemeProvider>();
+    setState(() {
+
+      themeChange.darkTheme = true;
+    });
     final TextEditingController controller = new TextEditingController();
     for (var event in dataModel.events.where((e) => !e.shared)) {
       final user = context.read<User?>();
@@ -115,6 +119,7 @@ class _LandingPageState extends State<LandingPage> {
         });
         (data?['blockedUsers'] as Map?)?.keys.forEach((key) {
           try {
+
             final ttuser =
             TeamTrackUser.fromJson(data?['blockedUsers']?[key], key);
             dataModel.blockedUsers.add(ttuser);
@@ -133,16 +138,19 @@ class _LandingPageState extends State<LandingPage> {
             backgroundColor: Theme.of(context).colorScheme.primary,
             title: title(),
             actions: [
-              IconButton(
-                tooltip: themeChange.darkTheme ? "Light Mode" : "Dark Mode",
-                icon: themeChange.darkTheme
-                    ? Icon(CupertinoIcons.sun_max)
-                    : Icon(CupertinoIcons.moon),
-                onPressed: () {
-                  setState(() =>
-                  themeChange.darkTheme = !themeChangeProvider.darkTheme);
-                },
+              SizedBox(
+                width: 50,
               )
+              // IconButton(
+              //   tooltip: themeChange.darkTheme ? "Light Mode" : "Dark Mode",
+              //   icon: themeChange.darkTheme
+              //       ? Icon(CupertinoIcons.sun_max)
+              //       : Icon(CupertinoIcons.moon),
+              //   onPressed: () {
+              //     setState(() =>
+              //     themeChange.darkTheme = !themeChangeProvider.darkTheme);
+              //   },
+              // )
             ],
           ),
 
