@@ -184,20 +184,3 @@ export const remoteConfigToDatabase = functions.remoteConfig
           .ref.set(temp.parameters);
     });
 
-// Remove old templates every week
-export const periodicTemplateRemoval = functions.pubsub
-    .schedule("every 1 day")
-    .onRun(async () => {
-      const now = new Date();
-      // eslint-disable-next-line max-len
-      const lastWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
-      return admin.firestore()
-          .collectionGroup("templates").where("createdAt", "<", lastWeek).get()
-          .then((querySnapshot) => {
-            const promises:Promise<FirebaseFirestore.WriteResult>[] = [];
-            querySnapshot.forEach((doc) => {
-              promises.push(doc.ref.delete());
-            });
-            return Promise.all(promises);
-          });
-    });
