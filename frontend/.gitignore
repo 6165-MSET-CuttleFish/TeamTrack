@@ -46,3 +46,5 @@ ios/Runner/GoogleService-Info.plist
 web/api/
 lib/api/*.dart
 lib/firebase_options.dart
+
+pubspec.lock
