@@ -88,19 +88,20 @@ class Event {
   Future<HttpsCallableResult<dynamic>> shareEvent({
     required String email,
     required Role role,
-  }) =>
-      functions.httpsCallable('shareEvent').call(
-        {
-          'email': email,
-          'name': name,
-          'id': id,
-          'author': author?.toJson(),
-          'type': type.toString(),
-          'gameName': gameName,
-          'role': role.toRep(),
-          'eventKey': eventKey,
-        },
-      );
+  }){
+  return functions.httpsCallable('shareEvent').call(
+      {
+        'email': email,
+        'name': name,
+        'id': id,
+        'author': author?.toJson(),
+        'type': type.toString(),
+        'gameName': gameName,
+        'role': role.toRep(),
+        'eventKey': eventKey,
+      },
+    );
+  }
 
   String? getKey() => eventKey;
 

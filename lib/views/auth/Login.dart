@@ -5,6 +5,8 @@ import 'package:teamtrack/providers/Auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:auth_buttons/auth_buttons.dart';
+
+import 'package:auth_buttons/src/shared/auth_icons.dart';
 import 'package:provider/provider.dart';
 
 class LoginView extends StatefulWidget {
@@ -26,12 +28,6 @@ class _LoginView extends State<LoginView> {
         children: [
           Container(
             decoration: BoxDecoration(
-              gradient: RadialGradient(
-                colors: [
-                  Color.fromRGBO(25, 25, 112, 1),
-                  Colors.black,
-                ],
-              ),
             ),
           ),
           Column(
@@ -48,7 +44,7 @@ class _LoginView extends State<LoginView> {
               color: Theme.of(context).cardColor.withOpacity(0.7),
               child: Container(
                 width: size.width - 20,
-                height: 310,
+                height: context.read<User?>()?.isAnonymous ?? false ? size.height*.35:size.height*.45,
                 child: PageView(
                   controller: _controller,
                   children: <Widget>[
@@ -96,114 +92,7 @@ class _LoginView extends State<LoginView> {
                 ),
               ),
               Spacer(),
-              OutlinedButton(
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(
-                    Theme.of(context).platform == TargetPlatform.iOS? Theme.of(context).colorScheme.primary?.withOpacity(1):Theme.of(context).colorScheme.primary?.withOpacity(.6),
-                  ),
-                  foregroundColor: MaterialStateProperty.all(
-                      Theme.of(context).textTheme.bodyText2?.color),
-                  side: MaterialStateProperty.all(
-                    BorderSide(color: Theme.of(context).colorScheme.primary ),
-                  ),
-                  shape: MaterialStateProperty.all(
-                    RoundedRectangleBorder(
-                      borderRadius:Theme.of(context).platform == TargetPlatform.iOS? BorderRadius.all(
-                        Radius.elliptical(10, 10),
-                      ):BorderRadius.all(
-                        Radius.elliptical(50 , 50),
-                      ),
-                    ),
-                  ),
-                ),
-                onPressed: () async {
-                  await showModalBottomSheet(
-                    context: context,
-                    builder: (context) => SignUpScreen(),
-                    isScrollControlled: true,
-                  );
-                  if (widget.returnBack ?? false)
-                    Navigator.of(context).pop();
-                },
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [Icon(Icons.person), Text('Sign Up')],
-                ),
-              ),
-              OutlinedButton(
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(
-                    Theme.of(context).platform == TargetPlatform.iOS? Colors.purple?.withOpacity(1):Colors.purple?.withOpacity(0.6),
-                  ),
-                  foregroundColor: MaterialStateProperty.all(
-                      Theme.of(context).textTheme.bodyText2?.color),
-                  side: MaterialStateProperty.all(
-                    BorderSide(color: Colors.purple ?? Colors.transparent),
-                  ),
-                  shape: MaterialStateProperty.all(
-                    RoundedRectangleBorder(
-                      borderRadius:Theme.of(context).platform == TargetPlatform.iOS? BorderRadius.all(
-                        Radius.elliptical(10, 10),
-                      ):BorderRadius.all(
-                        Radius.elliptical(50 , 50),
-                      ),
-                    ),
-                  ),
-                ),
-                child: Text(
-                  "Forgot Password",
-                  style: TextStyle(fontSize: 14),
-                ),
-                onPressed: () async {
-                  String? s = await context
-                      .read<AuthenticationService>()
-                      .forgotPassword(email: emailController.text.trim());
-                  emailController.clear();
-                  passwordController.clear();
-                  if (s != "sent") {
-                    showPlatformDialog(
-                      context: context,
-                      builder: (BuildContext context) => PlatformAlert(
-                        title: Text('Error'),
-                        content: Text(
-                          s ?? 'Something went wrong',
-                          style: Theme.of(context).textTheme.bodyText1,
-                        ),
-                        actions: [
-                          PlatformDialogAction(
-                            isDefaultAction: true,
-                            child: Text('Okay'),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        ],
-                      ),
-                    );
-                  } else {
-                    showPlatformDialog(
-                      context: context,
-                      builder: (BuildContext context) => PlatformAlert(
-                        title: Text('Success'),
-                        content: Text(
-                          'Reset email sent',
-                          style: Theme.of(context).textTheme.bodyText1,
-                        ),
-                        actions: [
-                          PlatformDialogAction(
-                            isDefaultAction: true,
-                            child: Text('Okay'),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-                },
-              ),
+
             ],
           ),
         ),
@@ -220,45 +109,127 @@ class _LoginView extends State<LoginView> {
           textInputAction: TextInputAction.next,
           controller: passwordController,
           keyboardType: TextInputType.visiblePassword,
-          placeholder: "Password",
           obscureText: true,
+          placeholder: "Password",
         ),
         Padding(
-          padding: EdgeInsets.all(5),
+          padding: EdgeInsets.all(0),
         ),
-        PlatformButton(
-          child: Text("Sign In"),
-          color: Colors.green,
-          onPressed: () async {
-            String? s = await context.read<AuthenticationService>().signIn(
-              email: emailController.text.trim(),
-              password: passwordController.text,
-            );
-            emailController.clear();
-            passwordController.clear();
-            if (s != "Signed in") {
-              showPlatformDialog(
-                context: context,
-                builder: (BuildContext context) => PlatformAlert(
-                  title: Text('Error'),
-                  content: Text(
-                    s ?? 'Something went wrong',
-                    style: Theme.of(context).textTheme.bodyText1,
-                  ),
-                  actions: [
-                    PlatformDialogAction(
-                      isDefaultAction: true,
-                      child: Text('Okay'),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
+        Row(
+          children:[
+            TextButton(
+
+              onPressed: () async {
+                await showModalBottomSheet(
+                  context: context,
+                  builder: (context) => SignUpScreen(),
+                  isScrollControlled: true,
+                );
+                if (widget.returnBack ?? false)
+                  Navigator.of(context).pop();
+              },
+              child:Text('Sign Up',style:Theme.of(context).textTheme.bodyMedium?.apply(color: Colors.blue,decoration: TextDecoration.underline)),
+              ),
+
+            TextButton(
+              child: Text(
+                "Forgot Password?",
+  style:Theme.of(context).textTheme.bodyMedium?.apply(color:Colors.blue,decoration: TextDecoration.underline)
+              ),
+              onPressed: () async {
+                String? s = await context
+                    .read<AuthenticationService>()
+                    .forgotPassword(email: emailController.text.trim());
+                emailController.clear();
+                passwordController.clear();
+                if (s != "sent") {
+                  showPlatformDialog(
+                    context: context,
+                    builder: (BuildContext context) => PlatformAlert(
+                      title: Text('Error'),
+                      content: Text(
+                        s ?? 'Something went wrong',
+                        style: Theme.of(context).textTheme.bodyText1,
+                      ),
+                      actions: [
+                        PlatformDialogAction(
+                          isDefaultAction: true,
+                          child: Text('Okay'),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              );
-            }
-          },
+                  );
+                } else {
+                  showPlatformDialog(
+                    context: context,
+                    builder: (BuildContext context) => PlatformAlert(
+                      title: Text('Success'),
+                      content: Text(
+                        'Reset email sent',
+                        style: Theme.of(context).textTheme.bodyText1,
+                      ),
+                      actions: [
+                        PlatformDialogAction(
+                          isDefaultAction: true,
+                          child: Text('Okay'),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              },
+            ),
+          ]
         ),
+        Padding(
+          padding:EdgeInsets.all(10)
+        ),
+        OutlinedButton(
+            onPressed: () async {
+              String? s = await context.read<AuthenticationService>().signIn(
+                email: emailController.text.trim(),
+                password: passwordController.text,
+              );
+              emailController.clear();
+              passwordController.clear();
+              if (s != "Signed in") {
+                showPlatformDialog(
+                  context: context,
+                  builder: (BuildContext context) => PlatformAlert(
+                    title: Text('Error'),
+                    content: Text(
+                      s ?? 'Something went wrong',
+                      style: Theme.of(context).textTheme.bodyText1,
+                    ),
+                    actions: [
+                      PlatformDialogAction(
+                        isDefaultAction: true,
+                        child: Text('Okay'),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              }
+            },
+            child: Padding(
+                padding: EdgeInsets.fromLTRB(0, 15, 0, 15),
+                child:Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children:[
+                      Text("Sign In",style:Theme.of(context).textTheme.titleMedium,),
+                    ]
+                ))),
+
       ],
     ),
   );
@@ -266,82 +237,102 @@ class _LoginView extends State<LoginView> {
   Widget signInList() => Column(
     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
     children: [
-      if (context.read<User?>()?.isAnonymous ?? false)
-        PlatformButton(
-          color: CupertinoColors.systemBlue,
-          onPressed: () => Navigator.of(context).pop(),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [Icon(Icons.arrow_back_ios_new_sharp), Text('Back')],
-          ),
-        ),
-      PlatformButton(
-        color: Theme.of(context).colorScheme.primary,
-        onPressed: () async {
-          await showModalBottomSheet(
-            context: context,
-            builder: (context) => SignUpScreen(),
-            isScrollControlled: true,
-          );
-          if (widget.returnBack ?? false) Navigator.of(context).pop();
-        },
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [Icon(Icons.person), Text('Sign Up')],
-        ),
-      ),
+
       if (!(context.read<User?>()?.isAnonymous ?? false))
-        PlatformButton(
-          color: CupertinoColors.systemBlue,
-          onPressed: () => showPlatformDialog(
-            context: context,
-            builder: (context) => PlatformAlert(
-              title: Text('Anonymously Sign In?'),
-              content: Text('This has limited functionality'),
-              actions: [
-                PlatformDialogAction(
-                  isDefaultAction: true,
-                  child: Text('No'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-                PlatformDialogAction(
-                  isDestructive: true,
-                  child: Text('Yes'),
-                  onPressed: () async {
-                    await context
-                        .read<AuthenticationService>()
-                        .signInWithAnonymous();
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.visibility_off),
-              Text('Sign In Anonymously')
-            ],
-          ),
-        ),
-      GoogleAuthButton(
+        Padding(padding:EdgeInsets.all(20),child:Text("Log in",style:Theme.of(context).textTheme.titleLarge,textScaleFactor: 1.5,)),
+      OutlinedButton(
         onPressed: () async {
           await context.read<AuthenticationService>().signInWithGoogle();
           if (widget.returnBack ?? false) Navigator.of(context).pop();
         },
-        darkMode: true,
-        style: AuthButtonStyle(
-          iconSize: 20,
-          textStyle: TextStyle(fontSize: 14, color: Colors.white),
-          width: size.width - 80,
-        ),
-      ),
+        child: Padding(
+            padding: EdgeInsets.fromLTRB(0, 15, 0, 15),
+  child:Row(
+  mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  children:[
+          Image(height:20,
+              image:ExactAssetImage(AuthIcons.google[0])),
+        SizedBox(width:25),
+        Text("Continue with Google",style:Theme.of(context).textTheme.titleMedium,),
+  SizedBox(width:25),
+        ]
+      ))),
+      if (!(context.read<User?>()?.isAnonymous ?? false))
+      OutlinedButton(
+
+          onPressed: ()  {setState(
+                () {
+              _controller.nextPage(
+                duration: Duration(milliseconds: 200),
+                curve: Curves.linear,
+              );
+            },
+          );
+          },
+          child: Padding(
+              padding: EdgeInsets.fromLTRB(0, 15, 0, 15),
+              child:Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children:[
+                   Icon(Icons.email_outlined,size:20,color: Colors.white),
+                    SizedBox(width:40),
+                    Text("Sign in with Email",style:Theme.of(context).textTheme.titleMedium,),
+                    SizedBox(width:40),
+                  ]
+              )))
+      ,Text("Or",style:Theme.of(context).textTheme.titleMedium),
+      OutlinedButton(
+          onPressed: () async {
+            await showModalBottomSheet(
+              context: context,
+              builder: (context) => SignUpScreen(),
+              isScrollControlled: true,
+            );
+            if (widget.returnBack ?? false) Navigator.of(context).pop();
+          },
+          child: Padding(
+              padding: EdgeInsets.fromLTRB(0, 15, 0, 15),
+              child:Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children:[
+                    SizedBox(width: 50,),
+                    Text("Create an Account",style:Theme.of(context).textTheme.titleMedium,),
+
+                    SizedBox(width: 50,),
+                  ]
+              ))),
+
+              if (!(context.read<User?>()?.isAnonymous ?? false))
+      TextButton(onPressed:  () => showPlatformDialog(
+  context: context,
+  builder: (context) => PlatformAlert(
+  title: Text('Anonymously Sign In?'),
+  content: Text('This has limited functionality'),
+  actions: [
+  PlatformDialogAction(
+  isDefaultAction: true,
+  child: Text('No'),
+  onPressed: () {
+  Navigator.of(context).pop();
+  },
+  ),
+  PlatformDialogAction(
+  isDestructive: true,
+  child: Text('Yes'),
+  onPressed: () async {
+  await context
+      .read<AuthenticationService>()
+      .signInWithAnonymous();
+  Navigator.of(context).pop();
+  },
+  ),
+  ],
+  ),
+  ), child: Text("Continue without an account",style:Theme.of(context).textTheme.bodyMedium?.apply(decoration: TextDecoration.underline)))
+
       /*if (NewPlatform.isIOS)
         AppleAuthButton(
           onPressed: () async {
@@ -354,24 +345,19 @@ class _LoginView extends State<LoginView> {
             width: size.width - 80,
           ),
         ),*/
-      if (!(context.read<User?>()?.isAnonymous ?? false))
-        EmailAuthButton(
-          onPressed: () {
-            setState(
-                  () {
-                _controller.nextPage(
-                  duration: Duration(milliseconds: 200),
-                  curve: Curves.linear,
-                );
-              },
-            );
-          },
-          style: AuthButtonStyle(
-            iconSize: 20,
-            textStyle: TextStyle(fontSize: 14),
-            width: size.width - 80,
-          ),
-        ),
+     , if (context.read<User?>()?.isAnonymous ?? false)
+  OutlinedButton(
+  onPressed: () => Navigator.of(context).pop(),
+  child: Padding(
+  padding: EdgeInsets.fromLTRB(0, 15, 0, 15),
+  child:Row(
+  mainAxisSize: MainAxisSize.min,
+  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  children:[
+  Text("Go Back",style:Theme.of(context).textTheme.titleMedium,),
+  ]
+  )))
+
     ],
   );
 }

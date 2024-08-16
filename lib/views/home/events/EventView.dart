@@ -401,6 +401,7 @@ class _EventView extends State<EventView> {
                 Icons.search,
               ),
               onPressed: () {
+                print(widget.event.id);
                 showSearch(
                   context: context,
                   delegate: _tab == 0

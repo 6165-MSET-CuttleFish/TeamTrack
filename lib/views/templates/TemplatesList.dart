@@ -190,6 +190,7 @@ class _TemplatesList extends State<TemplatesList> {
                 , overflow: TextOverflow.ellipsis,),
               tileColor: Colors.transparent,
               onTap: () {
+              print(bodvis[index]);
                 Navigator.push(
                   context,
                   platformPageRoute(
