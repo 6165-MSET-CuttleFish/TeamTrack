@@ -114,7 +114,7 @@ class _EventsList extends State<EventsList> {
       dataModel.driverAnalysis().map(eventTile).toList();
 
   Card eventTile(Event e) => Card(
-color: themeChangeProvider.darkTheme? Colors.white12:Colors.black87.withOpacity(.65),
+color: Colors.white12,
       child:Slidable(
         startActionPane: ActionPane(
           // A motion is a widget used to control how the pane animates.
@@ -184,7 +184,6 @@ color: themeChangeProvider.darkTheme? Colors.white12:Colors.black87.withOpacity(
                 Row(
                   children:[
                     e.shared? InfoPills(text: "Shared", color: Colors.blueAccent):InfoPills(text: "Private", color: Colors.grey),
-                    e.type == EventType.analysis? Row():InfoPills(text:format.format(e.createdAt.toDate()),color:Colors.red),
                     e.type == EventType.analysis? InfoPills(text:"Matches: "+e.matches.length.toString(),color:Colors.purple):Row()
 
             ]
@@ -203,7 +202,9 @@ color: themeChangeProvider.darkTheme? Colors.white12:Colors.black87.withOpacity(
                   ),
                   context,
                 );
+                print(e.id);
                 widget.onTap!(e);
+
               } else if(e.type!=EventType.analysis) {
                 Navigator.push(
                   context,

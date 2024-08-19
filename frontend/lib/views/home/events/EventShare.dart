@@ -105,10 +105,19 @@ class _EventShareState extends State<EventShare> {
                                   ),
                                 ),
                               );
-                              await widget.event.shareEvent(
+                              String x = 'Success!';
+                             x= await widget.event.shareEvent(
                                 email: emailController.text.trim(),
                                 role: shareRole,
-                              );
+                              ).asStream().toString();
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                behavior: SnackBarBehavior.floating,
+                                duration: const Duration(milliseconds: 1000),
+                                content: Text(x),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(25.0 ),
+                                ),
+                              ));
                               emailController.clear();
                             }
                             Navigator.pop(context);

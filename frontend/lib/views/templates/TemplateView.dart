@@ -228,8 +228,7 @@ class _TemplateView extends State<TemplateView> {
                 ),
               ),
             ),
-            data[0]['division_name']
-                ?.let((that) => Text('Division: ' + that.toString())),
+            data[0]['division_name']!=null? Text('Division: ' + data[0]['division_name'].toString()):null,
             Expanded(
               child: bod.isEmpty
                   ? Center(child: Text('No Teams Loaded Yet'))
