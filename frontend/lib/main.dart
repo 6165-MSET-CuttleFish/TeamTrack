@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:teamtrack/components/misc/PlatformGraphics.dart';
 import 'package:teamtrack/models/GameModel.dart';
@@ -16,10 +17,11 @@ import 'package:provider/provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
   await Firebase.initializeApp();
   await remoteConfig.fetchAndActivate();
-  Statics.gameName = remoteConfig.getString("gameName");
   // season's game name (to be changed in remote config every season)
+  Statics.gameName = remoteConfig.getString("gameName");
   dataModel.restoreEvents(); // restore on-device events from shared preferences
   if (!NewPlatform.isWeb) {
     final settings = await messaging.requestPermission(

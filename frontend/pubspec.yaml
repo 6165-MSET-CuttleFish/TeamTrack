@@ -37,8 +37,7 @@ dependencies:
   syncfusion_flutter_charts: ^21.2.10
   skeletons: ^0.0.3
   google_fonts: ^5.0.0
-
-
+  flutter_dotenv: ^5.1.0
 
   firebase_core: ^2.14.0
   firebase_messaging: ^14.6.3

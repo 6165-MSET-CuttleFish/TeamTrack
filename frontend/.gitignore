@@ -48,3 +48,4 @@ lib/api/*.dart
 lib/firebase_options.dart
 
 pubspec.lock
+*.env

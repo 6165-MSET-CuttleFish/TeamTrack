@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:ffi';
 import 'package:flutter/material.dart';
-import 'package:teamtrack/api/APIKEYS.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:teamtrack/functions/Extensions.dart';
 import 'package:teamtrack/functions/Statistics.dart';
 import 'package:teamtrack/models/GPTModel.dart';
@@ -13,7 +13,6 @@ import 'AllianceSimulator.dart';
 import 'TeamAllianceRecommend.dart';
 import 'TeamRowAlliance.dart';
 import 'package:http/http.dart' as http;
-
 
 class AllianceSelection extends StatefulWidget {
   AllianceSelection({
@@ -49,10 +48,14 @@ class _AllianceSelection extends State<AllianceSelection> {
   List<String> teleNames = [];
   List<String> endgameNames = [];
 
-
-
-
-  Widget _buildTable(Team team, List<double> autoRanks, List<double> teleRanks, List<double> endgameRanks, List<String> autoNames, List<String> teleNames, List<String> endgameNames) {
+  Widget _buildTable(
+      Team team,
+      List<double> autoRanks,
+      List<double> teleRanks,
+      List<double> endgameRanks,
+      List<String> autoNames,
+      List<String> teleNames,
+      List<String> endgameNames) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.deepPurple,
@@ -110,6 +113,7 @@ class _AllianceSelection extends State<AllianceSelection> {
       ),
     );
   }
+
   Widget _buildSubTable(int index, List<double> ranks, List<String> nameRanks) {
     List<TableRow> tableRows = [];
 
@@ -161,15 +165,14 @@ class _AllianceSelection extends State<AllianceSelection> {
                     color: (ranks[i] == -1)
                         ? Colors.black // Text color for "not enough data"
                         : (ranks[i] < 0.7)
-                        ? Colors.red
-                        : (ranks[i] >= 0.7 && ranks[i] <= 1.3)
-                        ? Colors.black // Change orange to black
-                        : Colors.green,
+                            ? Colors.red
+                            : (ranks[i] >= 0.7 && ranks[i] <= 1.3)
+                                ? Colors.black // Change orange to black
+                                : Colors.green,
                   ),
                 ),
               ),
             ),
-
           ],
         ),
       );
@@ -186,11 +189,8 @@ class _AllianceSelection extends State<AllianceSelection> {
     );
   }
 
-
-
-
-
-  Future<void> _showPromptDialog(BuildContext context, String prompt, Team team) async {
+  Future<void> _showPromptDialog(
+      BuildContext context, String prompt, Team team) async {
     final GlobalKey<State> key = GlobalKey<State>();
 
     showDialog(
@@ -224,9 +224,12 @@ class _AllianceSelection extends State<AllianceSelection> {
                   MaterialPageRoute(
                     builder: (context) => _buildTable(
                       team,
-                      getRanks(widget.event, team, OpModeType.auto, true, false),
-                      getRanks(widget.event, team, OpModeType.tele, true, false),
-                      getRanks(widget.event, team, OpModeType.endgame, true, false),
+                      getRanks(
+                          widget.event, team, OpModeType.auto, true, false),
+                      getRanks(
+                          widget.event, team, OpModeType.tele, true, false),
+                      getRanks(
+                          widget.event, team, OpModeType.endgame, true, false),
                       autoNames,
                       teleNames,
                       endgameNames,
@@ -245,25 +248,20 @@ class _AllianceSelection extends State<AllianceSelection> {
     }
   }
 
-
   completionFunc() async {
     if (returnResponse == 'Loading...') {
       setState(() => returnResponse = 'Loading...');
     }
     final response = await http.post(
-      Uri.parse(APIKEYS.GPT_URL),
+      Uri.parse('https://api.openai.com/v1/chat/completions'),
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ${APIKEYS.GPT_KEY}}',
+        'Authorization': 'Bearer ${dotenv.env['GPT_KEY']}}',
       },
       body: jsonEncode(<String, dynamic>{
         "model": "gpt-3.5-turbo",
         "messages": [
-
-          {
-            "role": "user",
-            "content": prompt
-          },
+          {"role": "user", "content": prompt},
         ],
         "max_tokens": 150,
         "temperature": 0.7,
@@ -283,14 +281,14 @@ class _AllianceSelection extends State<AllianceSelection> {
     }
   }
 
-
   void updateRecommended(int index) {
     setState(() {
       recommendedIndex = index;
     });
   }
 
-  void _generatePromptForTeam(Team selectedTeam, List<dynamic> autonomousTeams, List<dynamic> teleOpTeams, List<dynamic> endgameTeams, List<Team> teams) {
+  void _generatePromptForTeam(Team selectedTeam, List<dynamic> autonomousTeams,
+      List<dynamic> teleOpTeams, List<dynamic> endgameTeams, List<Team> teams) {
     final indexAuto = autonomousTeams.indexOf(selectedTeam) + 1;
     final indexTele = teleOpTeams.indexOf(selectedTeam) + 1;
     final indexEndgame = endgameTeams.indexOf(selectedTeam) + 1;
@@ -298,12 +296,10 @@ class _AllianceSelection extends State<AllianceSelection> {
 
     prompt = craftPrompt(
         teams.length, index, indexAuto, indexTele, indexEndgame, selectedTeam);
-
-
   }
 
-
-  static String craftPrompt(int teamLength, int index, int indexAuto, int indexTele, int indexEndgame, Team displayTeam) {
+  static String craftPrompt(int teamLength, int index, int indexAuto,
+      int indexTele, int indexEndgame, Team displayTeam) {
     String prompt = "";
     String rankTone = "";
     String indexTone = "";
@@ -354,8 +350,10 @@ class _AllianceSelection extends State<AllianceSelection> {
     }
 
     String GPTRecoTeam = "{${displayTeam.number} ${displayTeam.name}}";
-    String startInstruct = "Provide a concise evaluation of $GPTRecoTeam for alliance selection. Considered $indexTone for alliance collaboration due to their performance in autonomous, teleOp, and endgame. Specifically,";
-    String justifyRanks = "their rankings are $rankTone, reflecting a $collaborative approach.";
+    String startInstruct =
+        "Provide a concise evaluation of $GPTRecoTeam for alliance selection. Considered $indexTone for alliance collaboration due to their performance in autonomous, teleOp, and endgame. Specifically,";
+    String justifyRanks =
+        "their rankings are $rankTone, reflecting a $collaborative approach.";
 
     prompt = startInstruct + justifyRanks;
     return prompt;
@@ -382,7 +380,6 @@ class _AllianceSelection extends State<AllianceSelection> {
         ),
       ],
     ).then((selectedSort) {
-
       if (selectedSort != null) {
         setState(() {
           _sortBy = selectedSort;
@@ -395,24 +392,26 @@ class _AllianceSelection extends State<AllianceSelection> {
   Widget build(BuildContext context) {
     final teams = widget.statConfig.sorted
         ? widget.event.teams.sortedTeams(
-      widget.sortMode,
-      widget.elementSort,
-      widget.statConfig,
-      widget.event.matches.values.toList(),
-      widget.statistic,
-    )
+            widget.sortMode,
+            widget.elementSort,
+            widget.statConfig,
+            widget.event.matches.values.toList(),
+            widget.statistic,
+          )
         : widget.event.teams.orderedTeams();
 
     final autonomousTeams = List.from(teams);
     final teleOpTeams = List.from(teams);
     final endgameTeams = List.from(teams);
 
-
-
     if (_sortBy == 'Wins') {
       teams.sort((a, b) {
-        final aWLT = a.getWLT(widget.event)?.split('-').map(int.parse).toList() ?? [0, 0, 0];
-        final bWLT = b.getWLT(widget.event)?.split('-').map(int.parse).toList() ?? [0, 0, 0];
+        final aWLT =
+            a.getWLT(widget.event)?.split('-').map(int.parse).toList() ??
+                [0, 0, 0];
+        final bWLT =
+            b.getWLT(widget.event)?.split('-').map(int.parse).toList() ??
+                [0, 0, 0];
 
         if (aWLT[0] != bWLT[0]) {
           return bWLT[0].compareTo(aWLT[0]);
@@ -499,9 +498,9 @@ class _AllianceSelection extends State<AllianceSelection> {
     final indexEndgame = endgameTeams.indexOf(displayTeam) + 1;
     final index = teams.indexOf(displayTeam) + 1;
 
-
     if (teams.length >= 2) {
-      prompt = craftPrompt(teams.length, index, indexAuto, indexTele, indexEndgame, displayTeam);
+      prompt = craftPrompt(
+          teams.length, index, indexAuto, indexTele, indexEndgame, displayTeam);
     }
 
     return Scaffold(
@@ -510,11 +509,9 @@ class _AllianceSelection extends State<AllianceSelection> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             SizedBox(
-                width: 0.55*MediaQuery.of(context).size.width,
-              child: FittedBox (
-                fit: BoxFit.scaleDown,
-                child: Text('Alliance Selection')
-              ),
+              width: 0.55 * MediaQuery.of(context).size.width,
+              child: FittedBox(
+                  fit: BoxFit.scaleDown, child: Text('Alliance Selection')),
             ),
           ],
         ),
@@ -591,7 +588,8 @@ class _AllianceSelection extends State<AllianceSelection> {
                     ? Colors.yellow.withOpacity(0.7)
                     : null;
 
-                final wlt = team.getWLT(widget.event)?.split('-') ?? ['', '', ''];
+                final wlt =
+                    team.getWLT(widget.event)?.split('-') ?? ['', '', ''];
 
                 final teamTotalScore = team.getAllianceScore(widget.event);
 
@@ -599,7 +597,12 @@ class _AllianceSelection extends State<AllianceSelection> {
                 final indexTele = teleOpTeams.indexOf(team);
                 final indexEndgame = endgameTeams.indexOf(team);
 
-                List<int> parsedList = [indexAuto + 1, indexTele + 1, indexEndgame + 1, index + 1];
+                List<int> parsedList = [
+                  indexAuto + 1,
+                  indexTele + 1,
+                  indexEndgame + 1,
+                  index + 1
+                ];
 
                 return Container(
                   decoration: BoxDecoration(
@@ -623,12 +626,16 @@ class _AllianceSelection extends State<AllianceSelection> {
                               event: widget.event,
                               sortMode: widget.sortMode,
                               statConfig: widget.statConfig,
-                              statistic: widget.statistic
-                          ),
+                              statistic: widget.statistic),
                         ),
                       );
-                      _generatePromptForTeam(team, autonomousTeams, teleOpTeams, endgameTeams, teams);
-                      _showPromptDialog(context, returnResponse, team, );
+                      _generatePromptForTeam(team, autonomousTeams, teleOpTeams,
+                          endgameTeams, teams);
+                      _showPromptDialog(
+                        context,
+                        returnResponse,
+                        team,
+                      );
                     },
                     child: ListTile(
                       title: Text(
@@ -665,12 +672,13 @@ class _AllianceSelection extends State<AllianceSelection> {
               },
             ),
           ),
-
         ],
       ),
     );
   }
-  List<double> getRanks(Event event, Team team, OpModeType type, bool isUser, bool isPercent) {
+
+  List<double> getRanks(
+      Event event, Team team, OpModeType type, bool isUser, bool isPercent) {
     List<double> total = [];
     List<double> user = [];
     List<double> percent = [];
@@ -690,9 +698,13 @@ class _AllianceSelection extends State<AllianceSelection> {
 
         ScoreDivision? autoScores = score?.getScoreDivision(OpModeType.auto);
         ScoreDivision? teleScores = score?.getScoreDivision(OpModeType.tele);
-        ScoreDivision? endgameScores = score?.getScoreDivision(OpModeType.endgame);
+        ScoreDivision? endgameScores =
+            score?.getScoreDivision(OpModeType.endgame);
 
-        if (!doOnce && autoScores != null && teleScores != null && endgameScores != null) {
+        if (!doOnce &&
+            autoScores != null &&
+            teleScores != null &&
+            endgameScores != null) {
           int? length = 0;
           if (type == OpModeType.auto) {
             length = autoScores.elements.values.toList().length;
@@ -721,8 +733,8 @@ class _AllianceSelection extends State<AllianceSelection> {
         }
 
         if (type == OpModeType.auto && autoScores != null) {
-          List<ScoringElement> elementList = autoScores.elements.values
-              .toList();
+          List<ScoringElement> elementList =
+              autoScores.elements.values.toList();
           if (newTeam == team) {
             for (int i = 0; i < elementList.length; i++) {
               ScoringElement element = elementList[i];
@@ -734,10 +746,9 @@ class _AllianceSelection extends State<AllianceSelection> {
               total[i] += element.scoreValue();
             }
           }
-        }
-        else if (type == OpModeType.tele && teleScores != null) {
-          List<ScoringElement> elementList = teleScores.elements.values
-              .toList();
+        } else if (type == OpModeType.tele && teleScores != null) {
+          List<ScoringElement> elementList =
+              teleScores.elements.values.toList();
           if (newTeam == team) {
             for (int i = 0; i < elementList.length; i++) {
               ScoringElement element = elementList[i];
@@ -749,10 +760,9 @@ class _AllianceSelection extends State<AllianceSelection> {
               total[i] += element.scoreValue();
             }
           }
-        }
-        else if (type == OpModeType.endgame && endgameScores != null) {
-          List<ScoringElement> elementList = endgameScores.elements.values
-              .toList();
+        } else if (type == OpModeType.endgame && endgameScores != null) {
+          List<ScoringElement> elementList =
+              endgameScores.elements.values.toList();
           if (newTeam == team) {
             for (int i = 0; i < elementList.length; i++) {
               ScoringElement element = elementList[i];
@@ -764,7 +774,6 @@ class _AllianceSelection extends State<AllianceSelection> {
               total[i] += element.scoreValue();
             }
           }
-
         }
       }
     }
@@ -775,10 +784,10 @@ class _AllianceSelection extends State<AllianceSelection> {
       total[i] = (total[i] / plays).roundToDouble();
     }
     for (int i = 0; i < percent.length; i++) {
-      print (user[i]);
-      print (total[i]);
+      print(user[i]);
+      print(total[i]);
       if (total[i] != 0) {
-        percent[i] = (user[i]/total[i] * 100).roundToDouble();
+        percent[i] = (user[i] / total[i] * 100).roundToDouble();
       } else {
         percent[i] = -1;
       }

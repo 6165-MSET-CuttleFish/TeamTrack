@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-import 'package:teamtrack/api/APIKEYS.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:teamtrack/components/statistics/BarGraph.dart';
 import 'package:teamtrack/components/scores/Incrementor.dart';
@@ -133,9 +134,10 @@ class _MatchView extends State<MatchView> {
       _allianceTotal = false;
       try {
         http.get(
-          Uri.parse('${APIKEYS.TOA_URL}/team/${widget.team?.number}'),
+          Uri.parse(
+              'https://theorangealliance.org/api/team/${widget.team?.number}'),
           headers: {
-            'X-TOA-Key': APIKEYS.TOA_KEY,
+            'X-TOA-Key': dotenv.env['TOA_KEY']!,
             'X-Application-Origin': 'TeamTrack',
             'Content-Type': 'application/json',
           },
@@ -255,11 +257,11 @@ class _MatchView extends State<MatchView> {
                       elevation: 0,
                       actions: widget.match != null
                           ? [
-                            Center(
-                                child:Text("Timer",
-                                style:Theme.of(context).textTheme.titleSmall)
-                            ),
-
+                              Center(
+                                  child: Text("Timer",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleSmall)),
                               IconButton(
                                 tooltip: "Reset Score",
                                 icon: Icon(
@@ -359,98 +361,101 @@ class _MatchView extends State<MatchView> {
                                     _match?.type != EventType.analysis) &&
                                 widget.match != null)
                               SizedBox(
-                                  width: 0.9*MediaQuery.of(context).size.width,
-                                  child: FittedBox(
-                                      fit: BoxFit.scaleDown,
-                                child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: [
-                                  Container(
-                                    alignment: Alignment.center,
-                                    width: 100,
-                                    child: Text(
-                                      _match
-                                              ?.redScore(
-                                                showPenalties: true,
-                                              )
-                                              .toString() ??
-                                          '0',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headlineMedium,
-                                    ),
-                                  ),
-                                  DropdownButton<Dice>(
-                                    value: _match?.dice,
-                                    focusColor: Colors.black,
-                                    icon: Icon(Icons.height_rounded),
-                                    iconSize: 24,
-                                    iconEnabledColor:
-                                        Theme.of(context).shadowColor,
-                                    elevation: 16,
-                                    style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary),
-                                    underline: Container(
-                                      height: 0.5,
-                                      color: Colors.deepPurple,
-                                    ),
-                                    onChanged: (newValue) {
-                                      setState(
-                                        () {
-                                          HapticFeedback.mediumImpact();
-                                          _match?.setDice(newValue ?? Dice.one);
+                                width: 0.9 * MediaQuery.of(context).size.width,
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    children: [
+                                      Container(
+                                        alignment: Alignment.center,
+                                        width: 100,
+                                        child: Text(
+                                          _match
+                                                  ?.redScore(
+                                                    showPenalties: true,
+                                                  )
+                                                  .toString() ??
+                                              '0',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headlineMedium,
+                                        ),
+                                      ),
+                                      DropdownButton<Dice>(
+                                        value: _match?.dice,
+                                        focusColor: Colors.black,
+                                        icon: Icon(Icons.height_rounded),
+                                        iconSize: 24,
+                                        iconEnabledColor:
+                                            Theme.of(context).shadowColor,
+                                        elevation: 16,
+                                        style: TextStyle(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary),
+                                        underline: Container(
+                                          height: 0.5,
+                                          color: Colors.deepPurple,
+                                        ),
+                                        onChanged: (newValue) {
+                                          setState(
+                                            () {
+                                              HapticFeedback.mediumImpact();
+                                              _match?.setDice(
+                                                  newValue ?? Dice.one);
+                                            },
+                                          );
+                                          widget.event
+                                              .getRef()
+                                              ?.child(
+                                                  'matches/${_match?.id}/dice')
+                                              .set((newValue ?? Dice.one)
+                                                  .toString());
+                                          dataModel.saveEvents();
                                         },
-                                      );
-                                      widget.event
-                                          .getRef()
-                                          ?.child('matches/${_match?.id}/dice')
-                                          .set((newValue ?? Dice.one)
-                                              .toString());
-                                      dataModel.saveEvents();
-                                    },
-                                    items: [Dice.one, Dice.two, Dice.three]
-                                        .map<DropdownMenuItem<Dice>>(
-                                          (value) => DropdownMenuItem<Dice>(
-                                            value: value,
-                                            child: Text(
-                                              json.decode(
-                                                    remoteConfig.getString(
-                                                      widget.event.gameName,
-                                                    ),
-                                                  )['Dice']['name'] +
-                                                  ' : ' +
-                                                  value.toVal(
-                                                    widget.event.gameName,
-                                                  ),
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .bodyLarge,
-                                            ),
-                                          ),
-                                        )
-                                        .toList(),
+                                        items: [Dice.one, Dice.two, Dice.three]
+                                            .map<DropdownMenuItem<Dice>>(
+                                              (value) => DropdownMenuItem<Dice>(
+                                                value: value,
+                                                child: Text(
+                                                  json.decode(
+                                                        remoteConfig.getString(
+                                                          widget.event.gameName,
+                                                        ),
+                                                      )['Dice']['name'] +
+                                                      ' : ' +
+                                                      value.toVal(
+                                                        widget.event.gameName,
+                                                      ),
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyLarge,
+                                                ),
+                                              ),
+                                            )
+                                            .toList(),
+                                      ),
+                                      Container(
+                                        alignment: Alignment.center,
+                                        width: 100,
+                                        child: Text(
+                                          _match
+                                                  ?.blueScore(
+                                                      showPenalties:
+                                                          _showPenalties)
+                                                  .toString() ??
+                                              '0',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headlineMedium,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  Container(
-                                    alignment: Alignment.center,
-                                    width: 100,
-                                    child: Text(
-                                      _match
-                                              ?.blueScore(
-                                                  showPenalties: _showPenalties)
-                                              .toString() ??
-                                          '0',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headlineMedium,
-                                    ),
-                                  ),
-                                ],
+                                ),
                               ),
-                            ),
-                           ),
                             if ((_match?.type != EventType.remote &&
                                     _match?.type != EventType.analysis) &&
                                 _match != null)
@@ -579,11 +584,17 @@ class _MatchView extends State<MatchView> {
                                   groupValue: _view,
                                   children: {
                                     OpModeType.auto: Text('Autonomous',
-                                    style: Theme.of(context).textTheme.titleSmall),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleSmall),
                                     OpModeType.tele: Text('Tele-Op',
-                                        style: Theme.of(context).textTheme.titleSmall),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleSmall),
                                     OpModeType.endgame: Text('Endgame',
-                                        style: Theme.of(context).textTheme.titleSmall)
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleSmall)
                                   },
                                   onValueChanged: (OpModeType? type) {
                                     setState(
@@ -603,7 +614,8 @@ class _MatchView extends State<MatchView> {
                                     labelColor:
                                         Theme.of(context).colorScheme.primary,
                                     unselectedLabelColor: Colors.grey,
-                                    labelStyle: Theme.of(context).textTheme.titleSmall,
+                                    labelStyle:
+                                        Theme.of(context).textTheme.titleSmall,
                                     tabs: opModeExt
                                         .getMain()
                                         .map(
@@ -756,7 +768,7 @@ class _MatchView extends State<MatchView> {
                   child: BarGraph(
                     title: "Contribution",
                     vertical: false,
-                    height: MediaQuery.of(context).size.width*.9,
+                    height: MediaQuery.of(context).size.width * .9,
                     width: 15,
                     val: _score
                             ?.getScoreDivision(type)
@@ -833,30 +845,39 @@ class _MatchView extends State<MatchView> {
                     [],
             ]
           : [
-            Material(
+              Material(
                 child: Row(
-                  mainAxisAlignment:MainAxisAlignment.spaceAround,
-                    children:[
-                  Text("Begin "+(type==OpModeType.tele?"Tele-Op":"End Game") +" Phase"),
-                  IconButton(
-                  icon: Icon(Icons.play_arrow),
-                  tooltip: 'Driver Control Play',
-                  onPressed: () {
-                    _paused = false;
-                    _allowView = true;
-                  },
-                )]),
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Text("Begin " +
+                          (type == OpModeType.tele ? "Tele-Op" : "End Game") +
+                          " Phase"),
+                      IconButton(
+                        icon: Icon(Icons.play_arrow),
+                        tooltip: 'Driver Control Play',
+                        onPressed: () {
+                          _paused = false;
+                          _allowView = true;
+                        },
+                      )
+                    ]),
               ),
-            Material(child:Row(
-            mainAxisAlignment:MainAxisAlignment.spaceAround,
-            children:[
-              Text("View "+(type==OpModeType.tele?"Tele-Op":"End Game") +" Controls"),IconButton(
-                icon: Icon(Icons.visibility),
-                tooltip: 'View',
-                onPressed: () {
-                  _allowView = true;
-                },
-              )]),),
+              Material(
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Text("View " +
+                          (type == OpModeType.tele ? "Tele-Op" : "End Game") +
+                          " Controls"),
+                      IconButton(
+                        icon: Icon(Icons.visibility),
+                        tooltip: 'View',
+                        onPressed: () {
+                          _allowView = true;
+                        },
+                      )
+                    ]),
+              ),
             ],
     );
   }
